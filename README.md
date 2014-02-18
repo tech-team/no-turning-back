@@ -8,5 +8,7 @@ npm install grunt-cli -g
 ```
 
 Then you just need to run
-	npm install
+```
+npm install
+```
 in your project folder or run our deploy.sh file.
