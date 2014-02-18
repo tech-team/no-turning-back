@@ -1,0 +1,13 @@
+<fest:template xmlns:fest="http://fest.mail.ru"
+    context_name="json">
+    <div class="content-wrapper">
+	    <div class="content">
+	    	<form method='post'>
+	    		<input type="text" id="username" class="username-field" />
+	    		<input type="hidden" id="score" class="score-field" />
+	    	</form>
+
+		</div>
+		
+	</div>
+</fest:template>

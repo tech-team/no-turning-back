@@ -1,0 +1,25 @@
+{
+  "name": "frontend-game",
+  "version": "0.0.0",
+  "description": "frontend-game =============",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tech-team/frontend-game.git"
+  },
+  "author": "igorcoding, aleksel1992, abashinos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tech-team/frontend-game/issues"
+  },
+  "homepage": "https://github.com/tech-team/frontend-game",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-connect": "~0.6.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-fest": "~0.1.5"
+  }
+}

@@ -1,0 +1,12 @@
+<fest:template xmlns:fest="http://fest.mail.ru"
+    context_name="json">
+    <div class="content-wrapper">
+	    <div class="content game">
+    		<a href="#main" class="back-button">
+                <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
+                <span>Back</span>
+            </a>
+    		<canvas id="game-field"></canvas>
+		</div>
+	</div>
+</fest:template>
