@@ -3,7 +3,8 @@ define([
     'views/main',
     'views/scoreboard',
     'views/game'
-], function(Backbone, MainView, ScoreboardView, GameView) {
+], 
+function(Backbone, MainView, ScoreboardView, GameView) {
     var Router = Backbone.Router.extend({
         routes: {
             'scoreboard': 'scoreboardAction',
@@ -11,14 +12,13 @@ define([
             '*default': 'defaultActions'
         },
         defaultActions: function () {
-            var mainView = new MainView();
-            mainView.show();
+            MainView.show();
         },
         scoreboardAction: function () {
-            // TODO
+            ScoreboardView.show();
         },
         gameAction: function () {
-            // TODO
+            GameView.show();
         }
     });
 

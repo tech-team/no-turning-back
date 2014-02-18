@@ -1,11 +1,8 @@
 define([
     'backbone',
     'tmpl/main'
-], function(
-    Backbone,
-    tmpl
-){
-
+], 
+function(Backbone, tmpl) {
     var View = Backbone.View.extend({
 
         template: tmpl,

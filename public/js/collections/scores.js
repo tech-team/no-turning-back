@@ -1,9 +1,7 @@
 define([
     'backbone'
-], function(
-    Backbone
-){
-
+], 
+function(Backbone) {
     var Collection = Backbone.Collection.extend({
     });
 
