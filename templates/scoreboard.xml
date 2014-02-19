@@ -2,31 +2,47 @@
     context_name="json">
     <div class="content-wrapper">
 	    <div class="content">
-	    	<h1>Epic Game</h1>
-	    	<h2>Scoreboard</h2>
+	    	<h1 class="content__h1">Frontend Game</h1>
+	    	<h2 class="content__h2">Scoreboard</h2>
 	    	<div class="scores-wrapper">
 		    	<table class="scores">
-		    		<tr>
-		    			<th>#</th>
-		    			<th>Player</th>
-		    			<th>Score</th>
-		    		</tr>
-		    		<tr>
-		    			<td>1</td>
-		    			<td>Igor</td>
-		    			<td>754</td>
-		    		</tr>
-		    		<tr>
-		    			<td>2</td>
-		    			<td>Rome</td>
-		    			<td>421</td>
+		    		<tr class="scores__row">
+		    			<th class="scores__header">#</th>
+		    			<th class="scores__header">Player</th>
+		    			<th class="scores__header">Score</th>
 		    		</tr>
 
+		    		<fest:for iterate="json.scores" index="i">
+		    			<tr class="scores__row">
+		    				<td class="scores__col">
+					    		<fest:value>i+1</fest:value>
+					    	</td>
+					    	<td class="scores__col">
+					    		<fest:value>json.scores[i].name</fest:value>
+					    	</td>
+					    	<td class="scores__col">
+					    		<fest:value>json.scores[i].score</fest:value>
+					    	</td>
+						</tr>
+					</fest:for>
+<!--
+		    		
+		    		<tr class="scores__row">
+		    			<td class="scores__col">1</td>
+		    			<td class="scores__col">Igor</td>
+		    			<td class="scores__col">754</td>
+		    		</tr>
+		    		<tr class="scores__row">
+		    			<td class="scores__col">2</td>
+		    			<td class="scores__col">Rome</td>
+		    			<td class="scores__col">421</td>
+		    		</tr>
+-->
 		    	</table>
 	    	</div>
     		<a href="#main" class="back-button">
     			<div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
-    			<span>Back</span>
+    			<span class="back-button__caption">Back</span>
     		</a>
 		</div>
 		<footer class="page-footer">

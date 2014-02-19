@@ -6,6 +6,8 @@ function(Backbone, tmpl) {
     var View = Backbone.View.extend({
 
         template: tmpl,
+        el: '#page',
+
         initialize: function () {
             // TODO
         },
@@ -13,7 +15,7 @@ function(Backbone, tmpl) {
             // TODO
         },
         show: function () {
-            $('#page').html(this.template);
+            this.$el.html(this.template());
         },
         hide: function () {
             // TODO

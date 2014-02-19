@@ -2,8 +2,8 @@
     context_name="json">
     <div class="content-wrapper">
 	    <div class="content">
-	    	<h1>Epic Game</h1>
-	    	<h2>Main Menu</h2>
+	    	<h1 class="content__h1">Frontend Game</h1>
+	    	<h2 class="content__h2">Main Menu</h2>
 	    	<div class="mainmenu-wrapper">
 		    	<ul class="mainmenu">
 					<li class="mainmenu__item"><a href="#scoreboard">Scoreboard</a></li>
@@ -18,7 +18,7 @@
     			
     		</div>
     		<div class="github-wrapper">
-				<a href="http://github.com/igorcoding/" class="github" target="_blank">See us on GitHub</a>
+				<a href="https://github.com/tech-team/frontend-game" class="github" target="_blank">See us on GitHub</a>
 			</div>
     	</footer>
 		

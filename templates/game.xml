@@ -2,9 +2,9 @@
     context_name="json">
     <div class="content-wrapper">
 	    <div class="content game">
-    		<a href="#main" class="back-button">
+    		<a href="#main" class="back-button back-button_cornered">
                 <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
-                <span>Back</span>
+                <span class="back-button__caption">Back</span>
             </a>
     		<canvas id="game-field"></canvas>
 		</div>

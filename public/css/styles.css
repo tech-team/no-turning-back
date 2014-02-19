@@ -4,6 +4,12 @@ html, body {
 	background-color: #5C5C5C;
 }
 
+.page {
+	background-color: #5C5C5C;
+	width: 100%;
+	height: 100%;
+}
+
 /********** content **********/
 
 .content-wrapper {
@@ -25,7 +31,7 @@ html, body {
 	margin: 0 auto;
 }
 
-.content h1 {
+.content__h1 {
 	display: block;
 	margin: 20px 0 0 0;
 	padding: 5px 0;
@@ -35,7 +41,7 @@ html, body {
 }
 
 
-.content h2 {
+.content__h2 {
 	margin: 40px 0 0 0;
 	font-size: 35px;
 }
@@ -151,11 +157,11 @@ html, body {
     border-left-color: transparent;
 }
 
-.back-button span {
+.back-button__caption {
 	display: inline-block;
 }
 
-.in-game-button {
+.back-button_cornered {
 	position: absolute;
 }
 
@@ -171,27 +177,27 @@ html, body {
 	margin: 0 auto;
 }
 
-table.scores {
+.scores {
 	border-collapse: collapse;
 
 }
 
-table.scores th, td {
+.scores__header, .scores__col {
 	border: solid;
 	border-width: 1px 1px 1px 0;
 	border-color: #618597;
 }
 
-table.scores th:last-child, td:last-child {
+.scores__header:last-child, .scores__col:last-child {
 	border-right-width: 0;
 }
 
-table.scores th {
+.scores__header {
 	font-size: 20px;
 	background-color: #D4DCE0;
 }
 
-table.scores tr:hover {
+.scores__row:hover {
 	background-color: #F6F9FC;
 }
 
