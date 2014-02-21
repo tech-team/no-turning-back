@@ -1,14 +1,12 @@
 define([
     'backbone',
-    'tmpl/scores_row',
     'tmpl/scoreboard',
     'collections/scores'
 ], 
-function(Backbone, scoresRowTmpl, scoreboardTmpl, scoresCollection) {
+function(Backbone, scoreboardTmpl, scoresCollection) {
     var ScoreboardView = Backbone.View.extend({
 
         template: scoreboardTmpl,
-        scoresRowTemplate: scoresRowTmpl,
         el: '#page',
 
         initialize: function () {
