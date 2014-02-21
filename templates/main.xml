@@ -15,7 +15,9 @@
 
 		<footer class="page-footer">
     		<div class="social-buttons">
-    			
+    			<a href="https://vk.com/igorlatkin" class="page-footer__vk-button" target="_blank">VK</a>
+    			<a href="https://www.facebook.com" class="page-footer__fb-button" target="_blank">facebook</a>
+    			<a href="http://vk.com/james.hetfield" class="page-footer__dg-button" target="_blank">dogebook</a>
     		</div>
     		<div class="github-wrapper">
 				<a href="https://github.com/tech-team/frontend-game" class="github" target="_blank">See us on GitHub</a>
