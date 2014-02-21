@@ -64,34 +64,35 @@ html, body {
 	margin: 0 0 10px 10px;
 }
 
-.social-buttons > * {
+.social-button {
 	display: inline-block;
+	width: 70px;
+
+	font-size: 12px;
 	background-color: #5B6D8C;
 	color: #F5F5F5;
-	font-size: 12px;
-	width: 70px;
 
 	text-align: center;
 	text-decoration: none;
 }
 
-.page-footer__vk-button:hover {
+.page-footer__vk:hover {
 	background-color: #002366;
 }
 
-.page-footer__fb-button {
+.page-footer__fb {
 	margin-left: 10px;
 }
 
-.page-footer__fb-button:hover {
+.page-footer__fb:hover {
 	background-color: #3b5998;
 }
 
-.page-footer__dg-button {
+.page-footer__dg {
 	margin-left: 10px; 
 }
 
-.page-footer__dg-button:hover {
+.page-footer__dg:hover {
 	background-color: #8b9dc3;
 }
 
