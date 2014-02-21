@@ -61,7 +61,38 @@ html, body {
 .social-buttons {
 	display: inline-block;
 	float: left;
+	margin: 0 0 10px 10px;
+}
+
+.social-buttons > * {
+	display: inline-block;
+	background-color: #5B6D8C;
+	color: #F5F5F5;
+	font-size: 12px;
+	width: 70px;
+
+	text-align: center;
+	text-decoration: none;
+}
+
+.page-footer__vk-button:hover {
+	background-color: #002366;
+}
+
+.page-footer__fb-button {
 	margin-left: 10px;
+}
+
+.page-footer__fb-button:hover {
+	background-color: #3b5998;
+}
+
+.page-footer__dg-button {
+	margin-left: 10px; 
+}
+
+.page-footer__dg-button:hover {
+	background-color: #8b9dc3;
 }
 
 .github-wrapper {
