@@ -8,14 +8,14 @@ function(Backbone, tmpl, Game) {
 
         template: tmpl,
         el: '#page',
-        canvas: '#game-field',
+        canvas: 'game-field',
 
         initialize: function () {
             // TODO
         },
         render: function () {
             this.$el.html(this.template());
-            Game.run($(this.canvas));
+            Game.run(document.getElementById(this.canvas));
         },
         show: function () {
             
