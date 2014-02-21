@@ -3,7 +3,7 @@ define([
     'tmpl/game'
 ], 
 function(Backbone, tmpl) {
-    var View = Backbone.View.extend({
+    var GameView = Backbone.View.extend({
 
         template: tmpl,
         el: '#page',
@@ -12,10 +12,10 @@ function(Backbone, tmpl) {
             // TODO
         },
         render: function () {
-            // TODO
+            this.$el.html(this.template());
         },
         show: function () {
-            this.$el.html(this.template());
+            
         },
         hide: function () {
             // TODO
@@ -23,5 +23,5 @@ function(Backbone, tmpl) {
 
     });
 
-    return new View();
+    return new GameView();
 });

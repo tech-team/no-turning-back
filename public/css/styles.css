@@ -71,11 +71,12 @@ html, body {
 
 .github {
 	color: #3E69B4;
-	
+	text-decoration: none;
 }
 
 .github:hover {
 	color: #F7AF28;
+	text-decoration: underline;
 }
 
 

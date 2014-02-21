@@ -25,19 +25,6 @@
 					    	</td>
 						</tr>
 					</fest:for>
-<!--
-		    		
-		    		<tr class="scores__row">
-		    			<td class="scores__col">1</td>
-		    			<td class="scores__col">Igor</td>
-		    			<td class="scores__col">754</td>
-		    		</tr>
-		    		<tr class="scores__row">
-		    			<td class="scores__col">2</td>
-		    			<td class="scores__col">Rome</td>
-		    			<td class="scores__col">421</td>
-		    		</tr>
--->
 		    	</table>
 	    	</div>
     		<a href="#main" class="back-button">
@@ -50,7 +37,7 @@
     			
     		</div>
     		<div class="github-wrapper">
-				<a href="http://github.com/igorcoding/" class="github" target="_blank">See us on GitHub</a>
+				<a href="https://github.com/tech-team/frontend-game" class="github" target="_blank">See us on GitHub</a>
 			</div>
     	</footer>
 	</div>

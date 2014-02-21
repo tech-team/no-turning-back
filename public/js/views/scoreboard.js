@@ -1,22 +1,28 @@
 define([
     'backbone',
+    'tmpl/scores_row',
     'tmpl/scoreboard',
     'collections/scores'
 ], 
-function(Backbone, tmpl, ScoresCollection) {
-    var View = Backbone.View.extend({
+function(Backbone, scoresRowTmpl, scoreboardTmpl, scoresCollection) {
+    var ScoreboardView = Backbone.View.extend({
 
-        template: tmpl,
-        scores: ScoresCollection,
+        template: scoreboardTmpl,
+        scoresRowTemplate: scoresRowTmpl,
         el: '#page',
 
         initialize: function () {
             // TODO
         },
+
         render: function () {
-            console.log(this.scores.models);
-            this.$el.html(this.template({scores: this.scores.models}));
+            scoresCollection.sortByScore();
+            console.log(scoresCollection.models);
+            this.$el.html(this.template({scores: scoresCollection.toJSON()}));
+ 
+            return this;
         },
+
         show: function () {
             
         },
@@ -26,5 +32,5 @@ function(Backbone, tmpl, ScoresCollection) {
 
     });
 
-    return new View();
+    return new ScoreboardView();
 });
