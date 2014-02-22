@@ -2,8 +2,16 @@ define([
 
 ],
 function() {
-	var Player = {
-		score: 0
+	function Player() {
+		this.score = 0;
+	};
+
+	Player.prototype.update = function() {
+
+	};
+
+	Player.prototype.render = function() {
+
 	};
 
 	return Player;

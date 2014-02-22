@@ -16,7 +16,8 @@ function(Backbone, tmpl, Game) {
         },
         render: function () {
             this.$el.html(this.template());
-            Game.run($(this.scene), document.getElementById(this.canvas));
+            var game = new Game($(this.scene), document.getElementById(this.canvas));
+            game.run();
         },
         show: function () {
             
