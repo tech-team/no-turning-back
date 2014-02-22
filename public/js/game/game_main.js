@@ -1,6 +1,6 @@
 define([
 	'classy',
-    'game/ResourceManager'
+    'game/ResourceManager',
 	'game/models/player'
 ],
 function(Class, ResourceManager, Player) {
@@ -72,7 +72,7 @@ function(Class, ResourceManager, Player) {
             this.context.drawImage(
                 this.resourceManager.getSprite(ResourceManager.SpriteType.Wall), 10, 10);
         }
-    };
+    });
 
 	return Game;
 });
