@@ -22,7 +22,7 @@ function(Player) {
 		var self = this;
 		$(window).resize(function() {
 			var horizontalMargin = 50;
-			var verticalMargin = 10;
+			var verticalMargin = 20;
 			self.width = $(this).width() - 2 * horizontalMargin;
 			self.height = $(this).height() - 2 * verticalMargin;
 			var cssSizes = {
