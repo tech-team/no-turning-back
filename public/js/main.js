@@ -4,7 +4,8 @@ require.config({
     paths: {
         jquery: "lib/jquery",
         underscore: "lib/underscore",
-        backbone: "lib/backbone"
+        backbone: "lib/backbone",
+        classy: "lib/classy"
     },
     shim: {
         'backbone': {
@@ -13,6 +14,9 @@ require.config({
         },
         'underscore': {
             exports: '_'
+        },
+        'classy': {
+            exports: 'Class'
         }
     }
 });

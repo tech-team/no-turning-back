@@ -1,7 +1,8 @@
 define([
+	'classy',
 	'game/models/player'
 ],
-function(Player) {
+function(Class, Player) {
 	function Game(_scene, _canvas) {
 		this.FPS = 60;
 		this.scene = _scene;
@@ -39,6 +40,10 @@ function(Player) {
 	};
 
 	Game.prototype.run = function () {
+		var p = new Player();
+		console.log(p);
+
+		
 		var self = this;
 		setInterval(function() {
 			self.update();

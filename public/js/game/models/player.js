@@ -1,18 +1,20 @@
 define([
-
+	'classy'
 ],
-function() {
-	function Player() {
-		this.score = 0;
-	};
+function(Class) {
+	var Player = Class.$extend({
+		__init__ : function() {
+			this.score = 0;
+		},
 
-	Player.prototype.update = function() {
+		update: function() {
 
-	};
+		},
 
-	Player.prototype.render = function() {
+		render: function() {
 
-	};
+		}
+	});
 
 	return Player;
 });
