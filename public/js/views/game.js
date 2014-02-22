@@ -10,20 +10,21 @@ function(Backbone, tmpl, Game) {
         el: '#page',
         scene: '#scene',
         canvas: 'game-field',
+        game: null,
 
         initialize: function () {
-            // TODO
         },
         render: function () {
-            this.$el.html(this.template());
-            var game = new Game($(this.scene), document.getElementById(this.canvas));
-            game.run();
+            this.game = new Game($(this.scene), document.getElementById(this.canvas));
+            this.game.run();
+            return this;
         },
         show: function () {
+            this.$el.html(this.template());
             
         },
         hide: function () {
-            // TODO
+            
         }
 
     });
