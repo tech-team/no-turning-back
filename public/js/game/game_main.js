@@ -1,7 +1,7 @@
 define([
-	'game/models/player'
+	'game/ResourceManager', 'game/models/player'
 ],
-function(Player) {
+function(ResourceManager, Player) {
 	function Game(_scene, _canvas) {
 		this.FPS = 60;
 		this.scene = _scene;
@@ -10,8 +10,10 @@ function(Player) {
 		this.width = 0;
 		this.height = 0;
 
+        this.resourceManager = new ResourceManager();
+
 		this.calcDimensions();
-	};
+	}
 
 	Game.prototype.calcDimensions = function() {
 		if (this.scene === null) {
@@ -58,6 +60,9 @@ function(Player) {
                 this.context.clearRect(50 + i * 20, 50 + j * 20, 20, 20);
                 this.context.clearRect(50 + (i + 1) * 20, 50 + (j + 1) * 20, 20, 20);
             }
+
+        this.context.drawImage(
+            this.resourceManager.getSprite(ResourceManager.SpriteType.Wall), 10, 10);
 	};
 
 	return Game;
