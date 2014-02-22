@@ -4,16 +4,41 @@ define([
 function(Player) {
 	var Game = {
 		FPS: 60,
+		scene: null,
 		canvas: null,
 		context: null,
-		width: 300,
-		height: 300,
+		width: 0,
+		height: 0,
 
-		run: function (_canvas) {
+		calcDimensions: function() {
+			if (this.scene === null)
+				return;
+
+			var self = this;
+			$(window).resize(function() {
+				var horizontalMargin = 50;
+				var verticalMargin = 10;
+				self.width = $(this).width() - 2 * horizontalMargin;
+				self.height = $(this).height() - 2 * verticalMargin;
+				var cssSizes = {
+					'width': self.width + "px",
+					'height' : self.height + "px"
+				};
+				self.scene.css(cssSizes).css({'margin-top': verticalMargin});
+				self.scene.find('.game').css(cssSizes);
+				self.canvas.width = self.width;
+				self.canvas.height = self.height;
+			});
+			$(window).resize();
+
+		},
+
+		run: function (_scene, _canvas) {
+			this.scene = _scene;
 			this.canvas = _canvas;
-			this.canvas.width = this.width;
-			this.canvas.height = this.height;
 			this.context = _canvas.getContext("2d");
+
+			this.calcDimensions();
 			
 			var self = this;
 			setInterval(function() {

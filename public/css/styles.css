@@ -59,7 +59,6 @@ html, body {
 }
 
 .social-buttons {
-	display: inline-block;
 	float: left;
 	margin: 0 0 10px 10px;
 }
@@ -67,34 +66,33 @@ html, body {
 .social-button {
 	display: inline-block;
 	width: 70px;
+	height: 20px;
+	line-height: 20px;
+	vertical-align: middle;
+	margin-right: 10px;
+	padding: 2px 0;
 
 	font-size: 12px;
 	background-color: #5B6D8C;
-	color: #F5F5F5;
+	color: white;
 
 	text-align: center;
-	text-decoration: none;
 }
 
-.page-footer__vk:hover {
+.social-buton:last-child {
+	margin-right: 0;
+}
+
+.social-button a {
+	display: block;
+	text-decoration: none;
+	color: white;
+}
+
+.social-button:hover {
 	background-color: #002366;
 }
 
-.page-footer__fb {
-	margin-left: 10px;
-}
-
-.page-footer__fb:hover {
-	background-color: #3b5998;
-}
-
-.page-footer__dg {
-	margin-left: 10px; 
-}
-
-.page-footer__dg:hover {
-	background-color: #8b9dc3;
-}
 
 .github-wrapper {
 	display: inline-block;
@@ -235,12 +233,14 @@ html, body {
 }
 
 /********** game **********/
+.game-wrapper {
+	margin-top: 0;
+}
+
 .game {
-	width: 480px; /* 500px - 2*10px because of padding */
 	margin: 0;
+	padding: 0;
 }
 
 .game canvas {
-	width: 100%;
-	height: 100%;
 }

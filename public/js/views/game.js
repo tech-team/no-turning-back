@@ -8,6 +8,7 @@ function(Backbone, tmpl, Game) {
 
         template: tmpl,
         el: '#page',
+        scene: '#scene',
         canvas: 'game-field',
 
         initialize: function () {
@@ -15,7 +16,7 @@ function(Backbone, tmpl, Game) {
         },
         render: function () {
             this.$el.html(this.template());
-            Game.run(document.getElementById(this.canvas));
+            Game.run($(this.scene), document.getElementById(this.canvas));
         },
         show: function () {
             
