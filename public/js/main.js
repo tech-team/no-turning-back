@@ -13,6 +13,9 @@ require.config({
         },
         'underscore': {
             exports: '_'
+        },
+        'pulse': {
+            exports: 'pulse'
         }
     }
 });
