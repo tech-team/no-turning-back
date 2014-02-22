@@ -1,8 +1,9 @@
 define([
 	'classy',
+    'game/ResourceManager'
 	'game/models/player'
 ],
-function(Class, Player) {
+function(Class, ResourceManager, Player) {
 	var Game = Class.$extend({
 		__init__: function(_scene, _canvas) {
 			this.FPS = 60;
@@ -12,6 +13,8 @@ function(Class, Player) {
 			this.width = 0;
 			this.height = 0;
 
+            this.resourceManager = new ResourceManager();
+
 			this.calcDimensions();
 		},
 		
@@ -20,6 +23,7 @@ function(Class, Player) {
 				console.log("#scene is null");
 				return;
 			}
+
 
 			var self = this;
 			$(window).resize(function() {
@@ -56,17 +60,19 @@ function(Class, Player) {
 
 		},
 
-		render: function() {
-			this.context.fillRect(50, 50, 160, 160);
-	        
-	        for (i = 0; i < 8; i += 2)
-	            for (j = 0; j < 8; j += 2) {
-	                this.context.clearRect(50 + i * 20, 50 + j * 20, 20, 20);
-	                this.context.clearRect(50 + (i + 1) * 20, 50 + (j + 1) * 20, 20, 20);
-	            }
-		}
-		
-	});
+        render: function() {
+            this.context.fillRect(50, 50, 160, 160);
+
+            for (i = 0; i < 8; i += 2)
+                for (j = 0; j < 8; j += 2) {
+                    this.context.clearRect(50 + i * 20, 50 + j * 20, 20, 20);
+                    this.context.clearRect(50 + (i + 1) * 20, 50 + (j + 1) * 20, 20, 20);
+                }
+
+            this.context.drawImage(
+                this.resourceManager.getSprite(ResourceManager.SpriteType.Wall), 10, 10);
+        }
+    };
 
 	return Game;
 });
