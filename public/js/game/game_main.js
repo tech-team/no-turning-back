@@ -1,9 +1,10 @@
 define([
 	'classy',
     'game/ResourceManager',
-	'game/models/player'
+    'game/LevelManager',
+	'game/Player'
 ],
-function(Class, ResourceManager, Player) {
+function(Class, ResourceManager, LevelManager, Player) {
 	var Game = Class.$extend({
 		__init__: function(_scene, _canvas) {
 			this.FPS = 60;
@@ -13,6 +14,12 @@ function(Class, ResourceManager, Player) {
 			this.width = 0;
 			this.height = 0;
 
+            this.tileSize = 32;
+
+            this.levelId = 0;
+            this.level = null;
+
+            this.levelManager = new LevelManager();
             this.resourceManager = new ResourceManager();
 
 			this.calcDimensions();
@@ -48,6 +55,10 @@ function(Class, ResourceManager, Player) {
 			var p = new Player();
 			console.log(p);
 
+
+            this.levelId = 0;
+            this.level = this.levelManager.getLevel(this.levelId);
+            this.resourceManager.loadLevel(this.level);
 			
 			var self = this;
 			setInterval(function() {
@@ -61,17 +72,13 @@ function(Class, ResourceManager, Player) {
 		},
 
         render: function() {
-            this.context.fillRect(50, 50, 160, 160);
-
-            for (i = 0; i < 8; i += 2)
-                for (j = 0; j < 8; j += 2) {
-                    this.context.clearRect(50 + i * 20, 50 + j * 20, 20, 20);
-                    this.context.clearRect(50 + (i + 1) * 20, 50 + (j + 1) * 20, 20, 20);
-                }
-
-            this.context.drawImage(
-                this.resourceManager.getSprite(ResourceManager.SpriteType.Wall), 10, 10);
-        }
+            for (var i = 0; i < this.level.width; ++i)
+                for (var j = 0; j < this.level.height; ++j)
+                    this.context.drawImage(
+                        this.resourceManager.getSprite(this.level.cells[j][i]),
+                        i*this.tileSize,
+                        j*this.tileSize);
+}
     });
 
 	return Game;
