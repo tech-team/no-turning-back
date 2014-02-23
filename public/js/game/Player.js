@@ -10,12 +10,12 @@ function(Class, GameObject) {
             this.score = 0;
 		},
 
-        load: function(data) {
+        fromJSON: function(data) {
             this.$super(data);
         },
 
 		update: function() {
-			this.$super(data);
+			this.$super();
 		},
 
 		render: function(context) {

@@ -14,6 +14,9 @@ function(Class, ResourceManager, LevelManager, Player) {
 			this.width = 0;
 			this.height = 0;
 
+            this.horizontalMargin = 50;
+            this.verticalMargin = 20;
+
             this.tileSize = 32;
 
             this.keydown = [];
@@ -38,15 +41,13 @@ function(Class, ResourceManager, LevelManager, Player) {
 
 			var self = this;
 			$(window).resize(function() {
-				var horizontalMargin = 50;
-				var verticalMargin = 20;
-				self.width = $(this).width() - 2 * horizontalMargin;
-				self.height = $(this).height() - 2 * verticalMargin;
+				self.width = $(this).width() - 2 * self.horizontalMargin;
+				self.height = $(this).height() - 2 * self.verticalMargin;
 				var cssSizes = {
 					'width': self.width + "px",
 					'height' : self.height + "px"
 				};
-				self.scene.css(cssSizes).css({'margin-top': verticalMargin});
+				self.scene.css(cssSizes).css({'margin-top': self.verticalMargin});
 				self.scene.find('.game').css(cssSizes);
 				self.canvas.width = self.width;
 				self.canvas.height = self.height;
@@ -60,36 +61,63 @@ function(Class, ResourceManager, LevelManager, Player) {
             this.level = this.levelManager.getLevel(this.levelId);
             this.resourceManager.loadLevel(this.level);
 
-            this.player.load(this.level.player);
+            this.player.fromJSON(this.level.player);
 			
-			var self = this;
+			var game = this;
 			setInterval(function() {
-				self.update();
-				self.render();
+				game.update();
+                game.render();
 			}, 1000 / this.FPS);
 
             $(document).bind("keydown", function(event) {
-                self.keydown[String.fromCharCode(event.which).toLowerCase()] = true;
+                game.keydown[String.fromCharCode(event.which).toLowerCase()] = true;
             });
 
             $(document).bind("keyup", function(event) {
-                self.keydown[String.fromCharCode(event.which).toLowerCase()] = false;
+                game.keydown[String.fromCharCode(event.which).toLowerCase()] = false;
+            });
+
+            $(this.canvas).bind("mousemove", function(event) {
+                var pos = game.getCursorPos(event);
+
+                console.log(pos.x + " " + pos.y);
             });
 		},
 
+        getCursorPos: function(event) {
+            return {
+                x: event.pageX - this.horizontalMargin,
+                y: event.pageY - this.verticalMargin
+            }
+        },
+
+        isInWall: function(x, y) {
+            return this.level.cells[Math.floor(y/this.tileSize)][Math.floor(x/this.tileSize)]
+                == ResourceManager.TileType.Wall;
+        },
+
 		update: function() {
+            var x = this.player.x;
+            var y = this.player.y;
+
             if (this.keydown["a"])
-                this.player.x--;
+                x--;
 
             if (this.keydown["d"])
-                this.player.x++;
+                x++;
 
             if (this.keydown["w"])
-                this.player.y--;
+                y--;
 
             if (this.keydown["s"])
-                this.player.y++;
+                y++;
+
+            if (!this.isInWall(x + this.player.size/2, y + this.player.size/2)) {
+                this.player.x = x;
+                this.player.y = y;
+            }
 		},
+
         render: function() {
             for (var i = 0; i < this.level.width; ++i)
                 for (var j = 0; j < this.level.height; ++j)

@@ -8,11 +8,13 @@ function(Class) {
             this.y = 0;
             this.angle = 0;
 
+            this.size = 32;
+
             this.sprite = new Image();
             this.sprite.src = spriteUrl;
 		},
 
-        load: function(data) {
+        fromJSON: function(data) {
             this.x = data.x;
             this.y = data.y;
             this.angle = data.angle;

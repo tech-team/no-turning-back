@@ -3,7 +3,6 @@ require.config({
     baseUrl: "js",
     paths: {
         jquery: "lib/jquery",
-        jqueryHotKeys: "lib/jquery.hotkeys",
         underscore: "lib/underscore",
         backbone: "lib/backbone",
         classy: "lib/classy"
