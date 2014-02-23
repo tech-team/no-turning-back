@@ -21,7 +21,7 @@ html, body {
 	position: relative;
 
 	text-align: center;
-	font-family: Purisa;
+	font-family: 'macondoregular', cursive;
 }
 
 .content {
@@ -35,21 +35,21 @@ html, body {
 	display: block;
 	margin: 20px 0 0 0;
 	padding: 5px 0;
-	background-color: #5B6D8C;
+	background-color: #253858;
 	color: #F5F5F5;
-	font-size: 45px;
+	font-size: 50px;
 }
 
 
 .content__h2 {
 	margin: 40px 0 0 0;
-	font-size: 35px;
+	font-size: 45px;
 }
 
 .page-footer {
 	width: 100%;
 	position: absolute;
-	bottom: 0;
+	bottom: 10px;
 	right: 0;
 
 	font-size: 14px;
@@ -60,7 +60,7 @@ html, body {
 
 .social-buttons {
 	float: left;
-	margin: 0 0 10px 10px;
+	margin: 0 0 0 10px;
 }
 
 .social-button {
@@ -70,7 +70,7 @@ html, body {
 	line-height: 20px;
 	vertical-align: middle;
 	margin-right: 10px;
-	padding: 2px 0;
+	padding: 0;
 
 	font-size: 12px;
 	background-color: #5B6D8C;
@@ -96,6 +96,8 @@ html, body {
 
 .github-wrapper {
 	display: inline-block;
+	height: 20px;
+	line-height: 20px;
 	margin-right: 10px;
 }
 
@@ -128,10 +130,10 @@ html, body {
 	display: block;
 	height: 50px;
 	line-height: 50px;
-	margin-bottom: 10px;
+	margin-bottom: 15px;
 	vertical-align: middle;
 	text-decoration: none;
-	font-size: 20px;
+	font-size: 25px;
 	background-color: #CCCCCC;
 }
 
@@ -172,7 +174,6 @@ html, body {
 
 .left-arrow-wrapper {
 	display: inline-block;
-	vertical-align: middle;
 	margin-right: 3px;
 	margin-top: -3px;
 	margin-left: -6px;
@@ -201,6 +202,7 @@ html, body {
 
 /********** scoreboard **********/
 .scores-wrapper {
+	margin-top: 10px;
 	margin-bottom: 15px;
 	overflow: visible;
 }
@@ -212,7 +214,7 @@ html, body {
 
 .scores {
 	border-collapse: collapse;
-
+	font-size: 18px;
 }
 
 .scores__header, .scores__col {
@@ -222,11 +224,13 @@ html, body {
 }
 
 .scores__header:last-child, .scores__col:last-child {
+	width: 25%;
 	border-right-width: 0;
 }
 
 .scores__header {
 	font-size: 20px;
+	font-weight: bolder;
 	background-color: #D4DCE0;
 }
 
