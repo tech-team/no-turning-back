@@ -12,7 +12,12 @@ define([
             },
 
             update: function() {
-                this.x =
+                //TODO: change self position using speed and angle
+                //TODO: test for collisions after that (in the game_main)
+            },
+
+            render: function() {
+
             }
         });
 

@@ -19,7 +19,16 @@ function(Class, GameObject) {
 		},
 
 		render: function(context) {
+            context.save();
+
+            context.translate(this.x, this.y);
+            context.rotate(this.angle);
+            context.translate(-this.x, -this.y);
+
             this.$super(context);
+
+
+            context.restore();
 		}
 	});
 

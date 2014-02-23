@@ -6,8 +6,6 @@ function(Class) {
     var ResourceManager = Class.$extend({
         __init__: function() {
             this.tiles = [];
-            //this.tiles[this.SpriteType.Wall] = new Sprite("res/gfx/wall.png");
-
             this.sounds = [];
         },
 

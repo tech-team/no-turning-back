@@ -78,16 +78,17 @@ function(Class, ResourceManager, LevelManager, Player) {
             });
 
             $(this.canvas).bind("mousemove", function(event) {
-                var pos = game.getCursorPos(event);
+                var cursor = game.getCursorPos(event);
 
-                console.log(pos.x + " " + pos.y);
+                game.player.angle = Math.atan2(cursor.y - game.player.y,
+                    cursor.x - game.player.x);
             });
 		},
 
         getCursorPos: function(event) {
             return {
-                x: event.pageX - this.horizontalMargin,
-                y: event.pageY - this.verticalMargin
+                x: Math.ceil(event.pageX - $(event.target).offset().left),
+                y: Math.ceil(event.pageY - $(event.target).offset().top)
             }
         },
 
@@ -112,7 +113,7 @@ function(Class, ResourceManager, LevelManager, Player) {
             if (this.keydown["s"])
                 y++;
 
-            if (!this.isInWall(x + this.player.size/2, y + this.player.size/2)) {
+            if (!this.isInWall(x, y)) {
                 this.player.x = x;
                 this.player.y = y;
             }

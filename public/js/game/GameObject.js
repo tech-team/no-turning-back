@@ -25,7 +25,9 @@ function(Class) {
 		},
 
 		render: function(context) {
-            context.drawImage(this.sprite, this.x, this.y);
+            context.drawImage(this.sprite,
+                this.x - this.size/2,
+                this.y - this.size/2);
 		}
 	});
 
