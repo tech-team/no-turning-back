@@ -60,7 +60,7 @@ function(Class, ResourceManager, LevelManager, Player) {
             this.level = this.levelManager.getLevel(this.levelId);
             this.resourceManager.loadLevel(this.level);
 
-            this.player.load(this.level.player);
+            this.player.fromJSON(this.level.player);
 			
 			var self = this;
 			setInterval(function() {
@@ -77,19 +77,33 @@ function(Class, ResourceManager, LevelManager, Player) {
             });
 		},
 
+        isInWall: function(x, y) {
+            return this.level.cells[Math.floor(y/this.tileSize)][Math.floor(x/this.tileSize)]
+                == ResourceManager.TileType.Wall;
+        },
+
 		update: function() {
+            var x = this.player.x;
+            var y = this.player.y;
+
             if (this.keydown["a"])
-                this.player.x--;
+                x--;
 
             if (this.keydown["d"])
-                this.player.x++;
+                x++;
 
             if (this.keydown["w"])
-                this.player.y--;
+                y--;
 
             if (this.keydown["s"])
-                this.player.y++;
+                y++;
+
+            if (!this.isInWall(x + this.player.size/2, y + this.player.size/2)) {
+                this.player.x = x;
+                this.player.y = y;
+            }
 		},
+
         render: function() {
             for (var i = 0; i < this.level.width; ++i)
                 for (var j = 0; j < this.level.height; ++j)
