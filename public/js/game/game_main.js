@@ -56,10 +56,6 @@ function(Class, ResourceManager, LevelManager, Player) {
 		},
 
 		run: function () {
-			var p = new Player();
-			console.log(p);
-
-
             this.levelId = 0;
             this.level = this.levelManager.getLevel(this.levelId);
             this.resourceManager.loadLevel(this.level);
@@ -94,7 +90,6 @@ function(Class, ResourceManager, LevelManager, Player) {
             if (this.keydown["s"])
                 this.player.y++;
 		},
-
         render: function() {
             for (var i = 0; i < this.level.width; ++i)
                 for (var j = 0; j < this.level.height; ++j)

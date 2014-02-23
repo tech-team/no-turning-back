@@ -1,31 +1,25 @@
 define([
-	'classy'
+	'classy',
+	'game/GameObject'
 ],
-function(Class) {
-	var Player = Class.$extend({
+function(Class, GameObject) {
+	var Player = GameObject.$extend({
 		__init__ : function() {
-            this.x = 0;
-            this.y = 0;
-            this.angle = 0;
+            this.$super("res/gfx/objects/player.png");
 
-			this.score = 0;
-
-            this.sprite = new Image();
-            this.sprite.src = "res/gfx/objects/player.png";
+            this.score = 0;
 		},
 
         load: function(data) {
-            this.x = data.x;
-            this.y = data.y;
-            this.angle = data.angle;
+            this.$super(data);
         },
 
 		update: function() {
-
+			this.$super(data);
 		},
 
 		render: function(context) {
-            context.drawImage(this.sprite, this.x, this.y);
+            this.$super(context);
 		}
 	});
 
