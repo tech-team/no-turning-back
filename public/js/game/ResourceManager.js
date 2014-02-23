@@ -5,32 +5,32 @@ function(Class) {
 
     var ResourceManager = Class.$extend({
         __init__: function() {
-            this.sprites = [];
-            //this.sprites[this.SpriteType.Wall] = new Sprite("res/gfx/wall.png");
+            this.tiles = [];
+            //this.tiles[this.SpriteType.Wall] = new Sprite("res/gfx/wall.png");
 
             this.sounds = [];
         },
 
         __classvars__: {
-            SpriteType : {
+            TileType : {
                 Floor: 0,
                 Wall: 1
             }
         },
 
         loadLevel: function(level) {
-            this.sprites = [];
+            this.tiles = [];
 
             for (var i = 0; i < level.textures.length; ++i) {
-                this.sprites[i] = new Image();
-                this.sprites[i].src = level.textures[i];
+                this.tiles[i] = new Image();
+                this.tiles[i].src = level.textures[i];
             }
 
             this.sounds = [];
         },
 
         getSprite: function(id) {
-            return this.sprites[id];
+            return this.tiles[id];
         },
 
         getSound: function(id) {
