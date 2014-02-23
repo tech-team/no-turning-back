@@ -83,8 +83,9 @@ function(Class, ResourceManager, LevelManager, Player) {
                         i*this.tileSize,
                         j*this.tileSize);
 
+
             this.player.render(this.context);
-}
+        }
     });
 
 	return Game;
