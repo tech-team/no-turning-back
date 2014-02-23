@@ -16,6 +16,8 @@ function(Class, ResourceManager, LevelManager, Player) {
 
             this.tileSize = 32;
 
+            this.keydown = [];
+
             this.levelId = 0;
             this.level = null;
 
@@ -69,10 +71,28 @@ function(Class, ResourceManager, LevelManager, Player) {
 				self.update();
 				self.render();
 			}, 1000 / this.FPS);
+
+            $(document).bind("keydown", function(event) {
+                self.keydown[String.fromCharCode(event.which).toLowerCase()] = true;
+            });
+
+            $(document).bind("keyup", function(event) {
+                self.keydown[String.fromCharCode(event.which).toLowerCase()] = false;
+            });
 		},
 
 		update: function() {
+            if (this.keydown["a"])
+                this.player.x--;
 
+            if (this.keydown["d"])
+                this.player.x++;
+
+            if (this.keydown["w"])
+                this.player.y--;
+
+            if (this.keydown["s"])
+                this.player.y++;
 		},
 
         render: function() {
