@@ -8,6 +8,12 @@ define([
 
             },
 
+            __classvars__: {
+                ObjectType: {
+                    Chest: 0
+                }
+            },
+
             getLevel: function(id) {
                 //TODO: should load from server via AJAX
 
@@ -33,8 +39,16 @@ define([
                         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                     ],
 
+                    player: {
+                        x: 100, y: 100, angle: 30
+                    },
+
+                    enemies: {
+
+                    },
+
                     objects: [
-                        {id: 1, x: 10, y: 20, angle: 30}
+
                     ],
 
                     wayPoints: [

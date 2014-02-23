@@ -22,6 +22,8 @@ function(Class, ResourceManager, LevelManager, Player) {
             this.levelManager = new LevelManager();
             this.resourceManager = new ResourceManager();
 
+            this.player = new Player();
+
 			this.calcDimensions();
 		},
 		
@@ -59,6 +61,8 @@ function(Class, ResourceManager, LevelManager, Player) {
             this.levelId = 0;
             this.level = this.levelManager.getLevel(this.levelId);
             this.resourceManager.loadLevel(this.level);
+
+            this.player.load(this.level.player);
 			
 			var self = this;
 			setInterval(function() {
@@ -78,6 +82,8 @@ function(Class, ResourceManager, LevelManager, Player) {
                         this.resourceManager.getSprite(this.level.cells[j][i]),
                         i*this.tileSize,
                         j*this.tileSize);
+
+            this.player.render(this.context);
 }
     });
 

@@ -14,6 +14,12 @@ function(Class) {
             this.sprite.src = "res/gfx/objects/player.png";
 		},
 
+        load: function(data) {
+            this.x = data.x;
+            this.y = data.y;
+            this.angle = data.angle;
+        },
+
 		update: function() {
 
 		},
