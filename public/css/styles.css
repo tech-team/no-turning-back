@@ -2,6 +2,14 @@ html, body {
 	margin: 0;
 	padding: 0;
 	background-color: #5C5C5C;
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
 }
 
 .page {
@@ -165,6 +173,8 @@ html, body {
 	color: black;
 	font-size: 20px;
 	background-color: #CCCCCC;
+
+
 }
 
 .back-button:hover {
