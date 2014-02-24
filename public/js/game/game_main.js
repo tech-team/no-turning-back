@@ -102,16 +102,20 @@ function(Class, ResourceManager, LevelManager, Player) {
             var y = this.player.y;
 
             if (this.keydown["a"])
-                x--;
+                this.player.angle-=0.1;
 
             if (this.keydown["d"])
-                x++;
+                this.player.angle+=0.1;
 
-            if (this.keydown["w"])
-                y--;
+            if (this.keydown["w"]) {
+                y += Math.sin(this.player.angle);
+				x += Math.cos(this.player.angle);
+			}
 
-            if (this.keydown["s"])
-                y++;
+            if (this.keydown["s"]) {
+                y -= Math.sin(this.player.angle);
+				x -= Math.cos(this.player.angle);
+            }
 
             if (!this.isInWall(x, y)) {
                 this.player.x = x;
