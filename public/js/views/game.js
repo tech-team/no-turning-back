@@ -1,7 +1,7 @@
 define([
     'backbone',
     'tmpl/game',
-    'game/game_main'
+    'game/Game'
 ], 
 function(Backbone, tmpl, Game) {
     var GameView = Backbone.View.extend({
