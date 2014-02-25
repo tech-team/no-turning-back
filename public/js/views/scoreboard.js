@@ -15,7 +15,7 @@ function(Backbone, scoreboardTmpl, scoresCollection) {
 
         render: function () {
             scoresCollection.sortByScore();
-            console.log(scoresCollection.models);
+            //console.log(scoresCollection.models);
             this.$el.html(this.template({scores: scoresCollection.toJSON()}));
  
             return this;
