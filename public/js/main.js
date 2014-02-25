@@ -5,7 +5,11 @@ require.config({
         jquery: "lib/jquery",
         underscore: "lib/underscore",
         backbone: "lib/backbone",
-        classy: "lib/classy"
+        classy: "lib/classy",
+        easel: "lib/game/easeljs",
+        preload: "lib/game/preloadjs",
+        sound: "lib/game/soundjs",
+        tween: "lib/game/tweenjs",
     },
     shim: {
         'backbone': {
@@ -17,6 +21,18 @@ require.config({
         },
         'classy': {
             exports: 'Class'
+        },
+        'easel': {
+            exports: 'createjs'
+        },
+        'preload': {
+            exports: 'createjs'
+        },
+        'sound': {
+            exports: 'createjs'
+        },
+        'tween': {
+            exports: 'createjs'
         }
     }
 });
