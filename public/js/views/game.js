@@ -8,22 +8,54 @@ function(Backbone, tmpl, Game) {
 
         template: tmpl,
         el: '#page',
-        scene: '#scene',
-        canvas: 'game-field',
+        canvas: null,
+        scene: null,
         game: null,
 
         initialize: function () {
+
         },
+        calcDimensions: function() {
+            if (this.scene === null) {
+                console.log("#scene is null");
+                return;
+            }
+
+            var horizontalMargin = 50;
+            var verticalMargin = 10;
+            var self = this;
+            $(window).resize(function() {
+                var width = $(this).width() - 2 * horizontalMargin;
+                var height = $(this).height() - 2 * verticalMargin;
+                var cssSizes = {
+                    'width': width + "px",
+                    'height' : height + "px"
+                };
+                self.scene.css(cssSizes).css({'margin-top': verticalMargin});
+                self.canvas.width = width;
+                self.canvas.height = height;
+            });
+            $(window).resize();
+
+        },
+
+        runGame: function() {
+            this.game = new Game(this.canvas);
+            this.game.run();
+        },
+
         render: function () {
-            //this.game = new Game($(this.scene), document.getElementById(this.canvas));
-            //this.game.run();
-            Game.x = 1005;
-            console.log(Game.x);
+            this.$el.html(this.template());
+            this.canvas = document.getElementById('game-field');
+            this.scene = $('#scene');
+            this.calcDimensions();
+
+            this.runGame();
             return this;
         },
         show: function () {
-            this.$el.html(this.template());
             
+            this.render();
         },
         hide: function () {
             

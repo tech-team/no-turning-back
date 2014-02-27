@@ -1,12 +1,10 @@
 <fest:template xmlns:fest="http://fest.mail.ru"
     context_name="json">
     <div id="scene" class="content-wrapper game-wrapper">
-        <div class="content game">
             <a href="#main" class="back-button back-button_cornered">
                 <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
                 <span class="back-button__caption">Back</span>
             </a>
             <canvas id="game-field">You have a very old browser, dude.</canvas>
-        </div>
     </div>
 </fest:template>
