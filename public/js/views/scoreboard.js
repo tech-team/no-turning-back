@@ -22,7 +22,7 @@ function(Backbone, scoreboardTmpl, scoresCollection) {
         },
 
         show: function () {
-            
+            this.render();
         },
         hide: function () {
             // TODO

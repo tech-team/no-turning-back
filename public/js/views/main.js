@@ -13,9 +13,10 @@ function(Backbone, tmpl) {
         },
         render: function () {
             this.$el.html(this.template());
+            return this;
         },
         show: function () {
-            
+            this.render();
         },
         hide: function () {
             // TODO
