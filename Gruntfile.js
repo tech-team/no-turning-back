@@ -1,4 +1,6 @@
 var liveReload = true;
+var cssFiles = ['public/css/macondoregular/macondo-font.css',
+				'public/css/styles.css']
 
 module.exports = function (grunt) {
 	grunt.initConfig({
@@ -30,6 +32,15 @@ module.exports = function (grunt) {
 				}
 			}
 		},
+		concat: {
+			options: {
+		    	separator: '\n',
+		    },
+		    css: {
+		    	src: cssFiles,
+		    	dest: 'public/css/common.css',
+		    }
+		},
 		watch: {
 			fest: {
 			    files: ['templates/*.xml'],
@@ -48,8 +59,8 @@ module.exports = function (grunt) {
                 }
             },
             css: {
-                files: 'public/css/**/*.css',
-                tasks: [],
+                files: cssFiles,
+                tasks: ['concat:css'],
                 options: {
                     atBegin: true,
 			        livereload: liveReload
@@ -59,6 +70,7 @@ module.exports = function (grunt) {
 	});
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-fest');
+	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.registerTask('default', ['connect', 'watch']);
 }

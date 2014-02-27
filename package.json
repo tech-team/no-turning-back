@@ -20,6 +20,7 @@
     "grunt": "~0.4.2",
     "grunt-contrib-connect": "~0.6.0",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-fest": "~0.1.5"
+    "grunt-fest": "~0.1.5",
+    "grunt-contrib-concat": "~0.3.0"
   }
 }
