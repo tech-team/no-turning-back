@@ -3,7 +3,7 @@ define([
 ],
 function(Class) {
 	var Level = Class.$extend({
-		__init__: function() {
+		__init__: function(levelInfo, resourceManager) {
 
 		},
 

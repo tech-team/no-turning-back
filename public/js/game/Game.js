@@ -1,17 +1,25 @@
 define([
 	'classy',
 	'easel',
-	'game/LevelManager'
+	'game/LevelManager',
+	'game/Level',
+	'game/Player'
 ],
-function(Class, createjs, LevelManager) {
+function(Class, createjs, LevelManager, Level, Player) {
 	var Game = Class.$extend({
 		__init__: function(canvas) {
 			this.FPS = 60;
 			this.canvas = canvas;
+			this.WIDTH = canvas.width;
+			this.HEIGHT = canvas.height;
 			this.stage = new createjs.Stage(this.canvas);
 			this.ticker = createjs.Ticker;
-			this.LevelManager = new LevelManager();
+			this.levelManager = new LevelManager();
+			this.startLevelId = 0;
 			this.level = null;
+			this.player = new Player();
+			this.resourceManager = new ResourceManager();
+			
 		},
 
 		run: function() {
@@ -22,20 +30,13 @@ function(Class, createjs, LevelManager) {
 				self.update(event);
 			});
 			
-			this.test();
+			this.level = new Level(this.levelManager.getLevel(this.startLevelId),
+								   this.resourceManager);
 		},
 
-		circle: null,
-        output: null,
-
 		update: function(event) {
-			this.circle.x += event.delta / 1000 * 300;
-
-            if (this.circle.x + 50 > this.stage.canvas.width) {
-                this.circle.x = 50;
-            }
-
-            this.output.text = "FPS = " + Math.round(createjs.Ticker.getMeasuredFPS());
+			this.level.update(event);
+			this.player.update(event);
 
             this.stage.update(event);
 		},
