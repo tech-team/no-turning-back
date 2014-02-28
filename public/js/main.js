@@ -26,13 +26,15 @@ require.config({
             exports: 'createjs'
         },
         'preload': {
-            exports: 'createjs'
+            deps: ['easel'],
+            exports: 'preloadjs'
         },
         'sound': {
-            exports: 'createjs'
+            exports: 'soundjs'
         },
         'tween': {
-            exports: 'createjs'
+            deps: ['easel'],
+            exports: 'tweenjs'
         }
     }
 });

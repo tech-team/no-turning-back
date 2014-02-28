@@ -1,15 +1,17 @@
 define([
 	'classy',
-	'easel'
+	'easel',
+	'game/LevelManager'
 ],
-function(Class, createjs) {
+function(Class, createjs, LevelManager) {
 	var Game = Class.$extend({
 		__init__: function(canvas) {
 			this.FPS = 60;
 			this.canvas = canvas;
 			this.stage = new createjs.Stage(this.canvas);
 			this.ticker = createjs.Ticker;
-			//this.level = new Level();
+			this.LevelManager = new LevelManager();
+			this.level = null;
 		},
 
 		run: function() {
@@ -27,7 +29,6 @@ function(Class, createjs) {
         output: null,
 
 		update: function(event) {
-
 			this.circle.x += event.delta / 1000 * 300;
 
             if (this.circle.x + 50 > this.stage.canvas.width) {

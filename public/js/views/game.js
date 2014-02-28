@@ -15,6 +15,24 @@ function(Backbone, tmpl, Game) {
         initialize: function () {
 
         },
+
+        render: function () {
+            this.$el.html(this.template());
+            this.canvas = document.getElementById('game-field');
+            this.scene = $('#scene');
+            this.calcDimensions();
+
+            this.runGame();
+            return this;
+        },
+        show: function () {
+            this.render();
+        },
+        
+        hide: function () {
+            
+        },
+
         calcDimensions: function() {
             if (this.scene === null) {
                 console.log("#scene is null");
@@ -42,23 +60,6 @@ function(Backbone, tmpl, Game) {
         runGame: function() {
             this.game = new Game(this.canvas);
             this.game.run();
-        },
-
-        render: function () {
-            this.$el.html(this.template());
-            this.canvas = document.getElementById('game-field');
-            this.scene = $('#scene');
-            this.calcDimensions();
-
-            this.runGame();
-            return this;
-        },
-        show: function () {
-            
-            this.render();
-        },
-        hide: function () {
-            
         }
 
     });
