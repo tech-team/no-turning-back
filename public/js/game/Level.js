@@ -6,12 +6,10 @@ define([
 function(Class, _, easeljs) {
 	var Level = Class.$extend({
 		__init__: function(stage, levelData, resourceManager) {
-			
+
             _.each(levelData.walls, function(wall) {
-                var sprite = new easeljs.Bitmap(resourceManager.getTexture(wall.tex));
-                sprite.x = 100;
-                sprite.y = 200;
-                
+                var spriteSheet = resourceManager.getTexture(wall.tex);
+                var sprite = new easeljs.Sprite(spriteSheet);
                 stage.addChild(sprite);
             });
 		},

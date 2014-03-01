@@ -29,7 +29,16 @@ function(Class, _, createjs, preloadjs) {
 
             function handleComplete() {
                 _.each(manifest, function(tex) {
-                    self.textures[tex.id] = queue.getResult(tex.id);
+                    var data = {
+                        images: [queue.getResult(tex.id)],
+                        frames: {
+                            width: 32,
+                            height: 32
+                        }
+                    };
+
+                    self.textures[tex.id] = new createjs.SpriteSheet(data);
+
                 });
                 onComplete.call(onCompleteContext);
             }
