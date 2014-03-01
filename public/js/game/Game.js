@@ -11,6 +11,7 @@ function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
 		__init__: function(canvas) {
 			this.FPS = 60;
 			this.canvas = canvas;
+            this.state = Game.GameState.Loading;
 			this.WIDTH = canvas.width;
 			this.HEIGHT = canvas.height;
 			this.stage = new createjs.Stage(this.canvas);
@@ -19,8 +20,24 @@ function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
 			this.startLevelId = 0;
 			this.level = null;
 			this.player = new Player();
-			this.resourceManager = new ResourceManager(this.run, this);
+			this.resourceManager = new ResourceManager(this.onResourcesLoaded, this);
 		},
+
+        __classvars__: {
+          GameState: {
+              Loading: 0,
+              Game: 1,
+              GameOver: 2
+          }
+        },
+
+        onResourcesLoaded: function() {
+            this.state = Game.GameState.Game;
+            console.log("onResourcesLoaded");
+
+            this.level = new Level(this.stage, this.levelManager.loadLevel(this.startLevelId),
+                this.resourceManager);
+        },
 
 		run: function() {
 			var self = this;
@@ -29,16 +46,15 @@ function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
 			this.ticker.on("tick", function(event) {
 				self.update(event);
 			});
-			
-			this.level = new Level(this.levelManager.loadLevel(this.startLevelId),
-								   this.resourceManager);
 		},
 
 		update: function(event) {
-			this.level.update(event);
-			this.player.update(event);
+            if (this.state == Game.GameState.Game) {
+                this.level.update(event);
+                this.player.update(event);
 
-            this.stage.update(event);
+                this.stage.update(event);
+            }
 		},
 
 		test: function() {
