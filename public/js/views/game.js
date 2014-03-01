@@ -59,7 +59,6 @@ function(Backbone, tmpl, Game) {
 
         runGame: function() {
             this.game = new Game(this.canvas);
-            this.game.run();
         }
 
     });

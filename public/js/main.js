@@ -26,8 +26,7 @@ require.config({
             exports: 'createjs'
         },
         'preload': {
-            deps: ['easel'],
-            exports: 'preloadjs'
+            exports: 'createjs'
         },
         'sound': {
             exports: 'soundjs'

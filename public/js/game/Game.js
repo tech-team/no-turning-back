@@ -19,8 +19,7 @@ function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
 			this.startLevelId = 0;
 			this.level = null;
 			this.player = new Player();
-			this.resourceManager = new ResourceManager();
-			
+			this.resourceManager = new ResourceManager(this.run, this);
 		},
 
 		run: function() {
@@ -31,7 +30,7 @@ function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
 				self.update(event);
 			});
 			
-			this.level = new Level(this.levelManager.getLevel(this.startLevelId),
+			this.level = new Level(this.levelManager.loadLevel(this.startLevelId),
 								   this.resourceManager);
 		},
 
@@ -52,7 +51,6 @@ function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
             this.output.x = 100;
             this.output.y = 15;
 			this.stage.addChild(this.circle);
-
 		}
 	});
 
