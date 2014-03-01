@@ -3,9 +3,10 @@ define([
 	'easel',
 	'game/LevelManager',
 	'game/Level',
-	'game/Player'
+	'game/Player',
+	'game/ResourceManager'
 ],
-function(Class, createjs, LevelManager, Level, Player) {
+function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
 	var Game = Class.$extend({
 		__init__: function(canvas) {
 			this.FPS = 60;
