@@ -1,9 +1,10 @@
 define([
 	'classy',
     'underscore',
+    'easel',
     'preload'
 ],
-function(Class, _, preload) {
+function(Class, _, createjs, preloadjs) {
 	var ResourceManager = Class.$extend({
 		__init__: function(onComplete, onCompleteContext) {
             this.textures = [];
@@ -11,7 +12,7 @@ function(Class, _, preload) {
 
             var self = this;
 
-            var queue = new preload.LoadQueue();
+            var queue = new preloadjs.LoadQueue();
             queue.on("complete", handleComplete, this);
 
             var manifest = [
@@ -28,13 +29,8 @@ function(Class, _, preload) {
 
             function handleComplete() {
                 _.each(manifest, function(tex) {
-                    var data = {
-                        images: [queue.getResult(tex.id)]
-                    };
-
-                    self.textures[tex.id] = new createjs.SpriteSheet(data);
+                    self.textures[tex.id] = queue.getResult(tex.id);
                 });
-
                 onComplete.call(onCompleteContext);
             }
 		},

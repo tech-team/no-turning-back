@@ -32,11 +32,13 @@ function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
         },
 
         onResourcesLoaded: function() {
+        	console.log("Resources loaded");
             this.state = Game.GameState.Game;
-            console.log("onResourcesLoaded");
 
-            this.level = new Level(this.stage, this.levelManager.loadLevel(this.startLevelId),
-                this.resourceManager);
+
+            var levelData = this.levelManager.loadLevel(this.startLevelId);
+            console.log(levelData);
+            this.level = new Level(this.stage, levelData, this.resourceManager);
         },
 
 		run: function() {
