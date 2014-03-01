@@ -4,9 +4,10 @@ define([
 	'game/LevelManager',
 	'game/Level',
 	'game/Player',
-	'game/ResourceManager'
+	'game/ResourceManager',
+	'game/SpriteTiler'
 ],
-function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
+function(Class, createjs, LevelManager, Level, Player, ResourceManager, SpriteTiler) {
 	var Game = Class.$extend({
 		__init__: function(canvas) {
 			this.FPS = 60;
@@ -48,6 +49,13 @@ function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
 			this.ticker.on("tick", function(event) {
 				self.update(event);
 			});
+
+			var img = new Image();
+			img.onload = function() {
+				console.log(SpriteTiler(img, 10, 10));
+			}
+			img.src = "res/gfx/wall.png";
+			
 		},
 
 		update: function(event) {
