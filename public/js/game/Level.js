@@ -13,9 +13,9 @@ function(Class, _, easeljs) {
             var self = this;
 
             //add background
-            //TODO: repeat texture to fill entire (levelData.width, levelData.height)
-            var background = new easeljs.Sprite(resourceManager.getTexture(levelData.tex));
-            stage.addChild(background);
+            var backgroundSh = resourceManager.getTiledSpriteSheet(levelData.tex, levelData.width, levelData.height);
+            var backgroundSprite = new easeljs.Sprite(backgroundSh);
+            stage.addChild(backgroundSprite);
 
             //add walls
             _.each(levelData.walls, function(wall) {
@@ -34,14 +34,20 @@ function(Class, _, easeljs) {
             player.setDispObj(this.addToStage(levelData.player));
 		},
 
-        addToStage: function(levelObj) {
-            var spriteSheet = this.resourceManager.getTexture(levelObj.tex);
+        resizeTexture: function(tex, desiredWidth, desiredHeight) {
+
+        },
+
+        addToStage: function(objData) {
+            var spriteSheet =
+                this.resourceManager.getTiledSpriteSheet(objData.tex, objData.width || 32, objData.height || 32);
+
             var sprite = new easeljs.Sprite(spriteSheet);
             var dispObj =  this.stage.addChild(sprite);
 
-            dispObj.x = levelObj.x || 0;
-            dispObj.y = levelObj.y || 0;
-            dispObj.angle = levelObj.angle || 0;
+            dispObj.x = objData.x || 0;
+            dispObj.y = objData.y || 0;
+            dispObj.angle = objData.angle || 0;
 
             return dispObj;
         },

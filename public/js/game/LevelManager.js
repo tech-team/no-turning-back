@@ -22,8 +22,8 @@ function(Class) {
         },
 
 		dummyLevel: {
-            width: 800,
-            height: 600,
+            width: 1280,
+            height: 768,
             tex: "ground",
 
             name: "Dummy level",

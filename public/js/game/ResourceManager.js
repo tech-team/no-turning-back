@@ -2,12 +2,14 @@ define([
 	'classy',
     'underscore',
     'easel',
-    'preload'
+    'preload',
+    'game/ImageTiler'
 ],
-function(Class, _, createjs, preloadjs) {
+function(Class, _, createjs, preloadjs, ImageTiler) {
 	var ResourceManager = Class.$extend({
 		__init__: function(onComplete, onCompleteContext) {
-            this.textures = [];
+            this.images = [];
+            this.spriteSheets = [];
             this.sounds = [];
 
             var self = this;
@@ -16,36 +18,66 @@ function(Class, _, createjs, preloadjs) {
             queue.on("complete", handleComplete, this);
 
             var manifest = [
-                {id: "ground",  src:"ground.png", w: 32, h: 32},
-                {id: "zombie",  src:"zombie.png", w: 32, h: 32},
-                {id: "player",  src:"player.png", w: 32, h: 32},
-                {id: "wall",    src:"wall.png", w: 32, h: 32},
-                {id: "chest",   src:"chest.png", w: 32, h: 32},
-                {id: "door",    src:"door.png", w: 32, h: 32},
-                {id: "rubbish", src:"rubbish.png", w: 32, h: 32},
+                {id: "ground",  src:"ground.png"},
+                {id: "zombie",  src:"zombie.png"},
+                {id: "player",  src:"player.png"},
+                {id: "wall",    src:"wall.png"},
+                {id: "chest",   src:"chest.png"},
+                {id: "door",    src:"door.png"},
+                {id: "rubbish", src:"rubbish.png"},
             ];
 
             queue.loadManifest(manifest, true, "res/gfx/");
 
             function handleComplete() {
                 _.each(manifest, function(tex) {
-                    var data = {
-                        images: [queue.getResult(tex.id)],
-                        frames: {
-                            width: tex.w,
-                            height: tex.h
-                        }
-                    };
-
-                    self.textures[tex.id] = new createjs.SpriteSheet(data);
-
+                    self.images[tex.id] = queue.getResult(tex.id);
                 });
                 onComplete.call(onCompleteContext);
             }
 		},
 
-        getTexture: function(name) {
-            return this.textures[name];
+        getSpriteSheet: function(tex) {
+            var spriteSheet = this.spriteSheets[tex];
+
+            if (!spriteSheet) { //if not cached
+                var image = this.images[tex];
+
+                var data = {
+                    images: [image],
+                    frames: {
+                        width: image.width,
+                        height: image.height
+                    }
+                };
+
+                this.spriteSheets[tex] = spriteSheet = new createjs.SpriteSheet(data);
+            }
+
+            return spriteSheet;
+        },
+
+        getTiledSpriteSheet: function(tex, desiredWidth, desiredHeight) {
+            var image = this.images[tex];
+
+            if (image.width != desiredWidth || image.height != desiredHeight) {
+                var tiledImage =
+                    ImageTiler(image,
+                        desiredWidth/image.width,
+                        desiredHeight/image.height);
+
+                var data = {
+                    images: [tiledImage],
+                    frames: {
+                        width: desiredWidth,
+                        height: desiredHeight
+                    }
+                };
+
+                return new createjs.SpriteSheet(data);
+            }
+            else
+                return this.getSpriteSheet(tex);
         }
 	});
 
