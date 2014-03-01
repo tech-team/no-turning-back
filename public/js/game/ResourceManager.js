@@ -16,13 +16,13 @@ function(Class, _, createjs, preloadjs) {
             queue.on("complete", handleComplete, this);
 
             var manifest = [
-                {id: "ground",  src:"ground.png"},
-                {id: "zombie",  src:"zombie.png"},
-                {id: "player",  src:"player.png"},
-                {id: "wall",    src:"wall.png"},
-                {id: "chest",   src:"chest.png"},
-                {id: "door",    src:"door.png"},
-                {id: "rubbish", src:"rubbish.png"},
+                {id: "ground",  src:"ground.png", w: 32, h: 32},
+                {id: "zombie",  src:"zombie.png", w: 32, h: 32},
+                {id: "player",  src:"player.png", w: 32, h: 32},
+                {id: "wall",    src:"wall.png", w: 32, h: 32},
+                {id: "chest",   src:"chest.png", w: 32, h: 32},
+                {id: "door",    src:"door.png", w: 32, h: 32},
+                {id: "rubbish", src:"rubbish.png", w: 32, h: 32},
             ];
 
             queue.loadManifest(manifest, true, "res/gfx/");
@@ -32,8 +32,8 @@ function(Class, _, createjs, preloadjs) {
                     var data = {
                         images: [queue.getResult(tex.id)],
                         frames: {
-                            width: 32,
-                            height: 32
+                            width: tex.w,
+                            height: tex.h
                         }
                     };
 
