@@ -24,11 +24,13 @@ function(Class) {
 		dummyLevel: {
             width: 800,
             height: 600,
+            tex: "ground",
 
             name: "Dummy level",
 
             player: {
                 x: 100, y: 100, angle: 1.62,
+                tex: "player",
                 health: 100,
                 inventory: ["silver_key"]
             },
@@ -46,8 +48,8 @@ function(Class) {
             ],
 
             walls: [
-                {tex: "wall", x: 10, y: 10, width: 100, height: 10},
-                {tex: "wall", x: 10, y: 30, width: 100, height: 10}
+                {tex: "wall", x: 10, y: 100, width: 100, height: 10},
+                {tex: "wall", x: 10, y: 150, width: 100, height: 10}
             ],
 
             objects: [

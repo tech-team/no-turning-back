@@ -12,8 +12,8 @@ function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
 			this.FPS = 60;
 			this.canvas = canvas;
             this.state = Game.GameState.Loading;
-			this.WIDTH = canvas.width;
-			this.HEIGHT = canvas.height;
+			this.width = canvas.width;
+			this.height = canvas.height;
 			this.stage = new createjs.Stage(this.canvas);
 			this.ticker = createjs.Ticker;
 			this.levelManager = new LevelManager();
@@ -35,10 +35,8 @@ function(Class, createjs, LevelManager, Level, Player, ResourceManager) {
         	console.log("Resources loaded");
             this.state = Game.GameState.Game;
 
-
             var levelData = this.levelManager.loadLevel(this.startLevelId);
-            console.log(levelData);
-            this.level = new Level(this.stage, levelData, this.resourceManager);
+            this.level = new Level(this.stage, levelData, this.player, this.resourceManager);
         },
 
 		run: function() {
