@@ -40,7 +40,7 @@ function(Class) {
             ],
 
             chests: [
-                {tex: "chest", x: 10, y: 100, width: 32, height: 32, inventory: ["shotgun"]}
+                {tex: "chest", x: 500, y: 500, width: 32, height: 32, inventory: ["shotgun"]}
             ],
 
             doors: [
@@ -48,8 +48,8 @@ function(Class) {
             ],
 
             walls: [
-                {tex: "wall", x: 10, y: 100, width: 100, height: 10},
-                {tex: "wall", x: 10, y: 150, width: 100, height: 10}
+                {tex: "wall", x: 10, y: 100, width: 128, height: 32},
+                {tex: "wall", x: 10, y: 150, width: 128, height: 32}
             ],
 
             objects: [

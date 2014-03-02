@@ -55,6 +55,9 @@ function(_, Class, createjs, KeyCoder, LevelManager, Level, Player, ResourceMana
 		update: function(event) {
 			if (event.keys[KeyCoder.UP_ARROW])
 				console.log("up");
+            if (event.keys[KeyCoder.RIGHT_ARROW])
+                console.log("right");
+
             if (this.state == Game.GameState.Game) {
                 this.level.update(event);
                 this.player.update(event);

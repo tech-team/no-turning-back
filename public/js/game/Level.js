@@ -9,6 +9,8 @@ function(Class, _, easeljs) {
             this.stage = stage;
             this.resourceManager = resourceManager;
             this.walls = [];
+            this.doors = [];
+            this.chests = [];
 
             var self = this;
 
@@ -18,19 +20,25 @@ function(Class, _, easeljs) {
             stage.addChild(backgroundSprite);
 
             //add walls
-            _.each(levelData.walls, function(wall) {
-                self.walls.push(self.addToStage(wall));
+            _.each(levelData.walls, function(obj) {
+                self.walls.push(self.addToStage(obj));
             });
 
+            //TODO: doors and chests has some additional parameteres, should they be classes
+            //TODO: or should we just add some fields to existing displayObjects?
             //add doors
+            _.each(levelData.doors, function(obj) {
+                self.doors.push(self.addToStage(obj));
+            });
 
             //add chests
-
+            _.each(levelData.chests, function(obj) {
+                self.chests.push(self.addToStage(obj));
+            });
 
             //add enemies
 
             //add player
-
             player.setDispObj(this.addToStage(levelData.player));
 		},
 
