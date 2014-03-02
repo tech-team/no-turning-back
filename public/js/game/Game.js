@@ -8,7 +8,7 @@ define([
 	'game/Player',
 	'game/ResourceManager'
 ],
-function(_, Class, createjs, keyCoder, LevelManager, Level, Player, ResourceManager) {
+function(_, Class, createjs, KeyCoder, LevelManager, Level, Player, ResourceManager) {
 	var Game = Class.$extend({
 		__init__: function(canvas) {
 			this.FPS = 10;
@@ -23,6 +23,7 @@ function(_, Class, createjs, keyCoder, LevelManager, Level, Player, ResourceMana
 			this.level = null;
 			this.player = new Player();
 			this.resourceManager = new ResourceManager(this.onResourcesLoaded, this);
+			this.keyCoder = new KeyCoder();
 		},
 
         __classvars__: {
@@ -46,14 +47,13 @@ function(_, Class, createjs, keyCoder, LevelManager, Level, Player, ResourceMana
 			this.ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
 			this.ticker.setFPS(this.FPS);
 			this.ticker.on("tick", function(event) {
-				var keys = keyCoder.getKeys();
-				_.extend(event, keys);
+				_.extend(event, self.keyCoder.getKeys());
 				self.update(event);
 			});
 		},
 
 		update: function(event) {
-			if (event.keys[keyCoder.$class.UP_ARROW])
+			if (event.keys[KeyCoder.UP_ARROW])
 				console.log("up");
             if (this.state == Game.GameState.Game) {
                 this.level.update(event);

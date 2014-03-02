@@ -27,9 +27,7 @@ function(Class) {
 			RIGHT_ARROW: 39,
 			DOWN_ARROW: 40
 		}
-
-
 	});
 
-	return new KeyCoder();
+	return KeyCoder;
 });
