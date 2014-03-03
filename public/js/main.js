@@ -10,6 +10,7 @@ require.config({
         preload: "lib/game/preloadjs",
         sound: "lib/game/soundjs",
         tween: "lib/game/tweenjs",
+        collision: "lib/game/collision"
     },
     shim: {
         'backbone': {
@@ -34,7 +35,11 @@ require.config({
         'tween': {
             deps: ['easel'],
             exports: 'tweenjs'
+        },
+        'collision': {
+            exports: 'ndgmr'
         }
+
     }
 });
 

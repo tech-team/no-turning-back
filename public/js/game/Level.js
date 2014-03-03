@@ -1,9 +1,11 @@
 define([
 	'classy',
     'underscore',
-    'easel'
+    'easel',
+    'collision',
+    'game/KeyCoder'
 ],
-function(Class, _, easeljs) {
+function(Class, _, easeljs, collider, KeyCoder) {
 	var Level = Class.$extend({
 		__init__: function(stage, levelData, player, resourceManager) {
             this.stage = stage;
@@ -39,7 +41,10 @@ function(Class, _, easeljs) {
             //add enemies
 
             //add player
-            player.setDispObj(this.addToStage(levelData.player));
+            var playerObj = this.addToStage(levelData.player);
+            playerObj.regX = playerObj.getBounds().width / 2;
+            playerObj.regY = playerObj.getBounds().height / 2;
+            player.setDispObj(playerObj);
 		},
 
         resizeTexture: function(tex, desiredWidth, desiredHeight) {
@@ -55,13 +60,99 @@ function(Class, _, easeljs) {
 
             dispObj.x = objData.x || 0;
             dispObj.y = objData.y || 0;
-            dispObj.angle = objData.angle || 0;
+            dispObj.angle = objData.angle || 0; // deprecated?
 
             return dispObj;
         },
 
-		update: function(event) {
-			
+		update: function(event, player) {
+
+            var offsetX, offsetY;
+            var offsetRotation = 4;
+            var speedModifier = 2;
+
+            if (event.keys[KeyCoder.W]) {
+                if (event.keys[KeyCoder.SHIFT]) { speedModifier = 4; }
+                offsetX = speedModifier * Math.cos( (Math.PI / 180) * player.dispObj.rotation);
+                offsetY = speedModifier * Math.sin( (Math.PI / 180) * player.dispObj.rotation);
+                player.dispObj.x += offsetX;
+                player.dispObj.y += offsetY;
+                for (var i = 0; i < this.walls.length; ++i) {
+                    if (collider.checkPixelCollision (player.dispObj, this.walls[i])) {
+                        player.dispObj.x -= offsetX;
+                        player.dispObj.y -= offsetY;
+                    }
+                }
+                if (event.keys[KeyCoder.D]) {
+                    player.dispObj.rotation += offsetRotation;
+                    for (var i = 0; i < this.walls.length; ++i) {
+                        if (collider.checkPixelCollision (player.dispObj, this.walls[i])) {
+                            player.dispObj.rotation -= offsetRotation;
+                        }
+                    }
+                }
+                if (event.keys[KeyCoder.A]) {
+                    player.dispObj.rotation -= offsetRotation;
+                    for (var i = 0; i < this.walls.length; ++i) {
+                        if (collider.checkPixelCollision (player.dispObj, this.walls[i])) {
+                            player.dispObj.rotation += offsetRotation;
+                        }
+                    }
+                }
+            }
+            if (event.keys[KeyCoder.S]) {
+                offsetX = speedModifier * Math.cos( (Math.PI / 180) * player.dispObj.rotation);
+                offsetY = speedModifier * Math.sin( (Math.PI / 180) * player.dispObj.rotation);
+                player.dispObj.x -= offsetX;
+                player.dispObj.y -= offsetY;
+                for (var i = 0; i < this.walls.length; ++i) {
+                    if (collider.checkPixelCollision (player.dispObj, this.walls[i])) {
+                        player.dispObj.x += offsetX;
+                        player.dispObj.y += offsetY;
+                    }
+                }
+                if (event.keys[KeyCoder.D]) {
+                    player.dispObj.rotation -= offsetRotation;
+                    for (var i = 0; i < this.walls.length; ++i) {
+                        if (collider.checkPixelCollision (player.dispObj, this.walls[i])) {
+                            player.dispObj.rotation += offsetRotation;
+                        }
+                    }
+                }
+                if (event.keys[KeyCoder.A]) {
+                    player.dispObj.rotation += offsetRotation;
+                    for (var i = 0; i < this.walls.length; ++i) {
+                        if (collider.checkPixelCollision (player.dispObj, this.walls[i])) {
+                            player.dispObj.rotation -= offsetRotation;
+                        }
+                    }
+                }
+            }
+
+            if (!(event.keys[KeyCoder.W] || event.keys[KeyCoder.S])) {
+                if (event.keys[KeyCoder.D]) {
+                    offsetRotation *= 2;
+                    player.dispObj.rotation += offsetRotation;
+                    for (var i = 0; i < this.walls.length; ++i) {
+                        if (collider.checkPixelCollision (player.dispObj, this.walls[i])) {
+                            player.dispObj.rotation -= offsetRotation;
+                        }
+                    }
+                }
+                if (event.keys[KeyCoder.A]) {
+                    offsetRotation *= 2;
+                    player.dispObj.rotation -= offsetRotation;
+                    for (var i = 0; i < this.walls.length; ++i) {
+                        if (collider.checkPixelCollision (player.dispObj, this.walls[i])) {
+                            player.dispObj.rotation += offsetRotation;
+                        }
+                    }
+                }
+            }
+
+
+            player.update(event);
+
 		}
 	});
 

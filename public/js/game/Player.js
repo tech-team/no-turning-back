@@ -1,16 +1,19 @@
 define([
 	'classy',
-	'game/AliveObject'
+	'game/AliveObject',
+    'game/KeyCoder',
+    'collision'
 ],
-function(Class, AliveObject) {
+function(Class, AliveObject, KeyCoder, ndgmr) {
 	var Player = AliveObject.$extend({
 		__init__: function() {
 			this.score = 0;
+
 		},
 
 		update: function(event) {
-			
-		}
+
+        }
 	});
 
 	return Player;

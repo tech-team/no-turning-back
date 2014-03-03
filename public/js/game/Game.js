@@ -2,16 +2,17 @@ define([
 	'underscore',
 	'classy',
 	'easel',
+    'collision',
 	'game/KeyCoder',
 	'game/LevelManager',
 	'game/Level',
 	'game/Player',
 	'game/ResourceManager'
 ],
-function(_, Class, createjs, KeyCoder, LevelManager, Level, Player, ResourceManager) {
+function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager) {
 	var Game = Class.$extend({
 		__init__: function(canvas) {
-			this.FPS = 10;
+			this.FPS = 30;
 			this.canvas = canvas;
             this.state = Game.GameState.Loading;
 			this.width = canvas.width;
@@ -53,14 +54,14 @@ function(_, Class, createjs, KeyCoder, LevelManager, Level, Player, ResourceMana
 		},
 
 		update: function(event) {
+
 			if (event.keys[KeyCoder.UP_ARROW])
 				console.log("up");
             if (event.keys[KeyCoder.RIGHT_ARROW])
                 console.log("right");
 
             if (this.state == Game.GameState.Game) {
-                this.level.update(event);
-                this.player.update(event);
+                this.level.update(event, this.player);
 
                 this.stage.update(event);
             }
