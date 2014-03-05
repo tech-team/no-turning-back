@@ -11,22 +11,13 @@ function(Backbone, MainView, ScoreboardView, GameView) {
             'game': 'gameAction',
             '*default': 'defaultActions'
         },
-        defaultActions: function () {
-            ScoreboardView.hide();
-            GameView.hide();
-            
+        defaultActions: function () {            
             MainView.show();
         },
         scoreboardAction: function () {
-            MainView.hide();
-            GameView.hide();
-
             ScoreboardView.show();
         },
         gameAction: function () {
-            MainView.hide();
-            ScoreboardView.hide();
-
             GameView.show();
         }
     });

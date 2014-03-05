@@ -28,11 +28,11 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 		},
 
         __classvars__: {
-          GameState: {
-              Loading: 0,
-              Game: 1,
-              GameOver: 2
-          }
+          	GameState: {
+              	Loading: 0,
+              	Game: 1,
+              	GameOver: 2
+          	}
         },
 
         onResourcesLoaded: function() {

@@ -1,31 +1,39 @@
 define([
     'backbone',
     'tmpl/scoreboard',
-    'collections/scores'
+    'collections/scores',
+    'views/viewmanager'
 ], 
-function(Backbone, scoreboardTmpl, scoresCollection) {
+function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
     var ScoreboardView = Backbone.View.extend({
 
         template: scoreboardTmpl,
-        el: '#page',
+        el: '#pages',
+        pageId: '#scoreboardPage',
 
         initialize: function () {
-            // TODO
+            ViewManager.addView(this.pageId, this);
+            this.render();
         },
 
         render: function () {
             scoresCollection.sortByScore();
-            //console.log(scoresCollection.models);
-            this.$el.html(this.template({scores: scoresCollection.toJSON()}));
+            var p = $(this.template({scores: scoresCollection.toJSON()}));
+            p.attr("id", this.pageId.slice(1));
+            p.appendTo(this.$el);
  
             return this;
         },
 
         show: function () {
-            this.render();
+            this.$el.find(this.pageId).show();
+            $.event.trigger({
+                type: "showPageEvent",
+                pageId: this.pageId
+            });
         },
         hide: function () {
-            // TODO
+            this.$el.find(this.pageId).hide();
         }
 
     });

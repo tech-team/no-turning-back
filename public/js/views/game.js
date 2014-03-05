@@ -1,23 +1,29 @@
 define([
     'backbone',
     'tmpl/game',
-    'game/Game'
+    'game/Game',
+    'views/viewmanager'
 ], 
-function(Backbone, tmpl, Game) {
+function(Backbone, tmpl, Game, ViewManager) {
     var GameView = Backbone.View.extend({
 
         template: tmpl,
-        el: '#page',
+        el: '#pages',
+        pageId: '#gamePage',
         canvas: null,
         scene: null,
         game: null,
 
         initialize: function () {
-
+            ViewManager.addView(this.pageId, this);
+            this.render();
         },
 
         render: function () {
-            this.$el.html(this.template());
+            var p = $(this.template());
+            p.attr("id", this.pageId.slice(1));
+            p.appendTo(this.$el);
+
             this.canvas = document.getElementById('game-field');
             this.scene = $('#scene');
             this.calcDimensions();
@@ -26,11 +32,14 @@ function(Backbone, tmpl, Game) {
             return this;
         },
         show: function () {
-            this.render();
+            this.$el.find(this.pageId).show();
+            $.event.trigger({
+                type: "showPageEvent",
+                pageId: this.pageId
+            });
         },
-        
         hide: function () {
-            
+            this.$el.find(this.pageId).hide();
         },
 
         calcDimensions: function() {
