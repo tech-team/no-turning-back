@@ -9,6 +9,7 @@ function(Class, _, easeljs, collider, KeyCoder) {
 	var Level = Class.$extend({
 		__init__: function(stage, levelData, player, resourceManager) {
             this.stage = stage;
+            this.selectedObject = null;
             this.resourceManager = resourceManager;
             this.walls = [];
             this.doors = [];
@@ -52,15 +53,48 @@ function(Class, _, easeljs, collider, KeyCoder) {
         },
 
         addToStage: function(objData) {
+            var self = this;
+            var editorMode = false; //TODO: move it somewhere to the top of the game-architecture
+
             var spriteSheet =
                 this.resourceManager.getTiledSpriteSheet(objData.tex, objData.width || 32, objData.height || 32);
 
             var sprite = new easeljs.Sprite(spriteSheet);
-            var dispObj =  this.stage.addChild(sprite);
+            var objToAdd = sprite;
+
+            if (editorMode) {
+                var container = new createjs.Container();
+                container.addChild(sprite);
+                objToAdd = container;
+            }
+
+            var dispObj = this.stage.addChild(objToAdd);
 
             dispObj.x = objData.x || 0;
             dispObj.y = objData.y || 0;
-            dispObj.angle = objData.angle || 0; // deprecated?
+            dispObj.rotation = objData.r || 0;
+            dispObj.data = objData;
+
+
+            if (editorMode) {
+                container.on("pressmove",function(evt) {
+                    self.selectedObject = evt.currentTarget;
+
+                    evt.currentTarget.x = evt.stageX;
+                    evt.currentTarget.y = evt.stageY;
+
+                    self.stage.update();
+                });
+
+                container.on("dblclick",function(evt) {
+                    self.selectedObject = evt.currentTarget;
+                });
+
+                container.on("dblclick",function(evt) {
+                    console.log(evt.currentTarget.data);
+                });
+            }
+
 
             return dispObj;
         },

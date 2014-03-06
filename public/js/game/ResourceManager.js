@@ -18,13 +18,17 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
             queue.on("complete", handleComplete, this);
 
             var manifest = [
-                {id: "ground",  src:"ground.png"},
-                {id: "zombie",  src:"zombie.png"},
-                {id: "player",  src:"player.png"},
-                {id: "wall",    src:"wall.png"},
-                {id: "chest",   src:"chest.png"},
-                {id: "door",    src:"door.png"},
-                {id: "rubbish", src:"rubbish.png"},
+                {id: "ground",          src:"ground.png"},
+                {id: "zombie",          src:"zombie.png"},
+                {id: "player",          src:"player.png"},
+                {id: "wall",            src:"wall.png"},
+                {id: "brick_wall1",     src:"brick_wall_1.png"},
+                {id: "brick_wall2",     src:"brick_wall_2.png"},
+                {id: "brick_wall3",     src:"brick_wall_3.png"},
+                {id: "brick_wall4",     src:"brick_wall_4.png"},
+                {id: "chest",           src:"chest.png"},
+                {id: "door",            src:"door.png"},
+                {id: "rubbish",         src:"rubbish.png"},
             ];
 
             queue.loadManifest(manifest, true, "res/gfx/");

@@ -49,15 +49,15 @@ function(Class) {
             ],
 
             walls: [
-                {tex: "wall", x: 32, y: 64, width: 32, height: 160},
-                {tex: "wall", x: 64, y: 64, width: 128, height: 32},
-                {tex: "wall", x: 192, y: 64, width: 32, height: 160},
-                {tex: "wall", x: 32, y: 224, width: 64, height: 32},
-                {tex: "wall", x: 160, y: 224, width: 64, height: 32},
-                {tex: "wall", x: 64, y: 256, width: 32, height: 192},
-                {tex: "wall", x: 160, y: 256, width: 32, height: 96},
-                {tex: "wall", x: 96, y: 416, width: 288, height: 32},
-                {tex: "wall", x: 192, y: 320, width: 192, height: 32},
+                {tex: "brick_wall1", x: 32, y: 64, width: 32, height: 160},
+                {tex: "brick_wall2", x: 64, y: 64, r: 10, width: 128, height: 32},
+                {tex: "brick_wall3", x: 192, y: 64, width: 32, height: 160},
+                {tex: "brick_wall4", x: 32, y: 224, width: 64, height: 32},
+                {tex: "brick_wall1", x: 160, y: 224, width: 64, height: 32},
+                {tex: "brick_wall2", x: 64, y: 256, width: 32, height: 192},
+                {tex: "brick_wall3", x: 160, y: 256, width: 32, height: 96},
+                {tex: "brick_wall4", x: 96, y: 416, width: 288, height: 32},
+                {tex: "brick_wall1", x: 192, y: 320, width: 192, height: 32},
             ],
 
             objects: [
