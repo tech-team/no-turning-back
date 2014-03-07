@@ -23,11 +23,6 @@ function(Class, _, easeljs, collider, KeyCoder) {
             this.reload(levelData);
 		},
 
-        //TODO: what this function stands for?
-        resizeTexture: function(tex, desiredWidth, desiredHeight) {
-
-        },
-
         reload: function(levelData) {
             var self = this;
             this.levelData = levelData;
@@ -226,11 +221,11 @@ function(Class, _, easeljs, collider, KeyCoder) {
             }
 
             if (event.keys[KeyCoder.Q]) {
-                this.selectedObject.rotation++;
+                this.selectedObject.rotation--;
             }
 
             if (event.keys[KeyCoder.E]) {
-                this.selectedObject.rotation--;
+                this.selectedObject.rotation++;
             }
         },
         
