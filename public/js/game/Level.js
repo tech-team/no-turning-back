@@ -16,9 +16,9 @@ function(Class, _, easeljs, collider, KeyCoder) {
             this.walls = [];
             this.doors = [];
             this.chests = [];
-            this.data = levelData;
 
-            this.selectionFilter = new easeljs.ColorFilter(0, 0, 0, 1, 0, 0, 255, 0);
+            this.data = levelData;
+            this.selectionFilter = new easeljs.ColorFilter(1, 1, 1, 1, 10, 60, 10, 100);
 
             this.reload(levelData);
 		},
@@ -39,7 +39,7 @@ function(Class, _, easeljs, collider, KeyCoder) {
             //add background
             var backgroundSh = this.resourceManager.getTiledSpriteSheet(levelData.tex, levelData.width, levelData.height);
             var backgroundSprite = new easeljs.Sprite(backgroundSh);
-            this.stage.addChild(backgroundSprite);
+            this.background = this.stage.addChild(backgroundSprite);
 
             //add walls
             _.each(levelData.walls, function(obj) {
@@ -88,10 +88,9 @@ function(Class, _, easeljs, collider, KeyCoder) {
             dispObj.regY = dispObj.getBounds().height / 2;
             dispObj.data = objData;
 
-
             if (this.editorMode) {
-                container.on("pressmove",function(evt) {
-                    self.selectedObject = evt.currentTarget;
+                container.on("pressmove", function(evt) {
+                    self.selectObject(evt.currentTarget);
 
                     evt.currentTarget.x = evt.stageX;
                     evt.currentTarget.y = evt.stageY;
@@ -99,32 +98,8 @@ function(Class, _, easeljs, collider, KeyCoder) {
                     self.stage.update();
                 });
 
-                container.on("click",function(evt) {
-                    //reset filters
-                    if (self.selectedObject) {
-                        self.selectedObject.filters = [];
-
-                        //TODO: change coordinates
-                        //http://createjs.com/Docs/EaselJS/classes/DisplayObject.html#method_cache
-                        self.selectedObject.cache(
-                            -self.selectedObject.data.width/2,
-                            -self.selectedObject.data.height/2,
-                            self.selectedObject.data.width,
-                            self.selectedObject.data.height
-                        );
-
-                        self.selectedObject.updateCache();
-                    }
-
-                    //select object
-                    self.selectedObject = evt.currentTarget;
-                    self.selectedObject.filters = [self.selectionFilter];
-                    self.selectedObject.cache(
-                        -self.selectedObject.data.width/2,
-                        -self.selectedObject.data.height/2,
-                        self.selectedObject.data.width,
-                        self.selectedObject.data.height
-                    );
+                container.on("click", function(evt) {
+                    self.selectObject(evt.currentTarget);
                 });
 
                 container.on("dblclick",function(evt) {
@@ -257,6 +232,26 @@ function(Class, _, easeljs, collider, KeyCoder) {
             if (event.keys[KeyCoder.E]) {
                 this.selectedObject.rotation--;
             }
+        },
+        
+        applyFilters: function(dispObj, filters) {
+            dispObj.filters = filters;
+
+            dispObj.cache(0, 0,
+                dispObj.getBounds().width,
+                dispObj.getBounds().height);
+            dispObj.updateCache();
+        },
+
+        selectObject: function(dispObj) {
+            //reset filters
+            if (this.selectedObject) {
+                this.applyFilters(this.selectedObject, null);
+            }
+
+            //select object
+            this.selectedObject = dispObj;
+            this.applyFilters(this.selectedObject, [this.selectionFilter]);
         }
 	});
 
