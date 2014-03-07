@@ -11,7 +11,8 @@ define([
 ],
 function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager) {
 	var Game = Class.$extend({
-		__init__: function(canvas) {
+		__init__: function(canvas, editorMode) {
+            this.editorMode = editorMode;
 			this.FPS = 30;
 			this.canvas = canvas;
             this.state = Game.GameState.Loading;
@@ -40,7 +41,8 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
             this.state = Game.GameState.Game;
 
             var levelData = this.levelManager.loadLevel(this.startLevelId);
-            this.level = new Level(this.stage, levelData, this.player, this.resourceManager);
+
+            this.level = new Level(this.stage, levelData, this.player, this.resourceManager, this.editorMode);
         },
 
 		run: function() {
@@ -54,29 +56,11 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 		},
 
 		update: function(event) {
-
-			if (event.keys[KeyCoder.UP_ARROW])
-				console.log("up");
-            if (event.keys[KeyCoder.RIGHT_ARROW])
-                console.log("right");
-
             if (this.state == Game.GameState.Game) {
-                this.level.update(event, this.player);
+                this.level.update(event);
 
                 this.stage.update(event);
             }
-		},
-
-		test: function() {
-			this.circle = new createjs.Shape();
-			this.circle.graphics.beginFill("blue").drawCircle(100, 100, 50);
-
-            this.output = this.stage.addChild(new createjs.Text("","bold 16px Verdana", "#000"))
-            this.output.lineHeight = 15;
-            this.output.textBaseline = "top";
-            this.output.x = 100;
-            this.output.y = 15;
-			this.stage.addChild(this.circle);
 		}
 	});
 

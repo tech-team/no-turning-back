@@ -7,8 +7,9 @@
 		    	<h2 class="content__h2">Main Menu</h2>
 		    	<div class="mainmenu-wrapper">
 			    	<ul class="mainmenu">
-						<li class="mainmenu__item"><a href="#scoreboard">Scoreboard</a></li>
 						<li class="mainmenu__item"><a href="#game">Start Game</a></li>
+                        <li class="mainmenu__item"><a href="#editor">Editor</a></li>
+                        <li class="mainmenu__item"><a href="#scoreboard">Scoreboard</a></li>
 			    	</ul>
 		    	</div>  
 

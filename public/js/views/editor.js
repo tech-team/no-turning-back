@@ -1,15 +1,15 @@
 define([
     'backbone',
-    'tmpl/game',
+    'tmpl/editor',
     'game/Game',
     'views/viewmanager'
 ], 
 function(Backbone, tmpl, Game, ViewManager) {
-    var GameView = Backbone.View.extend({
+    var EditorView = Backbone.View.extend({
 
         template: tmpl,
         el: '#pages',
-        pageId: '#gamePage',
+        pageId: '#editorPage',
         canvas: null,
         scene: null,
         game: null,
@@ -24,8 +24,8 @@ function(Backbone, tmpl, Game, ViewManager) {
             p.attr("id", this.pageId.slice(1));
             p.appendTo(this.$el);
 
-            this.canvas = document.getElementById('game-field');
-            this.scene = $('#scene');
+            this.canvas = document.getElementById('editor-field');
+            this.scene = $('#editor-scene');
             this.calcDimensions();
 
             this.runGame();
@@ -48,30 +48,20 @@ function(Backbone, tmpl, Game, ViewManager) {
                 return;
             }
 
-            var horizontalMargin = 50;
-            var verticalMargin = 10;
             var self = this;
             $(window).resize(function() {
-                var width = $(this).width() - 2 * horizontalMargin;
-                var height = $(this).height() - 2 * verticalMargin;
-                var cssSizes = {
-                    'width': width + "px",
-                    'height' : height + "px"
-                };
-                self.scene.css(cssSizes).css({'margin-top': verticalMargin});
-                self.canvas.width = width;
-                self.canvas.height = height;
+                self.canvas.width = $(this).width()*0.8; //80%
+                self.canvas.height = $(this).height();
             });
             $(window).resize();
-
         },
 
         runGame: function() {
-            this.game = new Game(this.canvas, false);
+            this.game = new Game(this.canvas, true);
             this.game.run();
         }
 
     });
 
-    return new GameView();
+    return new EditorView();
 });

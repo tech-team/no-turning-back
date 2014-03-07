@@ -1,18 +1,19 @@
 define([
-	'classy'
+	'classy',
+    'jquery'
 ],
-function(Class) {
+function(Class, $) {
 	var KeyCoder = Class.$extend({
 		__init__: function() {
 			this.keys = [];
 			var self = this;
-			document.onkeydown = function(event) {
+			$(document).keydown(function(event) {
 				self.keys[event.keyCode] = true;
-			};
+			});
 
-			document.onkeyup = function(event) {
-				self.keys[event.keyCode] = false;
-			};
+            $(document).keyup(function(event) {
+                self.keys[event.keyCode] = false;
+            });
 		},
 
 		getKeys: function() {
@@ -30,7 +31,9 @@ function(Class) {
             A: 65,
             D: 68,
             S: 83,
-            W: 87
+            W: 87,
+            Q: 81,
+            E: 69
 		}
 	});
 

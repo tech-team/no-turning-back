@@ -275,3 +275,36 @@ html, body {
 
 .game canvas {
 }
+
+/********** editor **********/
+.editor-scene {
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    width: 80%;
+    height: 100%;
+}
+
+.editor-sidebar {
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    width: 20%;
+    height: 100%;
+
+    background-color: white;
+    border-style: outset;
+}
+
+.editor-sidebar__group {
+    height: 33%;
+    padding: 0px 10px 0px 10px;
+
+    border-style: inset;
+}
+
+.editor-sidebar__group__header {
+    margin: 5px 0px 5px 0px;
+}
