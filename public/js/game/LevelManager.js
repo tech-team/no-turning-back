@@ -25,6 +25,7 @@ function(Class) {
             width: 1280,
             height: 768,
             tex: "ground",
+            draggable: false,
 
             name: "Dummy level",
 

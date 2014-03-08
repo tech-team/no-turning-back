@@ -35,9 +35,10 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
             this.stage.update();
 
             //add background
-            var backgroundSh = this.resourceManager.getTiledSpriteSheet(levelData.tex, levelData.width, levelData.height);
-            var backgroundSprite = new easeljs.Sprite(backgroundSh);
-            this.background = this.stage.addChild(backgroundSprite);
+            //var backgroundSh = this.resourceManager.getTiledSpriteSheet(levelData.tex, levelData.width, levelData.height);
+            //var backgroundSprite = new easeljs.Sprite(backgroundSh);
+            //this.stage.addChild(backgroundSprite);
+            this.addToStage(levelData);
 
             //add walls
             _.each(levelData.walls, function(obj) {
@@ -79,15 +80,15 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
             }
 
             var dispObj = this.stage.addChild(objToAdd);
-            dispObj.x = objData.x || 0;
-            dispObj.y = objData.y || 0;
+            dispObj.x = objData.x || objData.width/2 || 16;
+            dispObj.y = objData.y || objData.height/2 || 16;
             dispObj.rotation = objData.r || 0;
             dispObj.regX = dispObj.getBounds().width / 2;
             dispObj.regY = dispObj.getBounds().height / 2;
             dispObj.data = objData;
 
             if (this.editorMode)
-                this.editor.setContainerHandlers(container); //TODO dispObj?
+                this.editor.setContainerHandlers(dispObj);
 
             return dispObj;
         },

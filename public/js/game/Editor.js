@@ -39,6 +39,14 @@ define([
             setContainerHandlers: function(container) {
                 var self = this;
 
+                if (container.data.draggable === false) {
+                    container.on("click", function(evt) {
+                        self.selectObject(null);
+                    });
+
+                    return;
+                }
+
                 container.on("pressmove", function(evt) {
                     self.selectObject(evt.currentTarget);
 
@@ -122,7 +130,8 @@ define([
 
                 //select object
                 this.selectedObject = dispObj;
-                this.applyFilters(this.selectedObject, [this.selectionFilter]);
+                if (this.selectedObject)
+                    this.applyFilters(this.selectedObject, [this.selectionFilter]);
             }
         });
 
