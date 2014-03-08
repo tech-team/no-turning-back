@@ -7,6 +7,11 @@ define([
 ],
 function(Class, _, createjs, preloadjs, ImageTiler) {
 	var ResourceManager = Class.$extend({
+        __classvars__: {
+            texList: ["ground", "zombie", "player", "wall", "brick_wall1", "brick_wall2",
+                "brick_wall3", "brick_wall4", "chest", "door", "rubbish"]
+        },
+
 		__init__: function(onComplete, onCompleteContext) {
             this.images = [];
             this.spriteSheets = [];
@@ -17,19 +22,13 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
             var queue = new preloadjs.LoadQueue();
             queue.on("complete", handleComplete, this);
 
-            var manifest = [
-                {id: "ground",          src:"ground.png"},
-                {id: "zombie",          src:"zombie.png"},
-                {id: "player",          src:"player.png"},
-                {id: "wall",            src:"wall.png"},
-                {id: "brick_wall1",     src:"brick_wall_1.png"},
-                {id: "brick_wall2",     src:"brick_wall_2.png"},
-                {id: "brick_wall3",     src:"brick_wall_3.png"},
-                {id: "brick_wall4",     src:"brick_wall_4.png"},
-                {id: "chest",           src:"chest.png"},
-                {id: "door",            src:"door.png"},
-                {id: "rubbish",         src:"rubbish.png"},
-            ];
+            var manifest = [];
+            _.each(ResourceManager.texList, function(tex) {
+                manifest.push({
+                    id: tex,
+                    src: tex + ".png"
+                });
+            });
 
             queue.loadManifest(manifest, true, "res/gfx/");
 

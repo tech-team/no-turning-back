@@ -34,6 +34,9 @@
                         <option value="chest">Chest</option>
                         <option value="door">Door</option>
                     </select>
+                    <select id="texture-select">
+
+                    </select>
 
                     <button id="addObject">Add</button>
                 </form>

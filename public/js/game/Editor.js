@@ -3,9 +3,10 @@ define([
     'underscore',
     'easel',
     'jquery',
-    'game/KeyCoder'
+    'game/KeyCoder',
+    'game/ResourceManager'
 ],
-    function(Class, _, easeljs, $, KeyCoder) {
+    function(Class, _, easeljs, $, KeyCoder, ResourceManager) {
         var Editor = Class.$extend({
             __init__: function(level, stage) {
                 this.level = level;
@@ -24,13 +25,14 @@ define([
 
                 $('#addObject').click(function() {
                     var type = $('#type-select').val();
+                    var tex = $('#texture-select').val();
 
                     var data = {
                         x: self.stage.getBounds().width/2,
                         y: self.stage.getBounds().height/2,
                         r: 0,
-                        tex: type, //TODO: add tex selector
-                        type: type
+                        type: type,
+                        tex: tex
                     };
 
                     var collectionName = type + 's';
@@ -64,6 +66,11 @@ define([
                         self.selectedObject.rotation++;
                         self.selectedObject.data.r++;
                     }
+                });
+
+                var textureSelect = $('#texture-select');
+                _.each(ResourceManager.texList, function(tex) {
+                    textureSelect.append($("<option />").val(tex).text(tex));
                 });
             },
 
