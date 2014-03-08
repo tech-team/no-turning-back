@@ -68,7 +68,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
             var self = this;
 
             var spriteSheet =
-                this.resourceManager.getTiledSpriteSheet(objData.tex, objData.width || 32, objData.height || 32);
+                this.resourceManager.getTiledSpriteSheet(objData.tex, objData.width, objData.height);
 
             var sprite = new easeljs.Sprite(spriteSheet);
             var objToAdd = sprite;

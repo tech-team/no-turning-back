@@ -21,9 +21,22 @@
             </div>
             <div class="editor-sidebar__group editor-sidebar__object">
                 <h3 class="editor-sidebar__group__header">Selected Object:</h3>
+                <form>
+
+                    <button id="deleteObject">Delete</button>
+                </form>
             </div>
             <div class="editor-sidebar__group editor-sidebar__palette">
                 <h3 class="editor-sidebar__group__header">Palette:</h3>
+                <form>
+                    <select id="type-select">
+                        <option value="wall">Wall</option>
+                        <option value="chest">Chest</option>
+                        <option value="door">Door</option>
+                    </select>
+
+                    <button id="addObject">Add</button>
+                </form>
             </div>
         </div>
 	</section>

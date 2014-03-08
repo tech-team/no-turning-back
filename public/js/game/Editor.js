@@ -22,6 +22,37 @@ define([
                     self.onLevelLoadClick();
                 });
 
+                $('#addObject').click(function() {
+                    var type = $('#type-select').val();
+
+                    var data = {
+                        x: self.stage.getBounds().width/2,
+                        y: self.stage.getBounds().height/2,
+                        r: 0,
+                        tex: type, //TODO: add tex selector
+                        type: type
+                    };
+
+                    var collectionName = type + 's';
+
+                    self.level.levelData[collectionName].push(data);
+                    var dataRef = self.level.levelData[collectionName][self.level.levelData[collectionName].length-1];
+
+                    self.level.addToStage(dataRef);
+                });
+
+                $('#deleteObject').click(function() {
+                    if (!self.selectedObject || self.selectedObject.data.type == 'player')
+                        return;
+
+                    var collectionName = self.selectedObject.data.type + 's';
+                    var collection = self.level.levelData[collectionName];
+
+                    var id = collection.indexOf(self.selectedObject);
+                    collection.splice(id, 1);
+                    self.stage.removeChild(self.selectedObject);
+                });
+
                 $(window).bind("mousewheel", function(evt) {
                     if (!self.selectedObject)
                         return;
