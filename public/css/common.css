@@ -283,7 +283,6 @@ html, body {
     top: 0;
 
     width: 80%;
-    height: 99%;
 }
 
 .editor-sidebar {
@@ -295,7 +294,6 @@ html, body {
     height: 99%;
 
     background-color: white;
-    border-style: outset;
 }
 
 .editor-sidebar__group {

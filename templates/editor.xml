@@ -1,14 +1,14 @@
 <fest:template xmlns:fest="http://fest.mail.ru"
     context_name="json">
     <section class="page">
-	    <span id="editor-scene" class="content-wrapper game-wrapper editor-scene">
+	    <div id="editor-scene" class="content-wrapper game-wrapper editor-scene">
 	            <a href="#main" class="back-button back-button_cornered">
 	                <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
 	                <span class="back-button__caption">Back</span>
 	            </a>
 	            <canvas id="editor-field">You have a very old browser, dude.</canvas>
-	    </span>
-        <span id="editor-sidebar" class="editor-sidebar">
+	    </div>
+        <div id="editor-sidebar" class="editor-sidebar">
             <!-- TODO: BEM required! -->
             <div class="editor-sidebar__group editor-sidebar__level">
                 <h3 class="editor-sidebar__group__header">
@@ -25,6 +25,6 @@
             <div class="editor-sidebar__group editor-sidebar__palette">
                 <h3 class="editor-sidebar__group__header">Palette:</h3>
             </div>
-        </span>
+        </div>
 	</section>
 </fest:template>

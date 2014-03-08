@@ -11,6 +11,10 @@ function() {
 		return canvas;
 	}
 
+	function removeCanvas(canvas) {
+		canvas.parentNode.removeChild(canvas);
+	}
+
 	var SpriteTiler = function(tileImage, widthFactor, heightFactor) {
 		var width = tileImage.width * widthFactor;
 		var height = tileImage.height * heightFactor;
@@ -32,6 +36,8 @@ function() {
 	    }
 
 	    var dataURL = canvas.toDataURL();
+
+	    removeCanvas(canvas);
 	    return dataURL;
 	}
 

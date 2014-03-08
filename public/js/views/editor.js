@@ -12,6 +12,7 @@ function(Backbone, tmpl, Game, ViewManager) {
         pageId: '#editorPage',
         canvas: null,
         scene: null,
+        sidebar: null,
         game: null,
 
         initialize: function () {
@@ -26,6 +27,7 @@ function(Backbone, tmpl, Game, ViewManager) {
 
             this.canvas = document.getElementById('editor-field');
             this.scene = $('#editor-scene');
+            this.sidebar = $('#editor-sidebar');
             this.calcDimensions();
 
             this.runGame();
@@ -50,8 +52,18 @@ function(Backbone, tmpl, Game, ViewManager) {
 
             var self = this;
             $(window).resize(function() {
-                self.canvas.width = $(this).width()*0.8; //80%
-                self.canvas.height = $(this).height();
+                var width = $(this).width() * 0.8;
+                var height = $(this).height() - 5;
+
+                var cssSizes = {
+                    'width': width + "px",
+                    'height' : height + "px"
+                };
+
+                self.canvas.width = width;
+                self.canvas.height = height;
+                self.scene.css(cssSizes);
+                self.sidebar.height(height);
             });
             $(window).resize();
         },
