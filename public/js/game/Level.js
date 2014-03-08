@@ -3,22 +3,25 @@ define([
     'underscore',
     'easel',
     'collision',
-    'game/KeyCoder'
+    'game/KeyCoder',
+    'game/Editor'
 ],
-function(Class, _, easeljs, collider, KeyCoder) {
+function(Class, _, easeljs, collider, KeyCoder, Editor) {
 	var Level = Class.$extend({
 		__init__: function(stage, levelData, player, resourceManager, editorMode) {
-            this.editorMode = true;
+            this.editorMode = editorMode;
+
+            if (this.editorMode)
+                this.editor = new Editor(this, stage);
+
             this.stage = stage;
             this.player = player;
-            this.selectedObject = null;
             this.resourceManager = resourceManager;
             this.walls = [];
             this.doors = [];
             this.chests = [];
 
             this.data = levelData;
-            this.selectionFilter = new easeljs.ColorFilter(1, 1, 1, 1, 10, 60, 10, 100);
 
             this.reload(levelData);
 		},
@@ -83,24 +86,8 @@ function(Class, _, easeljs, collider, KeyCoder) {
             dispObj.regY = dispObj.getBounds().height / 2;
             dispObj.data = objData;
 
-            if (this.editorMode) {
-                container.on("pressmove", function(evt) {
-                    self.selectObject(evt.currentTarget);
-
-                    evt.currentTarget.x = evt.stageX;
-                    evt.currentTarget.y = evt.stageY;
-
-                    self.stage.update();
-                });
-
-                container.on("click", function(evt) {
-                    self.selectObject(evt.currentTarget);
-                });
-
-                container.on("dblclick",function(evt) {
-                    console.log(evt.currentTarget.data);
-                });
-            }
+            if (this.editorMode)
+                this.editor.setContainerHandlers(container); //TODO dispObj?
 
             return dispObj;
         },
@@ -111,7 +98,7 @@ function(Class, _, easeljs, collider, KeyCoder) {
                 this.player.update(event);
             }
             else
-                this.editorKeyFunc(event);
+                this.editor.keyFunc(event);
 		},
 
         keyFunc: function(event) {
@@ -198,56 +185,6 @@ function(Class, _, easeljs, collider, KeyCoder) {
                 }
             }
         },
-
-        //TODO: maybe move it to the separate class?
-        editorKeyFunc: function(event) {
-            if (this.selectedObject == null)
-                return;
-
-            if (event.keys[KeyCoder.A]) {
-                this.selectedObject.x--;
-            }
-
-            if (event.keys[KeyCoder.D]) {
-                this.selectedObject.x++;
-            }
-
-            if (event.keys[KeyCoder.W]) {
-                this.selectedObject.y--;
-            }
-
-            if (event.keys[KeyCoder.S]) {
-                this.selectedObject.y++;
-            }
-
-            if (event.keys[KeyCoder.Q]) {
-                this.selectedObject.rotation--;
-            }
-
-            if (event.keys[KeyCoder.E]) {
-                this.selectedObject.rotation++;
-            }
-        },
-        
-        applyFilters: function(dispObj, filters) {
-            dispObj.filters = filters;
-
-            dispObj.cache(0, 0,
-                dispObj.getBounds().width,
-                dispObj.getBounds().height);
-            dispObj.updateCache();
-        },
-
-        selectObject: function(dispObj) {
-            //reset filters
-            if (this.selectedObject) {
-                this.applyFilters(this.selectedObject, null);
-            }
-
-            //select object
-            this.selectedObject = dispObj;
-            this.applyFilters(this.selectedObject, [this.selectionFilter]);
-        }
 	});
 
 	return Level;

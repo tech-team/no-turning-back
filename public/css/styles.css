@@ -272,7 +272,7 @@ html, body {
     top: 0;
 
     width: 80%;
-    height: 100%;
+    height: 99%;
 }
 
 .editor-sidebar {
@@ -281,14 +281,14 @@ html, body {
     top: 0;
 
     width: 20%;
-    height: 100%;
+    height: 99%;
 
     background-color: white;
     border-style: outset;
 }
 
 .editor-sidebar__group {
-    height: 33%;
+    height: 32%;
     padding: 0px 10px 0px 10px;
 
     border-style: inset;
@@ -296,4 +296,10 @@ html, body {
 
 .editor-sidebar__group__header {
     margin: 5px 0px 5px 0px;
+}
+
+.editor-sidebar__group__controlls {
+    position: absolute;
+    top: 5px;
+    right: 5px;
 }
