@@ -25,7 +25,7 @@ define([
 
                 $('#addObject').click(function() {
                     var type = $('#type-select').val();
-                    var tex = $('#texture-select').val();
+                    var tex = $('#add-texture-select').val();
 
                     var data = {
                         x: self.stage.getBounds().width/2,
@@ -68,7 +68,7 @@ define([
                     }
                 });
 
-                var textureSelect = $('#texture-select');
+                var textureSelect = $('.texture-select');
                 _.each(ResourceManager.texList, function(tex) {
                     textureSelect.append($("<option />").val(tex).text(tex));
                 });

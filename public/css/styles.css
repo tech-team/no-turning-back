@@ -286,7 +286,6 @@ html, body {
 }
 
 .editor-sidebar__group {
-    height: 32%;
     padding: 0px 10px 0px 10px;
 
     border-style: inset;
@@ -297,7 +296,17 @@ html, body {
 }
 
 .editor-sidebar__group__controls {
+    float: right;
+}
+
+.editor-sidebar__object {
+    top: 0;
+    bottom: 0;
+}
+
+.editor-sidebar__palette {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    right: 0;
+    left: 0;
+    bottom: 0;
 }
