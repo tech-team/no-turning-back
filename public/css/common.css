@@ -264,6 +264,72 @@ html, body {
 }
 
 /********** game **********/
+.score-content {
+	padding-top: 30px;
+	padding-bottom: 30px;
+	border: solid 1px;
+}
+
+.score-content__score-value {
+	font-size: 60px;
+	margin-bottom: 20px;
+
+}
+
+.score-value__value {
+	padding-left: 25px;
+	padding-right: 25px;
+	border-bottom: solid 1px black;
+}
+
+.score-content__username-field {
+	width: 350px;
+	height: 45px;
+	padding-left: 5px;
+
+	border-style: solid;
+	border-width: 1px;
+	border-right-width: 0px;
+	border-color: #5C5C5C;
+	border-radius: 5px 0 0 5px;
+
+	font-family: 'macondoregular', cursive;
+	font-size: 35px;
+}
+
+.score-content__sendScore-button {
+	width: 70px;
+	height: 49px;
+	vertical-align: top;
+
+	font-family: 'macondoregular', cursive;
+	font-size: 20px;
+	color: black;
+
+	background-color: #FDC66A;
+	
+
+	border-color: black;
+	border-width: 1px;
+	-webkit-border-radius: 0 5px 5px 0;
+    -moz-border-radius: 0 5px 5px 0;
+    border-radius: 0 5px 5px 0;
+
+    -webkit-transition: All 0.2s ease;
+	-moz-transition: All 0.2s ease;
+	-o-transition: All 0.2s ease;
+	-ms-transition: All 0.2s ease;
+	transition: All 0.2s ease;
+
+    cursor: pointer;
+}
+
+.score-content__sendScore-button:hover {
+	background-color: #F7AF28;
+}
+
+
+/********** game **********/
 .game-wrapper {
 	margin-top: 0;
 }
