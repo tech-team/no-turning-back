@@ -28,7 +28,7 @@ function(Backbone, tmpl, Game, ViewManager) {
             this.scene = $('#scene');
             this.calcDimensions();
 
-            this.runGame();
+            
             return this;
         },
         show: function () {
@@ -37,6 +37,7 @@ function(Backbone, tmpl, Game, ViewManager) {
                 type: "showPageEvent",
                 pageId: this.pageId
             });
+            this.runGame();
         },
         hide: function () {
             this.$el.find(this.pageId).hide();
