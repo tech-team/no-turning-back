@@ -3,9 +3,6 @@
   "version": "0.0.0",
   "description": "frontend-game",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/tech-team/frontend-game.git"
@@ -21,6 +18,8 @@
     "grunt-contrib-connect": "~0.6.0",
     "grunt-contrib-watch": "~0.5.3",
     "grunt-fest": "~0.1.5",
-    "grunt-contrib-concat": "~0.3.0"
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-express-server": "~0.4.13",
+    "express": "~3.5.0"
   }
 }

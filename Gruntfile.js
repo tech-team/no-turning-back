@@ -4,16 +4,15 @@ var cssFiles = ['public/css/macondoregular/macondo-font.css',
 
 module.exports = function (grunt) {
 	grunt.initConfig({
-		connect: {
-			server: {
-				options: {
-					keepalive: false,
-					livereload: liveReload,
-					port: 8000,
-					base: 'public'
-				}
-			}
-		},
+		express: {
+            server: {
+                options: {
+                    livereload: true,
+                    port: 8000,
+                    script: 'app.js'
+                }
+            }
+        },
 		fest: {
 			templates: {
 				files: [{
@@ -42,6 +41,16 @@ module.exports = function (grunt) {
 		    }
 		},
 		watch: {
+			express: {
+                files:  [
+                    'routes/**/*.js',
+                    'app.js'
+                ],
+                tasks:  [ 'express' ],
+                options: {
+                    spawn: false
+                }
+            },
 			fest: {
 			    files: ['templates/*.xml'],
 			    tasks: ['fest'],
@@ -55,6 +64,7 @@ module.exports = function (grunt) {
                 tasks: [],
                 options: {
                     atBegin: true,
+                    interrupt: true,
 			        livereload: liveReload
                 }
             },
@@ -68,9 +78,10 @@ module.exports = function (grunt) {
             }
 		}
 	});
-	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-fest');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.registerTask('default', ['connect', 'watch']);
+	grunt.loadNpmTasks('grunt-express-server');
+	
+	grunt.registerTask('default', ['express', 'watch']);
 }
