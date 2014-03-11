@@ -108,6 +108,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
             var offsetX, offsetY;
             var offsetRotation = 4;
             var speedModifier = 2;
+            var reboundModifier = 1.1;
 
             if (event.keys[KeyCoder.W]) {
                 if (event.keys[KeyCoder.SHIFT]) { speedModifier = 4; }
@@ -117,15 +118,20 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
                 this.player.dispObj.y += offsetY;
                 for (var i = 0; i < this.walls.length; ++i) {
                     if (collider.checkPixelCollision (this.player.dispObj, this.walls[i])) {
-                        this.player.dispObj.x -= offsetX;
-                        this.player.dispObj.y -= offsetY;
+                        this.player.dispObj.x -= reboundModifier * offsetX;
+                        this.player.dispObj.y -= reboundModifier * offsetY;
+                        if (collider.checkPixelCollision (this.player.dispObj, this.walls[i])) {
+                            this.player.dispObj.x += (reboundModifier - 1) * offsetX;
+                            this.player.dispObj.y += (reboundModifier - 1) * offsetY;
+                        }
                     }
                 }
                 if (event.keys[KeyCoder.D]) {
                     this.player.dispObj.rotation += offsetRotation;
                     for (var i = 0; i < this.walls.length; ++i) {
                         if (collider.checkPixelCollision (this.player.dispObj, this.walls[i])) {
-                            this.player.dispObj.rotation -= offsetRotation;
+                            this.player.dispObj.rotation -= reboundModifier * offsetRotation;
+
                         }
                     }
                 }
@@ -133,7 +139,8 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
                     this.player.dispObj.rotation -= offsetRotation;
                     for (var i = 0; i < this.walls.length; ++i) {
                         if (collider.checkPixelCollision (this.player.dispObj, this.walls[i])) {
-                            this.player.dispObj.rotation += offsetRotation;
+                            this.player.dispObj.rotation += reboundModifier * offsetRotation;
+
                         }
                     }
                 }
@@ -145,15 +152,20 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
                 this.player.dispObj.y -= offsetY;
                 for (var i = 0; i < this.walls.length; ++i) {
                     if (collider.checkPixelCollision (this.player.dispObj, this.walls[i])) {
-                        this.player.dispObj.x += offsetX;
-                        this.player.dispObj.y += offsetY;
+                        this.player.dispObj.x += reboundModifier * offsetX;
+                        this.player.dispObj.y += reboundModifier * offsetY;
+                        if (collider.checkPixelCollision (this.player.dispObj, this.walls[i])) {
+                            this.player.dispObj.x -= (reboundModifier - 1) * offsetX;
+                            this.player.dispObj.y -= (reboundModifier - 1) * offsetY;
+                        }
                     }
                 }
                 if (event.keys[KeyCoder.D]) {
                     this.player.dispObj.rotation -= offsetRotation;
                     for (var i = 0; i < this.walls.length; ++i) {
                         if (collider.checkPixelCollision (this.player.dispObj, this.walls[i])) {
-                            this.player.dispObj.rotation += offsetRotation;
+                            this.player.dispObj.rotation += reboundModifier * offsetRotation;
+
                         }
                     }
                 }
@@ -161,7 +173,8 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
                     this.player.dispObj.rotation += offsetRotation;
                     for (var i = 0; i < this.walls.length; ++i) {
                         if (collider.checkPixelCollision (this.player.dispObj, this.walls[i])) {
-                            this.player.dispObj.rotation -= offsetRotation;
+                            this.player.dispObj.rotation -= reboundModifier * offsetRotation;
+
                         }
                     }
                 }
@@ -174,6 +187,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
                     for (var i = 0; i < this.walls.length; ++i) {
                         if (collider.checkPixelCollision (this.player.dispObj, this.walls[i])) {
                             this.player.dispObj.rotation -= offsetRotation;
+
                         }
                     }
                 }
@@ -183,11 +197,21 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
                     for (var i = 0; i < this.walls.length; ++i) {
                         if (collider.checkPixelCollision (this.player.dispObj, this.walls[i])) {
                             this.player.dispObj.rotation += offsetRotation;
+
                         }
                     }
                 }
             }
-        },
+
+            if(event.keys[KeyCoder.SPACE] && this.player.cooldown == 0) {
+                console.log("POW!");
+                this.player.cooldown = 30;
+            }
+
+            if (this.player.cooldown > 0) {
+                --this.player.cooldown;
+            }
+        }
 	});
 
 	return Level;
