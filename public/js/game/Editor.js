@@ -4,9 +4,10 @@ define([
     'easel',
     'jquery',
     'game/KeyCoder',
-    'game/ResourceManager'
+    'game/ResourceManager',
+    'game/DefaultObjects'
 ],
-    function(Class, _, easeljs, $, KeyCoder, ResourceManager) {
+    function(Class, _, easeljs, $, KeyCoder, ResourceManager, DefaultObjects) {
         var Editor = Class.$extend({
             __init__: function(level, stage) {
                 this.level = level;
@@ -17,35 +18,25 @@ define([
                 var self = this;
                 $('#levelSave').click(function(evt) {
                     self.onLevelSaveClick();
+                    return false;
                 });
 
                 $('#levelLoad').click(function(evt) {
                     self.onLevelLoadClick();
+                    return false;
                 });
 
                 $('#addObject').click(function() {
                     var type = $('#type-select').val();
                     var tex = $('#add-texture-select').val();
 
-                    var data = {
-                        x: self.stage.getBounds().width/2,
-                        y: self.stage.getBounds().height/2,
-                        r: 0,
-                        type: type,
-                        tex: tex
-                    };
-
-                    var collectionName = type + 's';
-
-                    self.level.levelData[collectionName].push(data);
-                    var dataRef = self.level.levelData[collectionName][self.level.levelData[collectionName].length-1];
-
-                    self.level.addToStage(dataRef);
+                    self.createObject(type, tex);
+                    return false;
                 });
 
                 $('#deleteObject').click(function() {
                     if (!self.selectedObject || self.selectedObject.data.type == 'player')
-                        return;
+                        return false;
 
                     var collectionName = self.selectedObject.data.type + 's';
                     var collection = self.level.levelData[collectionName];
@@ -53,11 +44,12 @@ define([
                     var id = collection.indexOf(self.selectedObject);
                     collection.splice(id, 1);
                     self.stage.removeChild(self.selectedObject);
+                    return false;
                 });
 
                 $(window).bind("mousewheel", function(evt) {
                     if (!self.selectedObject)
-                        return;
+                        return false;
 
                     if (evt.originalEvent.wheelDelta >= 0){
                         self.selectedObject.rotation--;
@@ -66,6 +58,8 @@ define([
                         self.selectedObject.rotation++;
                         self.selectedObject.data.r++;
                     }
+
+                    return false;
                 });
 
                 var textureSelect = $('.texture-select');
@@ -170,6 +164,43 @@ define([
                 this.selectedObject = dispObj;
                 if (this.selectedObject)
                     this.applyFilters(this.selectedObject, [this.selectionFilter]);
+
+                this.generateObjectPropertiesTable();
+            },
+
+            createObject: function(type, tex) {
+                var params = {
+                    x: this.stage.getBounds().width/2,
+                    y: this.stage.getBounds().height/2,
+
+                    type: type,
+                    tex: tex
+                }
+
+                var data = DefaultObjects.build(type, params);
+                var collectionName = type + 's';
+
+                this.level.levelData[collectionName].push(data);
+                var dataRef = this.level.levelData[collectionName][this.level.levelData[collectionName].length-1];
+
+                this.selectObject(this.level.addToStage(dataRef));
+            },
+
+            generateObjectPropertiesTable: function() {
+                var objectTable = $("#selected-object").find("tbody");
+                objectTable.empty();
+
+                for (var field in this.selectedObject.data) {
+                    var tr = $("<tr />");
+                    tr.append($("<td />").text(field + ':'));
+                    tr.append($("<td />")
+                        .append($("<input />")
+                            .attr('type', 'text')
+                            .attr('id', 'object-' + field)
+                            .val(this.selectedObject.data[field])));
+
+                    objectTable.append(tr);
+                }
             }
         });
 

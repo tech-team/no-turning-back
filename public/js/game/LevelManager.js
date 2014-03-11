@@ -43,7 +43,7 @@ function(Class) {
             ],
 
             chests: [
-                {type: "chest", tex: "chest", x: 500, y: 500, width: 32, height: 32, inventory: ["shotgun"]}
+                {type: "chest", tex: "chest", x: 500, y: 500, width: 32, height: 32, storage: ["shotgun"]}
                 // TODO: activation zone for chests
             ],
 

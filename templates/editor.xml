@@ -21,19 +21,19 @@
                 <table>
                     <tr>
                         <td>name:</td>
-                        <td><input type="text"></input></td>
+                        <td><input id="level-name" type="text"></input></td>
                     </tr>
                     <tr>
                         <td>width:</td>
-                        <td><input type="number"></input></td>
+                        <td><input  id="level-width" type="number"></input></td>
                     </tr>
                     <tr>
                         <td>height:</td>
-                        <td><input type="number"></input></td>
+                        <td><input id="level-height" type="number"></input></td>
                     </tr>
                     <tr>
                         <td>tex:</td>
-                        <td><select id="level-texture-select" class="texture-select" /></td>
+                        <td><select id="level-tex" class="texture-select" /></td>
                     </tr>
                 </table>
                 <button id="applyToLevel">Apply</button>
@@ -45,41 +45,12 @@
                         <button id="deleteObject">Delete</button>
                     </div>
                 </h3>
-                <form>
-                    <form>
-                        <table>
-                            <tr>
-                                <td>type:</td>
-                                <td><input type="text"></input></td>
-                            </tr>
-                            <tr>
-                                <td>name:</td>
-                                <td><input type="text"></input></td>
-                            </tr>
-                            <tr>
-                                <td>x:</td>
-                                <td><input type="number"></input></td>
-                            </tr>
-                            <tr>
-                                <td>y:</td>
-                                <td><input type="number"></input></td>
-                            </tr>
-                            <tr>
-                                <td>width:</td>
-                                <td><input type="number"></input></td>
-                            </tr>
-                            <tr>
-                                <td>height:</td>
-                                <td><input type="number"></input></td>
-                            </tr>
-                            <tr>
-                                <td>tex:</td>
-                                <td><select id="object-texture-select" class="texture-select" /></td>
-                            </tr>
-                        </table>
-                    </form>
-                    <button id="applyToObject">Apply</button>
-                </form>
+                <table id="selected-object">
+                    <tbody />
+                </table>
+
+
+                <button id="applyToObject">Apply</button>
             </div>
             <div class="editor-sidebar__group editor-sidebar__palette">
                 <h3 class="editor-sidebar__group__header">Palette:</h3>

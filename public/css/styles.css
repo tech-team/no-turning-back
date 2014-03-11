@@ -310,3 +310,7 @@ html, body {
     left: 0;
     bottom: 0;
 }
+
+.type-specific-props {
+    display: none;
+}
