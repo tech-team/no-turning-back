@@ -1,6 +1,6 @@
 define([
     'backbone',
-    'tmpl/main',
+    'tmpl/form',
     'views/viewmanager'
 ], 
 function(Backbone, tmpl, ViewManager) {
@@ -15,7 +15,7 @@ function(Backbone, tmpl, ViewManager) {
             this.render();
         },
         render: function () {
-            var p = $(this.template());
+            var p = $(this.template({score: 452}));
             p.attr("id", this.pageId.slice(1));
             p.appendTo(this.$el);
             return this;
