@@ -64,8 +64,9 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
             var image = this.images[tex];
 
             //if desired sizes specified differs from actual image's size
-            if (desiredWidth && desiredHeight &&
-                (image.width != desiredWidth || image.height != desiredHeight)) {
+            if (desiredWidth && desiredHeight
+                && desiredWidth != "" && desiredHeight != "" //default editor values
+                && (image.width != desiredWidth || image.height != desiredHeight)) {
                 var tiledImage =
                     ImageTiler(image,
                         desiredWidth/image.width,

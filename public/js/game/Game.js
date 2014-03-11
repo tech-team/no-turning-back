@@ -53,10 +53,6 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 				_.extend(event, self.keyCoder.getKeys());
 				self.update(event);
 			});
-
-            if (this.editorMode) {
-                $
-            }
 		},
 
 		update: function(event) {

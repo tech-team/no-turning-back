@@ -47,6 +47,22 @@ define([
                     return false;
                 });
 
+                $('#applyToObject').click(function() {
+                    if (!self.selectedObject)
+                        return false;
+
+                    var data = {};
+                    var inputs = $("#selected-object").find("input");
+                    inputs.each(function(input) {
+                        var field = input.id();
+                        if (field[0] == 'object')
+                            data[field[1]] = input.val();
+                    });
+
+                    self.updateObjectData(self.selectedObject, data);
+                    return false;
+                });
+
                 $(window).bind("mousewheel", function(evt) {
                     if (!self.selectedObject)
                         return false;
@@ -58,6 +74,8 @@ define([
                         self.selectedObject.rotation++;
                         self.selectedObject.data.r++;
                     }
+
+                    self.regenerateObjectPropertiesTable();
 
                     return false;
                 });
@@ -80,7 +98,7 @@ define([
                 }
 
                 container.on("pressmove", function(evt) {
-                    self.selectObject(evt.currentTarget);
+                    //self.selectObject(evt.currentTarget);
 
                     evt.currentTarget.x = evt.stageX;
                     evt.currentTarget.y = evt.stageY;
@@ -89,15 +107,15 @@ define([
                     evt.currentTarget.data.x = evt.stageX;
                     evt.currentTarget.data.y = evt.stageY;
 
+                    self.regenerateObjectPropertiesTable();
                     //self.stage.update();
                 });
 
-                container.on("click", function(evt) {
+                container.on("mousedown", function(evt) {
                     self.selectObject(evt.currentTarget);
                 });
 
                 container.on("dblclick",function(evt) {
-                    //self.selectObject(evt.currentTarget);
                     self.duplicateObject(self.selectedObject);
                 });
             },
@@ -135,6 +153,14 @@ define([
                     this.selectedObject.rotation++;
                     this.selectedObject.data.r++;
                 }
+
+                //TODO: move it to KeyCoder maybe?
+                var somethingPressed = _.any(event.keys, function(key) {
+                    return key == true;
+                });
+
+                if (somethingPressed)
+                    this.regenerateObjectPropertiesTable();
             },
 
             onLevelSaveClick: function() {
@@ -165,7 +191,7 @@ define([
                 if (this.selectedObject)
                     this.applyFilters(this.selectedObject, [this.selectionFilter]);
 
-                this.generateObjectPropertiesTable();
+                this.regenerateObjectPropertiesTable();
             },
 
             addObjectByData: function(data) {
@@ -195,12 +221,12 @@ define([
                 this.addObjectByData(newData);
             },
 
-            generateObjectPropertiesTable: function() {
-                if (!this.selectedObject)
-                    return;
-
+            regenerateObjectPropertiesTable: function() {
                 var objectTable = $("#selected-object").find("tbody");
                 objectTable.empty();
+
+                if (!this.selectedObject)
+                    return;
 
                 for (var field in this.selectedObject.data) {
                     var tr = $("<tr />");
@@ -213,6 +239,25 @@ define([
 
                     objectTable.append(tr);
                 }
+            },
+
+            updateObjectData: function(dispObj, newData) {
+                if (!dispObj || !newData)
+                    return;
+
+                if (newData.tex != dispObj.data.tex
+                    || newData.w != dispObj.data.w
+                    || newData.h != dispObj.data.h)
+                    alert("Texture params changed.\nWanna see changes right now? Please reload level then.");
+
+                //TODO: replace with _.clone()?
+                for (var field in newData) {
+                    dispObj.data[field] = newData;
+                }
+
+                dispObj.x = dispObj.data.x;
+                dispObj.y = dispObj.data.y;
+                dispObj.rotation = dispObj.data.r;
             }
         });
 

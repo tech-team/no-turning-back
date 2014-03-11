@@ -38,7 +38,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
             //var backgroundSh = this.resourceManager.getTiledSpriteSheet(levelData.tex, levelData.width, levelData.height);
             //var backgroundSprite = new easeljs.Sprite(backgroundSh);
             //this.stage.addChild(backgroundSprite);
-            this.addToStage(levelData);
+            var background = this.addToStage(levelData, true);
 
             //add walls
             _.each(levelData.walls, function(obj) {
@@ -64,11 +64,11 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
             this.player.setDispObj(playerObj);
         },
 
-        addToStage: function(objData) {
+        addToStage: function(objData, doNotCenter) {
             var self = this;
 
             var spriteSheet =
-                this.resourceManager.getTiledSpriteSheet(objData.tex, objData.width, objData.height);
+                this.resourceManager.getTiledSpriteSheet(objData.tex, objData.w, objData.h);
 
             var sprite = new easeljs.Sprite(spriteSheet);
             var objToAdd = sprite;
@@ -80,11 +80,13 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
             }
 
             var dispObj = this.stage.addChild(objToAdd);
-            dispObj.x = objData.x || objData.width/2 || 16;
-            dispObj.y = objData.y || objData.height/2 || 16;
+            dispObj.x = objData.x || objData.width/2 || 0;
+            dispObj.y = objData.y || objData.height/2 || 0;
             dispObj.rotation = objData.r || 0;
-            dispObj.regX = dispObj.getBounds().width / 2;
-            dispObj.regY = dispObj.getBounds().height / 2;
+            if (!doNotCenter) {
+                dispObj.regX = dispObj.getBounds().width / 2;
+                dispObj.regY = dispObj.getBounds().height / 2;
+            }
             dispObj.data = objData;
 
             if (this.editorMode)
