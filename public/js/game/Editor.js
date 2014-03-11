@@ -97,8 +97,8 @@ define([
                 });
 
                 container.on("dblclick",function(evt) {
-                    //TODO: double selectedObject
-                    console.log(evt.currentTarget.data);
+                    //self.selectObject(evt.currentTarget);
+                    self.duplicateObject(self.selectedObject);
                 });
             },
 
@@ -168,6 +168,15 @@ define([
                 this.generateObjectPropertiesTable();
             },
 
+            addObjectByData: function(data) {
+                var collectionName = data.type + 's';
+
+                this.level.levelData[collectionName].push(data);
+                var dataRef = this.level.levelData[collectionName][this.level.levelData[collectionName].length-1];
+
+                this.selectObject(this.level.addToStage(dataRef));
+            },
+
             createObject: function(type, tex) {
                 var params = {
                     x: this.stage.getBounds().width/2,
@@ -178,15 +187,18 @@ define([
                 }
 
                 var data = DefaultObjects.build(type, params);
-                var collectionName = type + 's';
+                this.addObjectByData(data);
+            },
 
-                this.level.levelData[collectionName].push(data);
-                var dataRef = this.level.levelData[collectionName][this.level.levelData[collectionName].length-1];
-
-                this.selectObject(this.level.addToStage(dataRef));
+            duplicateObject: function(dispObj) {
+                var newData = _.clone(dispObj.data);
+                this.addObjectByData(newData);
             },
 
             generateObjectPropertiesTable: function() {
+                if (!this.selectedObject)
+                    return;
+
                 var objectTable = $("#selected-object").find("tbody");
                 objectTable.empty();
 
