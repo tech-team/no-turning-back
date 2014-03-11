@@ -24,6 +24,7 @@ function(Class, $) {
 
 		__classvars__: {
             SHIFT: 16,
+            SPACE: 32,
 			LEFT_ARROW: 37,
 			UP_ARROW: 38,
 			RIGHT_ARROW: 39,
