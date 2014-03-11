@@ -1,6 +1,6 @@
 define([
     'backbone',
-    'tmpl/form',
+    'tmpl/main',
     'views/viewmanager'
 ], 
 function(Backbone, tmpl, ViewManager) {
