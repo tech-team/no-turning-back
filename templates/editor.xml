@@ -6,7 +6,7 @@
 	                <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
 	                <span class="back-button__caption">Back</span>
 	            </a>
-	            <canvas id="editor-field">You have a very old browser, dude.</canvas>
+	            <canvas id="editor-field" tabindex="1">You have a very old browser, dude.</canvas>
 	    </div>
         <div id="editor-sidebar" class="editor-sidebar">
             <!-- TODO: BEM required! -->

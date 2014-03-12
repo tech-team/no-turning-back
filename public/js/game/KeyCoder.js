@@ -4,14 +4,21 @@ define([
 ],
 function(Class, $) {
 	var KeyCoder = Class.$extend({
-		__init__: function() {
+		__init__: function(editorMode) {
 			this.keys = [];
 			var self = this;
-			$(document).keydown(function(event) {
+
+            var listener = null;
+            if (editorMode)
+                listener = $('#editor-field');
+            else
+                listener = $(document);
+
+            listener.keydown(function(event) {
 				self.keys[event.keyCode] = true;
 			});
 
-            $(document).keyup(function(event) {
+            listener.keyup(function(event) {
                 self.keys[event.keyCode] = false;
             });
 		},
