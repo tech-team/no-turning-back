@@ -53,10 +53,11 @@ define([
 
                     var data = {};
                     var inputs = $("#selected-object").find("input");
-                    inputs.each(function(input) {
-                        var field = input.id();
+                    inputs.each(function(i, input) {
+                        var field = input.id.split('-');
+
                         if (field[0] == 'object')
-                            data[field[1]] = input.val();
+                            data[field[1]] = input.value;
                     });
 
                     self.updateObjectData(self.selectedObject, data);
@@ -248,11 +249,13 @@ define([
                 if (newData.tex != dispObj.data.tex
                     || newData.w != dispObj.data.w
                     || newData.h != dispObj.data.h)
-                    alert("Texture params changed.\nWanna see changes right now? Please reload level then.");
+                    alert("Texture params changed.\n"
+                            + "Seriously! They are, thrust me!"
+                            + "But for now ypu can't see changes in editor");
 
                 //TODO: replace with _.clone()?
                 for (var field in newData) {
-                    dispObj.data[field] = newData;
+                    dispObj.data[field] = newData[field];
                 }
 
                 dispObj.x = dispObj.data.x;
