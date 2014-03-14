@@ -208,6 +208,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
                 this.player.cooldown = 30;
             }
 
+            //TODO: move to player class
             if (this.player.cooldown > 0) {
                 --this.player.cooldown;
             }

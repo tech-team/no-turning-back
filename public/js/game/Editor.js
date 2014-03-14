@@ -204,13 +204,18 @@ define([
                 this.selectObject(this.level.addToStage(dataRef));
             },
 
-            createObject: function(type, tex) {
+            createObject: function(type, tex, w, h) {
                 var params = {
                     x: this.stage.getBounds().width/2,
                     y: this.stage.getBounds().height/2,
 
                     type: type,
                     tex: tex
+                }
+
+                if (w && h) {
+                    params.w = w;
+                    params.h = h;
                 }
 
                 var data = DefaultObjects.build(type, params);
@@ -248,12 +253,10 @@ define([
 
                 if (newData.tex != dispObj.data.tex
                     || newData.w != dispObj.data.w
-                    || newData.h != dispObj.data.h)
-                    alert("Texture params changed.\n"
-                            + "Seriously! They are, thrust me!"
-                            + "But for now ypu can't see changes in editor");
+                    || newData.h != dispObj.data.h) {
+                    dispObj = this.updateDispObjTexture(newData);
+                }
 
-                //TODO: replace with _.clone()?
                 for (var field in newData) {
                     dispObj.data[field] = newData[field];
                 }
@@ -261,6 +264,13 @@ define([
                 dispObj.x = dispObj.data.x;
                 dispObj.y = dispObj.data.y;
                 dispObj.rotation = dispObj.data.r;
+            },
+
+            updateDispObjTexture: function(dispObj, newData, w, h) {
+                var newDispObj = null;
+
+
+                return newDispObj;
             }
         });
 
