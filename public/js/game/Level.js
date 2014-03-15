@@ -64,7 +64,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
             this.player.setDispObj(playerObj);
         },
 
-        addToStage: function(objData, doNotCenter) {
+        addToStage: function(objData, doNotCenter, id) {
             var self = this;
 
             var spriteSheet =
@@ -79,7 +79,12 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
                 objToAdd = container;
             }
 
-            var dispObj = this.stage.addChild(objToAdd);
+            var dispObj = null;
+            if (id)
+                dispObj = this.stage.addChildAt(objToAdd, id);
+            else
+                dispObj = this.stage.addChild(objToAdd);
+
             dispObj.x = objData.x || objData.width/2 || 0;
             dispObj.y = objData.y || objData.height/2 || 0;
             dispObj.rotation = objData.r || 0;

@@ -52,15 +52,18 @@ define([
                         return false;
 
                     var data = {};
-                    var inputs = $("#selected-object").find("input");
+                    var inputs = $("#selected-object").find("input, select");
                     inputs.each(function(i, input) {
+                        var $input = $(input);
+
                         var field = input.id.split('-');
 
                         if (field[0] == 'object')
-                            data[field[1]] = input.value;
+                            data[field[1]] = parseInt($input.val()) || $input.val();
                     });
 
                     self.updateObjectData(self.selectedObject, data);
+                    self.regenerateObjectPropertiesTable();
                     return false;
                 });
 
@@ -81,7 +84,12 @@ define([
                     return false;
                 });
 
-                var textureSelect = $('.texture-select');
+                this.populateTexSelect();
+            },
+
+            populateTexSelect: function(select) {
+                var textureSelect = select || $('.texture-select');
+
                 _.each(ResourceManager.texList, function(tex) {
                     textureSelect.append($("<option />").val(tex).text(tex));
                 });
@@ -195,13 +203,16 @@ define([
                 this.regenerateObjectPropertiesTable();
             },
 
-            addObjectByData: function(data) {
+            addObjectByData: function(data, id) {
                 var collectionName = data.type + 's';
 
                 this.level.levelData[collectionName].push(data);
                 var dataRef = this.level.levelData[collectionName][this.level.levelData[collectionName].length-1];
 
-                this.selectObject(this.level.addToStage(dataRef));
+                var dispObj = this.level.addToStage(dataRef, false, id);
+                this.selectObject(dispObj);
+
+                return dispObj;
             },
 
             createObject: function(type, tex, w, h) {
@@ -237,14 +248,27 @@ define([
                 for (var field in this.selectedObject.data) {
                     var tr = $("<tr />");
                     tr.append($("<td />").text(field + ':'));
-                    tr.append($("<td />")
-                        .append($("<input />")
+                    var td = $("<td />");
+                    if (field != 'tex') {
+                        td.append($("<input />")
                             .attr('type', 'text')
                             .attr('id', 'object-' + field)
-                            .val(this.selectedObject.data[field])));
+                            .val(this.selectedObject.data[field]));
+                    }
+                    else {
+                        var select = $("<select />")
+                            .attr('id', 'object-' + field)
+                        td.append(select);
+
+                        this.populateTexSelect(select);
+                        select.val(this.selectedObject.data[field]);
+                    }
+                    tr.append(td);
 
                     objectTable.append(tr);
                 }
+
+                $('#object-type').prop('disabled', true);
             },
 
             updateObjectData: function(dispObj, newData) {
@@ -254,7 +278,8 @@ define([
                 if (newData.tex != dispObj.data.tex
                     || newData.w != dispObj.data.w
                     || newData.h != dispObj.data.h) {
-                    dispObj = this.updateDispObjTexture(newData);
+                    this.replaceObject(dispObj, newData);
+                    alert(newData.tex + " : " + dispObj.data.tex);
                 }
 
                 for (var field in newData) {
@@ -266,11 +291,16 @@ define([
                 dispObj.rotation = dispObj.data.r;
             },
 
-            updateDispObjTexture: function(dispObj, newData, w, h) {
-                var newDispObj = null;
+            replaceObject: function(dispObj, newData) {
+                dispObj.removeAllChildren();
 
+                var spriteSheet =
+                    this.level.resourceManager.getTiledSpriteSheet(newData.tex, newData.w, newData.h);
 
-                return newDispObj;
+                var sprite = new easeljs.Sprite(spriteSheet);
+
+                dispObj.addChild(sprite);
+                this.selectObject(dispObj);
             }
         });
 
