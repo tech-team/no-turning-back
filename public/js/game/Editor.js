@@ -7,10 +7,12 @@ define([
     'game/ResourceManager',
     'game/DefaultObjects'
 ],
+    //TODO: too many code here
     function(Class, _, easeljs, $, KeyCoder, ResourceManager, DefaultObjects) {
         var Editor = Class.$extend({
             __init__: function(level, stage) {
                 this.level = level;
+
                 this.stage = stage;
                 this.selectedObject = null;
                 this.selectionFilter = new easeljs.ColorFilter(1, 1, 1, 1, 10, 60, 10, 100);
@@ -58,12 +60,35 @@ define([
 
                         var field = input.id.split('-');
 
-                        if (field[0] == 'object')
-                            data[field[1]] = parseInt($input.val()) || $input.val();
+                        if (field[0] == 'object') {
+                            var prop = field[1];
+                            if ($input.data('isArray') == true)
+                                data[prop] = $input.val().split(',');
+                            else
+                                data[prop] = parseInt($input.val()) || $input.val();
+                        }
                     });
 
                     self.updateObjectData(self.selectedObject, data);
                     self.regenerateObjectPropertiesTable();
+                    return false;
+                });
+
+                $('#applyToLevel').click(function() {
+                    var data = {};
+                    var inputs = $("#level-object").find("input, select");
+                    inputs.each(function(i, input) {
+                        var $input = $(input);
+                        var field = input.id.split('-');
+
+                        if (field[0] == 'level') {
+                            var prop = field[1];
+                            data[prop] = parseInt($input.val()) || $input.val();
+                        }
+                    });
+
+                    self.updateLevelData(data);
+                    self.regenerateLevelPropertiesTable();
                     return false;
                 });
 
@@ -84,6 +109,7 @@ define([
                     return false;
                 });
 
+                this.regenerateLevelPropertiesTable();
                 this.populateTexSelect();
             },
 
@@ -117,16 +143,27 @@ define([
                     evt.currentTarget.data.y = evt.stageY;
 
                     self.regenerateObjectPropertiesTable();
-                    //self.stage.update();
                 });
 
                 container.on("mousedown", function(evt) {
                     self.selectObject(evt.currentTarget);
                 });
 
-                container.on("dblclick",function(evt) {
+                container.on("dblclick", function(evt) {
                     self.duplicateObject(self.selectedObject);
                 });
+            },
+
+            loadDefaultLevel: function() {
+                var player = DefaultObjects.build('player');
+                var level = DefaultObjects.level;
+                level.player = player;
+                //warning, overriding Level's data
+                this.level.data = level;
+
+                this.stage.removeAllChildren();
+                this.level.addToStage(level, true, 0);
+                this.level.addToStage(player);
             },
 
             keyFunc: function(event) {
@@ -177,7 +214,8 @@ define([
             },
 
             onLevelLoadClick: function() {
-                alert("Not implemented");
+                if (confirm("All changes will be lost.\nDo you really want to load an empty map?"))
+                    this.loadDefaultLevel();
             },
 
             applyFilters: function(dispObj, filters) {
@@ -238,35 +276,54 @@ define([
                 this.addObjectByData(newData);
             },
 
-            regenerateObjectPropertiesTable: function() {
-                var objectTable = $("#selected-object").find("tbody");
+            regeneratePropertiesTable: function(tableId, idPrefix, data) {
+                var objectTable = $(tableId).find("tbody");
                 objectTable.empty();
 
-                if (!this.selectedObject)
-                    return;
-
-                for (var field in this.selectedObject.data) {
+                for (var field in data) {
                     var tr = $("<tr />");
                     tr.append($("<td />").text(field + ':'));
                     var td = $("<td />");
                     if (field != 'tex') {
                         td.append($("<input />")
                             .attr('type', 'text')
-                            .attr('id', 'object-' + field)
-                            .val(this.selectedObject.data[field]));
+                            .attr('id', idPrefix + '-' + field)
+                            .data('isArray', _.isArray(data[field]))
+                            .val(data[field]));
                     }
                     else {
                         var select = $("<select />")
-                            .attr('id', 'object-' + field)
+                            .attr('id', idPrefix + '-' + field)
+                            .data('isArray', _.isArray(data[field]));
                         td.append(select);
 
                         this.populateTexSelect(select);
-                        select.val(this.selectedObject.data[field]);
+                        select.val(data[field]);
                     }
                     tr.append(td);
 
                     objectTable.append(tr);
                 }
+            },
+
+            regenerateLevelPropertiesTable: function() {
+                //exclude arrays
+                var obj = this.level.data;
+
+                var excludedKeys = _.filter(_.keys(obj), function(el) { return _.isArray(obj[el]); });
+                excludedKeys.push('player');
+                excludedKeys.push('draggable');
+                excludedKeys.push('type');
+
+                this.regeneratePropertiesTable('#level-object', 'level',
+                    _.omit(this.level.data, excludedKeys));
+            },
+
+            regenerateObjectPropertiesTable: function() {
+                if (!this.selectedObject)
+                    return;
+
+                this.regeneratePropertiesTable('#selected-object', 'object', this.selectedObject.data);
 
                 $('#object-type').prop('disabled', true);
             },
@@ -279,7 +336,6 @@ define([
                     || newData.w != dispObj.data.w
                     || newData.h != dispObj.data.h) {
                     this.replaceObject(dispObj, newData);
-                    alert(newData.tex + " : " + dispObj.data.tex);
                 }
 
                 for (var field in newData) {
@@ -291,6 +347,23 @@ define([
                 dispObj.rotation = dispObj.data.r;
             },
 
+            updateLevelData: function(newData) {
+                if (!newData)
+                    return;
+
+                var dispObj = this.level.background;
+
+                if (newData.tex != dispObj.data.tex
+                    || newData.w != dispObj.data.w
+                    || newData.h != dispObj.data.h) {
+                    this.replaceObject(dispObj, newData);
+                }
+
+                for (var field in newData) {
+                    dispObj.data[field] = newData[field];
+                }
+            },
+
             replaceObject: function(dispObj, newData) {
                 dispObj.removeAllChildren();
 
@@ -300,7 +373,9 @@ define([
                 var sprite = new easeljs.Sprite(spriteSheet);
 
                 dispObj.addChild(sprite);
-                this.selectObject(dispObj);
+
+                if (this.selectedObject == dispObj) //if it was selected
+                    this.selectObject(dispObj); //update it
             }
         });
 

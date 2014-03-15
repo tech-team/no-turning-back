@@ -9,19 +9,20 @@ define([
 function(Class, _, easeljs, collider, KeyCoder, Editor) {
 	var Level = Class.$extend({
 		__init__: function(stage, levelData, player, resourceManager, editorMode) {
+            this.data = levelData;
+
             this.editorMode = editorMode;
 
             if (this.editorMode)
                 this.editor = new Editor(this, stage);
 
             this.stage = stage;
+            this.background = null;
             this.player = player;
             this.resourceManager = resourceManager;
             this.walls = [];
             this.doors = [];
             this.chests = [];
-
-            this.data = levelData;
 
             this.reload(levelData);
 		},
@@ -38,7 +39,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor) {
             //var backgroundSh = this.resourceManager.getTiledSpriteSheet(levelData.tex, levelData.width, levelData.height);
             //var backgroundSprite = new easeljs.Sprite(backgroundSh);
             //this.stage.addChild(backgroundSprite);
-            var background = this.addToStage(levelData, true);
+            this.background = this.addToStage(levelData, true);
 
             //add walls
             _.each(levelData.walls, function(obj) {

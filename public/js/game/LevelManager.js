@@ -22,13 +22,12 @@ function(Class) {
         },
 
 		dummyLevel: {
-            w: 1280,
-            h: 768,
             tex: "ground",
             type: "background",
-            draggable: false,
-
             name: "Dummy level",
+            draggable: false,
+            w: 1280,
+            h: 768,
 
             player: {
                 type: "player",
@@ -37,7 +36,7 @@ function(Class) {
                 r: 0,
                 w: "", h: "",
                 health: 100,
-                inventory: ["silver_key"]
+                inventory: ["silver_key", "key"]
             },
 
             mobs: [

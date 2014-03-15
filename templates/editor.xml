@@ -18,23 +18,8 @@
                         <button id="levelSave">Save</button>
                     </span>
                 </h3>
-                <table>
-                    <tr>
-                        <td>name:</td>
-                        <td><input id="level-name" type="text"></input></td>
-                    </tr>
-                    <tr>
-                        <td>width:</td>
-                        <td><input  id="level-width" type="number"></input></td>
-                    </tr>
-                    <tr>
-                        <td>height:</td>
-                        <td><input id="level-height" type="number"></input></td>
-                    </tr>
-                    <tr>
-                        <td>tex:</td>
-                        <td><select id="level-tex" class="texture-select" /></td>
-                    </tr>
+                <table id="level-object">
+                    <tbody />
                 </table>
                 <button id="applyToLevel">Apply</button>
             </div>
