@@ -40,24 +40,34 @@ function(Class) {
             },
 
             mobs: [
-                {type: "mob", name: "Vasja", tex: "zombie", r: "", x: 200, y: 200, w: "", h: "", drops: ["golden_key"]}
+                {type: "mob", name: "Vasja", tex: "zombie", r: 0, x: 500, y: 600, w: "", h: "", speed: 2,
+                    drops: ["golden_key"],
+                    waypoints: [
+                        {type: "waypoint", tex: "waypoint", x: 400, y: 400, w: "", h: ""},
+                        {type: "waypoint", tex: "waypoint", x: 600, y: 400, w: "", h: ""},
+                        {type: "waypoint", tex: "waypoint", x: 700, y: 200, w: "", h: ""},
+                    ]}
             ],
 
             chests: [
-                {type: "chest", tex: "chest", x: 500, y: 500, r: 0, w: "", h: "", storage: ["shotgun"]}
+                {type: "chest", tex: "chest", x: 500, y: 500, r: 0, w: "", h: "", storage: ["shotgun"], state: "closed"}
                 // TODO: activation zone for chests
             ],
 
             doors: [
-                {type: "door", tex: "door", x: 250, y: 250, r: 0, w: "", h: "", require: "golden_key", role: "exit", state: "closed"}
+                {type: "door", tex: "door-closed", x: 300, y: 300, r: 0, w: "", h: "", require: "golden_key", role: "exit", state: "closed"}
             ],
 
             walls: [
                 {type: "wall", tex: "brick_wall2", x: 64, y: 64, r: 10, w: "", h: ""},
+                {type: "wall", tex: "brick_wall2", x: 180, y: 180, r: 0, w: "", h: ""},
+                {type: "wall", tex: "brick_wall2", x: 256, y: 256, r: 90, w: "", h: ""}
             ],
 
             objects: [
-            ]
+            ],
+
+
 		}
 	});
 
