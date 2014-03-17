@@ -144,7 +144,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Mob, Chest, Door) {
                 this.keyFunc(event);
                 this.player.update(event);
                 for (var i = 0; i < this.mobs.length; ++i) {
-                    this.mobs[i].update(event);
+                    this.mobs[i].update(event, this.player);
                 }
             }
             else

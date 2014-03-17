@@ -44,8 +44,21 @@ function(Class) {
                     drops: ["golden_key"],
                     waypoints: [
                         {type: "waypoint", tex: "waypoint", x: 400, y: 400, w: "", h: ""},
-                        {type: "waypoint", tex: "waypoint", x: 600, y: 400, w: "", h: ""},
-                        {type: "waypoint", tex: "waypoint", x: 700, y: 200, w: "", h: ""},
+                        {type: "waypoint", tex: "waypoint", x: 400, y: 600, w: "", h: ""},
+                        {type: "waypoint", tex: "waypoint", x: 700, y: 600, w: "", h: ""}
+                    ]},
+                {type: "mob", name: "Vasja", tex: "zombie", r: 0, x: 700, y: 150, w: "", h: "", speed: 2,
+                    drops: ["golden_key"],
+                    waypoints: [
+                        {type: "waypoint", tex: "waypoint", x: 600, y: 200, w: "", h: ""},
+                        {type: "waypoint", tex: "waypoint", x: 700, y: 500, w: "", h: ""},
+                        {type: "waypoint", tex: "waypoint", x: 800, y: 500, w: "", h: ""}
+                    ]},
+                {type: "mob", name: "Vasja", tex: "zombie", r: 0, x: 150, y: 500, w: "", h: "", speed: 2,
+                    drops: ["golden_key"],
+                    waypoints: [
+                        {type: "waypoint", tex: "waypoint", x: 100, y: 450, w: "", h: ""},
+                        {type: "waypoint", tex: "waypoint", x: 1000, y: 450, w: "", h: ""}
                     ]}
             ],
 
