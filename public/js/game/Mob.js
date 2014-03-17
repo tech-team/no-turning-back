@@ -41,6 +41,9 @@ define([
 
                 if (vectorToPlayer.distance() < 150) {
                     this.target = player.dispObj;
+                    if (vectorToPlayer.distance() < 20) {
+                        player.health -= 0.5;
+                    }
                 }
                 else {
                     this.target = this.waypoints[this.currentWaypoint];

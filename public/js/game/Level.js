@@ -146,6 +146,14 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Mob, Chest, Door) {
                 for (var i = 0; i < this.mobs.length; ++i) {
                     this.mobs[i].update(event, this.player);
                 }
+
+                if (this.player.health <= 0) {
+                    console.log("Game over.");
+                    $.event.trigger({
+                        type: "levelFinished",
+                        score: this.player.score
+                    });
+                }
             }
             else
                 this.editor.keyFunc(event);
@@ -260,6 +268,8 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Mob, Chest, Door) {
             if (this.player.cooldown > 0) {
                 --this.player.cooldown;
             }
+
+
         }
 	});
 
