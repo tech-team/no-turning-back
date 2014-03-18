@@ -74,7 +74,8 @@ function(Class) {
             walls: [
                 {type: "wall", tex: "brick_wall2", x: 64, y: 64, r: 10, w: "", h: ""},
                 {type: "wall", tex: "brick_wall2", x: 180, y: 180, r: 0, w: "", h: ""},
-                {type: "wall", tex: "brick_wall2", x: 256, y: 256, r: 270, w: "", h: ""}
+                {type: "wall", tex: "brick_wall2", x: 256, y: 256, r: 270, w: "", h: ""},
+                {type: "wall", tex: "brick_wall2", x: 256, y: 256, r: 90, w: "", h: ""}
             ],
 
             objects: [

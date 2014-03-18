@@ -10,7 +10,7 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
         __classvars__: {
             texList: ["ground", "zombie", "player", "wall", "brick_wall1", "brick_wall2",
                 "brick_wall3", "brick_wall4", "chest", "door-open", "door-closed", "rubbish",
-                "waypoint"]
+                "waypoint", "pistol-bullet"]
         },
 
 		__init__: function(onComplete, onCompleteContext) {
