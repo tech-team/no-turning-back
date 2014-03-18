@@ -170,6 +170,14 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Mob, Chest, Door, Bullet
             var speedModifier = 2;
             var reboundModifier = 1.1;
 
+            var self = this;
+            if (event.keys[KeyCoder.E]) {
+                $.event.trigger({
+                    type: "levelFinished",
+                    score: self.player.score
+                });
+            }
+
             if (event.keys[KeyCoder.W]) {
                 if (event.keys[KeyCoder.SHIFT]) { speedModifier = 4; }
                 offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.player.dispObj.rotation);

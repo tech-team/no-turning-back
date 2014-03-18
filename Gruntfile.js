@@ -1,13 +1,14 @@
 var liveReload = true;
 var cssFiles = ['public/css/macondoregular/macondo-font.css',
-				'public/css/styles.css']
+				'public/css/styles.css'];
+var commonCss = 'public/css/common.css';
+var jsFiles = ['public/js/**/*.js'];
 
 module.exports = function (grunt) {
 	grunt.initConfig({
 		express: {
             server: {
                 options: {
-                    livereload: true,
                     port: 8000,
                     script: 'app.js'
                 }
@@ -32,12 +33,12 @@ module.exports = function (grunt) {
 			}
 		},
 		concat: {
-			options: {
-		    	separator: '\n',
-		    },
 		    css: {
 		    	src: cssFiles,
 		    	dest: 'public/css/common.css',
+		    	options: {
+			    	separator: '\n',
+			    }
 		    }
 		},
 		watch: {
@@ -48,7 +49,9 @@ module.exports = function (grunt) {
                 ],
                 tasks:  [ 'express' ],
                 options: {
-                    spawn: false
+                    spawn: false,
+                    atBegin: true
+
                 }
             },
 			fest: {
@@ -59,11 +62,10 @@ module.exports = function (grunt) {
 			        livereload: liveReload
 			    }
 			},
-            js: {
-                files: 'public/js/**/*.js',
+            frontend: {
+                files: jsFiles.concat([commonCss]),
                 tasks: [],
                 options: {
-                    atBegin: true,
                     interrupt: true,
 			        livereload: liveReload
                 }
@@ -71,10 +73,7 @@ module.exports = function (grunt) {
             css: {
                 files: cssFiles,
                 tasks: ['concat:css'],
-                options: {
-                    atBegin: true,
-			        livereload: liveReload
-                }
+                options: {}
             }
 		}
 	});
@@ -82,6 +81,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-express-server');
+	
 	
 	grunt.registerTask('default', ['express', 'watch']);
 }
