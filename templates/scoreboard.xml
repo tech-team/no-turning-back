@@ -30,7 +30,7 @@
 		    	</div>
 	    		<a href="#main" class="back-button">
 	    			<div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
-	    			<span class="back-button__caption">Back</span>
+	    			<span class="back-button__caption">Menu</span>
 	    		</a>
 			</div>
 			<footer class="page-footer">

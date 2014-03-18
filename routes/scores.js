@@ -1,6 +1,12 @@
 var scores = [],
 	id = 0;
 
+var test = {
+	name: "test",
+	score: 21
+}
+scores.push(test);
+
 function sortScores(){
 	scores.sort(function(a,b){
 		return a.score < b.score;

@@ -41,7 +41,7 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
             this.state = Game.GameState.Game;
 
             var levelData = this.levelManager.loadLevel(this.startLevelId);
-
+ 
             this.level = new Level(this.stage, levelData, this.player, this.resourceManager, this.editorMode);
         },
 
@@ -53,10 +53,6 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 				_.extend(event, self.keyCoder.getKeys());
 				self.update(event);
 			});
-
-            if (this.editorMode) {
-                $
-            }
 		},
 
 		update: function(event) {
