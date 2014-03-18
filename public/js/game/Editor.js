@@ -10,10 +10,15 @@ define([
     //TODO: too many code here
     function(Class, _, easeljs, $, KeyCoder, ResourceManager, DefaultObjects) {
         var Editor = Class.$extend({
+            __classvars__: {
+                duplicateDelta: 30
+            },
+
             __init__: function(level, stage) {
                 this.level = level;
 
                 this.stage = stage;
+                this.showingWpsOwner = null;
                 this.selectedObject = null;
                 this.selectionFilter = new easeljs.ColorFilter(1, 1, 1, 1, 10, 60, 10, 100);
 
@@ -37,15 +42,8 @@ define([
                 });
 
                 $('#deleteObject').click(function() {
-                    if (!self.selectedObject || self.selectedObject.data.type == 'player')
-                        return false;
-
-                    var collectionName = self.selectedObject.data.type + 's';
-                    var collection = self.level.levelData[collectionName];
-
-                    var id = collection.indexOf(self.selectedObject);
-                    collection.splice(id, 1);
-                    self.stage.removeChild(self.selectedObject);
+                    if (self.selectedObject)
+                        self.deleteObject(self.selectedObject);
                     return false;
                 });
 
@@ -87,7 +85,7 @@ define([
                         }
                     });
 
-                    self.updateLevelData(data);
+                    self.updatedata(data);
                     self.regenerateLevelPropertiesTable();
                     return false;
                 });
@@ -135,14 +133,16 @@ define([
                 container.on("pressmove", function(evt) {
                     //self.selectObject(evt.currentTarget);
 
-                    evt.currentTarget.x = evt.stageX;
-                    evt.currentTarget.y = evt.stageY;
+                    if (evt.nativeEvent.button != 1) { //middle mouse button
+                        evt.currentTarget.x = evt.stageX;
+                        evt.currentTarget.y = evt.stageY;
 
-                    //TODO: properties, which will set .x and .data.x fields simultaneously, would be much appreciated
-                    evt.currentTarget.data.x = evt.stageX;
-                    evt.currentTarget.data.y = evt.stageY;
+                        //TODO: properties, which will set .x and .data.x fields simultaneously, would be much appreciated
+                        evt.currentTarget.data.x = evt.stageX;
+                        evt.currentTarget.data.y = evt.stageY;
 
-                    self.regenerateObjectPropertiesTable();
+                        self.regenerateObjectPropertiesTable();
+                    }
                 });
 
                 container.on("mousedown", function(evt) {
@@ -210,7 +210,8 @@ define([
             },
 
             onLevelSaveClick: function() {
-                alert(JSON.stringify(this.level.data));
+                console.log(JSON.stringify(this.level.data));
+                alert("Watch result in your console log!");
             },
 
             onLevelLoadClick: function() {
@@ -235,19 +236,29 @@ define([
 
                 //select object
                 this.selectedObject = dispObj;
-                if (this.selectedObject)
+                if (this.selectedObject) {
                     this.applyFilters(this.selectedObject, [this.selectionFilter]);
+
+                    if (this.selectedObject.data.type == 'zombie') {
+                        this.showObjectWayPoints(this.selectedObject);
+                    }
+                }
 
                 this.regenerateObjectPropertiesTable();
             },
 
             addObjectByData: function(data, id) {
-                var collectionName = data.type + 's';
+                if (data.type != 'waypoint')
+                    this.level.data[data.type + 's'].push(data);
+                else {
+                    //insert after clicked wp
+                    var wps = this.showingWpsOwner.data.waypoints;
 
-                this.level.levelData[collectionName].push(data);
-                var dataRef = this.level.levelData[collectionName][this.level.levelData[collectionName].length-1];
+                    var index = wps.indexOf(this.selectedObject) + 1;
+                    wps.splice(index, 0, data);
+                }
 
-                var dispObj = this.level.addToStage(dataRef, false, id);
+                var dispObj = this.level.addToStage(data, false, id);
                 this.selectObject(dispObj);
 
                 return dispObj;
@@ -268,11 +279,20 @@ define([
                 }
 
                 var data = DefaultObjects.build(type, params);
-                this.addObjectByData(data);
+                if (data.type == 'zombie') {
+                    //create first WP
+                    var wp = DefaultObjects.build('waypoint', {x: data.x + Editor.duplicateDelta, y: data.y});
+                    data.waypoints.push(wp);
+                }
+
+                var dispObj = this.addObjectByData(data);
+                this.showObjectWayPoints(dispObj);
             },
 
             duplicateObject: function(dispObj) {
                 var newData = _.clone(dispObj.data);
+                newData.x += Editor.duplicateDelta;
+
                 this.addObjectByData(newData);
             },
 
@@ -323,7 +343,8 @@ define([
                 if (!this.selectedObject)
                     return;
 
-                this.regeneratePropertiesTable('#selected-object', 'object', this.selectedObject.data);
+                this.regeneratePropertiesTable('#selected-object', 'object',
+                    _.omit(this.selectedObject.data, ['waypoints']));
 
                 $('#object-type').prop('disabled', true);
             },
@@ -347,7 +368,7 @@ define([
                 dispObj.rotation = dispObj.data.r;
             },
 
-            updateLevelData: function(newData) {
+            updatedata: function(newData) {
                 if (!newData)
                     return;
 
@@ -376,6 +397,46 @@ define([
 
                 if (this.selectedObject == dispObj) //if it was selected
                     this.selectObject(dispObj); //update it
+            },
+
+            showObjectWayPoints: function(dispObj) {
+                var self = this;
+                var oldWps = [];
+
+                //find old waypoints
+                _.each(this.stage.children, function(child) {
+                    if (child.data.type == 'waypoint')
+                        oldWps.push(child);
+                });
+
+                //delete them
+                _.each(oldWps, function(wp) {
+                    self.stage.removeChild(wp);
+                });
+
+                //show new ones
+                this.showingWpsOwner = dispObj;
+                _.each(this.showingWpsOwner.data.waypoints, function(wp) {
+                    self.level.addToStage(wp);
+                });
+            },
+
+            deleteObject: function(dispObj) {
+                if (!dispObj || dispObj.data.type == 'player')
+                    return;
+
+                var collection = null;
+                if (dispObj.data.type != 'waypoint') {
+                    var collectionName = dispObj.data.type + 's';
+                    collection = this.level.data[collectionName];
+                }
+                else {
+                    collection = this.showingWpsOwner.data.waypoints;
+                }
+
+                var id = collection.indexOf(dispObj);
+                collection.splice(id, 1);
+                this.stage.removeChild(dispObj);
             }
         });
 

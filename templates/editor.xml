@@ -41,6 +41,7 @@
                 <h3 class="editor-sidebar__group__header">Palette:</h3>
                 <form>
                     <select id="type-select">
+                        <option value="zombie">Zombie</option>
                         <option value="wall">Wall</option>
                         <option value="chest">Chest</option>
                         <option value="door">Door</option>

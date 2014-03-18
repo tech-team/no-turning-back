@@ -5,14 +5,14 @@ define([
     'collision',
     'game/KeyCoder',
     'game/Editor',
-    'game/Mob',
+    'game/Zombie',
     'game/Chest',
     'game/Door'
 ],
-function(Class, _, easeljs, collider, KeyCoder, Editor, Mob, Chest, Door) {
+function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door) {
 	var Level = Class.$extend({
-		__init__: function(stage, levelData, player, resourceManager, editorMode) {
-            this.data = levelData;
+		__init__: function(stage, data, player, resourceManager, editorMode) {
+            this.data = data;
 
             this.editorMode = editorMode;
 
@@ -27,42 +27,42 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Mob, Chest, Door) {
             this.walls = [];
             this.doors = [];
             this.chests = [];
-            this.mobs = [];
+            this.zombies = [];
             this.collisionObjects = [];
 
-            this.reload(levelData);
+            this.reload(data);
 		},
 
-        reload: function(levelData) {
+        reload: function(data) {
             var self = this;
-            this.levelData = levelData;
+            this.data = data;
 
             //reset stage
             this.stage.removeAllChildren();
             this.stage.update();
 
             //add background
-            //var backgroundSh = this.resourceManager.getTiledSpriteSheet(levelData.tex, levelData.width, levelData.height);
+            //var backgroundSh = this.resourceManager.getTiledSpriteSheet(data.tex, data.width, data.height);
             //var backgroundSprite = new easeljs.Sprite(backgroundSh);
             //this.stage.addChild(backgroundSprite);
-            this.background = this.addToStage(levelData, true);
+            this.background = this.addToStage(data, true);
 
             //add walls
-            _.each(levelData.walls, function(obj) {
+            _.each(data.walls, function(obj) {
                 self.walls.push(self.addToStage(obj));
             });
 
             //TODO: doors and chests have some additional parameteres, should they be classes
             //TODO: or should we just add some fields to existing displayObjects?
             //add doors
-            _.each(levelData.doors, function(obj) {
+            _.each(data.doors, function(obj) {
                 var door = new Door(obj);
                 door.setDispObj(self.addToStage(obj));
                 self.doors.push(door);
             });
 
             //add chests
-            _.each(levelData.chests, function(obj) {
+            _.each(data.chests, function(obj) {
                 var chest = new Chest(obj);
                 chest.setDispObj(self.addToStage(obj));
                 self.chests.push(chest);
@@ -70,21 +70,21 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Mob, Chest, Door) {
 
 
             //add enemies
-            _.each(levelData.mobs, function(obj) {
-                var mob = new Mob(obj);
-                mob.setDispObj(self.addToStage(obj));
-                self.mobs.push(mob);
+            _.each(data.zombies, function(obj) {
+                var zombie = new Zombie(obj);
+                zombie.setDispObj(self.addToStage(obj));
+                self.zombies.push(zombie);
             });
 
             //add waypoints
-            for (var i = 0; i < self.mobs.length; ++i) {
-                _.each(self.mobs[i].waypoints, function(obj) {
+            for (var i = 0; i < self.zombies.length; ++i) {
+                _.each(self.zombies[i].waypoints, function(obj) {
                     self.addToStage(obj);
                 });
             }
 
             //add player
-            var playerObj = this.addToStage(levelData.player);
+            var playerObj = this.addToStage(data.player);
             this.player.setDispObj(playerObj);
 
             this.createCollisionObjects();
@@ -143,8 +143,8 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Mob, Chest, Door) {
             if (!this.editorMode) {
                 this.keyFunc(event);
                 this.player.update(event);
-                for (var i = 0; i < this.mobs.length; ++i) {
-                    this.mobs[i].update(event, this.player);
+                for (var i = 0; i < this.zombies.length; ++i) {
+                    this.zombies[i].update(event, this.player);
                 }
 
                 if (this.player.health <= 0) {

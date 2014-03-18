@@ -4,7 +4,7 @@ define([
     'collision'
 ],
     function(Class, AliveObject, ndgmr) {
-        var Mob = AliveObject.$extend({
+        var Zombie = AliveObject.$extend({
             __init__: function(obj) {
                 this.waypoints = obj.waypoints;
                 this.target = obj.waypoints[0];
@@ -74,5 +74,5 @@ define([
             }
         });
 
-        return Mob;
+        return Zombie;
     });

@@ -10,15 +10,17 @@ define([
 
                     var typeData = DefaultObjects[type];
                     for (var field in typeData) {
-                        data[field] = typeData[field];
+                        data[field] = _.clone(typeData[field]);
                     }
 
                     for (var field in params) {
-                        data[field] = params[field];
+                        data[field] = _.clone(params[field]);
                     }
 
                     data.type = type;
-                    data.tex = type;
+
+                    if (data.tex == "object")
+                        data.tex = type;
 
                     return data;
                 },
@@ -34,7 +36,7 @@ define([
                     draggable: false,
 
                     player: {},
-                    mobs: [],
+                    zombies: [],
                     walls: [],
                     doors: [],
                     chests: []
@@ -45,9 +47,10 @@ define([
                     inventory: []
                 },
 
-                mob: {
-                    name: "Vasja",
-                    drops: []
+                zombie: {
+                    speed: 0,
+                    drops: [],
+                    waypoints: []
                 },
 
                 wall: {
@@ -60,6 +63,10 @@ define([
                 },
 
                 chest: {
+
+                },
+
+                waypoint: {
 
                 },
 
