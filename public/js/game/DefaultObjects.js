@@ -17,6 +17,9 @@ define([
                         data[field] = params[field];
                     }
 
+                    data.type = type;
+                    data.tex = type;
+
                     return data;
                 },
 
@@ -24,8 +27,10 @@ define([
                     type: "background",
                     tex: "ground",
                     name: "Default level",
-                    width: 1280,
-                    height: 768,
+                    x: 0,
+                    y: 0,
+                    w: 1280,
+                    h: 768,
                     draggable: false,
 
                     player: {},
@@ -59,8 +64,8 @@ define([
                 },
 
                 object: {
-                    type: "", //will be set in runtime
-                    tex: "", //will be set in runtime
+                    type: "object",
+                    tex: "object",
                     name: "", //represents undefined value
                     x: 100,
                     y: 100,

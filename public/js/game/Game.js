@@ -25,7 +25,7 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 			this.level = null;
 			this.player = new Player();
 			this.resourceManager = new ResourceManager(this.onResourcesLoaded, this);
-			this.keyCoder = new KeyCoder();
+			this.keyCoder = new KeyCoder(editorMode);
 		},
 
         __classvars__: {

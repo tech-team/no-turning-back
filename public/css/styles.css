@@ -415,3 +415,7 @@ html, body {
 .type-specific-props {
     display: none;
 }
+
+select {
+    width: 100%;
+}

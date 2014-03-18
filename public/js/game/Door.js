@@ -3,10 +3,9 @@ define([
     'game/GameObject'
 ],
     function(Class, GameObject) {
-        var Chest = GameObject.$extend({
+        var Door = GameObject.$extend({
             __init__: function(obj) {
-                this.storage = obj.storage;
-                this.state = ( obj.state === "open" ) ? Chest.State.Open : Chest.State.Closed ;
+                this.state = ( obj.state === "open" ) ? Door.State.Open : Door.State.Closed ;
             },
 
             __classvars__: {
@@ -21,5 +20,5 @@ define([
             }
         });
 
-        return Chest;
+        return Door;
     });
