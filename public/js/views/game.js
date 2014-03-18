@@ -2,9 +2,10 @@ define([
     'backbone',
     'tmpl/game',
     'game/Game',
-    'views/viewmanager'
+    'views/viewmanager',
+    'views/gamefinishedview'
 ], 
-function(Backbone, tmpl, Game, ViewManager) {
+function(Backbone, tmpl, Game, ViewManager, GameFinishedView) {
     var GameView = Backbone.View.extend({
 
         template: tmpl,
@@ -17,6 +18,12 @@ function(Backbone, tmpl, Game, ViewManager) {
         initialize: function () {
             ViewManager.addView(this.pageId, this);
             this.render();
+
+            var self = this;
+            $(document).on("levelFinished", function(event) {
+                game = null;
+                GameFinishedView.show(event.score);
+            });
         },
 
         render: function () {

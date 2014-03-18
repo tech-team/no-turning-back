@@ -263,11 +263,29 @@ html, body {
 	background-color: #F6F9FC;
 }
 
-/********** game **********/
+/********** score sender **********/
+.score-sender-dimmer {
+	height: 1000px;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: black;
+	opacity: 0.7;
+}
+
+.score-content-wrapper {
+	height: 220px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	border-radius: 20px;
+}
+
 .score-content {
 	padding-top: 30px;
 	padding-bottom: 30px;
-	border: solid 1px;
+	position: relative;
 }
 
 .score-content__score-value {
@@ -326,6 +344,23 @@ html, body {
 
 .score-content__sendScore-button:hover {
 	background-color: #F7AF28;
+}
+
+.score-content__sendScore-button:disabled:hover {
+	cursor: wait;
+	background-color: #FDC66A;
+}
+
+.score-content__loading-indicator {
+	display: none;
+	width: 30px;
+	height: 30px;
+	position: absolute;
+	top: 10px;
+	right: -4px;
+
+	background-image: url("/res/img/loader.gif");
+	opacity: 0.4;
 }
 
 

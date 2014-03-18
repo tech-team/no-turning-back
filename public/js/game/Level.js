@@ -7,8 +7,10 @@ define([
     'game/Editor',
     'game/Zombie',
     'game/Chest',
-    'game/Door'
+    'game/Door',
+    'game/Bullet'
 ],
+
 function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door) {
 	var Level = Class.$extend({
 		__init__: function(stage, data, player, resourceManager, editorMode) {
@@ -28,6 +30,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door) {
             this.doors = [];
             this.chests = [];
             this.zombies = [];
+            this.bullets = [];
             this.collisionObjects = [];
 
             this.reload(data);
@@ -117,7 +120,6 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door) {
                 container.addChild(sprite);
                 objToAdd = container;
             }
-
             var dispObj = null;
             if (id)
                 dispObj = this.stage.addChildAt(objToAdd, id);
@@ -146,6 +148,9 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door) {
                 for (var i = 0; i < this.zombies.length; ++i) {
                     this.zombies[i].update(event, this.player);
                 }
+                for (var i = 0; i < this.bullets.length; ++i) {
+                    this.bullets[i].update(event);
+                }
 
                 if (this.player.health <= 0) {
                     console.log("Game over.");
@@ -165,6 +170,14 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door) {
             var offsetRotation = 4;
             var speedModifier = 2;
             var reboundModifier = 1.1;
+
+            var self = this;
+            if (event.keys[KeyCoder.E]) {
+                $.event.trigger({
+                    type: "levelFinished",
+                    score: self.player.score
+                });
+            }
 
             if (event.keys[KeyCoder.W]) {
                 if (event.keys[KeyCoder.SHIFT]) { speedModifier = 4; }
@@ -261,6 +274,11 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door) {
 
             if(event.keys[KeyCoder.SPACE] && this.player.cooldown == 0) {
                 console.log("POW!");
+                var bullet = new Bullet("pistol", this.player);
+                bullet.setDispObj(this.addToStage(bullet));
+                this.bullets.push(bullet);
+                //TODO: Valid addToStage for bullet
+                //TODO: Bullet is flying, but dispObj isn't.
                 this.player.cooldown = 30;
             }
 
@@ -268,7 +286,6 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door) {
             if (this.player.cooldown > 0) {
                 --this.player.cooldown;
             }
-
 
         }
 	});

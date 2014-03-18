@@ -3,10 +3,44 @@ define([
     'models/player'
 ], 
 function(Backbone, Player) {
-    var Scores = Backbone.Collection.extend({
+    var ScoreBoard = Backbone.Collection.extend({
     	model: Player,
 
     	initialize: function() {
+            this.on('add', function(model) {
+                var data_set = {
+                    name: model.get('name'),
+                    score: model.get('score')
+                };
+                console.log(JSON.stringify(data_set));
+                $.ajax({
+                    type: 'POST',
+                    url: 'scores',
+                    data: data_set,
+                    dataType: 'json',
+                    beforeSend: function() {
+                        $.event.trigger({
+                            type: "scoreSending"
+                        });
+                    },
+                    success: function(data) {
+                        $.event.trigger({
+                            type: "scoreSent",
+                            response: data
+                        });
+                    },
+                    error: function(data) {
+                        $.event.trigger({
+                            type: "scoreSendFailed",
+                            response: data
+                        });
+                    }
+                });
+
+            });
+
+
+
     		this.models = [
 	    		new Player({
 	    			name: 'Igor',
@@ -22,6 +56,41 @@ function(Backbone, Player) {
 	    		})
     		];
     	},
+
+        retrieve: function(limitCount) {
+            var self = this;
+            $.ajax({
+                    type: 'GET',
+                    url: 'scores',
+                    data: {
+                        limit: limitCount
+                    },
+                    dataType: 'json',
+                    beforeSend: function() {
+                        $.event.trigger({
+                            type: "scoresRetrieving"
+                        });
+                    },
+                    success: function(data) {
+                        self.models = [];
+                        for (var i = 0; i < data.length; ++i) {
+                            self.models.push(new Player(data[i]));
+                        }
+                        // console.log(this.models);
+
+                        $.event.trigger({
+                            type: "scoresRetrieved",
+                            response: data
+                        });
+                    },
+                    error: function(data) {
+                        $.event.trigger({
+                            type: "scoresRetrievingFailed",
+                            response: data
+                        });
+                    }
+                });
+        },
 
         comparator: function(a, b) {
             a = a.get(this.sort_key);
@@ -47,5 +116,5 @@ function(Backbone, Player) {
         }
     });
 
-    return new Scores();
+    return new ScoreBoard();
 });
