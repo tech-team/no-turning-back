@@ -11,7 +11,7 @@ define([
     'game/Bullet'
 ],
 
-function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door) {
+function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bullet) {
 	var Level = Class.$extend({
 		__init__: function(stage, data, player, resourceManager, editorMode) {
             this.data = data;
@@ -274,8 +274,14 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door) {
 
             if(event.keys[KeyCoder.SPACE] && this.player.cooldown == 0) {
                 console.log("POW!");
-                var bullet = new Bullet("pistol", this.player);
-                bullet.setDispObj(this.addToStage(bullet));
+                var bulletData = {
+                    x: this.player.dispObj.x,
+                    y: this.player.dispObj.y,
+                    r: this.player.dispObj.rotation,
+                    tex: "pistol-bullet"
+                };
+
+                var bullet = new Bullet(this.addToStage(bulletData), bulletData);
                 this.bullets.push(bullet);
                 //TODO: Valid addToStage for bullet
                 //TODO: Bullet is flying, but dispObj isn't.
