@@ -9,13 +9,9 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
 	var ResourceManager = Class.$extend({
         __classvars__: {
             texList: ["ground", "zombie", "player", "wall", "brick_wall1", "brick_wall2",
-<<<<<<< HEAD
-                "brick_wall3", "brick_wall4", "chest", "door-closed", "door-open", "rubbish",
-                "waypoint"]
-=======
+
                 "brick_wall3", "brick_wall4", "chest", "door-open", "door-closed", "rubbish",
                 "waypoint", "pistol-bullet"]
->>>>>>> b5a807e566572aa773661250d7700b6020f329b4
         },
 
 		__init__: function(onComplete, onCompleteContext) {
