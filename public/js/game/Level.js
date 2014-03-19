@@ -23,6 +23,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
 
             this.stage = stage;
             this.background = null;
+            this.fog = null;
             this.player = player;
             this.resourceManager = resourceManager;
 
@@ -89,6 +90,9 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             //add player
             var playerObj = this.addToStage(data.player);
             this.player.setDispObj(playerObj);
+
+            //add fog
+            this.fog = this.addToStage({tex: "fog", x: this.player.dispObj.x, y: this.player.dispObj.y});
 
             this.createCollisionObjects();
         },
@@ -159,6 +163,9 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                         score: this.player.score
                     });
                 }
+
+                this.fog.x = this.player.dispObj.x;
+                this.fog.y = this.player.dispObj.y;
             }
             else
                 this.editor.keyFunc(event);
