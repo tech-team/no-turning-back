@@ -87,7 +87,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             //add waypoints
             for (var i = 0; i < self.zombies.length; ++i) {
                 _.each(self.zombies[i].waypoints, function(obj) {
-                    self.addToStage(obj);
+                    self.addToStage(obj).visible = false;
                 });
             }
 
@@ -101,6 +101,8 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                 this.effects.damage = this.addToStage({tex: "effects/damage", x: 0, y: 0}, true);
                 this.effects.damage.visible = false;
             }
+
+            this.player.setEffects(this.effects);
 
             this.createCollisionObjects();
         },
