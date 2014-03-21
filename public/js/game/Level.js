@@ -23,7 +23,11 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
 
             this.stage = stage;
             this.background = null;
-            this.fog = null;
+            this.effects = {
+                fog: null,
+                damageEffect: null
+            };
+
             this.player = player;
             this.resourceManager = resourceManager;
 
@@ -91,8 +95,12 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             var playerObj = this.addToStage(data.player);
             this.player.setDispObj(playerObj);
 
-            //add fog
-            this.fog = this.addToStage({tex: "fog", x: this.player.dispObj.x, y: this.player.dispObj.y});
+            //add effecrs
+            if (!this.editorMode) {
+                this.effects.fog = this.addToStage({tex: "effects/fog", x: this.player.dispObj.x, y: this.player.dispObj.y});
+                this.effects.damage = this.addToStage({tex: "effects/damage", x: 0, y: 0}, true);
+                this.effects.damage.visible = false;
+            }
 
             this.createCollisionObjects();
         },
@@ -164,8 +172,10 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                     });
                 }
 
-                this.fog.x = this.player.dispObj.x;
-                this.fog.y = this.player.dispObj.y;
+                if (this.effects.fog) {
+                    this.effects.fog.x = this.player.dispObj.x;
+                    this.effects.fog.y = this.player.dispObj.y;
+                }
             }
             else
                 this.editor.keyFunc(event);
