@@ -97,8 +97,16 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
 
             //add effecrs
             if (!this.editorMode) {
-                this.effects.fog = this.addToStage({tex: "effects/fog", x: this.player.dispObj.x, y: this.player.dispObj.y});
-                this.effects.damage = this.addToStage({tex: "effects/damage", x: 0, y: 0}, true);
+                this.effects.fog = this.addToStage({
+                    tex: "effects/fog",
+                    x: this.player.dispObj.x,
+                    y: this.player.dispObj.y});
+
+                this.effects.damage = this.addToStage({
+                    tex: "effects/damage",
+                    x: 0, y: 0,
+                    w: this.stage.getBounds().width,
+                    h: this.stage.getBounds().height}, true);
                 this.effects.damage.visible = false;
             }
 

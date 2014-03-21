@@ -34,7 +34,7 @@ function(Class, AliveObject, KeyCoder, ndgmr) {
                     damageEffect.visible = false;
                     clearInterval(tid);
                 }
-            }, 100);
+            }, 50);
         },
 
         isDead: function() {

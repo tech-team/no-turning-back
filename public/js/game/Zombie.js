@@ -10,6 +10,11 @@ define([
                 this.target = obj.waypoints[0];
                 this.speed = obj.speed;
                 this.currentWaypoint = 0;
+                this.canAttack = true;
+                this.attackInterval = 1000;
+                this.damage = 5;
+                this.followDistance = 150;
+                this.attackDistnance = 20;
             },
 
             update: function(event, player) {
@@ -39,10 +44,16 @@ define([
 
                 this.dispObj.rotation = (180 / Math.PI) * angle;
 
-                if (vectorToPlayer.distance() < 150) {
+                if (vectorToPlayer.distance() < this.followDistance) {
                     this.target = player.dispObj;
-                    if (vectorToPlayer.distance() < 20) {
-                        player.damage(0.5);
+                    if (this.canAttack && vectorToPlayer.distance() < this.attackDistnance) {
+                        player.damage(this.damage);
+                        this.canAttack = false;
+                        var self = this;
+
+                        setTimeout(function() {
+                            self.canAttack = true;
+                        }, this.attackInterval);
                     }
                 }
                 else {
