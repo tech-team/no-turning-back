@@ -21,6 +21,7 @@ define([
                 this.showingWpsOwner = null;
                 this.selectedObject = null;
                 this.selectionFilter = new easeljs.ColorFilter(1, 1, 1, 1, 10, 60, 10, 100);
+                this.wpPath = null;
 
                 var self = this;
                 $('#levelSave').click(function(evt) {
@@ -410,15 +411,31 @@ define([
                 });
 
                 //delete them
+                this.stage.removeChild(this.wpPath);
                 _.each(oldWps, function(wp) {
                     self.stage.removeChild(wp);
                 });
 
                 //show new ones
                 this.showingWpsOwner = dispObj;
-                _.each(this.showingWpsOwner.data.waypoints, function(wp) {
-                    self.level.addToStage(wp);
-                });
+                if (this.showingWpsOwner == null)
+                    return;
+
+                var wps = this.showingWpsOwner.data.waypoints;
+                if (wps.length) {
+                    var graphics = easeljs.Graphics();
+                    graphics.setStrokeStyle(3, "round").beginStroke("#00F");
+                    graphics.moveTo(wps[0].x, wps[0].y);
+
+                    _.each(this.showingWpsOwner.data.waypoints, function(wp) {
+                        graphics.lineTo(wp.x, wp.y);
+                        self.level.addToStage(wp);
+                    });
+                    graphics.endStroke();
+
+                    this.wpPath = new easeljs.Shape(graphics);
+                    this.stage.addChild(this.wpPath);
+                }
             },
 
             deleteObject: function(dispObj) {
