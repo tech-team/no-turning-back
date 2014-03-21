@@ -142,6 +142,7 @@ define([
                         evt.currentTarget.data.x = evt.stageX;
                         evt.currentTarget.data.y = evt.stageY;
 
+                        self.updateWpPath();
                         self.regenerateObjectPropertiesTable();
                     }
                 });
@@ -249,20 +250,23 @@ define([
             },
 
             addObjectByData: function(data, id) {
-                if (data.type != 'waypoint')
-                    this.level.data[data.type + 's'].push(data);
-                else {
-                    //insert after clicked wp
-                    var wps = this.showingWpsOwner.data.waypoints;
-
-                    var index = wps.indexOf(this.selectedObject) + 1;
-                    wps.splice(index, 0, data);
-                }
+                this.level.data[data.type + 's'].push(data);
 
                 var dispObj = this.level.addToStage(data, false, id);
                 this.selectObject(dispObj);
 
                 return dispObj;
+            },
+
+            addWayPoint: function(data, after) {
+                //insert after clicked wp
+                var wps = this.showingWpsOwner.data.waypoints;
+
+                var index = wps.indexOf(after) + 1;
+                wps.splice(index, 0, data);
+
+                var dispObj = this.level.addToStage(data);
+                this.selectObject(dispObj);
             },
 
             createObject: function(type, tex, w, h) {
@@ -291,10 +295,18 @@ define([
             },
 
             duplicateObject: function(dispObj) {
+                if (!dispObj)
+                    return;
+
                 var newData = _.clone(dispObj.data);
                 newData.x += Editor.duplicateDelta;
 
-                this.addObjectByData(newData);
+                if (newData.type == 'waypoint') {
+                    this.addWayPoint(newData, dispObj.data);
+                    this.updateWpPath();
+                }
+                else
+                    this.addObjectByData(newData);
             },
 
             regeneratePropertiesTable: function(tableId, idPrefix, data) {
@@ -400,13 +412,13 @@ define([
                     this.selectObject(dispObj); //update it
             },
 
-            showObjectWayPoints: function(dispObj) {
+            hideObjectWayPoints: function() {
                 var self = this;
                 var oldWps = [];
 
                 //find old waypoints
                 _.each(this.stage.children, function(child) {
-                    if (child.data.type == 'waypoint')
+                    if (child.data && child.data.type == 'waypoint')
                         oldWps.push(child);
                 });
 
@@ -415,6 +427,11 @@ define([
                 _.each(oldWps, function(wp) {
                     self.stage.removeChild(wp);
                 });
+            },
+
+            showObjectWayPoints: function(dispObj) {
+                var self = this;
+                this.hideObjectWayPoints();
 
                 //show new ones
                 this.showingWpsOwner = dispObj;
@@ -423,13 +440,25 @@ define([
 
                 var wps = this.showingWpsOwner.data.waypoints;
                 if (wps.length) {
-                    var graphics = easeljs.Graphics();
-                    graphics.setStrokeStyle(3, "round").beginStroke("#00F");
-                    graphics.moveTo(wps[0].x, wps[0].y);
+                    this.updateWpPath(wps);
+                    _.each(this.showingWpsOwner.data.waypoints, function(wp) {
+                        self.level.addToStage(wp);
+                    });
+                }
+            },
+
+            updateWpPath: function(wps) {
+                var waypoints = wps || this.showingWpsOwner.data.waypoints;
+
+                this.stage.removeChild(this.wpPath);
+                if (waypoints.length) {
+                    var graphics = new easeljs.Graphics();
+                    graphics.setStrokeStyle(3, "round");
+                    graphics.beginStroke("#00F");
+                    graphics.moveTo(waypoints[0].x, waypoints[0].y);
 
                     _.each(this.showingWpsOwner.data.waypoints, function(wp) {
                         graphics.lineTo(wp.x, wp.y);
-                        self.level.addToStage(wp);
                     });
                     graphics.endStroke();
 
