@@ -70,6 +70,7 @@ define([
 
                     self.updateObjectData(self.selectedObject, data);
                     self.regenerateObjectPropertiesTable();
+                    self.updateWpPath();
                     return false;
                 });
 
@@ -207,8 +208,10 @@ define([
                     return key == true;
                 });
 
-                if (somethingPressed)
+                if (somethingPressed) {
                     this.regenerateObjectPropertiesTable();
+                    this.updateWpPath();
+                }
             },
 
             onLevelSaveClick: function() {
@@ -243,6 +246,9 @@ define([
 
                     if (this.selectedObject.data.type == 'zombie') {
                         this.showObjectWayPoints(this.selectedObject);
+                    }
+                    else if(this.selectedObject.data.type != 'waypoint') {
+                        this.hideObjectWayPoints();
                     }
                 }
 
