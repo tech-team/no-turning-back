@@ -425,7 +425,8 @@ define([
                 if (wps.length) {
                     var graphics = easeljs.Graphics();
                     graphics.setStrokeStyle(3, "round").beginStroke("#00F");
-                    graphics.moveTo(wps[0].x, wps[0].y);
+                    graphics.moveTo(this.showingWpsOwner.x, this.showingWpsOwner.y);
+                    graphics.lineTo(wps[0].x, wps[0].y);
 
                     _.each(this.showingWpsOwner.data.waypoints, function(wp) {
                         graphics.lineTo(wp.x, wp.y);
