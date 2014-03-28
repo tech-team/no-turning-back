@@ -60,8 +60,6 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                 self.walls.push(self.addToStage(obj));
             });
 
-            //TODO: doors and chests have some additional parameteres, should they be classes
-            //TODO: or should we just add some fields to existing displayObjects?
             //add doors
             _.each(data.doors, function(obj) {
                 var door = new Door(obj);
@@ -95,8 +93,12 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             var playerObj = this.addToStage(data.player);
             this.player.setDispObj(playerObj);
 
-            //add effecrs
+            //add effects
             if (!this.editorMode) {
+                var graphics = new easeljs.Graphics();
+                this.effects.fogBox = new easeljs.Shape(graphics);
+                this.stage.addChild(this.effects.fogBox);
+
                 this.effects.fog = this.addToStage({
                     tex: "effects/fog",
                     x: this.player.dispObj.x,
@@ -110,6 +112,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                 this.effects.damage.visible = false;
             }
 
+            this.updateFog(true);
             this.player.setEffects(this.effects);
 
             this.createCollisionObjects();
@@ -125,7 +128,6 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                     this.collisionObjects.push(this.doors[i].dispObj);
                 }
             }
-
         },
 
         addToStage: function(objData, doNotCenter, id) {
@@ -182,10 +184,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                     });
                 }
 
-                if (this.effects.fog) {
-                    this.effects.fog.x = this.player.dispObj.x;
-                    this.effects.fog.y = this.player.dispObj.y;
-                }
+                this.updateFog();
             }
             else
                 this.editor.keyFunc(event);
@@ -319,7 +318,56 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             if (this.player.cooldown > 0) {
                 --this.player.cooldown;
             }
+        },
 
+        updateFog: function(forceUpdate) {
+            if (this.effects.fog) {
+                //if player moved
+                if (this.effects.fog.x != this.player.dispObj.x
+                    || this.effects.fog.y != this.player.dispObj.y
+                    || forceUpdate) {
+
+                    var fogBox = this.effects.fogBox.graphics;
+                    var playerPos = {
+                        x: this.player.dispObj.x,
+                        y: this.player.dispObj.y
+                    };
+                    var frameSize = 370;
+                    var stageSize = this.stage.getBounds();
+
+                    fogBox.clear();
+                    fogBox.beginFill("#000");
+
+                    fogBox.rect(
+                        0,
+                        0,
+                        stageSize.width,
+                        playerPos.y - frameSize/2); //top
+
+                    fogBox.rect(
+                        0,
+                        playerPos.y - frameSize/2,
+                        playerPos.x - frameSize/2,
+                        stageSize.height); //left
+
+                    fogBox.rect(
+                        0,
+                        playerPos.y + frameSize/2,
+                        stageSize.width,
+                        stageSize.height - playerPos.y - frameSize/2
+                    ); //bottom
+
+                    fogBox.rect(
+                        playerPos.x + frameSize/2,
+                        playerPos.y - frameSize/2,
+                        stageSize.width - playerPos.x + frameSize/2,
+                        stageSize.height
+                    ); //right
+
+                    this.effects.fog.x = this.player.dispObj.x;
+                    this.effects.fog.y = this.player.dispObj.y;
+                }
+            }
         }
 	});
 
