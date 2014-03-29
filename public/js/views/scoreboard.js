@@ -10,26 +10,34 @@ function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
         template: scoreboardTmpl,
         el: '#pages',
         pageId: '#scoreboardPage',
+        loader: '.scores-wrapper__loading-indicator',
+        scoresTable: '.scores',
 
         initialize: function () {
             ViewManager.addView(this.pageId, this);
 
             var self = this;
             $(document).on("scoresRetrieving", function(event) {
+                $(self.scoresTable).hide();
+                $(self.loader).show();
                 console.log("scoresRetrieving");
-                // loading
             });
 
             $(document).on("scoresRetrieved", function(event) {
                 self.totalShow();
+                //self.$el.find(self.loader).hide();
+                //self.$el.find(self.scoresTable).show();
+                
                 console.log("scoresRetrieved");
             });
 
             $(document).on("scoresRetrievingFailed", function(event) {
+                $(self.loader).hide();
                 console.log("scoresRetrievingFailed");
             });
 
             this.render();
+            this.$el.find(this.pageId).show();
         },
 
         render: function (data) {
@@ -61,6 +69,7 @@ function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
         },
 
         hide: function () {
+            $(self.scoresTable).hide();
             this.$el.find(this.pageId).hide();
         }
 

@@ -76,7 +76,6 @@ function(Backbone, Player) {
                         for (var i = 0; i < data.length; ++i) {
                             self.models.push(new Player(data[i]));
                         }
-                        // console.log(this.models);
 
                         $.event.trigger({
                             type: "scoresRetrieved",

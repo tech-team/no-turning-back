@@ -4,8 +4,8 @@
     	<div class="score-sender-dimmer"></div>
 	    <div class="content-wrapper score-content-wrapper">
 		    <div class="content score-content ">
-		    	<div class="score-content__loading-indicator"></div>
-		    	
+		    	<div class="loading-indicator score-content__loading-indicator"></div>
+
 		    	<div class="score-content__score-value">
 		    		<span class="score-value__value">
 		    			Score: <fest:space></fest:space><fest:value>json.score</fest:value>

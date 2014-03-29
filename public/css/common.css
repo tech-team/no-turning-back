@@ -351,7 +351,7 @@ html, body {
 	background-color: #FDC66A;
 }
 
-.score-content__loading-indicator {
+.loading-indicator {
 	display: none;
 	width: 30px;
 	height: 30px;
@@ -360,7 +360,13 @@ html, body {
 	right: -4px;
 
 	background-image: url("/res/img/loader.gif");
+	background-repeat: no-repeat;
 	opacity: 0.4;
+}
+
+.scores-wrapper__loading-indicator {
+	position: static;
+	margin: 0 auto;
 }
 
 
