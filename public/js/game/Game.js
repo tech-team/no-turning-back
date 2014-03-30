@@ -21,7 +21,6 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 			this.stage = new createjs.Stage(this.canvas);
 			this.ticker = createjs.Ticker;
 			this.levelManager = new LevelManager();
-			this.startLevelId = 1;
 			this.level = null;
 			this.player = new Player();
 			this.resourceManager = new ResourceManager(this.onResourcesLoaded, this);
@@ -42,12 +41,10 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
             this.state = Game.GameState.Game;
 
             var self = this;
-        	$(document).on('levelLoaded', function(event) {
+            this.levelManager.loadNextLevel(function(event) {
         		self.level = new Level(self.stage, event.levelData, self.player, self.resourceManager, self.editorMode);
         		self.onLoadedCallback();
         	});
-
-            this.levelManager.loadLevel(this.startLevelId);
         },
 
 		run: function() {

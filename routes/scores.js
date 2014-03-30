@@ -8,7 +8,7 @@ var test = {
 scores.push(test);
 
 function sortScores(){
-	scores.sort(function(a,b){
+	scores.sort(function(a,b) {
 		return b.score - a.score;
 	});
 }

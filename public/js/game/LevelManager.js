@@ -3,33 +3,35 @@ define([
 ],
 function(Class) {
 	var LevelManager = Class.$extend({
+        levels: [
+            'Default level'
+        ],
 		__init__: function() {
 			this.currentLevelId = null;
 		},
 
-        loadNextLevel: function() {
+        loadNextLevel: function(callback) {
 			if (this.currentLevelId === null)
 				this.currentLevelId = 0;
 			else
                 ++this.currentLevelId;
 
-			return this.loadLevel(this.currentLevelId);
+			return this.loadLevel(this.currentLevelId, callback);
 		},
 
-        loadLevel: function(levelId) {
+        loadLevel: function(levelId, callback) {
+            var self = this;
             $.ajax({
                     type: 'GET',
                     url: 'levels',
                     data: {
-                        id: levelId
+                        name: self.levels[levelId]
                     },
                     dataType: 'json',
                     beforeSend: function() {
                     },
                     success: function(data) {
-                        console.log(data);
-                        $.event.trigger({
-                            type: "levelLoaded",
+                        callback({
                             levelData: data
                         });
                     },

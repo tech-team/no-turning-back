@@ -44,4 +44,5 @@ app.del('/scores/:id', scores.del);
 app.put('/scores/:id', scores.put);
 
 app.get('/levels', levels.getLevel);
+app.get('/levels/exists', levels.existLevel);
 app.post('/levels', levels.addLevel);
