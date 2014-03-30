@@ -5,10 +5,10 @@ define([
     'jquery',
     'game/KeyCoder',
     'game/ResourceManager',
+    'game/LevelManager',
     'game/DefaultObjects'
 ],
-    //TODO: too many code here
-    function(Class, _, easeljs, $, KeyCoder, ResourceManager, DefaultObjects) {
+    function(Class, _, easeljs, $, KeyCoder, ResourceManager, LevelManager, DefaultObjects) {
         var Editor = Class.$extend({
             __classvars__: {
                 duplicateDelta: 30
@@ -215,13 +215,67 @@ define([
             },
 
             onLevelSaveClick: function() {
-                console.log(JSON.stringify(this.level.data));
-                alert("Watch result in your console log!");
+                var levelStr = JSON.stringify(this.level.data);
+
+                var self = this;
+                var actualSaveLevel = function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: 'levels',
+                        data: {
+                            name: self.level.data.name,
+                            data: levelStr
+                        },
+                        success: function(data) {
+                            alert("Level successfully saved!");
+                        },
+                        error: function(data) {
+                            alert("Unable to save level");
+                        }
+                    });
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    url: 'levels/exists',
+                    data: {name: this.level.data.name},
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data == "false")
+                            actualSaveLevel();
+                        else {
+                            if (confirm("Level " + self.level.data.name + " already exists.\nDo you want to rewrite it?"))
+                                actualSaveLevel();
+                        }
+                    },
+                    error: function(data) {
+                        alert("Unable to save level");
+                    }
+                });
             },
 
             onLevelLoadClick: function() {
-                if (confirm("All changes will be lost.\nDo you really want to load an empty map?"))
-                    this.loadDefaultLevel();
+                var res = prompt("Input level name, or leave it empty to load empty level");
+                if (res != null) {
+                    if (res == "")
+                        this.loadDefaultLevel();
+                    else {
+                        var self = this;
+                        $.ajax({
+                            type: 'GET',
+                            url: 'levels',
+                            data: {name: res},
+                            dataType: 'json',
+                            success: function(data) {
+                                self.level.reload(data);
+                                alert("Level successfully loaded!");
+                            },
+                            error: function(data) {
+                                alert("Unable to load level");
+                            }
+                        });
+                    }
+                }
             },
 
             applyFilters: function(dispObj, filters) {
@@ -429,6 +483,7 @@ define([
                 });
 
                 //delete them
+                this.showingWpsOwner = null;
                 this.stage.removeChild(this.wpPath);
                 _.each(oldWps, function(wp) {
                     self.stage.removeChild(wp);
@@ -454,6 +509,9 @@ define([
             },
 
             updateWpPath: function(wps) {
+                if (!this.showingWpsOwner)
+                    return;
+
                 var waypoints = wps || this.showingWpsOwner.data.waypoints;
 
                 this.stage.removeChild(this.wpPath);

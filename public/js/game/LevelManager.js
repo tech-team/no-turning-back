@@ -36,7 +36,7 @@ function(Class) {
                         });
                     },
                     error: function(data) {
-                        console.log("failed");
+                        alert("Unable to load level");
                     }
             });
         },

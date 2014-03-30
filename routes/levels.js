@@ -17,16 +17,20 @@ module.exports = {
 	},
 
 	addLevel: function(req, resp) {
-		var data = req.body;
-		if (!data) {
+		if (!req.body || !req.body.name || !req.body.data) {
 			resp.writeHead(400, 'Bad Request');
 			resp.end("No data provided");
 		}
 
+        var levelName = req.body.name;
+        var levelStr = req.body.data;
+
 		var levelsDir = path.join('public', 'levels');
-		fs.writeFile(path.join(levelsDir, data.name + '.json'), JSON.stringify(data), function (err) {
-		  	if (err) throw err;
-		  	resp.end();
+		fs.writeFile(path.join(levelsDir, levelName + '.json'), levelStr, function (err) {
+		  	if (err)
+                resp.status(400).send();
+
+		  	resp.status(200).send("ok");
 		});
 	},
 
