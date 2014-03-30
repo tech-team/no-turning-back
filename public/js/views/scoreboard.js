@@ -18,6 +18,7 @@ function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
 
             var self = this;
             $(document).on("scoresRetrieving", function(event) {
+
                 $(self.scoresTable).hide();
                 $(self.loader).show();
                 console.log("scoresRetrieving");
@@ -33,13 +34,14 @@ function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
 
             $(document).on("scoresRetrievingFailed", function(event) {
                 $(self.loader).hide();
+                self.totalShow("Connection Error. Try again later.");
                 console.log("scoresRetrievingFailed");
             });
 
             this.render();
         },
 
-        render: function (data) {
+        render: function (data, error_message) {
             if (typeof (data) === 'undefined') {
                 data = [];
             }
@@ -47,7 +49,10 @@ function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
             if (p !== null)
                 p.parentNode.removeChild(p);
 
-            var p = $(this.template({scores: data}));
+            var p = $(this.template({
+                                        scores: data,
+                                        error: error_message
+                                    }));
             p.attr("id", this.pageId.slice(1));
             p.appendTo(this.$el);
  
@@ -62,8 +67,8 @@ function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
             scoresCollection.retrieve(10);
         },
 
-        totalShow: function() {
-            this.render(scoresCollection.toJSON());
+        totalShow: function(error_message) {
+            this.render(scoresCollection.toJSON(), error_message);
             this.$el.find(this.pageId).show();
         },
 

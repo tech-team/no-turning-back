@@ -19,7 +19,7 @@ function(Backbone, Player, LocalStorage) {
             });
     	},
 
-        sendScore: function(score_data) {
+        sendScore: function(score_data, without_echoing) {
             var self = this;
             $.ajax({
                     type: 'POST',
@@ -27,23 +27,29 @@ function(Backbone, Player, LocalStorage) {
                     data: score_data,
                     dataType: 'json',
                     beforeSend: function() {
-                        $.event.trigger({
-                            type: "scoreSending"
-                        });
+                        if (!without_echoing) {
+                            $.event.trigger({
+                                type: "scoreSending"
+                            });
+                        }
                     },
                     success: function(data) {
-                        $.event.trigger({
-                            type: "scoreSent",
-                            response: data
-                        });
+                        if (!without_echoing) {
+                            $.event.trigger({
+                                type: "scoreSent",
+                                response: data
+                            });
+                        }
                     },
                     error: function(data) {
                         LocalStorage.addToArray(self.localStorageScoreKey, score_data);
-                        $.event.trigger({
-                            type: "scoreSendFailed",
-                            response: data,
-                            message: "Connection Failed. Score saved locally."
-                        });
+                        if (!without_echoing) {
+                            $.event.trigger({
+                                type: "scoreSendFailed",
+                                response: data,
+                                message: "Connection Failed. Score saved locally."
+                            });
+                        }
                     }
             });
         },
@@ -63,13 +69,13 @@ function(Backbone, Player, LocalStorage) {
                             type: "scoresRetrieving"
                         });
 
-                        var savedScores = LocalStorage.getJSON(this.localStorageScoreKey);
+                        var savedScores = LocalStorage.getJSON(self.localStorageScoreKey);
                         if (savedScores) {
                             console.log("There are scores saved locally. Attempt to send them to the server.");
                             _.each(savedScores,
                                 function(elem, i) {
                                     LocalStorage.popFromArray(self.localStorageScoreKey);
-                                    self.sendScore(elem);
+                                    self.sendScore(elem, true);
                                 });
                         }
 

@@ -26,6 +26,8 @@ function(Backbone, formTmpl, Scoreboard, Player, ScoreboardView) {
             $(document).on("scoreSendFailed", function(event) {
                 self.failForm(event);
             });
+
+            
         },
 
         calcDimensions: function() {
@@ -79,7 +81,6 @@ function(Backbone, formTmpl, Scoreboard, Player, ScoreboardView) {
             this.calcDimensions();
             this.$el.find(this.pageId).show();
 
-            var self = this;
             var form = $('#scoreForm');
             form.submit(function(event) {
                 var data = {};
@@ -125,6 +126,16 @@ function(Backbone, formTmpl, Scoreboard, Player, ScoreboardView) {
             console.log("failed to send");
             console.log(event);
             this.unblockForm();
+
+            $error_field = $(this.pageId).find('.error_message');
+            $error_field.text("Connection error. Your score saved locally.")
+            $error_field.show();
+
+            this.called = false;
+            var self = this;
+                self.hide();
+                ScoreboardView.show();
+            
         }
 
     });

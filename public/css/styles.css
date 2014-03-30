@@ -253,6 +253,12 @@ html, body {
 	background-color: #F6F9FC;
 }
 
+.error_message {
+	font-size: 18px;
+	color: darkred;
+	margin-bottom: 10px;
+}
+
 /********** score sender **********/
 .score-sender-dimmer {
 	height: 1000px;
@@ -359,6 +365,12 @@ html, body {
 	margin: 0 auto;
 }
 
+.sending-score__error {
+	display: none;
+	margin-bottom: 0;
+	margin-top: 10px;
+	font-size: 24px;
+}
 
 /********** game **********/
 .game-wrapper {

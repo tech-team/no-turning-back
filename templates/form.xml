@@ -16,8 +16,9 @@
 		    		<input type="text" id="username" class="score-content__username-field" placeholder="Enter your name" autocomplete="off" name="name"/>
 		    		<input type="submit" id="sendScore" class="score-content__sendScore-button" value="Submit" />
 		    	</form>
-		    	<!--<div class="score-content__loading-indicator"></div>-->
-
+		    	<div class="error_message sending-score__error">
+    				
+    			</div>
 			</div>
 			
 		</div>

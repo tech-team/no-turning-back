@@ -7,6 +7,12 @@
 		    	<h2 class="content__h2">Scoreboard</h2>
 		    	<div class="scores-wrapper">
 		    		<div class="loading-indicator scores-wrapper__loading-indicator"></div>
+		    		<fest:if test="json.error">
+		    			<div class="error_message scores-wrapper__error">
+		    				<fest:value>json.error</fest:value>
+		    			</div>
+		    		</fest:if>
+
 		    		<fest:if test="json.scores.length != 0">
 				    	<table class="scores">
 				    		<tr class="scores__row">
