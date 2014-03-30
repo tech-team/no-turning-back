@@ -11,7 +11,7 @@ define([
 ],
 function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager) {
 	var Game = Class.$extend({
-		__init__: function(canvas, editorMode) {
+		__init__: function(canvas, editorMode, onLoadedCallback) {
             this.editorMode = editorMode;
 			this.FPS = 30;
 			this.canvas = canvas;
@@ -21,11 +21,12 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 			this.stage = new createjs.Stage(this.canvas);
 			this.ticker = createjs.Ticker;
 			this.levelManager = new LevelManager();
-			this.startLevelId = 0;
+			this.startLevelId = 1;
 			this.level = null;
 			this.player = new Player();
 			this.resourceManager = new ResourceManager(this.onResourcesLoaded, this);
 			this.keyCoder = new KeyCoder(editorMode);
+			this.onLoadedCallback = onLoadedCallback;
 		},
 
         __classvars__: {
@@ -40,9 +41,13 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
         	console.log("Resources loaded");
             this.state = Game.GameState.Game;
 
-            var levelData = this.levelManager.loadLevel(this.startLevelId);
- 
-            this.level = new Level(this.stage, levelData, this.player, this.resourceManager, this.editorMode);
+            var self = this;
+        	$(document).on('levelLoaded', function(event) {
+        		self.level = new Level(self.stage, event.levelData, self.player, self.resourceManager, self.editorMode);
+        		self.onLoadedCallback();
+        	});
+
+            this.levelManager.loadLevel(this.startLevelId);
         },
 
 		run: function() {

@@ -15,29 +15,6 @@ function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
 
         initialize: function () {
             ViewManager.addView(this.pageId, this);
-
-            var self = this;
-            $(document).on("scoresRetrieving", function(event) {
-
-                $(self.scoresTable).hide();
-                $(self.loader).show();
-                console.log("scoresRetrieving");
-            });
-
-            $(document).on("scoresRetrieved", function(event) {
-                self.totalShow();
-                //self.$el.find(self.loader).hide();
-                //self.$el.find(self.scoresTable).show();
-                
-                console.log("scoresRetrieved");
-            });
-
-            $(document).on("scoresRetrievingFailed", function(event) {
-                $(self.loader).hide();
-                self.totalShow("Connection Error. Try again later.");
-                console.log("scoresRetrievingFailed");
-            });
-
             this.render();
         },
 
@@ -64,7 +41,30 @@ function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
                 type: "showPageEvent",
                 pageId: this.pageId
             });
-            scoresCollection.retrieve(10);
+
+            var self = this;
+            scoresCollection.retrieve(10,
+                {
+                    before: function() {
+                        $(self.scoresTable).hide();
+                        $(self.loader).show();
+                        console.log("scoresRetrieving");
+                    },
+
+                    success: function(data) {
+                        self.totalShow();
+                        //self.$el.find(self.loader).hide();
+                        //self.$el.find(self.scoresTable).show();
+                        
+                        console.log("scoresRetrieved");
+                    },
+
+                    fail: function(data) {
+                        $(self.loader).hide();
+                        self.totalShow(data.message);
+                        console.log("scoresRetrievingFailed");
+                    }
+                });
         },
 
         totalShow: function(error_message) {

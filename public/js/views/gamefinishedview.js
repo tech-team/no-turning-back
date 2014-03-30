@@ -81,14 +81,27 @@ function(Backbone, formTmpl, Scoreboard, Player, ScoreboardView) {
             this.calcDimensions();
             this.$el.find(this.pageId).show();
 
+            var self = this;
             var form = $('#scoreForm');
             form.submit(function(event) {
+                event.preventDefault();
+
                 var data = {};
                 $.each(form.serializeArray(), function (i, input) {
                     data[input.name] = input.value;
                 });
-                Scoreboard.add(new Player(data));
-                event.preventDefault();
+                Scoreboard.sendScore(data, {
+                    before: function() {
+                        self.sendingForm();
+                    },
+                    success: function(event) {
+                        self.okForm(event);
+                    },
+                    fail: function(event) {
+                        self.failForm(event);
+                    }
+                });
+                
             });
         },
         hide: function () {
@@ -128,13 +141,13 @@ function(Backbone, formTmpl, Scoreboard, Player, ScoreboardView) {
             this.unblockForm();
 
             $error_field = $(this.pageId).find('.error_message');
-            $error_field.text("Connection error. Your score saved locally.")
+            $error_field.text(event.message);
             $error_field.show();
 
             this.called = false;
             var self = this;
-                self.hide();
-                ScoreboardView.show();
+            self.hide();
+            ScoreboardView.show();
             
         }
 

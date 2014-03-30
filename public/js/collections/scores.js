@@ -9,17 +9,12 @@ function(Backbone, Player, LocalStorage) {
         localStorageScoreKey: "scores",
 
     	initialize: function() {
-            var self = this;
-            this.on('add', function(model) {
-                var data_set = {
-                    name: model.get('name'),
-                    score: model.get('score')
-                };
-                self.sendScore(data_set);
-            });
+
     	},
 
-        sendScore: function(score_data, without_echoing) {
+        sendScore: function(score_data, callbacks) {
+            var without_echoing = !callbacks;
+
             var self = this;
             $.ajax({
                     type: 'POST',
@@ -28,33 +23,28 @@ function(Backbone, Player, LocalStorage) {
                     dataType: 'json',
                     beforeSend: function() {
                         if (!without_echoing) {
-                            $.event.trigger({
-                                type: "scoreSending"
-                            });
+                            callbacks.before();
                         }
                     },
                     success: function(data) {
                         if (!without_echoing) {
-                            $.event.trigger({
-                                type: "scoreSent",
-                                response: data
-                            });
+                            callbacks.success(data);
                         }
+                        self.add(new Player(score_data));
                     },
                     error: function(data) {
                         LocalStorage.addToArray(self.localStorageScoreKey, score_data);
                         if (!without_echoing) {
-                            $.event.trigger({
-                                type: "scoreSendFailed",
-                                response: data,
+                            callbacks.fail({
+                                data: data,
                                 message: "Connection Failed. Score saved locally."
-                            });
+                            })
                         }
                     }
             });
         },
 
-        retrieve: function(limitCount) {
+        retrieve: function(limitCount, callbacks) {
             var self = this;
 
             $.ajax({
@@ -65,9 +55,7 @@ function(Backbone, Player, LocalStorage) {
                     },
                     dataType: 'json',
                     beforeSend: function() {
-                        $.event.trigger({
-                            type: "scoresRetrieving"
-                        });
+                        callbacks.before();
 
                         var savedScores = LocalStorage.getJSON(self.localStorageScoreKey);
                         if (savedScores) {
@@ -75,7 +63,7 @@ function(Backbone, Player, LocalStorage) {
                             _.each(savedScores,
                                 function(elem, i) {
                                     LocalStorage.popFromArray(self.localStorageScoreKey);
-                                    self.sendScore(elem, true);
+                                    self.sendScore(elem, null);
                                 });
                         }
 
@@ -86,15 +74,12 @@ function(Backbone, Player, LocalStorage) {
                             self.models.push(new Player(data[i]));
                         }
 
-                        $.event.trigger({
-                            type: "scoresRetrieved",
-                            response: data
-                        });
+                        callbacks.success(data);
                     },
                     error: function(data) {
-                        $.event.trigger({
-                            type: "scoresRetrievingFailed",
-                            response: data
+                        callbacks.fail({
+                            data: data,
+                            message: "Connection Error. Try again later."
                         });
                     }
                 });

@@ -75,8 +75,13 @@ function(Backbone, tmpl, Game, ViewManager, GameFinishedView) {
         },
 
         runGame: function() {
-            this.game = new Game(this.canvas, false);
-            this.game.run();
+            var self = this;
+            this.game = new Game(this.canvas, false, 
+                function() {
+                    self.game.run();
+                }
+            );
+            
         }
 
     });
