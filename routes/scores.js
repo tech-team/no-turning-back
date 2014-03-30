@@ -9,7 +9,7 @@ scores.push(test);
 
 function sortScores(){
 	scores.sort(function(a,b){
-		return a.score < b.score;
+		return b.score - a.score;
 	});
 }
 
@@ -63,6 +63,7 @@ module.exports = {
 
 	post: function(req, res){
 		var newScore = req.body;
+		console.log(newScore);
 
 		if (!newScore || !newScore.name || !newScore.score || newScore.score && isNaN(parseInt(newScore.score, 10))){
 			res.writeHead(400, 'Bad Request');
