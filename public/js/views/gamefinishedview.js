@@ -122,9 +122,9 @@ function(Backbone, formTmpl, Scoreboard, Player, ScoreboardView) {
         },
 
         failForm: function(event) {
-            console.log("form sending failed");
+            console.log("failed to send");
+            console.log(event);
             this.unblockForm();
-
         }
 
     });

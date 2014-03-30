@@ -2,7 +2,7 @@ define([
     'backbone',
     'tmpl/scoreboard',
     'collections/scores',
-    'views/viewmanager'
+    'views/viewmanager',
 ], 
 function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
     var ScoreboardView = Backbone.View.extend({
@@ -37,7 +37,6 @@ function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
             });
 
             this.render();
-            this.$el.find(this.pageId).show();
         },
 
         render: function (data) {

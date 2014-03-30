@@ -1,22 +1,30 @@
 define([
     'backbone',
-    'models/player'
+    'models/player',
+    'collections/LocalStorage'
 ], 
-function(Backbone, Player) {
+function(Backbone, Player, LocalStorage) {
     var ScoreBoard = Backbone.Collection.extend({
     	model: Player,
+        localStorageScoreKey: "scores",
 
     	initialize: function() {
+            var self = this;
             this.on('add', function(model) {
                 var data_set = {
                     name: model.get('name'),
                     score: model.get('score')
                 };
-                console.log(JSON.stringify(data_set));
-                $.ajax({
+                self.sendScore(data_set);
+            });
+    	},
+
+        sendScore: function(score_data) {
+            var self = this;
+            $.ajax({
                     type: 'POST',
                     url: 'scores',
-                    data: data_set,
+                    data: score_data,
                     dataType: 'json',
                     beforeSend: function() {
                         $.event.trigger({
@@ -30,35 +38,19 @@ function(Backbone, Player) {
                         });
                     },
                     error: function(data) {
+                        LocalStorage.addToArray(self.localStorageScoreKey, score_data);
                         $.event.trigger({
                             type: "scoreSendFailed",
-                            response: data
+                            response: data,
+                            message: "Connection Failed. Score saved locally."
                         });
                     }
-                });
-
             });
-
-
-
-    		this.models = [
-	    		new Player({
-	    			name: 'Igor',
-	    			score: 754
-	    		}),
-                new Player({
-                    name: 'Vasja',
-                    score: 1
-                }),
-                new Player({
-	    			name: 'Rome',
-	    			score: 200
-	    		})
-    		];
-    	},
+        },
 
         retrieve: function(limitCount) {
             var self = this;
+
             $.ajax({
                     type: 'GET',
                     url: 'scores',
@@ -70,6 +62,17 @@ function(Backbone, Player) {
                         $.event.trigger({
                             type: "scoresRetrieving"
                         });
+
+                        var savedScores = LocalStorage.getJSON(this.localStorageScoreKey);
+                        if (savedScores) {
+                            console.log("There are scores saved locally. Attempt to send them to the server.");
+                            _.each(savedScores,
+                                function(elem, i) {
+                                    LocalStorage.popFromArray(self.localStorageScoreKey);
+                                    self.sendScore(elem);
+                                });
+                        }
+
                     },
                     success: function(data) {
                         self.models = [];
