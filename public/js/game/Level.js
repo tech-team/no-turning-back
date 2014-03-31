@@ -342,13 +342,15 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                         0,
                         0,
                         stageSize.width,
-                        playerPos.y - frameSize/2); //top
+                        playerPos.y - frameSize/2
+                    ); //top
 
                     fogBox.rect(
                         0,
                         playerPos.y - frameSize/2,
                         playerPos.x - frameSize/2,
-                        stageSize.height); //left
+                        stageSize.height
+                    ); //left
 
                     fogBox.rect(
                         0,
@@ -359,7 +361,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
 
                     fogBox.rect(
                         playerPos.x + frameSize/2,
-                        playerPos.y - frameSize/2,
+                        0,
                         stageSize.width - playerPos.x + frameSize/2,
                         stageSize.height
                     ); //right

@@ -22,7 +22,7 @@ function(Class, AliveObject, KeyCoder, ndgmr) {
         },
 
         damage: function(howMuch) {
-            this.health -= 0.5;
+            this.health -= howMuch;
 
             var damageEffect = this.effects.damage;
             damageEffect.alpha = 1;
