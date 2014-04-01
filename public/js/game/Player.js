@@ -8,6 +8,7 @@ function(Class, AliveObject, KeyCoder, ndgmr) {
 	var Player = AliveObject.$extend({
 		__init__: function() {
             this.health = 100;
+            this.dead = false;
 			this.score = 0;
             this.cooldown = 0;
             this.effects = null;

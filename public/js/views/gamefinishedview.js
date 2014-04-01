@@ -132,7 +132,8 @@ function(Backbone, formTmpl, Scoreboard, Player, ScoreboardView) {
             this.deleteForm();
 
             this.called = false;
-            document.location = '#scoreboard';
+            this.hide();
+            ScoreboardView.show();
         },
 
         failForm: function(event) {

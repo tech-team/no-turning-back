@@ -19,11 +19,7 @@ function(Backbone, tmpl, Game, ViewManager, GameFinishedView) {
             ViewManager.addView(this.pageId, this);
             this.render();
 
-            var self = this;
-            $(document).on("levelFinished", function(event) {
-                game = null;
-                GameFinishedView.show(event.score);
-            });
+            
         },
 
         render: function () {
@@ -82,6 +78,10 @@ function(Backbone, tmpl, Game, ViewManager, GameFinishedView) {
                 }
             );
             
+            $(document).on("levelFinished", function(event) {
+                self.game.state = Game.GameState.GameOver;
+                GameFinishedView.show(event.score);
+            });
         }
 
     });

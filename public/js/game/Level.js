@@ -176,7 +176,8 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                     this.bullets[i].update(event);
                 }
 
-                if (this.player.health <= 0) {
+                if (this.player.health <= 0 && !this.player.dead) {
+                    this.player.dead = true;
                     console.log("Game over.");
                     $.event.trigger({
                         type: "levelFinished",
