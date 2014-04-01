@@ -183,7 +183,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                 this.keyFunc(event);
                 this.player.update(event);
                 for (var i = 0; i < this.zombies.length; ++i) {
-                    this.zombies[i].update(event, this.player);
+                    this.zombies[i].update(event, this.player, this.collisionObjects);
                 }
                 for (var i = 0; i < this.bullets.length; ++i) {
                     this.bullets[i].update(event);
@@ -315,7 +315,7 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             }
 
             if(event.keys[KeyCoder.SPACE] && this.player.cooldown == 0) {
-                console.log("POW!");
+
                 var bulletData = {
                     x: this.player.dispObj.x,
                     y: this.player.dispObj.y,
@@ -323,11 +323,38 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                     tex: "pistol-bullet"
                 };
 
+                //TODO: bullet types
                 var bullet = new Bullet(this.addToStage(bulletData), bulletData);
                 this.bullets.push(bullet);
-                //TODO: Valid addToStage for bullet
-                //TODO: Bullet is flying, but dispObj isn't.
                 this.player.cooldown = 30;
+            }
+
+            out:
+            for (var i = 0; i < this.bullets.length; ++i) {
+                for(var j = 0; j < this.zombies.length; ++j) {
+                    if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
+                        this.zombies[j].health -= this.bullets[i].power;
+                        this.stage.removeChild(this.bullets[i].dispObj);
+                        this.bullets.splice(i, 1);
+                        break out;
+                    }
+                }
+                for(var j = 0; j < this.collisionObjects.length; ++j) {
+                    if (collider.checkPixelCollision(this.bullets[i].dispObj,this.collisionObjects[j])) {
+                        this.stage.removeChild(this.bullets[i].dispObj);
+                        this.bullets.splice(i, 1);
+                        break out;
+                    }
+                }
+            }
+
+            for (var i = 0; i < this.zombies.length; ++i) {
+                if (this.zombies[i].health <= 0) {
+                    //TODO: corpse
+                    this.stage.removeChild(this.zombies[i].dispObj);
+                    this.zombies.splice(i, 1);
+                    this.player.score += 5;
+                }
             }
 
             //TODO: move to player class
