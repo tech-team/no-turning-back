@@ -112,6 +112,19 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                 this.effects.damage.visible = false;
             }
 
+            if (!this.editorMode) {
+                var healthText = new easeljs.Text("Health: 100", "20px Arial", "#00FF00");
+                this.healthText = this.stage.addChild(healthText);
+                this.healthText.x = 20;
+                this.healthText.y = this.stage.getBounds().height - 210;
+                console.log(this.stage.getBounds());
+
+                var scoreText = new easeljs.Text("Score: 0", "20px Arial", "#00FF00");
+                this.scoreText = this.stage.addChild(scoreText);
+                this.scoreText.x = this.stage.getBounds().width - 350;
+                this.scoreText.y = this.stage.getBounds().height - 210;
+            }
+
             this.updateFog(true);
             this.player.setEffects(this.effects);
 
@@ -185,6 +198,8 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                     });
                 }
 
+                this.healthText.text = "Health: " + this.player.health;
+                this.scoreText.text = "Score: " + this.player.score;
                 this.updateFog();
             }
             else
