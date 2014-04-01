@@ -97,7 +97,8 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             if (!this.editorMode) {
                 var graphics = new easeljs.Graphics();
                 this.effects.fogBox = new easeljs.Shape(graphics);
-                this.stage.addChild(this.effects.fogBox);
+                var fogBox = this.stage.addChild(this.effects.fogBox);
+                this.fogId = this.stage.getChildIndex(fogBox);
 
                 this.effects.fog = this.addToStage({
                     tex: "effects/fog",
@@ -116,13 +117,12 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                 var healthText = new easeljs.Text("Health: 100", "20px Arial", "#00FF00");
                 this.healthText = this.stage.addChild(healthText);
                 this.healthText.x = 20;
-                this.healthText.y = this.stage.getBounds().height - 210;
-                console.log(this.stage.getBounds());
+                this.healthText.y = this.stage.canvas.height - 32;
 
                 var scoreText = new easeljs.Text("Score: 0", "20px Arial", "#00FF00");
                 this.scoreText = this.stage.addChild(scoreText);
-                this.scoreText.x = this.stage.getBounds().width - 350;
-                this.scoreText.y = this.stage.getBounds().height - 210;
+                this.scoreText.x = this.stage.canvas.width - 100;
+                this.scoreText.y = this.stage.canvas.height - 32;
             }
 
             this.updateFog(true);
@@ -324,7 +324,10 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                 };
 
                 //TODO: bullet types
-                var bullet = new Bullet(this.addToStage(bulletData), bulletData);
+                var bullet = new Bullet(
+                    this.addToStage(bulletData, false, this.fogId),
+                    bulletData);
+                
                 this.bullets.push(bullet);
                 this.player.cooldown = 30;
             }
