@@ -9,17 +9,21 @@ function(Backbone, tmpl) {
         tagName: 'section',
         className: 'page',
         pageId: '#mainPage',
+        hidden: true,
 
         initialize: function () {
             this.render();
         },
+
         render: function () {
             this.$el.html(this.template());
             this.$el.attr('id', this.pageId.slice(1));
             return this;
         },
+        
         show: function () {
             this.$el.show();
+            this.hidden = false;
             $.event.trigger({
                 type: "showPageEvent",
                 pageId: this.pageId
@@ -27,7 +31,10 @@ function(Backbone, tmpl) {
         },
 
         hide: function () {
-            this.$el.hide();
+            if (!this.hidden) {
+                this.$el.hide();
+                this.hidden = true;
+            }
         },
 
     });

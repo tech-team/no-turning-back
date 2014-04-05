@@ -20,8 +20,6 @@ function(Backbone) {
         addView: function(view) {
             this.views[view.pageId] = view;
             this.$el.append(view.$el);
-            console.log(view.$el);
-            console.log(this.$el);
         }
 
     });

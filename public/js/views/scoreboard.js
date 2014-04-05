@@ -10,8 +10,9 @@ function(Backbone, tmpl, scoresCollection) {
         tagName: 'section',
         className: 'page',
         pageId: '#scoreboardPage',
-        loader: '.scores-wrapper__loading-indicator',
-        scoresTable: '.scores',
+        hidden: true,
+
+        loader: null,
 
         initialize: function () {
             this.render();
@@ -25,11 +26,14 @@ function(Backbone, tmpl, scoresCollection) {
                                             error: error_message
                                         }));
             this.$el.attr('id', this.pageId.slice(1));
+
+            this.loader = this.$el.find('.scores-wrapper__loading-indicator');
  
             return this;
         },
 
         show: function () {
+            this.render();
             this.$el.show();
 
             $.event.trigger({
@@ -37,40 +41,34 @@ function(Backbone, tmpl, scoresCollection) {
                 pageId: this.pageId
             });
 
-            // var self = this;
-            // scoresCollection.retrieve(10,
-            //     {
-            //         before: function() {
-            //             $(self.scoresTable).hide();
-            //             self.totalShow();
-            //             $(self.loader).show();
-            //             console.log("scoresRetrieving");
-            //         },
+            var self = this;
+            scoresCollection.retrieve(10,
+                {
+                    before: function() {
+                        self.loader.show();
+                    },
 
-            //         success: function(data) {
-            //             self.totalShow();
-            //             //self.$el.find(self.loader).hide();
-            //             //self.$el.find(self.scoresTable).show();
-                        
-            //             console.log("scoresRetrieved");
-            //         },
+                    success: function(data) {
+                        self.totalShow();
+                    },
 
-            //         fail: function(data) {
-            //             $(self.loader).hide();
-            //             self.totalShow(data.message);
-            //             console.log("scoresRetrievingFailed");
-            //         }
-            //     });
+                    fail: function(data) {
+                        self.loader.hide();
+                        self.totalShow(data.message);
+                    }
+                });
+            this.hidden = false;
         },
 
         totalShow: function(error_message) {
             this.render(scoresCollection.toJSON(), error_message);
-            this.$el.show();
         },
 
         hide: function () {
-            // $(self.scoresTable).hide();
-            this.$el.hide();
+            if (!this.hidden) {
+                this.$el.hide();
+                this.hidden = true;
+            }
         }
 
     });

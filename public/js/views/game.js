@@ -2,7 +2,7 @@ define([
     'backbone',
     'tmpl/game',
     'game/Game',
-    'views/gamefinishedview'
+    'views/gamefinished'
 ], 
 function(Backbone, tmpl, Game, GameFinishedView) {
     var GameView = Backbone.View.extend({
@@ -11,6 +11,8 @@ function(Backbone, tmpl, Game, GameFinishedView) {
         tagName: 'section',
         className: 'page',
         pageId: '#gamePage',
+        hidden: true,
+
         canvas: null,
         scene: null,
         game: null,
@@ -32,6 +34,7 @@ function(Backbone, tmpl, Game, GameFinishedView) {
 
         show: function () {
             this.$el.show();
+            this.hidden = false;
             $.event.trigger({
                 type: "showPageEvent",
                 pageId: this.pageId
@@ -40,19 +43,23 @@ function(Backbone, tmpl, Game, GameFinishedView) {
         },
 
         hide: function () {
-            this.$el.hide();
+            if (!this.hidden) {
+                this.$el.hide();
+                this.game.stop();
+                this.hidden = true;
+            }
         },
 
         runGame: function() {
-            var self = this;
             this.game = new Game(this.canvas, false, 
                 function() {
                     self.game.run();
                 }
             );
             
+            var self = this;
             $(document).on("levelFinished", function(event) {
-                self.game.state = Game.GameState.GameOver;
+                self.game.stop();
                 GameFinishedView.show(event.score);
             });
         },
