@@ -182,6 +182,13 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             if (!this.editorMode) {
                 this.keyFunc(event);
                 this.player.update(event);
+                if (this.zombies.length === 0) {
+                    $.event.trigger({
+                        type: "levelFinished",
+                        score: this.player.score
+                    });
+                }
+
                 for (var i = 0; i < this.zombies.length; ++i) {
                     this.zombies[i].update(event, this.player, this.collisionObjects);
                 }
@@ -214,12 +221,12 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             var reboundModifier = 1.1;
 
             var self = this;
-            if (event.keys[KeyCoder.E]) {
-                $.event.trigger({
-                    type: "levelFinished",
-                    score: self.player.score
-                });
-            }
+            // if (event.keys[KeyCoder.E]) {
+            //     $.event.trigger({
+            //         type: "levelFinished",
+            //         score: self.player.score
+            //     });
+            // }
 
             if (event.keys[KeyCoder.W]) {
                 if (event.keys[KeyCoder.SHIFT]) { speedModifier = 4; }

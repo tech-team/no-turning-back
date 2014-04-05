@@ -49,7 +49,7 @@ define([
 
                 zombie: {
                     health: 20,
-                    speed: 0,
+                    speed: 2,
                     drops: [],
                     waypoints: []
                 },

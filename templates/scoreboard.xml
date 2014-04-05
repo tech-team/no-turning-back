@@ -1,55 +1,53 @@
 <fest:template xmlns:fest="http://fest.mail.ru"
     context_name="json">
-    <section class="page">
-	    <div class="content-wrapper">
-		    <div class="content">
-		    	<h1 class="content__h1">No Turning Back</h1>
-		    	<h2 class="content__h2">Scoreboard</h2>
-		    	<div class="scores-wrapper">
-		    		<div class="loading-indicator scores-wrapper__loading-indicator"></div>
-		    		<fest:if test="json.error">
-		    			<div class="error_message scores-wrapper__error">
-		    				<fest:value>json.error</fest:value>
-		    			</div>
-		    		</fest:if>
+    <div class="content-wrapper">
+	    <div class="content">
+	    	<h1 class="content__h1">No Turning Back</h1>
+	    	<h2 class="content__h2">Scoreboard</h2>
+	    	<div class="scores-wrapper">
+	    		<div class="loading-indicator scores-wrapper__loading-indicator"></div>
+	    		<fest:if test="json.error">
+	    			<div class="error_message scores-wrapper__error">
+	    				<fest:value>json.error</fest:value>
+	    			</div>
+	    		</fest:if>
 
-		    		<fest:if test="json.scores.length != 0">
-				    	<table class="scores">
-				    		<tr class="scores__row">
-				    			<th class="scores__header">#</th>
-				    			<th class="scores__header">Player</th>
-				    			<th class="scores__header">Score</th>
-				    		</tr>
+	    		<fest:if test="json.scores.length != 0">
+			    	<table class="scores">
+			    		<tr class="scores__row">
+			    			<th class="scores__header">#</th>
+			    			<th class="scores__header">Player</th>
+			    			<th class="scores__header">Score</th>
+			    		</tr>
 
-				    		<fest:for iterate="json.scores" index="i">
-				    			<tr class="scores__row">
-				    				<td class="scores__col">
-							    		<fest:value>i+1</fest:value>
-							    	</td>
-							    	<td class="scores__col">
-							    		<fest:value>json.scores[i].name</fest:value>
-							    	</td>
-							    	<td class="scores__col">
-							    		<fest:value>json.scores[i].score</fest:value>
-							    	</td>
-								</tr>
-							</fest:for>
-				    	</table>
-			    	</fest:if>
-		    	</div>
-	    		<a href="#main" class="back-button">
-	    			<div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
-	    			<span class="back-button__caption">Menu</span>
-	    		</a>
-			</div>
-			<footer class="page-footer">
-	    		<div class="social-buttons">
-	    			
-	    		</div>
-	    		<div class="github-wrapper">
-					<a href="https://github.com/tech-team/frontend-game" class="github" target="_blank">See us on GitHub</a>
-				</div>
-	    	</footer>
+			    		<fest:for iterate="json.scores" index="i">
+			    			<tr class="scores__row">
+			    				<td class="scores__col">
+						    		<fest:value>i+1</fest:value>
+						    	</td>
+						    	<td class="scores__col">
+						    		<fest:value>json.scores[i].name</fest:value>
+						    	</td>
+						    	<td class="scores__col">
+						    		<fest:value>json.scores[i].score</fest:value>
+						    	</td>
+							</tr>
+						</fest:for>
+			    	</table>
+		    	</fest:if>
+	    	</div>
+    		<a href="#main" class="back-button">
+    			<div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
+    			<span class="back-button__caption">Menu</span>
+    		</a>
 		</div>
-	</section>
+		<footer class="page-footer">
+    		<div class="social-buttons">
+    			
+    		</div>
+    		<div class="github-wrapper">
+				<a href="https://github.com/tech-team/frontend-game" class="github" target="_blank">See us on GitHub</a>
+			</div>
+    	</footer>
+	</div>
 </fest:template>

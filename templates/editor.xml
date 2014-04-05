@@ -1,55 +1,53 @@
 <fest:template xmlns:fest="http://fest.mail.ru"
     context_name="json">
-    <section class="page">
-	    <div id="editor-scene" class="content-wrapper game-wrapper editor-scene">
-	            <a href="#main" class="back-button back-button_cornered">
-	                <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
-	                <span class="back-button__caption">Back</span>
-	            </a>
-	            <canvas id="editor-field" tabindex="1">You have a very old browser, dude.</canvas>
-	    </div>
-        <div id="editor-sidebar" class="editor-sidebar">
-            <!-- TODO: BEM required! -->
-            <div class="editor-sidebar__group editor-sidebar__level">
-                <h3 class="editor-sidebar__group__header">
-                    Level:
-                    <span class="editor-sidebar__group__controls">
-                        <button id="levelLoad">Load</button>
-                        <button id="levelSave">Save</button>
-                    </span>
-                </h3>
-                <table id="level-object">
-                    <tbody />
-                </table>
-                <button id="applyToLevel">Apply</button>
-            </div>
-            <div class="editor-sidebar__group editor-sidebar__object">
-                <h3 class="editor-sidebar__group__header">
-                    Selected Object:
-                    <div class="editor-sidebar__group__controls">
-                        <button id="deleteObject">Delete</button>
-                    </div>
-                </h3>
-                <table id="selected-object">
-                    <tbody />
-                </table>
-
-
-                <button id="applyToObject">Apply</button>
-            </div>
-            <div class="editor-sidebar__group editor-sidebar__palette">
-                <h3 class="editor-sidebar__group__header">Palette:</h3>
-                <form>
-                    <select id="type-select">
-                        <option value="zombie">Zombie</option>
-                        <option value="wall">Wall</option>
-                        <option value="chest">Chest</option>
-                        <option value="door">Door</option>
-                    </select>
-                    <select id="add-texture-select" class="texture-select" />
-                    <button id="addObject">Add</button>
-                </form>
-            </div>
+    <div id="editor-scene" class="content-wrapper game-wrapper editor-scene">
+            <a href="#main" class="back-button back-button_cornered">
+                <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
+                <span class="back-button__caption">Back</span>
+            </a>
+            <canvas id="editor-field" tabindex="1">You have a very old browser, dude.</canvas>
+    </div>
+    <div id="editor-sidebar" class="editor-sidebar">
+        <!-- TODO: BEM required! -->
+        <div class="editor-sidebar__group editor-sidebar__level">
+            <h3 class="editor-sidebar__group__header">
+                Level:
+                <span class="editor-sidebar__group__controls">
+                    <button id="levelLoad">Load</button>
+                    <button id="levelSave">Save</button>
+                </span>
+            </h3>
+            <table id="level-object">
+                <tbody />
+            </table>
+            <button id="applyToLevel">Apply</button>
         </div>
-	</section>
+        <div class="editor-sidebar__group editor-sidebar__object">
+            <h3 class="editor-sidebar__group__header">
+                Selected Object:
+                <div class="editor-sidebar__group__controls">
+                    <button id="deleteObject">Delete</button>
+                </div>
+            </h3>
+            <table id="selected-object">
+                <tbody />
+            </table>
+
+
+            <button id="applyToObject">Apply</button>
+        </div>
+        <div class="editor-sidebar__group editor-sidebar__palette">
+            <h3 class="editor-sidebar__group__header">Palette:</h3>
+            <form>
+                <select id="type-select">
+                    <option value="zombie">Zombie</option>
+                    <option value="wall">Wall</option>
+                    <option value="chest">Chest</option>
+                    <option value="door">Door</option>
+                </select>
+                <select id="add-texture-select" class="texture-select" />
+                <button id="addObject">Add</button>
+            </form>
+        </div>
+    </div>
 </fest:template>

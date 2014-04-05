@@ -1,27 +1,25 @@
 define([
     'backbone',
-    'tmpl/main',
-    'views/viewmanager'
+    'tmpl/main'
 ], 
-function(Backbone, tmpl, ViewManager) {
+function(Backbone, tmpl) {
     var MainView = Backbone.View.extend({
 
         template: tmpl,
-        el: '#pages',
+        tagName: 'section',
+        className: 'page',
         pageId: '#mainPage',
 
         initialize: function () {
-            ViewManager.addView(this.pageId, this);
             this.render();
         },
         render: function () {
-            var p = $(this.template({score: 452}));
-            p.attr("id", this.pageId.slice(1));
-            p.appendTo(this.$el);
+            this.$el.html(this.template());
+            this.$el.attr('id', this.pageId.slice(1));
             return this;
         },
         show: function () {
-            this.$el.find(this.pageId).show();
+            this.$el.show();
             $.event.trigger({
                 type: "showPageEvent",
                 pageId: this.pageId
@@ -29,7 +27,7 @@ function(Backbone, tmpl, ViewManager) {
         },
 
         hide: function () {
-            this.$el.find(this.pageId).hide();
+            this.$el.hide();
         },
 
     });

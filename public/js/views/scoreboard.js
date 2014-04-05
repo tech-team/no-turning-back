@@ -1,80 +1,76 @@
 define([
     'backbone',
     'tmpl/scoreboard',
-    'collections/scores',
-    'views/viewmanager',
+    'collections/scores'
 ], 
-function(Backbone, scoreboardTmpl, scoresCollection, ViewManager) {
+function(Backbone, tmpl, scoresCollection) {
     var ScoreboardView = Backbone.View.extend({
 
-        template: scoreboardTmpl,
-        el: '#pages',
+        template: tmpl,
+        tagName: 'section',
+        className: 'page',
         pageId: '#scoreboardPage',
         loader: '.scores-wrapper__loading-indicator',
         scoresTable: '.scores',
 
         initialize: function () {
-            ViewManager.addView(this.pageId, this);
             this.render();
         },
 
         render: function (data, error_message) {
-            if (typeof (data) === 'undefined') {
-                data = [];
-            }
-            var p = document.getElementById(this.pageId.slice(1));
-            if (p !== null)
-                p.parentNode.removeChild(p);
+            data = data ? data : [];
 
-            var p = $(this.template({
-                                        scores: data,
-                                        error: error_message
-                                    }));
-            p.attr("id", this.pageId.slice(1));
-            p.appendTo(this.$el);
+            this.$el.html(this.template({
+                                            scores: data,
+                                            error: error_message
+                                        }));
+            this.$el.attr('id', this.pageId.slice(1));
  
             return this;
         },
 
         show: function () {
+            this.$el.show();
+
             $.event.trigger({
                 type: "showPageEvent",
                 pageId: this.pageId
             });
 
-            var self = this;
-            scoresCollection.retrieve(10,
-                {
-                    before: function() {
-                        $(self.scoresTable).hide();
-                        $(self.loader).show();
-                        console.log("scoresRetrieving");
-                    },
+            // var self = this;
+            // scoresCollection.retrieve(10,
+            //     {
+            //         before: function() {
+            //             $(self.scoresTable).hide();
+            //             self.totalShow();
+            //             $(self.loader).show();
+            //             console.log("scoresRetrieving");
+            //         },
 
-                    success: function(data) {
-                        self.totalShow();
-                        //self.$el.find(self.loader).hide();
-                        //self.$el.find(self.scoresTable).show();
+            //         success: function(data) {
+            //             self.totalShow();
+            //             //self.$el.find(self.loader).hide();
+            //             //self.$el.find(self.scoresTable).show();
                         
-                        console.log("scoresRetrieved");
-                    },
+            //             console.log("scoresRetrieved");
+            //         },
 
-                    fail: function(data) {
-                        $(self.loader).hide();
-                        self.totalShow(data.message);
-                        console.log("scoresRetrievingFailed");
-                    }
-                });
+            //         fail: function(data) {
+            //             $(self.loader).hide();
+            //             self.totalShow(data.message);
+            //             console.log("scoresRetrievingFailed");
+            //         }
+            //     });
         },
 
         totalShow: function(error_message) {
             this.render(scoresCollection.toJSON(), error_message);
-            this.$el.find(this.pageId).show();
+            this.$el.show();
         },
 
         hide: function () {
-            $(self.scoresTable).hide();
-            this.$el.find(this.pageId).hide();
+            // $(self.scoresTable).hide();
+            this.$el.hide();
         }
 
     });

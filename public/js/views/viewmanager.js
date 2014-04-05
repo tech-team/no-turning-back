@@ -1,11 +1,9 @@
 define([
     'backbone'
 ], 
-function(Backbone, tmpl) {
+function(Backbone) {
     var ViewManager = Backbone.View.extend({
-
-        template: tmpl,
-        el: '#page',
+        el: '#pages',
         views: {},
 
         initialize: function () {
@@ -19,9 +17,11 @@ function(Backbone, tmpl) {
             });
         },
 
-        addView: function(viewId, view) {
-            this.views[viewId] = view;
-            
+        addView: function(view) {
+            this.views[view.pageId] = view;
+            this.$el.append(view.$el);
+            console.log(view.$el);
+            console.log(this.$el);
         }
 
     });

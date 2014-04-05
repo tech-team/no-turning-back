@@ -2,48 +2,59 @@ define([
     'backbone',
     'tmpl/game',
     'game/Game',
-    'views/viewmanager',
     'views/gamefinishedview'
 ], 
-function(Backbone, tmpl, Game, ViewManager, GameFinishedView) {
+function(Backbone, tmpl, Game, GameFinishedView) {
     var GameView = Backbone.View.extend({
 
         template: tmpl,
-        el: '#pages',
+        tagName: 'section',
+        className: 'page',
         pageId: '#gamePage',
         canvas: null,
         scene: null,
         game: null,
 
         initialize: function () {
-            ViewManager.addView(this.pageId, this);
             this.render();
-
-            
         },
 
         render: function () {
-            var p = $(this.template());
-            p.attr("id", this.pageId.slice(1));
-            p.appendTo(this.$el);
+            this.$el.html(this.template());
+            this.$el.attr('id', this.pageId.slice(1));
 
-            this.canvas = document.getElementById('game-field');
-            this.scene = $('#scene');
+            this.canvas = this.$el.find('#game-field')[0];
+            this.scene = this.$el.find('#scene');
             this.calcDimensions();
 
-            
             return this;
         },
+
         show: function () {
-            this.$el.find(this.pageId).show();
+            this.$el.show();
             $.event.trigger({
                 type: "showPageEvent",
                 pageId: this.pageId
             });
             this.runGame();
         },
+
         hide: function () {
-            this.$el.find(this.pageId).hide();
+            this.$el.hide();
+        },
+
+        runGame: function() {
+            var self = this;
+            this.game = new Game(this.canvas, false, 
+                function() {
+                    self.game.run();
+                }
+            );
+            
+            $(document).on("levelFinished", function(event) {
+                self.game.state = Game.GameState.GameOver;
+                GameFinishedView.show(event.score);
+            });
         },
 
         calcDimensions: function() {
@@ -69,20 +80,6 @@ function(Backbone, tmpl, Game, ViewManager, GameFinishedView) {
             $(window).resize();
 
         },
-
-        runGame: function() {
-            var self = this;
-            this.game = new Game(this.canvas, false, 
-                function() {
-                    self.game.run();
-                }
-            );
-            
-            $(document).on("levelFinished", function(event) {
-                self.game.state = Game.GameState.GameOver;
-                GameFinishedView.show(event.score);
-            });
-        }
 
     });
 

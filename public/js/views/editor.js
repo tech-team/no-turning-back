@@ -8,7 +8,8 @@ function(Backbone, tmpl, Game, ViewManager) {
     var EditorView = Backbone.View.extend({
 
         template: tmpl,
-        el: '#pages',
+        tagName: 'section',
+        className: 'page',
         pageId: '#editorPage',
         canvas: null,
         scene: null,
@@ -16,32 +17,41 @@ function(Backbone, tmpl, Game, ViewManager) {
         game: null,
 
         initialize: function () {
-            ViewManager.addView(this.pageId, this);
             this.render();
         },
 
         render: function () {
-            var p = $(this.template());
-            p.attr("id", this.pageId.slice(1));
-            p.appendTo(this.$el);
+            this.$el.html(this.template());
+            this.$el.attr('id', this.pageId.slice(1));
 
-            this.canvas = document.getElementById('editor-field');
-            this.scene = $('#editor-scene');
-            this.sidebar = $('#editor-sidebar');
+            this.canvas = this.$el.find('#editor-field')[0];
+            this.scene = this.$el.find('#editor-scene');
+            this.sidebar = this.$el.find('#editor-sidebar');
             this.calcDimensions();
 
             return this;
         },
+
         show: function () {
-            this.$el.find(this.pageId).show();
+            this.$el.show();
             $.event.trigger({
                 type: "showPageEvent",
                 pageId: this.pageId
             });
             this.runGame();
         },
+
         hide: function () {
-            this.$el.find(this.pageId).hide();
+            this.$el.hide();
+        },
+
+        runGame: function() {
+            var self = this;
+            this.game = new Game(this.canvas, true,
+                function() {
+                    self.game.run();
+                }
+            );
         },
 
         calcDimensions: function() {
@@ -67,15 +77,6 @@ function(Backbone, tmpl, Game, ViewManager) {
             });
             $(window).resize();
         },
-
-        runGame: function() {
-            var self = this;
-            this.game = new Game(this.canvas, true,
-                function() {
-                    self.game.run();
-                }
-            );
-        }
 
     });
 

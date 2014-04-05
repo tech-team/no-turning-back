@@ -27,7 +27,8 @@ module.exports = {
 		s = JSON.stringify(s);
 		res.setHeader('Content-Type', 'application/javascript');
 		res.setHeader('Content-Length', Buffer.byteLength(s));
-		res.end(s);
+		setTimeout(function() { res.end(s) }, 5000)
+		// res.end(s);
 	},
 
 	getOne: function(req, res){
@@ -77,6 +78,7 @@ module.exports = {
 		var s = JSON.stringify(newScore);
 		res.setHeader('Content-Type', 'application/javascript');
 		res.setHeader('Content-Length', Buffer.byteLength(s));
+		// setTimeout(function() { res.end(s) }, 5000)
 		res.end(s);
 	},
 
