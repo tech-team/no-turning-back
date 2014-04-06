@@ -83,6 +83,9 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                 self.scene.css(cssSizes).css({'margin-top': verticalMargin});
                 self.canvas.width = width;
                 self.canvas.height = height;
+
+                if (self.game)
+                    self.game.resize();
             });
             $(window).resize();
 

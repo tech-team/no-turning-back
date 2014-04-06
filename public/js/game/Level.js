@@ -116,19 +116,25 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             if (!this.editorMode) {
                 var healthText = new easeljs.Text("Health: 100", "20px Arial", "#00FF00");
                 this.healthText = this.stage.addChild(healthText);
-                this.healthText.x = 20;
-                this.healthText.y = this.stage.canvas.height - 32;
 
                 var scoreText = new easeljs.Text("Score: 0", "20px Arial", "#00FF00");
                 this.scoreText = this.stage.addChild(scoreText);
-                this.scoreText.x = this.stage.canvas.width - 100;
-                this.scoreText.y = this.stage.canvas.height - 32;
+
+                this.resize(); //recalculate overlay positions
             }
 
             this.updateFog(true);
             this.player.setEffects(this.effects);
 
             this.createCollisionObjects();
+        },
+
+        resize: function() {
+            this.healthText.x = 20;
+            this.healthText.y = this.stage.canvas.height - 32;
+
+            this.scoreText.x = this.stage.canvas.width - 100;
+            this.scoreText.y = this.stage.canvas.height - 32;
         },
 
         createCollisionObjects: function() {

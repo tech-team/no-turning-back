@@ -431,8 +431,9 @@ html, body {
 }
 
 .editor-sidebar__object {
-    top: 0;
-    bottom: 0;
+    height: 100px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .editor-sidebar__palette {

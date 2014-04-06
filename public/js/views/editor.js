@@ -80,10 +80,18 @@ function(Backbone, tmpl, Game, ViewManager) {
                 self.canvas.height = height;
                 self.scene.css(cssSizes);
                 self.sidebar.height(height);
+
+                var level = $('.editor-sidebar__level');
+                var object = $('.editor-sidebar__object');
+                var palette = $('.editor-sidebar__palette');
+                object.height(
+                    self.sidebar.height()
+                    - level.height()
+                    - palette.height()
+                    - 18); //todo: everybody like magic
             });
             $(window).resize();
-        },
-
+        }
     });
 
     return new EditorView();
