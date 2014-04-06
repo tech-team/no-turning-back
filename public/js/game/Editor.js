@@ -407,9 +407,12 @@ define([
                 excludedKeys.push('player');
                 excludedKeys.push('draggable');
                 excludedKeys.push('type');
+                excludedKeys.push('x');
+                excludedKeys.push('y');
 
                 this.regeneratePropertiesTable('#level-object', 'level',
                     _.omit(this.level.data, excludedKeys));
+                $(window).resize(); //update sidebar's components heights
             },
 
             regenerateObjectPropertiesTable: function() {
