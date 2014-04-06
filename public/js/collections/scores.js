@@ -12,8 +12,14 @@ function(Backbone, Player, LocalStorage) {
 
     	},
 
+        saveLocally: function(data) {
+            LocalStorage.addToArray(this.localStorageScoreKey, data);
+        },
+
         sendScore: function(score_data, callbacks) {
-            var without_echoing = !callbacks;
+            callbacks.before = callbacks.before ? callbacks.before : function() {};
+            callbacks.success = callbacks.success ? callbacks.success : function(data) {};
+            callbacks.fail = callbacks.fail ? callbacks.fail : function(data) {};
 
             var self = this;
             $.ajax({
@@ -22,26 +28,42 @@ function(Backbone, Player, LocalStorage) {
                     data: score_data,
                     dataType: 'json',
                     beforeSend: function() {
-                        if (!without_echoing) {
-                            callbacks.before();
-                        }
+                        callbacks.before();
                     },
                     success: function(data) {
-                        if (!without_echoing) {
-                            callbacks.success(data);
-                        }
+                        callbacks.success(data);
                         self.add(new Player(score_data));
                     },
                     error: function(data) {
-                        LocalStorage.addToArray(self.localStorageScoreKey, score_data);
-                        if (!without_echoing) {
-                            callbacks.fail({
-                                data: data,
-                                message: "Connection Failed. Score saved locally."
-                            })
-                        }
+                        callbacks.fail({
+                            data: data,
+                            message: "Connection Problem. You can save score locally."
+                        });
                     }
             });
+        },
+
+        resendSaved: function() {
+            var self = this;
+
+            var savedScores = LocalStorage.getJSON(self.localStorageScoreKey);
+            if (savedScores) {
+                console.log("There are scores saved locally. Attempt to send them to the server.");
+
+                var finished = false;
+                for (var i = 0; i < savedScores.length; ++i) {
+                    self.sendScore(savedScores[i], {
+                        success: function(data) {
+                            LocalStorage.popFromArray(self.localStorageScoreKey);
+                        },
+                        fail: function(data) {
+                            finished = true;
+                        }
+                    });
+                    if (finished)
+                        break;
+                }
+            }
         },
 
         retrieve: function(limitCount, callbacks) {
@@ -56,26 +78,18 @@ function(Backbone, Player, LocalStorage) {
                     dataType: 'json',
                     beforeSend: function() {
                         callbacks.before();
-
-                        var savedScores = LocalStorage.getJSON(self.localStorageScoreKey);
-                        if (savedScores) {
-                            console.log("There are scores saved locally. Attempt to send them to the server.");
-                            _.each(savedScores,
-                                function(elem, i) {
-                                    LocalStorage.popFromArray(self.localStorageScoreKey);
-                                    self.sendScore(elem, null);
-                                });
-                        }
-
+                        self.resendSaved();
                     },
+
                     success: function(data) {
-                        self.models = [];
+                        self.reset();
                         for (var i = 0; i < data.length; ++i) {
-                            self.models.push(new Player(data[i]));
+                            self.add(new Player(data[i]));
                         }
 
                         callbacks.success(data);
                     },
+
                     error: function(data) {
                         callbacks.fail({
                             data: data,

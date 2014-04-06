@@ -66,7 +66,7 @@ function(Backbone, tmpl, Game, GameFinishedView) {
 
         calcDimensions: function() {
             if (this.scene === null) {
-                console.log("#scene is null");
+                console.error("#scene is null");
                 return;
             }
 

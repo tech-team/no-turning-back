@@ -9,10 +9,10 @@ function(Backbone, tmpl, Scoreboard, Player, ScoreboardView) {
 
     var GameFinishedView = Backbone.View.extend({
         template: tmpl,
-        el: '#pages',
         tagName: 'section',
         className: 'page',
         pageId: '#gameFinishedPage',
+        pages: null,
         hidden: true,
 
         senderForm: null,
@@ -49,39 +49,59 @@ function(Backbone, tmpl, Scoreboard, Player, ScoreboardView) {
             this.sendSubmit = this.$el.find('input#sendSubmit');
             this.loader = this.$el.find('.score-content__loading-indicator');
             this.errorField = this.$el.find('.error_message');
+            this.pages = $('#pages');
+
             
             return this;
         },
 
         show: function (scoreValue) {
             this.render(scoreValue);
-            this.calcDimensions();
+            
+            this.pages.append(this.$el);
             this.$el.show();
+            this.calcDimensions();
+            
+
             this.hidden = false;
 
             var self = this;
-            senderForm.submit(function(event) {
+            this.senderForm.submit(function(event) {
                 event.preventDefault();
 
                 var data = {};
-                $.each(senderForm.serializeArray(), function (i, input) {
+                $.each(self.senderForm.serializeArray(), function (i, input) {
                     data[input.name] = input.value;
                 });
+                data['name'] = data['name'].trim();
+                if (data['name'] === '') {
+                    self.errorField.text("Name cannot be empty");
+                    self.errorField.show();
+                    return;
+                }
+
+                if (data['save'] && data['save'] == 1) {
+                    delete data['save'];
+                    Scoreboard.saveLocally(data);
+
+                    self.hide();
+                    ScoreboardView.show();
+                    return;
+                }
+
                 Scoreboard.sendScore(data, {
                     before: function() {
-                        console.log("form is sending");
                         self.blockForm();
                     },
                     success: function(event) {
-                        console.log("form is sent successfully");
                         self.unblockForm();
                         self.hide();
 
                         ScoreboardView.show();
                     },
                     fail: function(event) {
-                        console.log("failed to send");
                         self.unblockForm();
+                        self.reconfigureSendToSave();
 
                         self.errorField.text(event.message);
                         self.errorField.show();   
@@ -109,6 +129,20 @@ function(Backbone, tmpl, Scoreboard, Player, ScoreboardView) {
             this.userField.prop('disabled', false);
             this.sendSubmit.prop('disabled', false);
             this.loader.hide();
+        },
+
+        reconfigureSendToSave: function() {
+            this.sendSubmit.css({
+                'background-color': '#05C925'
+            });
+            var content = this.$el.find('.score-content-wrapper');
+            content.css({
+                'height': 240 + 'px'
+            });
+            this.sendSubmit.prop('value', 'Save');
+
+            var saveFlagInput = $('<input type="hidden" value="1" name="save"/>');
+            this.senderForm.append(saveFlagInput);
         },
 
         calcDimensions: function() {
