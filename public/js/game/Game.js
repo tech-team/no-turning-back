@@ -57,6 +57,10 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 			});
 		},
 
+		stop: function() {
+			this.state = Game.GameState.GameOver;
+		},
+
 		update: function(event) {
             if (this.state == Game.GameState.Game) {
                 this.level.update(event);

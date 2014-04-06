@@ -1,0 +1,24 @@
+<fest:template xmlns:fest="http://fest.mail.ru"
+    context_name="json">
+	<div class="score-sender-dimmer"></div>
+    <div class="content-wrapper score-content-wrapper">
+	    <div class="content score-content ">
+	    	<div class="loading-indicator score-content__loading-indicator"></div>
+
+	    	<div class="score-content__score-value">
+	    		<span class="score-value__value">
+	    			Score: <fest:space></fest:space><fest:value>json.score</fest:value>
+	    		</span>
+	    	</div>
+	    	<form id="scoreForm" method='post'>
+	    		<input type="hidden" id="score" value="{json.score}" name="score"/>
+	    		<input type="text" id="user" class="score-content__username-field" placeholder="Enter your name" autocomplete="off" name="name"/>
+	    		<input type="submit" id="sendSubmit" class="score-content__sendScore-button" value="Submit" />
+	    	</form>
+	    	<div class="error_message sending-score__error">
+				
+			</div>
+		</div>
+		
+	</div>
+</fest:template>

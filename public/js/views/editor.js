@@ -11,6 +11,8 @@ function(Backbone, tmpl, Game, ViewManager) {
         tagName: 'section',
         className: 'page',
         pageId: '#editorPage',
+        hidden: true,
+        
         canvas: null,
         scene: null,
         sidebar: null,
@@ -34,6 +36,7 @@ function(Backbone, tmpl, Game, ViewManager) {
 
         show: function () {
             this.$el.show();
+            this.hidden = false;
             $.event.trigger({
                 type: "showPageEvent",
                 pageId: this.pageId
@@ -42,7 +45,10 @@ function(Backbone, tmpl, Game, ViewManager) {
         },
 
         hide: function () {
-            this.$el.hide();
+            if (!this.hidden) {
+                this.$el.hide();
+                this.hidden = true;
+            }
         },
 
         runGame: function() {
