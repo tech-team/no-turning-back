@@ -67,7 +67,11 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 
                 this.stage.update(event);
             }
-		}
+		},
+
+        resize: function() {
+            this.level.resize();
+        }
 	});
 
 	return Game;
