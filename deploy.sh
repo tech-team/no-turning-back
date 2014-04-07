@@ -6,7 +6,7 @@ TEMP_FOLDER=$HOME/nodejs-temp
 function install_node() {
 	echo "Installing Node.js ..."
 	if [ $SYSTEM_BIT == 32 ]; then
-		URL=http://nodejs.org/dist/v0.10.26/node-v0.10.26-sunos-x86.tar.gz
+		URL=http://nodejs.org/dist/v0.10.26/node-v0.10.26-linux-x86.tar.gz
 	fi
 
 	if [ $SYSTEM_BIT == 64 ]; then

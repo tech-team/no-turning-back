@@ -48,7 +48,7 @@ function(Backbone, tmpl, scoresCollection) {
                         self.loader.show();
                     },
 
-                    success: function(data) {
+                    success: function() {
                         self.totalShow();
                     },
 

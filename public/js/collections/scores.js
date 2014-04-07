@@ -47,7 +47,7 @@ function(Backbone, Player, LocalStorage) {
             var self = this;
 
             var savedScores = LocalStorage.getJSON(self.localStorageScoreKey);
-            if (savedScores) {
+            if (savedScores && savedScores.length != 0) {
                 console.log("There are scores saved locally. Attempt to send them to the server.");
 
                 var finished = false;

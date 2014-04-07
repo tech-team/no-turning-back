@@ -14,12 +14,12 @@
   },
   "homepage": "https://github.com/tech-team/frontend-game",
   "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-contrib-watch": "~0.5.3",
+    "grunt": "~0.4.4",
+    "grunt-contrib-watch": "~0.6.1",
     "grunt-fest": "~0.1.5",
-    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-concat": "~0.4.0",
     "grunt-express-server": "~0.4.13",
-    "express": "~3.5.0",
+    "express": "~3.5.1",
     "grunt-express": "~1.2.1"
   }
 }

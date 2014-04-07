@@ -35,7 +35,7 @@ function(Backbone, tmpl) {
                 this.$el.hide();
                 this.hidden = true;
             }
-        },
+        }
 
     });
 

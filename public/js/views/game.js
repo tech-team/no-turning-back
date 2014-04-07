@@ -89,7 +89,7 @@ function(Backbone, tmpl, Game, GameFinishedView) {
             });
             $(window).resize();
 
-        },
+        }
 
     });
 

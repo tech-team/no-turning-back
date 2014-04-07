@@ -4,7 +4,7 @@ define([
     'game/Game',
     'views/viewmanager'
 ], 
-function(Backbone, tmpl, Game, ViewManager) {
+function(Backbone, tmpl, Game) {
     var EditorView = Backbone.View.extend({
 
         template: tmpl,

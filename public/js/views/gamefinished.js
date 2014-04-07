@@ -3,18 +3,19 @@ define([
     'tmpl/gamefinished',
     'collections/scores',
     'models/player',
-    'views/scoreboard'
+    'views/scoreboard',
+    'views/viewmanager'
 ], 
-function(Backbone, tmpl, Scoreboard, Player, ScoreboardView) {
+function(Backbone, tmpl, Scoreboard, Player, ScoreboardView, ViewManager) {
 
     var GameFinishedView = Backbone.View.extend({
         template: tmpl,
         tagName: 'section',
         className: 'page',
         pageId: '#gameFinishedPage',
-        pages: null,
         hidden: true,
 
+        dimmer: null,
         senderForm: null,
         userField: null,
         scoreField: null,
@@ -23,18 +24,7 @@ function(Backbone, tmpl, Scoreboard, Player, ScoreboardView) {
         errorField: null,
 
         initialize: function () {
-            var self = this;
-            $(document).on("scoreSending", function(event) {
-                self.sendingForm();
-            });
-
-            $(document).on("scoreSent", function(event) {
-                self.okForm(event);
-            });
-
-            $(document).on("scoreSendFailed", function(event) {
-                self.failForm(event);
-            });
+            ViewManager.addView(this);
         },
 
         render: function (scoreValue) {
@@ -43,29 +33,26 @@ function(Backbone, tmpl, Scoreboard, Player, ScoreboardView) {
             this.$el.html(this.template({score: scoreValue}));
             this.$el.attr('id', this.pageId.slice(1));
 
+            this.dimmer = this.$el.find('.score-sender-dimmer');
             this.senderForm = this.$el.find('#scoreForm');
             this.userField = this.$el.find('input#user');
             this.scoreField = this.$el.find('input#score');
             this.sendSubmit = this.$el.find('input#sendSubmit');
             this.loader = this.$el.find('.score-content__loading-indicator');
             this.errorField = this.$el.find('.error_message');
-            this.pages = $('#pages');
 
-            
+            this.bindEvents();
             return this;
         },
 
-        show: function (scoreValue) {
-            this.render(scoreValue);
-            
-            this.pages.append(this.$el);
-            this.$el.show();
-            this.calcDimensions();
-            
-
-            this.hidden = false;
-
+        bindEvents: function() {
             var self = this;
+
+            this.dimmer.click(function() {
+                self.hide();
+                ScoreboardView.show();
+            });
+
             this.senderForm.submit(function(event) {
                 event.preventDefault();
 
@@ -104,11 +91,25 @@ function(Backbone, tmpl, Scoreboard, Player, ScoreboardView) {
                         self.reconfigureSendToSave();
 
                         self.errorField.text(event.message);
-                        self.errorField.show();   
+                        self.errorField.show();
                     }
                 });
-                
+
             });
+        },
+
+        show: function (scoreValue) {
+            this.render(scoreValue);
+            this.$el.show();
+            ViewManager.addToDOM(this.pageId);
+            this.calcDimensions();
+
+            $.event.trigger({
+                type: "showPageEvent",
+                pageId: this.pageId
+            });
+
+            this.hidden = false;
         },
 
         hide: function () {
@@ -146,7 +147,6 @@ function(Backbone, tmpl, Scoreboard, Player, ScoreboardView) {
         },
 
         calcDimensions: function() {
-            var $dimmer = this.$el.find('.score-sender-dimmer');
 
             var $sender = this.$el.find('.score-content-wrapper');
             var senderWidth = $sender.width();
@@ -157,7 +157,7 @@ function(Backbone, tmpl, Scoreboard, Player, ScoreboardView) {
                 var windowWidth = $(this).width();
                 var windowHeight = $(this).height();
 
-                $dimmer.css({
+                self.dimmer.css({
                     'height': windowHeight + 'px'
                 });
 
