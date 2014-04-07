@@ -3,10 +3,9 @@ define([
     'tmpl/gamefinished',
     'collections/scores',
     'models/player',
-    'views/scoreboard',
     'views/viewmanager'
 ], 
-function(Backbone, tmpl, Scoreboard, Player, ScoreboardView, ViewManager) {
+function(Backbone, tmpl, Scoreboard, Player, ViewManager) {
 
     var GameFinishedView = Backbone.View.extend({
         template: tmpl,
@@ -50,7 +49,7 @@ function(Backbone, tmpl, Scoreboard, Player, ScoreboardView, ViewManager) {
 
             this.dimmer.click(function() {
                 self.hide();
-                ScoreboardView.show();
+                window.location = '#scoreboard';
             });
 
             this.senderForm.submit(function(event) {
@@ -72,7 +71,7 @@ function(Backbone, tmpl, Scoreboard, Player, ScoreboardView, ViewManager) {
                     Scoreboard.saveLocally(data);
 
                     self.hide();
-                    ScoreboardView.show();
+                    window.location = '#scoreboard';
                     return;
                 }
 
@@ -84,7 +83,7 @@ function(Backbone, tmpl, Scoreboard, Player, ScoreboardView, ViewManager) {
                         self.unblockForm();
                         self.hide();
 
-                        ScoreboardView.show();
+                        window.location = '#scoreboard';
                     },
                     fail: function(event) {
                         self.unblockForm();
