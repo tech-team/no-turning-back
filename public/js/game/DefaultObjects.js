@@ -86,8 +86,11 @@ define([
 
                 weapon: {
                    name: "pistol",
-                   damage: 50,
+                   damage: 10,
                    ammo: 10
+                },
+
+                corpse: {
                 },
 
                 object: {
@@ -100,6 +103,7 @@ define([
                     w: "",
                     h: ""
                 }
+
             }
         });
 

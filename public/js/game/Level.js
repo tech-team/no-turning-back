@@ -3,6 +3,7 @@ define([
     'underscore',
     'easel',
     'collision',
+    'game/DefaultObjects',
     'game/KeyCoder',
     'game/Editor',
     'game/Zombie',
@@ -11,7 +12,7 @@ define([
     'game/Bullet'
 ],
 
-function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bullet) {
+function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, Chest, Door, Bullet) {
 	var Level = Class.$extend({
 		__init__: function(stage, data, player, resourceManager, editorMode) {
             this.data = data;
@@ -54,6 +55,8 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             //var backgroundSprite = new easeljs.Sprite(backgroundSh);
             //this.stage.addChild(backgroundSprite);
             this.background = this.addToStage(data, true);
+            this.backgroundId = this.stage.getChildIndex(this.background);
+
 
             //add walls
             _.each(data.walls, function(obj) {
@@ -146,6 +149,10 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
                 if (this.doors[i].state === Door.State.Closed) {
                     this.collisionObjects.push(this.doors[i].dispObj);
                 }
+            }
+
+            for (var i = 0; i < this.zombies.length; ++i) {
+                this.collisionObjects.push(this.zombies[i].dispObj);
             }
         },
 
@@ -367,7 +374,17 @@ function(Class, _, easeljs, collider, KeyCoder, Editor, Zombie, Chest, Door, Bul
             for (var i = 0; i < this.zombies.length; ++i) {
                 if (this.zombies[i].health <= 0) {
                     //TODO: corpse
+                    var corpse = DefaultObjects.build("corpse",
+                    {
+                        tex: "zombie_corpse",
+                        x: this.zombies[i].dispObj.x,
+                        y: this.zombies[i].dispObj.y,
+                        r: this.zombies[i].dispObj.rotation
+                    })
+
+                    this.addToStage(corpse, false, this.backgroundId);
                     this.stage.removeChild(this.zombies[i].dispObj);
+                    this.collisionObjects.splice(j, 1);
                     this.zombies.splice(i, 1);
                     this.player.score += 5;
                 }

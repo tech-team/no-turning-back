@@ -4,6 +4,7 @@ require.config({
     paths: {
         jquery: "lib/jquery",
         underscore: "lib/underscore",
+        lodash: "lib/lodash",
         backbone: "lib/backbone",
         classy: "lib/classy",
         easel: "lib/game/easeljs",
@@ -18,6 +19,9 @@ require.config({
             exports: 'Backbone'
         },
         'underscore': {
+            exports: '_'
+        },
+        'lodash': {
             exports: '_'
         },
         'classy': {
