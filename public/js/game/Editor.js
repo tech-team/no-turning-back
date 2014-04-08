@@ -1,6 +1,6 @@
 define([
     'classy',
-    'underscore',
+    'lodash',
     'easel',
     'jquery',
     'game/KeyCoder',
@@ -370,12 +370,12 @@ define([
                 if (!dispObj)
                     return;
 
-                var newData = _.clone(dispObj.data);
+                var newData = _.cloneDeep(dispObj.data);
                 newData.x += Editor.duplicateDelta;
 
                 //deep copy all inner arrays and objects
-                if (newData.type == 'zombie')
-                    newData.waypoints = _.clone(newData.waypoints);
+                //if (newData.type == 'zombie')
+                //    newData.waypoints = _.clone(newData.waypoints);
 
                 if (newData.type == 'waypoint') {
                     this.addWayPoint(newData, dispObj.data);
