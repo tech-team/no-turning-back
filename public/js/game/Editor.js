@@ -111,6 +111,7 @@ define([
 
                 this.regenerateLevelPropertiesTable();
                 this.populateTexSelect();
+                this.populateTypeSelect();
             },
 
             populateTexSelect: function(select) {
@@ -118,6 +119,17 @@ define([
 
                 _.each(ResourceManager.texList, function(tex) {
                     textureSelect.append($("<option />").val(tex).text(tex));
+                });
+            },
+
+            populateTypeSelect: function(select) {
+                var typeSelect = select || $('.type-select');
+
+                var excludedKeys = ['level', 'build', '$extend', '$withData', 'constructor'];
+                var types = _.difference(_.keys(DefaultObjects), excludedKeys);
+
+                _.each(types, function(tex) {
+                    typeSelect.append($("<option />").val(tex).text(tex));
                 });
             },
 
@@ -360,6 +372,10 @@ define([
 
                 var newData = _.clone(dispObj.data);
                 newData.x += Editor.duplicateDelta;
+
+                //deep copy all inner arrays and objects
+                if (newData.type == 'zombie')
+                    newData.waypoints = _.clone(newData.waypoints);
 
                 if (newData.type == 'waypoint') {
                     this.addWayPoint(newData, dispObj.data);
