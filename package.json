@@ -20,6 +20,7 @@
     "grunt-contrib-concat": "~0.4.0",
     "grunt-express-server": "~0.4.13",
     "express": "~3.5.1",
-    "grunt-express": "~1.2.1"
+    "grunt-express": "~1.2.1",
+    "grunt-contrib-sass": "~0.7.3"
   }
 }

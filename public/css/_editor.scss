@@ -1,0 +1,53 @@
+.editor-scene {
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    width: 80%;
+}
+
+.editor-sidebar {
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    width: 20%;
+    height: 99%;
+
+    background-color: white;
+
+    &__group {
+	    padding: 0px 10px 0px 10px;
+
+	    border-style: inset;
+
+	    &__header {
+		    margin: 5px 0px 5px 0px;
+		}
+
+		&__controls {
+		    float: right;
+		}
+	}
+
+	&__object {
+	    height: 100px;
+	    overflow-y: auto;
+	    overflow-x: hidden;
+	}
+
+	&__palette {
+	    position: absolute;
+	    right: 0;
+	    left: 0;
+	    bottom: 0;
+	}
+}
+
+.type-specific-props {
+    display: none;
+}
+
+select {
+    width: 100%;
+}
