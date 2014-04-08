@@ -1,6 +1,11 @@
 @import "macondoregular/macondo-font";
 
 $background-color: #5C5C5C;
+$content-wrapper-width: 500px;
+$content-wrapper-height: 600px;
+$content-width: 450px;
+$orange-color: #F7AF28;
+$font: 'macondoregular', cursive;
 
 html, body {
 	margin: 0;
@@ -29,20 +34,19 @@ html, body {
 /********** content **********/
 
 .content-wrapper {
-	width: 500px;
-	height: 600px;
+	width: $content-wrapper-width;
+	height: $content-wrapper-height;
 	display: block;
 	margin: 20px auto 0 auto;
-	background-color: #FFFFFF;
+	background-color: white;
 	position: relative;
 
 	text-align: center;
-	font-family: 'macondoregular', cursive;
+	font-family: $font;
 }
 
 .content {
-	
-	width: 450px;
+	width: $content-width;
 
 	padding: 10px;
 	margin: 0 auto;
@@ -128,9 +132,9 @@ html, body {
 }
 
 
-@import "_mainmenu"
-@import "_bakbutton"
-@import "_scoreboard"
-@import "_scoreSender"
-@import "_game"
-@import "_editor"
+@import "_mainmenu";
+@import "_backbutton";
+@import "_scoreboard";
+@import "_scoreSender";
+@import "_game";
+@import "_editor";

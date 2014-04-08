@@ -103,10 +103,10 @@ function(Backbone, tmpl, Scoreboard, Player, ViewManager) {
             ViewManager.addToDOM(this.pageId);
             this.calcDimensions();
 
-            $.event.trigger({
-                type: "showPageEvent",
-                pageId: this.pageId
-            });
+            // $.event.trigger({
+            //     type: "showPageEvent",
+            //     pageId: this.pageId
+            // });
 
             this.hidden = false;
         },

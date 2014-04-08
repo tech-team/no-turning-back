@@ -29,15 +29,6 @@ module.exports = function (grunt) {
 				}
 			}
 		},
-		/*concat: {
-		    css: {
-		    	src: cssFiles,
-		    	dest: 'public/css/common.css',
-		    	options: {
-			    	separator: '\n'
-			    }
-		    }
-		},*/
 		sass: {
 			css: {
 				files: [{

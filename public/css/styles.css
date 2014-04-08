@@ -29,10 +29,10 @@ html, body {
   height: 600px;
   display: block;
   margin: 20px auto 0 auto;
-  background-color: #FFFFFF;
+  background-color: white;
   position: relative;
   text-align: center;
-  font-family: 'macondoregular', cursive; }
+  font-family: "macondoregular", cursive; }
 
 .content {
   width: 450px;
@@ -96,7 +96,6 @@ html, body {
     color: #F7AF28;
     text-decoration: underline; }
 
-/********** mainmenu **********/
 .mainmenu-wrapper {
   margin-top: 50px; }
 
@@ -118,14 +117,13 @@ html, body {
     .mainmenu__item:last-child {
       margin-bottom: 0; }
     .mainmenu__item:hover {
-      background-color: #F7AF28;
+      background-color: #f7af28;
       cursor: pointer; }
     .mainmenu__item a {
       display: block;
       text-decoration: none;
       color: black; }
 
-/********** back button **********/
 .back-button {
   display: block;
   width: 60px;
@@ -138,7 +136,7 @@ html, body {
   font-size: 20px;
   background-color: #CCCCCC; }
   .back-button:hover {
-    background-color: #F7AF28;
+    background-color: #f7af28;
     cursor: pointer; }
   .back-button__caption {
     display: inline-block; }
@@ -162,9 +160,7 @@ html, body {
   border-top-color: transparent;
   border-left-color: transparent; }
 
-/********** scoreboard **********/
 .scores-wrapper {
-  margin-top: 10px;
   margin-bottom: 15px;
   overflow: visible; }
 
@@ -192,7 +188,6 @@ html, body {
   color: darkred;
   margin-bottom: 10px; }
 
-/********** score sender **********/
 .score-sender-dimmer {
   height: 1000px;
   width: 100%;
@@ -229,16 +224,16 @@ html, body {
     border-right-width: 0px;
     border-color: #5c5c5c;
     border-radius: 5px 0 0 5px;
-    font-family: 'macondoregular', cursive;
+    font-family: "macondoregular", cursive;
     font-size: 35px; }
   .score-content__sendScore-button {
     width: 70px;
     height: 49px;
     vertical-align: top;
-    font-family: 'macondoregular', cursive;
+    font-family: "macondoregular", cursive;
     font-size: 20px;
     color: black;
-    background-color: #FDC66A;
+    background-color: #f7af28;
     border-color: black;
     border-width: 1px;
     -webkit-border-radius: 0 5px 5px 0;
@@ -277,7 +272,6 @@ html, body {
   margin-top: 10px;
   font-size: 24px; }
 
-/********** game **********/
 .game-wrapper {
   margin-top: 0; }
 
