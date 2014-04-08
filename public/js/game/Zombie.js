@@ -64,7 +64,8 @@ define([
                         this.dispObj.y += offsetY;
                     }
                     for (var i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision(this.dispObj, collisionObjects[i])) {
+                        if (collider.checkPixelCollision(this.dispObj, collisionObjects[i]) &&
+                            collisionObjects[i] != this.dispObj) {
                             this.dispObj.x -= offsetX;
                             this.dispObj.y -= offsetY;
                         }
