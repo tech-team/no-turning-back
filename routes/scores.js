@@ -27,8 +27,7 @@ module.exports = {
 		s = JSON.stringify(s);
 		res.setHeader('Content-Type', 'application/javascript');
 		res.setHeader('Content-Length', Buffer.byteLength(s));
-		setTimeout(function() { res.end(s) }, 5000)
-		// res.end(s);
+		res.end(s);
 	},
 
 	getOne: function(req, res){

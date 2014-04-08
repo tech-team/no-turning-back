@@ -1,7 +1,4 @@
 var liveReload = true;
-var cssFiles = ['public/css/macondoregular/macondo-font.css',
-				'public/css/styles.css'];
-var commonCss = 'public/css/common.css';
 var jsFiles = ['public/js/**/*.js'];
 
 module.exports = function (grunt) {
@@ -32,14 +29,25 @@ module.exports = function (grunt) {
 				}
 			}
 		},
-		concat: {
+		/*concat: {
 		    css: {
 		    	src: cssFiles,
 		    	dest: 'public/css/common.css',
 		    	options: {
-			    	separator: '\n',
+			    	separator: '\n'
 			    }
 		    }
+		},*/
+		sass: {
+			css: {
+				files: [{
+					expand: true,
+					cwd: 'public/css',
+					src: '*.scss',
+					dest: 'public/css',
+					ext: '.css'
+				}]
+			}
 		},
 		watch: {
 			express: {
@@ -63,17 +71,20 @@ module.exports = function (grunt) {
 			    }
 			},
             frontend: {
-                files: jsFiles.concat([commonCss]),
+                files: jsFiles.concat(['public/css/*.css']),
                 tasks: [],
                 options: {
                     interrupt: true,
 			        livereload: liveReload
                 }
             },
-            css: {
-                files: cssFiles,
-                tasks: ['concat:css'],
-                options: {}
+            scss: {
+                files: ['public/css/*.scss'],
+                tasks: ['sass'],
+                options: {
+                	atBegin: true,
+                	livereload: false
+                }
             }
 		}
 	});
@@ -81,6 +92,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-express-server');
+	grunt.loadNpmTasks('grunt-contrib-sass');
 	
 	
 	grunt.registerTask('default', ['express', 'watch']);
