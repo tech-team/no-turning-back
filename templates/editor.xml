@@ -39,12 +39,7 @@
         <div class="editor-sidebar__group editor-sidebar__palette">
             <h3 class="editor-sidebar__group__header">Palette:</h3>
             <form>
-                <select id="type-select">
-                    <option value="zombie">Zombie</option>
-                    <option value="wall">Wall</option>
-                    <option value="chest">Chest</option>
-                    <option value="door">Door</option>
-                </select>
+                <select id="add-type-select" class="type-select" />
                 <select id="add-texture-select" class="texture-select" />
                 <button id="addObject">Add</button>
             </form>

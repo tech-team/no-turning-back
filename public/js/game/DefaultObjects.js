@@ -71,6 +71,25 @@ define([
 
                 },
 
+                medkit: {
+                    size: 25
+                },
+
+                key: {
+                    name: "golden_key"
+                },
+
+                ammo: {
+                    weapon: "pistol",
+                    size: 0
+                },
+
+                weapon: {
+                   name: "pistol",
+                   damage: 50,
+                   ammo: 10
+                },
+
                 object: {
                     type: "object",
                     tex: "object",
