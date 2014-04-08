@@ -1,0 +1,40 @@
+.scores-wrapper {
+	margin-top: 10px;
+	margin-bottom: 15px;
+	overflow: visible;
+}
+
+.scores {
+	width: 90%;
+	margin: 0 auto;
+
+	border-collapse: collapse;
+	font-size: 18px;
+
+	&__header, &__col {
+		border: solid;
+		border-width: 1px 1px 1px 0;
+		border-color: #618597;
+
+		&:last-child {
+			width: 25%;
+			border-right-width: 0;
+		}
+	}
+
+	&__header {
+		font-size: 20px;
+		font-weight: bolder;
+		background-color: #D4DCE0;
+	}
+
+	&__row:hover {
+		background-color: #F6F9FC;
+	}
+}
+
+.error_message {
+	font-size: 18px;
+	color: darkred;
+	margin-bottom: 10px;
+}
