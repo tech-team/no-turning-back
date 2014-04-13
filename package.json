@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/tech-team/frontend-game.git"
   },
-  "author": "igorcoding, aleksel1992, abashinos",
+  "author": "igorcoding, alekseyl1992, abashinos",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/tech-team/frontend-game/issues"
@@ -20,7 +20,6 @@
     "grunt-contrib-concat": "~0.4.0",
     "grunt-express-server": "~0.4.13",
     "express": "~3.5.1",
-    "grunt-express": "~1.2.1",
     "grunt-contrib-sass": "~0.7.3"
   },
   "dependencies": {}

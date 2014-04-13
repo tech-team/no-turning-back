@@ -96,6 +96,7 @@ html, body {
     color: #F7AF28;
     text-decoration: underline; }
 
+/********** mainmenu **********/
 .mainmenu-wrapper {
   margin-top: 50px; }
 
@@ -124,6 +125,7 @@ html, body {
       text-decoration: none;
       color: black; }
 
+/********** back button **********/
 .back-button {
   display: block;
   width: 60px;
@@ -160,6 +162,7 @@ html, body {
   border-top-color: transparent;
   border-left-color: transparent; }
 
+/********** scoreboard **********/
 .scores-wrapper {
   margin-bottom: 15px;
   overflow: visible; }
@@ -189,7 +192,6 @@ html, body {
   margin-bottom: 10px; }
 
 .score-sender-dimmer {
-  height: 1000px;
   width: 100%;
   position: absolute;
   top: 0;
@@ -272,6 +274,7 @@ html, body {
   margin-top: 10px;
   font-size: 24px; }
 
+/********** game **********/
 .game-wrapper {
   margin-top: 0; }
 
@@ -279,6 +282,7 @@ html, body {
   margin: 0;
   padding: 0; }
 
+/********** editor **********/
 .editor-scene {
   position: absolute;
   left: 0;

@@ -13,13 +13,14 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
                 "waypoint", "pistol-bullet", "effects/fog", "effects/damage", "zombie_corpse"]
         },
 
+
 		__init__: function(onComplete, onCompleteContext) {
             this.images = [];
             this.spriteSheets = [];
             this.sounds = [];
 
             var self = this;
-
+            
             var queue = new preloadjs.LoadQueue();
             queue.on("complete", handleComplete, this);
 
