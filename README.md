@@ -8,6 +8,7 @@ No Turning Back
   * [node.js](nodejs.org/) with [express server](http://expressjs.com/)
   * [grunt](gruntjs.com/)
   * [grunt-fest](https://github.com/eprev/grunt-fest/) with [fest](https://github.com/mailru/fest) template engine
+  * [SASS](http://sass-lang.com/) preprocessor
 
 
 To deploy this game you will need to have ```node.js``` and ```npm``` already been installed. 
@@ -20,4 +21,7 @@ Then you just need to run
 ```
 npm install
 ```
-in your project folder or run our ```deploy.sh``` file.
+in your project folder.
+Also you will need ```ruby``` and ```sass gem``` to be installed.
+
+Alternatively you can run our ```deploy.sh``` file.
