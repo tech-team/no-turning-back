@@ -35,7 +35,7 @@ define([
                 });
 
                 $('#addObject').click(function() {
-                    var type = $('#type-select').val();
+                    var type = $('#add-type-select').val();
                     var tex = $('#add-texture-select').val();
 
                     self.createObject(type, tex);
