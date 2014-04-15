@@ -21,9 +21,12 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
             this.sounds = [];
 
             var self = this;
-            
+
+            var $progressBar = $('#game-load-progress');
+
             var queue = new preloadjs.LoadQueue();
             queue.on("complete", handleComplete, this);
+            queue.on("progress", handleProgress, this);
 
             var manifest = [];
             _.each(ResourceManager.texList, function(tex) {
@@ -40,6 +43,16 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
                     self.images[tex.id] = queue.getResult(tex.id);
                 });
                 onComplete.call(onCompleteContext);
+
+                //hide progressBar
+                $progressBar.hide();
+                //show game canvas
+                $('#game-field').show();
+            }
+
+            function handleProgress(event) {
+                var val = Math.floor(event.progress*100);
+                $progressBar.val(val);
             }
 		},
 

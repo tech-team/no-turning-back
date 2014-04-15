@@ -2,9 +2,10 @@
     context_name="json">
     <div id="scene" class="content-wrapper game-wrapper">
             <a href="#main" class="back-button back-button_cornered">
-                <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
+                <div class="left-arrow-wrapper"><div class="left-arrow" /></div>
                 <span class="back-button__caption">Back</span>
             </a>
+            <progress id="game-load-progress" value="10" max="100" />
             <canvas id="game-field">You have a very old browser, dude.</canvas>
     </div>
 </fest:template>
