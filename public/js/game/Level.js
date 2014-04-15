@@ -38,6 +38,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
             this.zombies = [];
             this.bullets = [];
             this.collisionObjects = [];
+            this.keys = [];
 
             this.reload(data);
 		},
@@ -144,7 +145,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
             for (var i = 0; i < this.walls.length; ++i) {
                 this.collisionObjects.push(this.walls[i]);
             }
-
             for (var i = 0; i < this.doors.length; ++i) {
                 if (this.doors[i].state === Door.State.Closed) {
                     this.collisionObjects.push(this.doors[i].dispObj);
@@ -153,6 +153,10 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
 
             for (var i = 0; i < this.zombies.length; ++i) {
                 this.collisionObjects.push(this.zombies[i].dispObj);
+            }
+            //Порядок добавления важен!!!!!!!!!!!!!!!
+            for (var i = 0; i < this.chests.length; ++i) {
+                this.collisionObjects.push(this.chests[i].dispObj);
             }
         },
 
@@ -208,6 +212,9 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 for (var i = 0; i < this.bullets.length; ++i) {
                     this.bullets[i].update(event);
                 }
+                for (var i = 0; i < this.chests.length; ++i) {
+                    this.chests[i].update(event, this.player);
+                }
 
                 if (this.player.health <= 0 && !this.player.dead) {
                     this.player.dead = true;
@@ -241,6 +248,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
             //     });
             // }
 
+            //Movement handling
             if (event.keys[KeyCoder.W]) {
                 if (event.keys[KeyCoder.SHIFT]) { speedModifier = 4; }
                 offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.player.dispObj.rotation);
@@ -334,6 +342,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 }
             }
 
+            //Shooting handling
             if(event.keys[KeyCoder.SPACE] && this.player.cooldown == 0) {
 
                 var bulletData = {
@@ -352,6 +361,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 this.player.cooldown = 30;
             }
 
+            //Bullets collisions handling
             out:
             for (var i = 0; i < this.bullets.length; ++i) {
                 for(var j = 0; j < this.zombies.length; ++j) {
@@ -371,9 +381,9 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 }
             }
 
+            //Zombies death handling
             for (var i = 0; i < this.zombies.length; ++i) {
                 if (this.zombies[i].health <= 0) {
-                    //TODO: corpse
                     var corpse = DefaultObjects.build("corpse",
                     {
                         tex: "zombie_corpse",
@@ -382,13 +392,75 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                         r: this.zombies[i].dispObj.rotation
                     })
 
-                    this.addToStage(corpse, false, this.backgroundId);
+                    this.addToStage(corpse, false, this.backgroundId+1);
                     this.stage.removeChild(this.zombies[i].dispObj);
                     this.collisionObjects.splice(j, 1);
+
+
+                    this.zombies[i].drops.forEach(function(drop) {
+                        if (drop === "golden key") {
+                            var key = DefaultObjects.build("key",
+                            {
+                                key_type: "golden key",
+                                tex: "golden-key",
+                                x: self.zombies[i].dispObj.x,
+                                y: self.zombies[i].dispObj.y
+                            });
+                            self.keys.push(self.addToStage(key, false, self.backgroundId+2));
+                        }
+                        if (drop === "silver key") {
+                            var key = DefaultObjects.build("key",
+                            {
+                                key_type: "silver key",
+                                tex: "silver-key",
+                                x: self.zombies[i].dispObj.x,
+                                y: self.zombies[i].dispObj.y
+                            });
+                            self.keys.push(self.addToStage(key, false, self.backgroundId+2));
+                        }
+                    });
+
                     this.zombies.splice(i, 1);
                     this.player.score += 5;
                 }
             }
+
+            //Drops handling
+            //TODO: ammo drops
+            for (var i = 0; i < this.keys.length; ++i) {
+                if (collider.checkPixelCollision(this.keys[i], this.player.dispObj)) {
+                    this.player.keys.push(this.keys[i].data['key_type']);
+                    this.stage.removeChild(this.keys[i]);
+                    this.keys.splice(i, 1);
+                }
+            }
+
+            //TEMP: check keys (inventory?)
+            if(event.keys[KeyCoder.K]) {
+                this.player.keys.forEach(function(key) {
+                   console.log(key + " ");
+                });
+            }
+            if(event.keys[KeyCoder.I]) {
+                this.player.inventory.forEach(function(item) {
+                    console.log(item + " ");
+                });
+            }
+
+            //Chests opening handling
+
+            for (var i = 0; i < this.chests.length; ++i) {
+                if (this.chests[i].storage != null && this.chests[i].storage != [] && this.chests[i].state == "open") {
+
+                    this.chests[i].storage.forEach(function(item) {
+                       self.player.inventory.push(item);
+                    });
+                    this.chests[i].storage = [];
+                    this.stage.removeChild(this.chests[i].dispObj);
+                    this.addToStage(this.chests[i]);
+                }
+            }
+
 
             //TODO: move to player class
             if (this.player.cooldown > 0) {

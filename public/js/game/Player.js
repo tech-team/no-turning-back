@@ -12,6 +12,8 @@ function(Class, AliveObject, KeyCoder, ndgmr) {
 			this.score = 0;
             this.cooldown = 0;
             this.effects = null;
+            this.inventory = [];
+            this.keys = [];
 		},
 
         setEffects: function(effects) {

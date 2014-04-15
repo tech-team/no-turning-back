@@ -64,7 +64,7 @@ define([
                 },
 
                 chest: {
-
+                    requires: ""
                 },
 
                 waypoint: {
@@ -76,7 +76,6 @@ define([
                 },
 
                 key: {
-                    name: "golden_key"
                 },
 
                 ammo: {
@@ -92,6 +91,7 @@ define([
 
                 corpse: {
                 },
+
 
                 object: {
                     type: "object",

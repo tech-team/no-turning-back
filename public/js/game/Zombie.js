@@ -9,13 +9,14 @@ define([
                 this.waypoints = obj.waypoints;
                 this.target = obj.waypoints[0];
                 this.speed = obj.speed;
+                this.drops = obj.drops;
                 this.currentWaypoint = 0;
                 this.canAttack = true;
                 this.attackInterval = 1000;
                 this.health = 20;
                 this.damage = 5;
                 this.followDistance = 150;
-                this.attackDistance = 20;
+                this.attackDistance = 28;
             },
 
             update: function(event, player, collisionObjects) {
