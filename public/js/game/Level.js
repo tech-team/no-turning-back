@@ -112,8 +112,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 this.effects.damage = this.addToStage({
                     tex: "effects/damage",
                     x: 0, y: 0,
-                    w: this.stage.getBounds().width,
-                    h: this.stage.getBounds().height}, true);
+                    w: this.stage.canvas.width,
+                    h: this.stage.canvas.height}, true);
                 this.effects.damage.visible = false;
             }
 
@@ -481,7 +481,10 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                         y: this.player.dispObj.y
                     };
                     var frameSize = 370;
-                    var stageSize = this.stage.getBounds();
+                    var stageSize = {
+                        width: this.stage.canvas.width,
+                        height: this.stage.canvas.height
+                    };
 
                     fogBox.clear();
                     fogBox.beginFill("#000");
