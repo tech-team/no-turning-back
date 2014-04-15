@@ -145,15 +145,16 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
             for (var i = 0; i < this.walls.length; ++i) {
                 this.collisionObjects.push(this.walls[i]);
             }
-            for (var i = 0; i < this.doors.length; ++i) {
-                if (this.doors[i].state === Door.State.Closed) {
-                    this.collisionObjects.push(this.doors[i].dispObj);
-                }
-            }
 
             for (var i = 0; i < this.zombies.length; ++i) {
                 this.collisionObjects.push(this.zombies[i].dispObj);
             }
+            for (var i = 0; i < this.doors.length; ++i) {
+                if (this.doors[i].state === "closed") {
+                    this.collisionObjects.push(this.doors[i].dispObj);
+                }
+            }
+
             //Порядок добавления важен!!!!!!!!!!!!!!!
             for (var i = 0; i < this.chests.length; ++i) {
                 this.collisionObjects.push(this.chests[i].dispObj);
@@ -215,6 +216,10 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 for (var i = 0; i < this.chests.length; ++i) {
                     this.chests[i].update(event, this.player);
                 }
+                for (var i = 0; i < this.doors.length; ++i) {
+                    this.doors[i].update(event, this.player);
+                }
+
 
                 if (this.player.health <= 0 && !this.player.dead) {
                     this.player.dead = true;
@@ -448,16 +453,30 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
             }
 
             //Chests opening handling
-
             for (var i = 0; i < this.chests.length; ++i) {
-                if (this.chests[i].storage != null && this.chests[i].storage != [] && this.chests[i].state == "open") {
+                if (this.chests[i].justOpened == true) {
 
+                    this.chests[i].justOpened = false;
                     this.chests[i].storage.forEach(function(item) {
                        self.player.inventory.push(item);
                     });
                     this.chests[i].storage = [];
                     this.stage.removeChild(this.chests[i].dispObj);
-                    this.addToStage(this.chests[i]);
+                    this.addToStage(this.chests[i], false, this.backgroundId+1);
+                }
+            }
+            //Doors opening handling
+            for (var i = 0; i < this.doors.length; ++i) {
+                if (this.doors[i].justOpened == true) {
+
+                    this.doors[i].justOpened = false;
+                    for (var j = 0; j < this.collisionObjects.length; ++j) {
+                        if (this.collisionObjects[j] == this.doors[i].dispObj) {
+                            this.collisionObjects.splice(j, 1);
+                        }
+                    }
+                    this.stage.removeChild(this.doors[i].dispObj);
+                    this.addToStage(this.doors[i], false, this.backgroundId+1);
                 }
             }
 

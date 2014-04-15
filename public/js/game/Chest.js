@@ -9,10 +9,11 @@ define([
                 this.x = obj.x;
                 this.y = obj.y;
                 this.storage = obj.storage;
-                this.state = ( obj.state === "open" ) ? Chest.State.Open : Chest.State.Closed ;
+                this.state = ( obj.state === "open" ) ? "open" : "closed" ;
                 this.requires = obj.requires;
                 this.activationRadius = 50;
                 this.tex = ( this.state === "open") ? "chest-open" : "chest";
+                this.justOpened = false;
             },
 
             __classvars__: {
@@ -32,7 +33,8 @@ define([
                 if (vectorToPlayer.distance() <= this.activationRadius) {
                     if (event.keys[KeyCoder.Z]) {
                         for (var i = 0; i < player.keys.length; ++i) {
-                            if (player.keys[i] === this.requires) {
+                            if (this.state = "closed" && player.keys[i] === this.requires) {
+                                this.justOpened = true;
                                 this.state = "open";
                                 this.tex = "chest-open";
                             }
