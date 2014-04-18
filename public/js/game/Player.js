@@ -12,6 +12,8 @@ function(Class, AliveObject, KeyCoder, ndgmr) {
 			this.score = 0;
             this.cooldown = 0;
             this.effects = null;
+            this.weapons = {"knife": -1};
+            this.currentWeapon = "knife";
             this.inventory = [];
             this.keys = [];
 		},

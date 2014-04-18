@@ -7,7 +7,7 @@ define([
             __init__: function(dispObj, data) {
                 this.setDispObj(dispObj); //or kinda super(dispObj)
                 this.power = 10;
-                this.speed = 5;
+                this.speed = 10;
             },
 
             update: function(event) {

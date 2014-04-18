@@ -44,7 +44,9 @@ define([
 
                 player: {
                     health: 100,
-                    inventory: []
+                    inventory: [],
+                    keys: [],
+                    weapons: {"knife": -1}
                 },
 
                 zombie: {
@@ -84,9 +86,8 @@ define([
                 },
 
                 weapon: {
-                   name: "pistol",
-                   damage: 10,
-                   ammo: 10
+                   weapon_type: "pistol",
+                   ammo: 5
                 },
 
                 corpse: {

@@ -38,7 +38,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
             this.zombies = [];
             this.bullets = [];
             this.collisionObjects = [];
-            this.keys = [];
+            this.drops = [];
 
             this.reload(data);
 		},
@@ -183,7 +183,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
 
             dispObj.x = objData.x || objData.width/2 || 0;
             dispObj.y = objData.y || objData.height/2 || 0;
-            dispObj.rotation = objData.r || 0;
+            dispObj.rotation = objData.r || objData.rotation || 0;
             if (!doNotCenter) {
                 dispObj.regX = dispObj.getBounds().width / 2;
                 dispObj.regY = dispObj.getBounds().height / 2;
@@ -347,24 +347,77 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 }
             }
 
+            //Changing weapons handling
+            if(event.keys[KeyCoder.ONE]) {
+                if ("knife" in this.player.weapons) {
+                    this.player.currentWeapon = "knife";
+                    console.log("knife!");
+
+                    if (this.player.dispObj.tex != "player") {
+                        this.player.dispObj.tex = "player";
+                        this.stage.removeChild(this.player.dispObj);
+                        this.player.setDispObj(this.addToStage(this.player.dispObj));
+                    }
+                }
+            }
+            if(event.keys[KeyCoder.TWO]) {
+                if ("pistol" in this.player.weapons) {
+                    this.player.currentWeapon = "pistol";
+                    console.log("pistol!");
+
+                    if (this.player.dispObj.tex != "player-pistol") {
+                        this.player.dispObj.tex = "player-pistol";
+                        this.stage.removeChild(this.player.dispObj);
+                        this.player.setDispObj(this.addToStage(this.player.dispObj));
+                    }
+                }
+            }
+
             //Shooting handling
             if(event.keys[KeyCoder.SPACE] && this.player.cooldown == 0) {
+                var currentWeapon = this.player.currentWeapon;
 
-                var bulletData = {
-                    x: this.player.dispObj.x,
-                    y: this.player.dispObj.y,
-                    r: this.player.dispObj.rotation,
-                    tex: "pistol-bullet"
-                };
+                if (currentWeapon === "knife") {
+                    var knifePower = 10;
+                    for (var i = 0; i < this.zombies.length; ++i) {
+                        var xToZombie = this.player.dispObj.x - this.zombies[i].dispObj.x;
+                        var yToZombie = this.player.dispObj.y - this.zombies[i].dispObj.y;
+                        var distanceToZombie = Math.sqrt(xToZombie * xToZombie + yToZombie * yToZombie);
 
-                //TODO: bullet types
-                var bullet = new Bullet(
-                    this.addToStage(bulletData, false, this.fogId),
-                    bulletData);
-                
-                this.bullets.push(bullet);
-                this.player.cooldown = 30;
+                        if (distanceToZombie <= 50) {
+                            this.zombies[i].health -= knifePower;
+                            console.log("hit!");
+                        }
+                    }
+                    this.player.cooldown = 15;
+                }
+                else if (currentWeapon === "pistol") {
+                    if (this.player.weapons['pistol'] > 0) {
+                        var bulletData = {
+                            x: this.player.dispObj.x,
+                            y: this.player.dispObj.y,
+                            r: this.player.dispObj.rotation,
+                            tex: "pistol-bullet"
+                        };
+
+                        //TODO: bullet types
+                        var bullet = new Bullet(
+                            this.addToStage(bulletData, false, this.backgroundId+1),
+                            bulletData);
+
+                        this.bullets.push(bullet);
+
+                        this.player.cooldown = 30;
+                        this.player.weapons['pistol'] -= 1;
+                    }
+                    else {
+                        console.log("No bullets!");
+                    }
+                }
             }
+
+
+
 
             //Bullets collisions handling
             out:
@@ -399,29 +452,46 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
 
                     this.addToStage(corpse, false, this.backgroundId+1);
                     this.stage.removeChild(this.zombies[i].dispObj);
-                    this.collisionObjects.splice(j, 1);
 
+                    for (var j = 0; j < this.collisionObjects.length; ++j) {
+                        if (this.collisionObjects[j] == this.zombies[i].dispObj) {
+                            this.collisionObjects.splice(j, 1);
+                        }
+                    }
 
-                    this.zombies[i].drops.forEach(function(drop) {
-                        if (drop === "golden key") {
-                            var key = DefaultObjects.build("key",
+                    this.zombies[i].drops.forEach(function(dropped) {
+                        if (dropped === "golden key") {
+                            var drop = DefaultObjects.build("key",
                             {
+                                type: "key",
                                 key_type: "golden key",
                                 tex: "golden-key",
                                 x: self.zombies[i].dispObj.x,
                                 y: self.zombies[i].dispObj.y
                             });
-                            self.keys.push(self.addToStage(key, false, self.backgroundId+2));
+                            self.drops.push(self.addToStage(drop, false, self.backgroundId+2));
                         }
-                        if (drop === "silver key") {
-                            var key = DefaultObjects.build("key",
+                        if (dropped === "silver key") {
+                            var drop = DefaultObjects.build("key",
                             {
+                                type: "key",
                                 key_type: "silver key",
                                 tex: "silver-key",
                                 x: self.zombies[i].dispObj.x,
                                 y: self.zombies[i].dispObj.y
                             });
-                            self.keys.push(self.addToStage(key, false, self.backgroundId+2));
+                            self.drops.push(self.addToStage(drop, false, self.backgroundId+2));
+                        }
+                        if (dropped === "pistol") {
+                            var drop = DefaultObjects.build("weapon",
+                            {
+                               type: "weapon",
+                               weapon_type: "pistol",
+                               tex: "pistol",
+                               x: self.zombies[i].dispObj.x,
+                               y: self.zombies[i].dispObj.y
+                            });
+                            self.drops.push(self.addToStage(drop, false, self.backgroundId+2))
                         }
                     });
 
@@ -432,11 +502,23 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
 
             //Drops handling
             //TODO: ammo drops
-            for (var i = 0; i < this.keys.length; ++i) {
-                if (collider.checkPixelCollision(this.keys[i], this.player.dispObj)) {
-                    this.player.keys.push(this.keys[i].data['key_type']);
-                    this.stage.removeChild(this.keys[i]);
-                    this.keys.splice(i, 1);
+            for (var i = 0; i < this.drops.length; ++i) {
+                if (collider.checkPixelCollision(this.drops[i], this.player.dispObj)) {
+                    if (this.drops[i].data['type'] === "key") {
+                        this.player.keys.push(this.drops[i].data['key_type']);
+                    }
+                    else if (this.drops[i].data['type'] === "weapon") {
+                        var weapon_type = this.drops[i].data['weapon_type'];
+                        if (weapon_type in this.player.weapons) {
+                            this.player.weapons[weapon_type] += this.drops[i].data['ammo'];
+                        }
+                        else {
+                            this.player.weapons[weapon_type] = this.drops[i].data['ammo'];;
+                        }
+                    }
+
+                    this.stage.removeChild(this.drops[i]);
+                    this.drops.splice(i, 1);
                 }
             }
 
@@ -450,6 +532,11 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 this.player.inventory.forEach(function(item) {
                     console.log(item + " ");
                 });
+            }
+            if(event.keys[KeyCoder.O]) {
+                for (var weapon in this.player.weapons) {
+                        console.log(weapon + " : " + this.player.weapons[weapon]);
+                }
             }
 
             //Chests opening handling
