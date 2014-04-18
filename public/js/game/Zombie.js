@@ -7,7 +7,7 @@ define([
         var Zombie = AliveObject.$extend({
             __init__: function(obj) {
                 this.waypoints = obj.waypoints;
-                this.target = obj.waypoints[0];
+                this.target = (this.waypoints.length != 0) ? (this.waypoints[0]) : (null);
                 this.speed = obj.speed;
                 this.drops = obj.drops;
                 this.currentWaypoint = 0;
@@ -22,6 +22,10 @@ define([
             update: function(event, player, collisionObjects) {
 
                 var epsilon = 5, offsetX = 0, offsetY = 0;
+
+                if (this.target == null) {
+                    this.target = this.dispObj;
+                }
 
                 var vectorsToWaypoint = {
                     x: this.target.x - this.dispObj.x,
@@ -51,8 +55,11 @@ define([
                         }, this.attackInterval);
                     }
                 }
-                else {
+                else if (this.waypoints.length > 0) {
                     this.target = this.waypoints[this.currentWaypoint];
+                }
+                else {
+                    this.target = this.dispObj;
                 }
 
                 if (vectorToPlayer.distance() > this.attackDistance) {

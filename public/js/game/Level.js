@@ -378,7 +378,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 var currentWeapon = this.player.currentWeapon;
 
                 if (currentWeapon === "knife") {
-                    var knifePower = 10;
+                    //TODO: set knife power somewhere else
+                    var knifePower = 5;
                     for (var i = 0; i < this.zombies.length; ++i) {
                         var xToZombie = this.player.dispObj.x - this.zombies[i].dispObj.x;
                         var yToZombie = this.player.dispObj.y - this.zombies[i].dispObj.y;
@@ -389,7 +390,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                             console.log("hit!");
                         }
                     }
-                    this.player.cooldown = 15;
+                    this.player.cooldown = 40;
                 }
                 else if (currentWeapon === "pistol") {
                     if (this.player.weapons['pistol'] > 0) {
@@ -539,13 +540,46 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 }
             }
 
+            //TODO: decide ammo and health caches (size or amount or wut)
             //Chests opening handling
             for (var i = 0; i < this.chests.length; ++i) {
                 if (this.chests[i].justOpened == true) {
 
                     this.chests[i].justOpened = false;
                     this.chests[i].storage.forEach(function(item) {
-                       self.player.inventory.push(item);
+                        if (item === "medkit-large") {
+                            self.player.health += 50;
+                        }
+                        if (item === "medkit-medium") {
+                            self.player.health += 25;
+                        }
+                        if (item === "medkit-small") {
+                            self.player.health += 10;
+                        }
+
+                        self.player.health = (self.player.health > 100) ? 100 : self.player.health;
+
+                        if (item === "pistol-ammo-medium") {
+                            if ("pistol" in self.player.weapons) {
+                                self.player.weapons['pistol'] += 10;
+                            }
+                        }
+                        if (item === "pistol-ammo-small") {
+                            if ("pistol" in self.player.weapons) {
+                                self.player.weapons['pistol'] += 5;
+                            }
+                        }
+
+
+                        if (item === "golden key" || item === "silver key") {
+                            if (!(item in self.player.keys)) {
+                                self.player.keys.push(item);
+                            }
+                        }
+
+                        else {
+                            self.player.inventory.push(item);
+                        }
                     });
                     this.chests[i].storage = [];
                     this.stage.removeChild(this.chests[i].dispObj);
