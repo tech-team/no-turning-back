@@ -267,7 +267,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 this.player.dispObj.x += offsetX;
                 this.player.dispObj.y += offsetY;
                 for (var i = 0; i < this.collisionObjects.length; ++i) {
-                    if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
+                    if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i]) || this.checkBounds(this.player.dispObj)) {
                         this.player.dispObj.x -= reboundModifier * offsetX;
                         this.player.dispObj.y -= reboundModifier * offsetY;
                         if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
@@ -301,7 +301,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 this.player.dispObj.x -= offsetX;
                 this.player.dispObj.y -= offsetY;
                 for (var i = 0; i < this.collisionObjects.length; ++i) {
-                    if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
+                    if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i]) || this.checkBounds(this.player.dispObj)) {
                         this.player.dispObj.x += reboundModifier * offsetX;
                         this.player.dispObj.y += reboundModifier * offsetY;
                         if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
@@ -415,7 +415,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                         this.bullets.push(bullet);
 
                         this.player.cooldown = 30;
-                        this.player.weapons['pistol'] -= 1;
+                        --this.player.weapons['pistol'];
                     }
                     else {
                         console.log("No bullets!");
@@ -443,6 +443,11 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                         this.bullets.splice(i, 1);
                         break out;
                     }
+                }
+                if (this.checkBounds(this.bullets[i].dispObj)) {
+                    this.stage.removeChild(this.bullets[i].dispObj);
+                    this.bullets.splice(i, 1);
+                    break;
                 }
             }
 
@@ -500,7 +505,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                             break;
                         default:
                             if (this.drops[i].data['name']) {
-                                self.player.inventory.push(drop['name']);
+                                self.player.inventory.push(this.drops[i].data['name']);
                             }
                     }
 
@@ -537,7 +542,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                         switch (drop['type']) {
                             case "medkit":
                                 self.player.health += drop['size'];
-                                self.player.health = (self.player.health > 100) ? 100 : self.player.health;
+                                self.player.health = (self.player.health > self.player.maxHealth) ? self.player.maxHealth : self.player.health;
                                 break;
                             case "ammo":
                                 if (drop['weapon'] in self.player.weapons) {
@@ -581,6 +586,15 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
             if (this.player.cooldown > 0) {
                 --this.player.cooldown;
             }
+        },
+
+        checkBounds: function(obj) {
+            return (
+            obj.x + obj.getBounds().width/2 >= this.data['w'] ||
+            obj.x - obj.getBounds().width/2 <= 0 ||
+            obj.y + obj.getBounds().width/2 >= this.data['h'] ||
+            obj.y - obj.getBounds().width/2 <= 0
+            );
         },
 
         updateFog: function(forceUpdate) {
