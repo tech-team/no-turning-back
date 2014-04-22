@@ -661,6 +661,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
             var dispObjText = this.stage.addChild(text);
 
+            var self = this;
             new UntilTimer(1000,
                 function() {
                     text.alpha -= 0.1;
