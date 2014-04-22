@@ -125,6 +125,9 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 var healthText = new easeljs.Text("Health: 100", "20px Arial", "#00FF00");
                 this.healthText = this.stage.addChild(healthText);
 
+                var weaponText = new easeljs.Text("Ammo: 0", "20px Arial", "#00FF00");
+                this.weaponText = this.stage.addChild(weaponText);
+
                 var scoreText = new easeljs.Text("Score: 0", "20px Arial", "#00FF00");
                 this.scoreText = this.stage.addChild(scoreText);
 
@@ -138,11 +141,16 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
         },
 
         resize: function() {
+            var toolbarHeight = this.stage.canvas.height - 32;
+
             this.healthText.x = 20;
-            this.healthText.y = this.stage.canvas.height - 32;
+            this.healthText.y = toolbarHeight;
+
+            this.weaponText.x = this.stage.canvas.width / 2;
+            this.weaponText.y = toolbarHeight;
 
             this.scoreText.x = this.stage.canvas.width - 100;
-            this.scoreText.y = this.stage.canvas.height - 32;
+            this.scoreText.y = toolbarHeight;
         },
 
         createCollisionObjects: function() {
@@ -235,7 +243,17 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 }
 
                 this.healthText.text = "Health: " + this.player.health;
+
+                var currentWeapon = this.player.currentWeapon;
+                var ammo = this.player.weapons[currentWeapon];
+
+                var weaponText = currentWeapon;
+                if (ammo >= 0)
+                    weaponText += ": " + ammo;
+                this.weaponText.text = weaponText;
+
                 this.scoreText.text = "Score: " + this.player.score;
+
                 this.updateFog();
             }
             else
