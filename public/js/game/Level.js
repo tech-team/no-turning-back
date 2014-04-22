@@ -304,7 +304,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                     if (this.player.dispObj.tex != "player-pistol") {
                         this.player.dispObj.tex = "player-pistol";
                         this.stage.removeChild(this.player.dispObj);
-                        this.player.setDispObj(this.addToStage(this.player.dispObj));
+                        this.player.setDispObj(this.addToStage(this.player.dispObj, false, this.fogId));
                     }
                 }
             }
@@ -422,6 +422,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                         case "key":
                             if (!(this.drops[i].data['name'] in this.player.keys)) {
                                 this.player.keys.push(this.drops[i].data['name']);
+                                this.showMessage("You picked up a " + this.drops[i].data['name'], "#EE0");
                             }
                             break;
                         case "weapon":
@@ -431,11 +432,13 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                             }
                             else {
                                 this.player.weapons[name] = this.drops[i].data['ammo'];
+                                this.showMessage("You picked up a new weapon: " + this.drops[i].data['name'], "#DDD");
                             }
                             break;
                         default:
                             if (this.drops[i].data['name']) {
                                 self.player.inventory.push(this.drops[i].data['name']);
+                                this.showMessage(this.drops[i].data['name'] + " added to your inventory!", "#FFF");
                             }
                     }
 
@@ -455,16 +458,19 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                         switch (drop['type']) {
                             case "medkit":
                                 self.player.health += drop['size'];
+                                self.showMessage("You healed " + drop['size']);
                                 self.player.health = (self.player.health > self.player.maxHealth) ? self.player.maxHealth : self.player.health;
                                 break;
                             case "ammo":
                                 if (drop['weapon'] in self.player.weapons) {
                                     self.player.weapons[drop['weapon']] += drop['size'];
+                                    self.showMessage("You got a " + drop['name'], "#DDD");
                                 }
                                 break;
                             case "key":
                                 if (!(drop['key'] in self.player.keys)) {
                                     self.player.keys.push(drop['key']);
+                                    self.showMessage("You got a " + drop['name'], "#EE0");
                                 }
                                 break;
                             default:
