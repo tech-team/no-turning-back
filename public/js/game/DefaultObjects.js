@@ -78,15 +78,16 @@ define([
                 },
 
                 key: {
+                    name: "golden key"
                 },
 
                 ammo: {
-                    weapon: "pistol",
+                    name: "pistol",
                     size: 0
                 },
 
                 weapon: {
-                   weapon_type: "pistol",
+                   name: "pistol",
                    ammo: 5
                 },
 

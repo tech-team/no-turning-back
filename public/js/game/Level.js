@@ -43,6 +43,12 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
             this.reload(data);
 		},
 
+        __classvars__: {
+            SCORES: {
+                KILL: 5
+            }
+        },
+
         reload: function(data) {
             var self = this;
             this.data = data;
@@ -461,43 +467,15 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                     }
 
                     this.zombies[i].drops.forEach(function(dropped) {
-                        if (dropped === "golden key") {
-                            var drop = DefaultObjects.build("key",
-                            {
-                                type: "key",
-                                key_type: "golden key",
-                                tex: "golden-key",
-                                x: self.zombies[i].dispObj.x,
-                                y: self.zombies[i].dispObj.y
-                            });
-                            self.drops.push(self.addToStage(drop, false, self.backgroundId+2));
-                        }
-                        if (dropped === "silver key") {
-                            var drop = DefaultObjects.build("key",
-                            {
-                                type: "key",
-                                key_type: "silver key",
-                                tex: "silver-key",
-                                x: self.zombies[i].dispObj.x,
-                                y: self.zombies[i].dispObj.y
-                            });
-                            self.drops.push(self.addToStage(drop, false, self.backgroundId+2));
-                        }
-                        if (dropped === "pistol") {
-                            var drop = DefaultObjects.build("weapon",
-                            {
-                               type: "weapon",
-                               weapon_type: "pistol",
-                               tex: "pistol",
-                               x: self.zombies[i].dispObj.x,
-                               y: self.zombies[i].dispObj.y
-                            });
-                            self.drops.push(self.addToStage(drop, false, self.backgroundId+2))
-                        }
+                        dropped.x = self.zombies[i].dispObj.x;
+                        dropped.y = self.zombies[i].dispObj.y;
+
+                        var drop = DefaultObjects.build(dropped.type, dropped);
+                        self.drops.push(self.addToStage(drop, false, self.backgroundId+2))
                     });
 
                     this.zombies.splice(i, 1);
-                    this.player.score += 5;
+                    this.player.score += Level.SCORES.KILL;
                 }
             }
 
@@ -506,15 +484,15 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
             for (var i = 0; i < this.drops.length; ++i) {
                 if (collider.checkPixelCollision(this.drops[i], this.player.dispObj)) {
                     if (this.drops[i].data['type'] === "key") {
-                        this.player.keys.push(this.drops[i].data['key_type']);
+                        this.player.keys.push(this.drops[i].data['name']);
                     }
                     else if (this.drops[i].data['type'] === "weapon") {
-                        var weapon_type = this.drops[i].data['weapon_type'];
-                        if (weapon_type in this.player.weapons) {
-                            this.player.weapons[weapon_type] += this.drops[i].data['ammo'];
+                        var name = this.drops[i].data['name'];
+                        if (name in this.player.weapons) {
+                            this.player.weapons[name] += this.drops[i].data['ammo'];
                         }
                         else {
-                            this.player.weapons[weapon_type] = this.drops[i].data['ammo'];;
+                            this.player.weapons[name] = this.drops[i].data['ammo'];;
                         }
                     }
 
