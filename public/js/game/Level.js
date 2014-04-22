@@ -265,7 +265,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 this.player.dispObj.x += offsetX;
                 this.player.dispObj.y += offsetY;
                 for (var i = 0; i < this.collisionObjects.length; ++i) {
-                    if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
+                    if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i]) || this.checkBounds(this.player.dispObj)) {
                         this.player.dispObj.x -= reboundModifier * offsetX;
                         this.player.dispObj.y -= reboundModifier * offsetY;
                         if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
@@ -299,7 +299,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 this.player.dispObj.x -= offsetX;
                 this.player.dispObj.y -= offsetY;
                 for (var i = 0; i < this.collisionObjects.length; ++i) {
-                    if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
+                    if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i]) || this.checkBounds(this.player.dispObj)) {
                         this.player.dispObj.x += reboundModifier * offsetX;
                         this.player.dispObj.y += reboundModifier * offsetY;
                         if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
@@ -417,7 +417,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                         this.bullets.push(bullet);
 
                         this.player.cooldown = 30;
-                        this.player.weapons['pistol'] -= 1;
+                        --this.player.weapons['pistol'];
                     }
                     else {
                         console.log("No bullets!");
@@ -445,6 +445,11 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                         this.bullets.splice(i, 1);
                         break out;
                     }
+                }
+                if (this.checkBounds(this.bullets[i].dispObj)) {
+                    this.stage.removeChild(this.bullets[i].dispObj);
+                    this.bullets.splice(i, 1);
+                    break;
                 }
             }
 
@@ -485,17 +490,25 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             //TODO: ammo drops
             for (var i = 0; i < this.drops.length; ++i) {
                 if (collider.checkPixelCollision(this.drops[i], this.player.dispObj)) {
-                    if (this.drops[i].data['type'] === "key") {
-                        this.player.keys.push(this.drops[i].data['name']);
-                    }
-                    else if (this.drops[i].data['type'] === "weapon") {
-                        var name = this.drops[i].data['name'];
-                        if (name in this.player.weapons) {
-                            this.player.weapons[name] += this.drops[i].data['ammo'];
-                        }
-                        else {
-                            this.player.weapons[name] = this.drops[i].data['ammo'];;
-                        }
+                    switch (this.drops[i].data['type']) {
+                        case "key":
+                            if (!(this.drops[i].data['name'] in this.player.keys)) {
+                                this.player.keys.push(this.drops[i].data['name']);
+                            }
+                            break;
+                        case "weapon":
+                            var name = this.drops[i].data['name'];
+                            if (name in this.player.weapons) {
+                                this.player.weapons[name] += this.drops[i].data['ammo'];
+                            }
+                            else {
+                                this.player.weapons[name] = this.drops[i].data['ammo'];
+                            }
+                            break;
+                        default:
+                            if (this.drops[i].data['name']) {
+                                self.player.inventory.push(this.drops[i].data['name']);
+                            }
                     }
 
                     this.stage.removeChild(this.drops[i]);
@@ -526,41 +539,30 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 if (this.chests[i].justOpened == true) {
 
                     this.chests[i].justOpened = false;
-                    this.chests[i].storage.forEach(function(item) {
-                        if (item === "medkit-large") {
-                            self.player.health += 50;
-                        }
-                        if (item === "medkit-medium") {
-                            self.player.health += 25;
-                        }
-                        if (item === "medkit-small") {
-                            self.player.health += 10;
-                        }
+                    this.chests[i].storage.forEach(function(drop) {
 
-                        self.player.health = (self.player.health > 100) ? 100 : self.player.health;
-
-                        if (item === "pistol-ammo-medium") {
-                            if ("pistol" in self.player.weapons) {
-                                self.player.weapons['pistol'] += 10;
-                            }
-                        }
-                        if (item === "pistol-ammo-small") {
-                            if ("pistol" in self.player.weapons) {
-                                self.player.weapons['pistol'] += 5;
-                            }
-                        }
-
-
-                        if (item === "golden key" || item === "silver key") {
-                            if (!(item in self.player.keys)) {
-                                self.player.keys.push(item);
-                            }
-                        }
-
-                        else {
-                            self.player.inventory.push(item);
+                        switch (drop['type']) {
+                            case "medkit":
+                                self.player.health += drop['size'];
+                                self.player.health = (self.player.health > self.player.maxHealth) ? self.player.maxHealth : self.player.health;
+                                break;
+                            case "ammo":
+                                if (drop['weapon'] in self.player.weapons) {
+                                    self.player.weapons[drop['weapon']] += drop['size'];
+                                }
+                                break;
+                            case "key":
+                                if (!(drop['key'] in self.player.keys)) {
+                                    self.player.keys.push(drop['key']);
+                                }
+                                break;
+                            default:
+                                if (drop['name']) {
+                                    self.player.inventory.push(drop['name']);
+                                }
                         }
                     });
+
                     this.chests[i].storage = [];
                     this.stage.removeChild(this.chests[i].dispObj);
                     this.addToStage(this.chests[i], false, this.backgroundId+1);
@@ -586,6 +588,15 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             if (this.player.cooldown > 0) {
                 --this.player.cooldown;
             }
+        },
+
+        checkBounds: function(obj) {
+            return (
+            obj.x + obj.getBounds().width/2 >= this.data['w'] ||
+            obj.x - obj.getBounds().width/2 <= 0 ||
+            obj.y + obj.getBounds().width/2 >= this.data['h'] ||
+            obj.y - obj.getBounds().width/2 <= 0
+            );
         },
 
         updateFog: function(forceUpdate) {
