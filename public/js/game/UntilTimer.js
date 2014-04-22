@@ -5,17 +5,28 @@ define([
 ],
     function(_, Class, createjs) {
         var UntilTimer = Class.$extend({
-            __init__: function(millis, onTick) {
+            __init__: function(millis, onTick, onFinished) {
                 this.millis = millis;
-                this.startTime = easeljs.Ticker.getTime();
+                this.startTime = createjs.Ticker.getTime();
                 this.onTick = onTick;
+                this.onFinished = onFinished;
+                this.elapsed = 0;
 
-                easeljs.Ticker.addEventListener("tick", this);
+                var self = this;
+                this.updateHandler = function() {
+                    self.update();
+                }
+
+                createjs.Ticker.addEventListener("tick", this.updateHandler);
             },
 
             update: function() {
-                if (easeljs.Ticker.getTime() >= this.startTime + this.millis)
-                    easeljs.Ticker.removeEventListener("tick", this);
+                this.elapsed = createjs.Ticker.getTime() - this.startTime;
+
+                if (this.elapsed >= this.millis) {
+                    createjs.Ticker.removeEventListener("tick", this.updateHandler);
+                    this.onFinished();
+                }
                 else
                     this.onTick();
             }

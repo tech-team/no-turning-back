@@ -6,13 +6,14 @@ define([
     'game/DefaultObjects',
     'game/KeyCoder',
     'game/Editor',
+    'game/UntilTimer',
     'game/Zombie',
     'game/Chest',
     'game/Door',
     'game/Bullet'
 ],
 
-function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, Chest, Door, Bullet) {
+function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTimer, Zombie, Chest, Door, Bullet) {
 	var Level = Class.$extend({
 		__init__: function(stage, data, player, resourceManager, editorMode) {
             this.data = data;
@@ -58,9 +59,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
             this.stage.update();
 
             //add background
-            //var backgroundSh = this.resourceManager.getTiledSpriteSheet(data.tex, data.width, data.height);
-            //var backgroundSprite = new easeljs.Sprite(backgroundSh);
-            //this.stage.addChild(backgroundSprite);
             this.background = this.addToStage(data, true);
             this.backgroundId = this.stage.getChildIndex(this.background);
 
@@ -379,6 +377,10 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                 }
             }
 
+            if(event.keys[KeyCoder.E]) {
+                this.showMessage("You pressed E!", "#00FF00");
+            }
+
             //Shooting handling
             if(event.keys[KeyCoder.SPACE] && this.player.cooldown == 0) {
                 var currentWeapon = this.player.currentWeapon;
@@ -639,6 +641,23 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, Zombie, 
                     this.effects.fog.y = this.player.dispObj.y;
                 }
             }
+        },
+
+        showMessage: function(message, color) {
+            var text = new easeljs.Text(message, "20px Arial", color || "#00FF00");
+            text.x = this.stage.canvas.width / 2 - text.getMeasuredWidth() / 2;
+            text.y = text.getMeasuredHeight();
+
+            var dispObjText = this.stage.addChild(text);
+
+            new UntilTimer(1000,
+                function() {
+                    text.alpha -= 0.1;
+                },
+                function() {
+                    self.stage.removeChild(dispObjText);
+                }
+            );
         }
 	});
 
