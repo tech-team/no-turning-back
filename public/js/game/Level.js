@@ -33,6 +33,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             this.player = player;
             this.resourceManager = resourceManager;
 
+            this.prevPlayerPos = {};
             this.walls = [];
             this.doors = [];
             this.chests = [];
@@ -100,6 +101,12 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             //add player
             var playerObj = this.addToStage(data.player);
             this.player.setDispObj(playerObj);
+            this.prevPlayerPos = {
+                x: this.player.dispObj.x,
+                y: this.player.dispObj.y,
+                rotation: this.player.dispObj.rotation
+            };
+
 
             //add effects
             if (!this.editorMode) {
@@ -210,8 +217,11 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
 		update: function(event) {
             if (!this.editorMode) {
+
                 this.keyFunc(event);
-                this.player.update(event);
+                this.setPrevPlayerPos();
+
+                this.player.update(event, this.collisionObjects);
                 if (this.zombies.length === 0) {
                     $.event.trigger({
                         type: "levelFinished",
@@ -256,117 +266,21 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
                 this.updateFog();
             }
-            else
+            else {
                 this.editor.keyFunc(event);
+            }
+
 		},
 
         keyFunc: function(event) {
 
-            var offsetX, offsetY;
-            var offsetRotation = 4;
-            var speedModifier = 2;
-            var reboundModifier = 1.1;
-
             var self = this;
-            // if (event.keys[KeyCoder.E]) {
-            //     $.event.trigger({
-            //         type: "levelFinished",
-            //         score: self.player.score
-            //     });
-            // }
-
             //Movement handling
-            if (event.keys[KeyCoder.W]) {
-                if (event.keys[KeyCoder.SHIFT]) { speedModifier = 4; }
-                offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.player.dispObj.rotation);
-                offsetY = speedModifier * Math.sin( (Math.PI / 180) * this.player.dispObj.rotation);
-                this.player.dispObj.x += offsetX;
-                this.player.dispObj.y += offsetY;
-                for (var i = 0; i < this.collisionObjects.length; ++i) {
-                    if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i]) || this.checkBounds(this.player.dispObj)) {
-                        this.player.dispObj.x -= reboundModifier * offsetX;
-                        this.player.dispObj.y -= reboundModifier * offsetY;
-                        if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
-                            this.player.dispObj.x += (reboundModifier - 1) * offsetX;
-                            this.player.dispObj.y += (reboundModifier - 1) * offsetY;
-                        }
-                    }
-                }
-                if (event.keys[KeyCoder.D]) {
-                    this.player.dispObj.rotation += offsetRotation;
-                    for (var i = 0; i < this.collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
-                            this.player.dispObj.rotation -= reboundModifier * offsetRotation;
 
-                        }
-                    }
-                }
-                if (event.keys[KeyCoder.A]) {
-                    this.player.dispObj.rotation -= offsetRotation;
-                    for (var i = 0; i < this.collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
-                            this.player.dispObj.rotation += reboundModifier * offsetRotation;
-
-                        }
-                    }
-                }
-            }
-            if (event.keys[KeyCoder.S]) {
-                offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.player.dispObj.rotation);
-                offsetY = speedModifier * Math.sin( (Math.PI / 180) * this.player.dispObj.rotation);
-                this.player.dispObj.x -= offsetX;
-                this.player.dispObj.y -= offsetY;
-                for (var i = 0; i < this.collisionObjects.length; ++i) {
-                    if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i]) || this.checkBounds(this.player.dispObj)) {
-                        this.player.dispObj.x += reboundModifier * offsetX;
-                        this.player.dispObj.y += reboundModifier * offsetY;
-                        if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
-                            this.player.dispObj.x -= (reboundModifier - 1) * offsetX;
-                            this.player.dispObj.y -= (reboundModifier - 1) * offsetY;
-                        }
-                    }
-                }
-                if (event.keys[KeyCoder.D]) {
-                    this.player.dispObj.rotation -= offsetRotation;
-                    for (var i = 0; i < this.collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
-                            this.player.dispObj.rotation += reboundModifier * offsetRotation;
-
-                        }
-                    }
-                }
-                if (event.keys[KeyCoder.A]) {
-                    this.player.dispObj.rotation += offsetRotation;
-                    for (var i = 0; i < this.collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
-                            this.player.dispObj.rotation -= reboundModifier * offsetRotation;
-
-                        }
-                    }
-                }
-            }
-
-            if (!(event.keys[KeyCoder.W] || event.keys[KeyCoder.S])) {
-                if (event.keys[KeyCoder.D]) {
-                    offsetRotation *= 2;
-                    this.player.dispObj.rotation += offsetRotation;
-                    for (var i = 0; i < this.collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
-                            this.player.dispObj.rotation -= offsetRotation;
-
-                        }
-                    }
-                }
-                if (event.keys[KeyCoder.A]) {
-                    offsetRotation *= 2;
-                    this.player.dispObj.rotation -= offsetRotation;
-                    for (var i = 0; i < this.collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.player.dispObj, this.collisionObjects[i])) {
-                            this.player.dispObj.rotation += offsetRotation;
-
-                        }
-                    }
-                }
+            if (this.checkBounds(this.player.dispObj)) {
+                this.player.dispObj.x = this.prevPlayerPos.x;
+                this.player.dispObj.y = this.prevPlayerPos.y;
+                this.player.dispObj.rotation = this.prevPlayerPos.rotation;
             }
 
             //Changing weapons handling
@@ -413,7 +327,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
                         if (distanceToZombie <= 50) {
                             this.zombies[i].health -= knifePower;
-                            console.log("hit!");
                         }
                     }
                     this.player.cooldown = 40;
@@ -436,9 +349,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
                         this.player.cooldown = 30;
                         --this.player.weapons['pistol'];
-                    }
-                    else {
-                        console.log("No bullets!");
                     }
                 }
             }
@@ -534,23 +444,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 }
             }
 
-            //TEMP: check keys (inventory?)
-            if(event.keys[KeyCoder.K]) {
-                this.player.keys.forEach(function(key) {
-                   console.log(key + " ");
-                });
-            }
-            if(event.keys[KeyCoder.I]) {
-                this.player.inventory.forEach(function(item) {
-                    console.log(item + " ");
-                });
-            }
-            if(event.keys[KeyCoder.O]) {
-                for (var weapon in this.player.weapons) {
-                        console.log(weapon + " : " + this.player.weapons[weapon]);
-                }
-            }
-
             //TODO: decide ammo and health caches (size or amount or wut)
             //Chests opening handling
             for (var i = 0; i < this.chests.length; ++i) {
@@ -602,10 +495,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             }
 
 
-            //TODO: move to player class
-            if (this.player.cooldown > 0) {
-                --this.player.cooldown;
-            }
         },
 
         checkBounds: function(obj) {
@@ -615,6 +504,14 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             obj.y + obj.getBounds().width/2 >= this.data['h'] ||
             obj.y - obj.getBounds().width/2 <= 0
             );
+        },
+
+        setPrevPlayerPos: function() {
+            this.prevPlayerPos = {
+                x: this.player.dispObj.x,
+                y: this.player.dispObj.y,
+                rotation: this.player.dispObj.rotation
+            };
         },
 
         updateFog: function(forceUpdate) {

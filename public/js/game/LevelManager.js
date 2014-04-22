@@ -86,7 +86,6 @@ function(Class) {
 
             chests: [
                 {type: "chest", tex: "chest", x: 500, y: 500, r: 0, w: "", h: "", storage: ["shotgun"], state: "closed"}
-                // TODO: activation zone for chests
             ],
 
             doors: [
