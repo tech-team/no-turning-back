@@ -5,7 +5,7 @@ var path = require('path');
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 8000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'xml');
 // development only
@@ -36,6 +36,7 @@ app.configure('development', function(){
 		debug: true
 	}));
 });
+
 app.configure('production', function(){
 	app.engine('xml', require('artist').render({
 		cache: true,
@@ -48,6 +49,7 @@ var levels = require('./routes/levels');
 var routes = require('./routes/index');
 
 app.get('/', routes.index);
+app.get('/joystick', routes.joystick);
 
 app.get('/scores', scores.getFull);
 app.get('/scores/:id', scores.getOne);
@@ -60,9 +62,9 @@ app.get('/levels/exists', levels.existLevel);
 app.post('/levels', levels.addLevel);
 
 var server = http.createServer(app);
+
+require('./server/server').init(server);
+
 server.listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));
 });
-
-
-

@@ -88,7 +88,6 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                     self.game.resize();
             });
             $(window).resize();
-
         }
 
     });

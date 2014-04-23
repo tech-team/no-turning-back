@@ -4,7 +4,7 @@ var scores = [],
 var test = {
 	name: "test",
 	score: 21
-}
+};
 scores.push(test);
 
 function sortScores(){
@@ -63,7 +63,6 @@ module.exports = {
 
 	post: function(req, res){
 		var newScore = req.body;
-		console.log(newScore);
 
 		if (!newScore || !newScore.name || !newScore.score || newScore.score && isNaN(parseInt(newScore.score, 10))){
 			res.writeHead(400, 'Bad Request');
@@ -77,7 +76,6 @@ module.exports = {
 		var s = JSON.stringify(newScore);
 		res.setHeader('Content-Type', 'application/javascript');
 		res.setHeader('Content-Length', Buffer.byteLength(s));
-		// setTimeout(function() { res.end(s) }, 5000)
 		res.end(s);
 	},
 

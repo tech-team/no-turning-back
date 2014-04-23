@@ -1,5 +1,5 @@
 require.config({
-    //urlArgs: "_=" + (new Date()).getTime(),
+    urlArgs: "_=" + (new Date()).getTime(),
     baseUrl: "js",
     paths: {
         jquery: "lib/jquery",
@@ -11,7 +11,10 @@ require.config({
         preload: "lib/game/preloadjs",
         sound: "lib/game/soundjs",
         tween: "lib/game/tweenjs",
-        collision: "lib/game/collision"
+        collision: "lib/game/collision",
+        Connector: "lib/Connector",
+        FnQuery: "lib/FnQuery",
+        "socket.io": "/socket.io/socket.io"
     },
     shim: {
         'backbone': {
@@ -42,8 +45,10 @@ require.config({
         },
         'collision': {
             exports: 'ndgmr'
+        },
+        "socket.io": {
+            exports: "io"
         }
-
     }
 });
 
