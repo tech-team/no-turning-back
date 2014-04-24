@@ -160,6 +160,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
             this.scoreText.x = this.stage.canvas.width - 100;
             this.scoreText.y = toolbarHeight;
+
+            this.updateEffects();
         },
 
         createCollisionObjects: function() {
@@ -527,6 +529,18 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 y: this.player.dispObj.y,
                 rotation: this.player.dispObj.rotation
             };
+        },
+
+        updateEffects: function() {
+            this.updateFog(true);
+
+            this.stage.removeChild(this.effects.damage);
+            this.effects.damage = this.addToStage({
+                tex: "effects/damage",
+                x: 0, y: 0,
+                w: this.stage.canvas.width,
+                h: this.stage.canvas.height}, true);
+            this.effects.damage.visible = false;
         },
 
         updateFog: function(forceUpdate) {
