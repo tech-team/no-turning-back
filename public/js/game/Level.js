@@ -23,6 +23,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             if (this.editorMode)
                 this.editor = new Editor(this, stage);
 
+            this.showingMessagesCount = 0;
+
             this.stage = stage;
             this.background = null;
             this.effects = {
@@ -415,6 +417,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             }
 
             //Drops handling
+            //TODO: handle all the possible drops and chest storage items
             //TODO: ammo drops
             for (var i = 0; i < this.drops.length; ++i) {
                 if (collider.checkPixelCollision(this.drops[i], this.player.dispObj)) {
@@ -429,10 +432,11 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                             var name = this.drops[i].data['name'];
                             if (name in this.player.weapons) {
                                 this.player.weapons[name] += this.drops[i].data['ammo'];
+                                this.showMessage("You picked up " + this.drops[i].data['ammo'] + " ammo for " + this.drops[i].data['name'], "#0FF");
                             }
                             else {
                                 this.player.weapons[name] = this.drops[i].data['ammo'];
-                                this.showMessage("You picked up a new weapon: " + this.drops[i].data['name'], "#DDD");
+                                this.showMessage("You picked up a new weapon: " + this.drops[i].data['name'], "#0FF");
                             }
                             break;
                         default:
@@ -458,14 +462,18 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                         switch (drop['type']) {
                             case "medkit":
                                 self.player.health += drop['size'];
+                                if (self.player.health > self.player.maxHealth)
+                                    self.player.health = self.player.maxHealth;
+
                                 self.showMessage("You healed " + drop['size']);
-                                self.player.health = (self.player.health > self.player.maxHealth) ? self.player.maxHealth : self.player.health;
                                 break;
                             case "ammo":
-                                if (drop['weapon'] in self.player.weapons) {
-                                    self.player.weapons[drop['weapon']] += drop['size'];
-                                    self.showMessage("You got a " + drop['name'], "#DDD");
+                                if (drop['name'] in self.player.weapons) {
+                                    self.player.weapons[drop['name']] += drop['size'];
+                                    self.showMessage("You picked up " + drop['ammo'] + " ammo for " + drop['name'], "#0FF");
                                 }
+                                else
+                                    pickedUp = false; //do not remove form stage
                                 break;
                             case "key":
                                 if (!(drop['key'] in self.player.keys)) {
@@ -479,6 +487,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                                 }
                         }
                     });
+
 
                     this.chests[i].storage = [];
                     this.stage.removeChild(this.chests[i].dispObj);
@@ -576,14 +585,16 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
         },
 
         showMessage: function(message, color, period) {
+            this.showingMessagesCount++;
+
             var text = new easeljs.Text(message, "20px Arial", color || "#00FF00");
             text.x = this.stage.canvas.width / 2 - text.getMeasuredWidth() / 2;
-            text.y = text.getMeasuredHeight();
+            text.y = text.getMeasuredHeight() * this.showingMessagesCount;
 
             var dispObjText = this.stage.addChild(text);
 
             var self = this;
-            period = period || 1000;
+            period = period || 3000;
 
             new UntilTimer(period,
                 function() {
@@ -591,6 +602,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 },
                 function() {
                     self.stage.removeChild(dispObjText);
+                    self.showingMessagesCount--;
                 }
             );
         }
