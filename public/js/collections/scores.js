@@ -1,5 +1,4 @@
 define([
-<<<<<<< HEAD
     'backbone',
     'models/player',
     'collections/LocalStorage'
@@ -125,15 +124,4 @@ function(Backbone, Player, LocalStorage) {
     });
 
     return new ScoreBoard();
-=======
-    'backbone'
-], function(
-    Backbone
-){
-
-    var Collection = Backbone.Collection.extend({
-    });
-
-    return new Collection();
->>>>>>> tp/v8
 });
