@@ -575,7 +575,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             }
         },
 
-        showMessage: function(message, color) {
+        showMessage: function(message, color, period) {
             var text = new easeljs.Text(message, "20px Arial", color || "#00FF00");
             text.x = this.stage.canvas.width / 2 - text.getMeasuredWidth() / 2;
             text.y = text.getMeasuredHeight();
@@ -583,9 +583,11 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             var dispObjText = this.stage.addChild(text);
 
             var self = this;
-            new UntilTimer(1000,
+            var actualPeriod = period || 1000;
+
+            new UntilTimer(period,
                 function() {
-                    text.alpha -= 0.1;
+                    text.alpha = (period - this.elapsed)/period;
                 },
                 function() {
                     self.stage.removeChild(dispObjText);
