@@ -583,7 +583,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             var dispObjText = this.stage.addChild(text);
 
             var self = this;
-            var actualPeriod = period || 1000;
+            period = period || 1000;
 
             new UntilTimer(period,
                 function() {
