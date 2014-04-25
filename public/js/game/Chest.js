@@ -31,7 +31,7 @@ define([
                 };
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
-                    if (event.keys[KeyCoder.Z]) {
+                    if (event.keys[KeyCoder.E]) {
                         for (var i = 0; i < player.keys.length; ++i) {
                             if (this.state = "closed" && player.keys[i] === this.requires) {
                                 this.justOpened = true;
