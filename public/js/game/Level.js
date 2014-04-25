@@ -26,6 +26,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             this.showingMessagesCount = 0;
 
             this.stage = stage;
+
             this.background = null;
             this.effects = {
                 fog: null,

@@ -23,7 +23,7 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 			this.levelManager = new LevelManager();
 			this.level = null;
 			this.player = new Player();
-			this.resourceManager = new ResourceManager(this.onResourcesLoaded, this);
+			this.resourceManager = ResourceManager.load(this.onResourcesLoaded, this);
 			this.keyCoder = new KeyCoder(editorMode);
 			this.onLoadedCallback = onLoadedCallback;
 		},

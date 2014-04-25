@@ -51,6 +51,11 @@ function(Backbone, tmpl, Game, GameFinishedView) {
         },
 
         runGame: function() {
+            var ctx = this.canvas.getContext("2d");
+            //ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
             this.game = new Game(this.canvas, false, 
                 function() {
                     self.game.run();

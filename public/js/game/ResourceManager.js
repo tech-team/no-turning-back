@@ -11,7 +11,18 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
             texList: ["ground", "zombie", "player", "player-pistol", "wall", "brick_wall1", "brick_wall2",
                 "brick_wall3", "brick_wall4", "chest", "chest-open", "door-open", "door-closed", "rubbish",
                 "waypoint", "pistol", "pistol-bullet", "effects/fog", "effects/damage", "zombie_corpse",
-                "golden-key", "silver-key"]
+                "golden-key", "silver-key"],
+
+            instance: null,
+
+            load: function(onComplete, onCompleteContext) {
+                if (this.instance)
+                    onComplete.call(onCompleteContext);
+                else
+                    this.instance = new ResourceManager(onComplete, onCompleteContext);
+
+                return this.instance;
+            }
         },
 
 
