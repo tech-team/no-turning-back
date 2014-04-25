@@ -497,6 +497,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                     this.addToStage(this.chests[i], false, this.backgroundId+1);
                 }
             }
+
             //Doors opening handling
             for (var i = 0; i < this.doors.length; ++i) {
                 if (this.doors[i].justOpened == true) {
@@ -511,8 +512,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                     this.addToStage(this.doors[i], false, this.backgroundId+1);
                 }
             }
-
-
         },
 
         checkBounds: function(obj) {
@@ -574,7 +573,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
                     fogBox.rect(
                         0,
-                        playerPos.y - frameSize/2,
+                        0,
                         playerPos.x - frameSize/2,
                         stageSize.height
                     ); //left
