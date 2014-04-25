@@ -50,28 +50,26 @@ $borderRadius: 9px;
   border-radius: $borderRadius;
 }
 
+@mixin backgroundGradient($color1, $color2) {
+  background: $color1;
+  background: -moz-linear-gradient(top,  $color1 0%, $color2 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$color1), color-stop(100%,$color2));
+  background: -webkit-linear-gradient(top,  $color1 0%,$color2 100%);
+  background: -o-linear-gradient(top,  $color1 0%,$color2 100%);
+  background: -ms-linear-gradient(top,  $color1 0%,$color2 100%);
+  background: linear-gradient(to bottom,  $color1 0%,$color2 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$color1', endColorstr='$color2',GradientType=0 );
+  border-radius: $borderRadius;  
+}
+
 .html5-progress-bar progress::-webkit-progress-value {
-  background: $gradientColor1;
-  background: -moz-linear-gradient(top,  $gradientColor1 0%, $gradientColor2 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$gradientColor1), color-stop(100%,$gradientColor2));
-  background: -webkit-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
-  background: -o-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
-  background: -ms-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
-  background: linear-gradient(to bottom,  $gradientColor1 0%,$gradientColor2 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$gradientColor1', endColorstr='$gradientColor2',GradientType=0 );
-  border-radius: $borderRadius;
+  @include backgroundGradient($gradientColor1, $gradientColor2);
 }
+
 .html5-progress-bar progress::-moz-progress-bar {
-  background: $gradientColor1;
-  background: -moz-linear-gradient(top,  $gradientColor1 0%, $gradientColor2 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$gradientColor1), color-stop(100%,$gradientColor2));
-  background: -webkit-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
-  background: -o-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
-  background: -ms-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
-  background: linear-gradient(to bottom,  $gradientColor1 0%,$gradientColor2 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$gradientColor1', endColorstr='$gradientColor2',GradientType=0 );
-  border-radius: $borderRadius;
+  @include backgroundGradient($gradientColor1, $gradientColor2);
 }
+
 .html5-progress-bar .progress-value {
   padding: 0px 5px;
   line-height: 20px;
