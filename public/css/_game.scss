@@ -22,6 +22,18 @@ $gradientColor2: #a5c956;
 $backgroundColor: #f3f3f3;
 $borderRadius: 9px;
 
+@mixin backgroundGradient($color1, $color2) {
+  background: $color1;
+  background: -moz-linear-gradient(top, $color1 0%, $color2 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$color1), color-stop(100%,$color2));
+  background: -webkit-linear-gradient(top, $color1 0%, $color2 100%);
+  background: -o-linear-gradient(top, $color1 0%, $color2 100%);
+  background: -ms-linear-gradient(top, $color1 0%, $color2 100%);
+  background: linear-gradient(to bottom, $color1 0%, $color2 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$color1', endColorstr='$color2',GradientType=0);
+  border-radius: $borderRadius;  
+}
+
 .html5-progress-bar {
   width: 300px;
 
@@ -35,47 +47,35 @@ $borderRadius: 9px;
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-}
 
-.html5-progress-bar progress {
-  background-color: $backgroundColor;
-  border: 0;
-  width: 80%;
-  height: 18px;
-  border-radius: 9px;
-}
+  progress {
+    background-color: $backgroundColor;
+    border: 0;
+    width: 80%;
+    height: 18px;
+    border-radius: 9px;
+  }
 
-.html5-progress-bar progress::-webkit-progress-bar {
-  background-color: $backgroundColor;
-  border-radius: $borderRadius;
-}
+  .progress-value {
+    padding: 0px 5px;
+    line-height: 20px;
+    margin-left: 5px;
+    font-size: .8em;
+    color: #555;
+    height: 18px;
+    float: right;
+  }
 
-@mixin backgroundGradient($color1, $color2) {
-  background: $color1;
-  background: -moz-linear-gradient(top,  $color1 0%, $color2 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$color1), color-stop(100%,$color2));
-  background: -webkit-linear-gradient(top,  $color1 0%,$color2 100%);
-  background: -o-linear-gradient(top,  $color1 0%,$color2 100%);
-  background: -ms-linear-gradient(top,  $color1 0%,$color2 100%);
-  background: linear-gradient(to bottom,  $color1 0%,$color2 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$color1', endColorstr='$color2',GradientType=0 );
-  border-radius: $borderRadius;  
-}
+  progress::-webkit-progress-bar {
+    background-color: $backgroundColor;
+    border-radius: $borderRadius;
+  }
 
-.html5-progress-bar progress::-webkit-progress-value {
-  @include backgroundGradient($gradientColor1, $gradientColor2);
-}
+  progress::-webkit-progress-value {
+    @include backgroundGradient($gradientColor1, $gradientColor2);
+  }
 
-.html5-progress-bar progress::-moz-progress-bar {
-  @include backgroundGradient($gradientColor1, $gradientColor2);
-}
-
-.html5-progress-bar .progress-value {
-  padding: 0px 5px;
-  line-height: 20px;
-  margin-left: 5px;
-  font-size: .8em;
-  color: #555;
-  height: 18px;
-  float: right;
+  progress::-moz-progress-bar {
+    @include backgroundGradient($gradientColor1, $gradientColor2);
+  }
 }
