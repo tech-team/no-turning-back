@@ -26,10 +26,16 @@ require.config({
 define([
     'Connector'
 ], function(Connector){
-    var Console = function(runGame) {
+
+    var Console = function(callbacks) {
+        callbacks = callbacks ? callbacks : {};
+        callbacks.onStarted = callbacks.onStarted ? callbacks.onStarted : function(token) {};
+        callbacks.saveToken = callbacks.saveToken ? callbacks.saveToken : function(token) {};
+        callbacks.onMessage = callbacks.onMessage ? callbacks.onMessage : function(data) {};
+
+
 //        var message = document.getElementById('message');
         var start, init, reconnect;
-        var tokenResult = null;
 
         // Создаем связь с сервером
         var server = new Connector({
@@ -52,7 +58,7 @@ define([
                 // Получаем токен
                 server.getToken(function (token) {
                     console.log('token: ' + token);
-                    tokenResult = token;
+                    callbacks.saveToken(token);
                 });
             } else { // иначе
                 // переподключаемся к уже созданной связке
@@ -84,24 +90,19 @@ define([
             console.log('start console');
             // Сохраняем id связки
             localStorage.setItem('consoleguid', guid);
-            runGame(guid);
+            callbacks.onStarted();
         };
 
         init();
 
         // Обмен сообщениями
         server.on('message', function (data, answer) {
-            console.log('message', data);
+            callbacks.onMessage(data);
             answer('answer');
         });
-
         window.server = server;
 
-        /*
-         server.send('message', function(answer){
-         console.log(answer);
-         });
-         */
+
     };
     return Console;
 });

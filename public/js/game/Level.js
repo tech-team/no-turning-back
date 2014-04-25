@@ -45,6 +45,9 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             this.collisionObjects = [];
             this.drops = [];
 
+            this.isJoystick = false;
+            this.joystickServer = null;
+
             this.reload(data);
 		},
 
@@ -221,6 +224,10 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
         },
 
 		update: function(event) {
+            if (this.isJoystick) {
+//                this.joystickServer.send({test: "testFromLevel"});
+            }
+
             if (!this.editorMode) {
 
                 this.keyFunc(event);
@@ -230,7 +237,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 if (this.zombies.length === 0) {
                     $.event.trigger({
                         type: "levelFinished",
-                        score: this.player.score
+                        score: this.player.score,
+                        message: "You Win"
                     });
                 }
 
@@ -253,7 +261,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                     console.log("Game over.");
                     $.event.trigger({
                         type: "levelFinished",
-                        score: this.player.score
+                        score: this.player.score,
+                        message: "Game over"
                     });
                 }
 

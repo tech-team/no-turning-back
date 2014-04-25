@@ -6,10 +6,31 @@
 		<title>
 			<fest:value>json.title</fest:value>
 		</title>
-		<meta name="viewport" content="..." />
+		<!--<meta name="viewport" content="..." />-->
+        <link rel="stylesheet" type="text/css" href="css/joystick/joystick.css" />
 	</head>
 	<body>
-		Hello world!
+        <form>
+            <input id="token" />
+            <button id="connect" type="submit">connect</button>
+        </form>
+        <div id="message"></div>
+
+        <fest:if test="json.development">
+            <script data-main="js/main_joystick" src="js/lib/require.js"></script>
+            <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+        </fest:if>
+        <fest:if test="!json.development">
+            <script>
+                console.time('load');
+            </script>
+            <script src="joystick/js/build/build.min.js"></script>
+            <script>
+                require(['main'], function(){
+                console.timeEnd('load');
+                });
+            </script>
+        </fest:if>
 	</body>
 </html>
 </fest:template>

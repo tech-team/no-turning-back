@@ -13,5 +13,7 @@
                 </div>
             </div>
             <canvas id="game-field">You have a very old browser, dude.</canvas>
+            <input id="token" value="guid" disabled="disabled"/>
+            <!--<button id="connect" type="submit">connect</button>-->
     </div>
 </fest:template>

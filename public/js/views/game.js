@@ -16,6 +16,7 @@ function(Backbone, tmpl, Game, GameFinishedView) {
         canvas: null,
         scene: null,
         game: null,
+        guid: null,
 
         initialize: function () {
             this.render();
@@ -27,6 +28,7 @@ function(Backbone, tmpl, Game, GameFinishedView) {
 
             this.canvas = this.$el.find('#game-field')[0];
             this.scene = this.$el.find('#scene');
+            this.guid = this.$el.find('#token');
             this.calcDimensions();
 
             return this;
@@ -40,6 +42,19 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                 pageId: this.pageId
             });
             this.runGame();
+
+            var self = this;
+            Game.console({
+                onStarted: function() {
+                    self.game.startJoystickSession(window.server);
+                },
+                saveToken: function(guid) {
+                    self.guid.attr('value', guid);
+                },
+                onMessage: function(data) {
+                    console.log(data);
+                }
+            });
         },
 
         hide: function () {
@@ -65,7 +80,7 @@ function(Backbone, tmpl, Game, GameFinishedView) {
             var self = this;
             $(document).on("levelFinished", function(event) {
                 self.game.stop();
-                GameFinishedView.show(event.score);
+                GameFinishedView.show(event.score, event.message);
             });
         },
 

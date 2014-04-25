@@ -26,10 +26,11 @@ function(Backbone, tmpl, Scoreboard, Player, ViewManager) {
             ViewManager.addView(this);
         },
 
-        render: function (scoreValue) {
+        render: function (scoreValue, message) {
             scoreValue = scoreValue ? scoreValue : 0;
+            message = message ? message : "You Loose";
 
-            this.$el.html(this.template({score: scoreValue}));
+            this.$el.html(this.template({score: scoreValue, message: message}));
             this.$el.attr('id', this.pageId.slice(1));
 
             this.dimmer = this.$el.find('.score-sender-dimmer');
@@ -97,8 +98,8 @@ function(Backbone, tmpl, Scoreboard, Player, ViewManager) {
             });
         },
 
-        show: function (scoreValue) {
-            this.render(scoreValue);
+        show: function (scoreValue, message) {
+            this.render(scoreValue, message);
             this.$el.show();
             ViewManager.addToDOM(this.pageId);
             this.calcDimensions();

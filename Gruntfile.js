@@ -43,9 +43,9 @@ module.exports = function (grunt) {
             joystick: {
                 files: [{
                     expand: true,
-                    cwd: 'public/joystick/css',
+                    cwd: 'public/css/joystick',
                     src: '*.scss',
-                    dest: 'public/joystick/css',
+                    dest: 'public/css/joystick',
                     ext: '.css'
                 }]
             }
@@ -65,11 +65,11 @@ module.exports = function (grunt) {
             build_joystick: {
                 options: {
                     almond: true,
-                    baseUrl: 'public/joystick/js',
-                    mainConfigFile: 'public/joystick/js/joystick.js',
-                    name: 'joystick',
+                    baseUrl: 'public/js',
+                    mainConfigFile: 'public/js/main_joystick.js',
+                    name: 'main_joystick',
                     optimize: 'none',
-                    out: 'public/joystick/js/build/main.js'
+                    out: 'public/js/joystick/build/main.js'
                 }
             }
 		},
@@ -83,8 +83,8 @@ module.exports = function (grunt) {
 			},
 
             build_joystick: {
-                src: ['public/js/lib/almond.js', 'public/joystick/js/build/main.js'],
-                dest: 'public/joystick/js/build/build.js'
+                src: ['public/js/lib/almond.js', 'public/js/joystick/build/main.js'],
+                dest: 'public/js/joystick/build/build.js'
             }
 		},
 		uglify: {
@@ -96,8 +96,8 @@ module.exports = function (grunt) {
 			},
             build_joystick: {
                 files: [{
-                    src: ['public/joystick/js/build/build.js'],
-                    dest: 'public/joystick/js/build/build.min.js'
+                    src: ['public/js/joystick/build/build.js'],
+                    dest: 'public/js/joystick/build/build.min.js'
                 }]
             }
 		},
@@ -131,8 +131,8 @@ module.exports = function (grunt) {
                 }
             },
             joystick: {
-                files: ['public/joystick/js/**/*.js',
-                        'public/joystick/css/*.css'],
+                files: ['public/js/joystick/**/*.js',
+                        'public/css/joystick/*.css'],
                 tasks: [],
                 options: {
                     interrupt: true,
@@ -148,7 +148,7 @@ module.exports = function (grunt) {
                 }
             },
             scss_joystick: {
-                files: ['public/joystick/css/*.scss'],
+                files: ['public/css/joystick/*.scss'],
                 tasks: ['sass:joystick'],
                 options: {
                     atBegin: true,
