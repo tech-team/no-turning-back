@@ -17,10 +17,67 @@
   display: none;
 }
 
-#game-load-progress {
+$gradientColor1: #cdeb8e;
+$gradientColor2: #a5c956;
+$backgroundColor: #f3f3f3;
+$borderRadius: 9px;
+
+.html5-progress-bar {
+  width: 300px;
+
+  padding: 15px 15px;
+  border-radius: 3px;
+  background-color: #fff;
+  box-shadow:  0px 1px 2px 0px rgba(0, 0, 0, .2);
+
   position: absolute;
   top: 50%;
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
+}
+
+.html5-progress-bar progress {
+  background-color: $backgroundColor;
+  border: 0;
+  width: 80%;
+  height: 18px;
+  border-radius: 9px;
+}
+
+.html5-progress-bar progress::-webkit-progress-bar {
+  background-color: $backgroundColor;
+  border-radius: $borderRadius;
+}
+
+.html5-progress-bar progress::-webkit-progress-value {
+  background: $gradientColor1;
+  background: -moz-linear-gradient(top,  $gradientColor1 0%, $gradientColor2 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$gradientColor1), color-stop(100%,$gradientColor2));
+  background: -webkit-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
+  background: -o-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
+  background: -ms-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
+  background: linear-gradient(to bottom,  $gradientColor1 0%,$gradientColor2 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$gradientColor1', endColorstr='$gradientColor2',GradientType=0 );
+  border-radius: $borderRadius;
+}
+.html5-progress-bar progress::-moz-progress-bar {
+  background: $gradientColor1;
+  background: -moz-linear-gradient(top,  $gradientColor1 0%, $gradientColor2 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$gradientColor1), color-stop(100%,$gradientColor2));
+  background: -webkit-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
+  background: -o-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
+  background: -ms-linear-gradient(top,  $gradientColor1 0%,$gradientColor2 100%);
+  background: linear-gradient(to bottom,  $gradientColor1 0%,$gradientColor2 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$gradientColor1', endColorstr='$gradientColor2',GradientType=0 );
+  border-radius: $borderRadius;
+}
+.html5-progress-bar .progress-value {
+  padding: 0px 5px;
+  line-height: 20px;
+  margin-left: 5px;
+  font-size: .8em;
+  color: #555;
+  height: 18px;
+  float: right;
 }

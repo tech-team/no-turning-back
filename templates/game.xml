@@ -5,7 +5,13 @@
                 <div class="left-arrow-wrapper"><div class="left-arrow" /></div>
                 <span class="back-button__caption">Back</span>
             </a>
-            <progress id="game-load-progress" value="10" max="100" />
+            <div id="game-load-progress" class="html5-progress-bar">
+                <div class="progress-bar-wrapper">
+                    <h2>Loading resources...</h2>
+                    <progress id="progressbar" value="10" max="100" />
+                    <b><span id="progressbar-value" class="progress-value">0%</span></b>
+                </div>
+            </div>
             <canvas id="game-field">You have a very old browser, dude.</canvas>
     </div>
 </fest:template>
