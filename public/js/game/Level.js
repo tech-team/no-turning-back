@@ -246,8 +246,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             return dispObj;
         },
 
-        onJoystickMessage: function(data) {
-
+        onJoystickMessage: function(data, answer) {
+//            answer("hello");
         },
 
 		update: function(event) {

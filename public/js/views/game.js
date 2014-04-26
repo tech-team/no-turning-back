@@ -51,9 +51,9 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                 saveToken: function(guid) {
                     self.guid.attr('value', guid);
                 },
-                onMessage: function(data) {
-                    self.onJoystickMessage(data);
-                    self.game.onJoystickMessage(data);
+                onMessage: function(data, answer) {
+                    self.onJoystickMessage(data, answer);
+                    self.game.onJoystickMessage(data, answer);
                 }
             });
         },
