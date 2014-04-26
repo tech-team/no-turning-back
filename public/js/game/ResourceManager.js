@@ -39,7 +39,6 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
 		__init__: function(onComplete, onCompleteContext) {
             this.images = [];
             this.spriteSheets = [];
-            this.sounds = [];
 
             var self = this;
 

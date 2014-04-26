@@ -245,7 +245,7 @@ define([
                             alert("Unable to save level");
                         }
                     });
-                }
+                };
 
                 $.ajax({
                     type: 'GET',
@@ -348,7 +348,7 @@ define([
 
                     type: type,
                     tex: tex
-                }
+                };
 
                 if (w && h) {
                     params.w = w;
