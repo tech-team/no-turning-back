@@ -36,7 +36,7 @@ define([
     var message = document.getElementById('message');
 
     function main() {
-        window.server.send({test: "testFromJoystick"});
+//        window.server.send({test: "testFromJoystick"});
     }
 
     function onMessage(data) {

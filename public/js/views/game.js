@@ -59,7 +59,7 @@ function(Backbone, tmpl, Game, GameFinishedView) {
         },
 
         onJoystickMessage: function(data) {
-
+            console.log(data);
         },
 
         hide: function () {

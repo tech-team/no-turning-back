@@ -76,7 +76,9 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
             this.level.joystickServer = server;
         },
 
-        onJoystickMessage: this.level.onJoystickMessage,
+        onJoystickMessage: function(data) {
+            this.level.onJoystickMessage(data);
+        },
 
         resize: function() {
             this.level.resize();
