@@ -318,8 +318,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 this.player.dispObj.rotation = this.prevPlayerPos.rotation;
             }
 
-            this.weaponsHandle();
-            this.shootingHandle();
+            this.weaponsHandle(event);
+            this.shootingHandle(event);
 
             this.zombiesDeathHandle(self);
             this.dropsHandle();
@@ -328,7 +328,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             this.doorsOpeningHandle();
         },
 
-        weaponsHandle: function() {
+        weaponsHandle: function(event) {
             if(event.keys[KeyCoder.ONE]) {
                 if ("knife" in this.player.weapons) {
                     this.player.currentWeapon = "knife";
@@ -353,7 +353,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             }
         },
 
-        shootingHandle: function() {
+        shootingHandle: function(event) {
             if(event.keys[KeyCoder.SPACE] && this.player.cooldown == 0) {
                 var currentWeapon = this.player.currentWeapon;
 
