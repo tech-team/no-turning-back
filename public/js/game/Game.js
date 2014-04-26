@@ -66,7 +66,6 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 		update: function(event) {
             if (this.state == Game.GameState.Game) {
                 this.level.update(event);
-
                 this.stage.update(event);
             }
 		},
@@ -81,7 +80,8 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
         },
 
         resize: function() {
-            this.level.resize();
+            if (this.level)
+                this.level.resize();
         }
 	});
 
