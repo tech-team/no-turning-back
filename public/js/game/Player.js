@@ -17,8 +17,11 @@ function(Class, AliveObject, KeyCoder, collider) {
             this.currentWeapon = "knife";
             this.inventory = [];
             this.keys = [];
+
             this.power = 5;
+            this.reach = 50;
 		},
+
 
         setEffects: function(effects) {
             this.effects = effects;

@@ -63,7 +63,16 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 Medkit: "#1397F0",
                 Ammo: "#A7FA16",
                 DoorClosed: "#FF0000"
-            }
+            },
+
+            weaponPower: {
+                knife: 5,
+                pistol: 10
+            },
+            weaponCooldown: {
+                knife: 40,
+                pistol: 30
+            },
         },
 
         reload: function(data) {
@@ -302,7 +311,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
         keyFunc: function(event) {
 
             var self = this;
-            //Movement handling
 
             if (this.checkBounds(this.player.dispObj)) {
                 this.player.dispObj.x = this.prevPlayerPos.x;
@@ -310,11 +318,20 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 this.player.dispObj.rotation = this.prevPlayerPos.rotation;
             }
 
-            //Changing weapons handling
+            this.weaponsHandle();
+            this.shootingHandle();
+
+            this.zombiesDeathHandle(self);
+            this.dropsHandle();
+
+            this.chestsOpeningHandle(self);
+            this.doorsOpeningHandle();
+        },
+
+        weaponsHandle: function() {
             if(event.keys[KeyCoder.ONE]) {
                 if ("knife" in this.player.weapons) {
                     this.player.currentWeapon = "knife";
-                    console.log("knife!");
 
                     if (this.player.dispObj.tex != "player") {
                         this.player.dispObj.tex = "player";
@@ -326,7 +343,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             if(event.keys[KeyCoder.TWO]) {
                 if ("pistol" in this.player.weapons) {
                     this.player.currentWeapon = "pistol";
-                    console.log("pistol!");
 
                     if (this.player.dispObj.tex != "player-pistol") {
                         this.player.dispObj.tex = "player-pistol";
@@ -335,8 +351,9 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                     }
                 }
             }
+        },
 
-            //Shooting handling
+        shootingHandle: function() {
             if(event.keys[KeyCoder.SPACE] && this.player.cooldown == 0) {
                 var currentWeapon = this.player.currentWeapon;
 
@@ -346,11 +363,11 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                         var yToZombie = this.player.dispObj.y - this.zombies[i].dispObj.y;
                         var distanceToZombie = Math.sqrt(xToZombie * xToZombie + yToZombie * yToZombie);
 
-                        if (distanceToZombie <= 50) {
-                            this.zombies[i].health -= this.player.power;
+                        if (distanceToZombie <= this.player.reach) {
+                            this.zombies[i].health -= Level.weaponPower.knife;
                         }
                     }
-                    this.player.cooldown = 40;
+                    this.player.cooldown = Level.weaponCooldown.knife;
                 }
                 else if (currentWeapon === "pistol") {
                     if (this.player.weapons['pistol'] > 0) {
@@ -358,6 +375,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                             x: this.player.dispObj.x,
                             y: this.player.dispObj.y,
                             r: this.player.dispObj.rotation,
+                            power: Level.weaponPower.pistol,
                             tex: "pistol-bullet"
                         };
 
@@ -368,7 +386,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
                         this.bullets.push(bullet);
 
-                        this.player.cooldown = 30;
+                        this.player.cooldown = Level.weaponCooldown.pistol;
                         --this.player.weapons['pistol'];
                     }
                 }
@@ -376,39 +394,40 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
             //Bullets collisions handling
             out:
-            for (var i = 0; i < this.bullets.length; ++i) {
-                for(var j = 0; j < this.zombies.length; ++j) {
-                    if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
-                        this.zombies[j].health -= this.bullets[i].power;
+                for (var i = 0; i < this.bullets.length; ++i) {
+                    for(var j = 0; j < this.zombies.length; ++j) {
+                        if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
+                            this.zombies[j].health -= this.bullets[i].power;
+                            this.stage.removeChild(this.bullets[i].dispObj);
+                            this.bullets.splice(i, 1);
+                            break out;
+                        }
+                    }
+                    for(var j = 0; j < this.collisionObjects.length; ++j) {
+                        if (collider.checkPixelCollision(this.bullets[i].dispObj,this.collisionObjects[j])) {
+                            this.stage.removeChild(this.bullets[i].dispObj);
+                            this.bullets.splice(i, 1);
+                            break out;
+                        }
+                    }
+                    if (this.checkBounds(this.bullets[i].dispObj)) {
                         this.stage.removeChild(this.bullets[i].dispObj);
                         this.bullets.splice(i, 1);
-                        break out;
+                        break;
                     }
                 }
-                for(var j = 0; j < this.collisionObjects.length; ++j) {
-                    if (collider.checkPixelCollision(this.bullets[i].dispObj,this.collisionObjects[j])) {
-                        this.stage.removeChild(this.bullets[i].dispObj);
-                        this.bullets.splice(i, 1);
-                        break out;
-                    }
-                }
-                if (this.checkBounds(this.bullets[i].dispObj)) {
-                    this.stage.removeChild(this.bullets[i].dispObj);
-                    this.bullets.splice(i, 1);
-                    break;
-                }
-            }
+        },
 
-            //Zombies death handling
+        zombiesDeathHandle: function(self) {
             for (var i = 0; i < this.zombies.length; ++i) {
                 if (this.zombies[i].health <= 0) {
                     var corpse = DefaultObjects.build("corpse",
-                    {
-                        tex: "zombie_corpse",
-                        x: this.zombies[i].dispObj.x,
-                        y: this.zombies[i].dispObj.y,
-                        r: this.zombies[i].dispObj.rotation
-                    });
+                        {
+                            tex: "zombie_corpse",
+                            x: this.zombies[i].dispObj.x,
+                            y: this.zombies[i].dispObj.y,
+                            r: this.zombies[i].dispObj.rotation
+                        });
 
                     this.addToStage(corpse, false, this.backgroundId+1);
                     this.stage.removeChild(this.zombies[i].dispObj);
@@ -431,10 +450,66 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                     this.player.score += Level.SCORES.KILL;
                 }
             }
+        },
 
-            //Drops handling
-            //TODO: handle all the possible drops and chest storage items
-            //TODO: ammo drops
+        chestsOpeningHandle: function(self) {
+            for (var i = 0; i < this.chests.length; ++i) {
+                if (this.chests[i].justTried == true) {
+                    this.chests[i].justTried = false;
+                    this.showMessage(this.chests[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
+                }
+                else if (this.chests[i].justOpened == true) {
+
+                    this.chests[i].justOpened = false;
+                    this.chests[i].storage.forEach(function(drop) {
+
+                        switch (drop['type']) {
+                            case "weapon":
+                                var name = drop['name'];
+                                if (name in self.player.weapons) {
+                                    self.player.weapons[name] += drop['ammo'];
+                                    self.showMessage("You picked up " + drop['ammo'] + " ammo for " + drop['name'], Level.MessageColor.Ammo);
+                                }
+                                else {
+                                    self.player.weapons[name] = drop['ammo'];
+                                    self.showMessage("You picked up a new weapon: " + drop['name'], Level.MessageColor.NewWeapon);
+                                }
+                                break;
+                            case "medkit":
+                                self.player.health += drop['size'];
+                                if (self.player.health > self.player.maxHealth)
+                                    self.player.health = self.player.maxHealth;
+
+                                self.showMessage("You healed " + drop['size'] + " health", Level.MessageColor.Medkit);
+                                break;
+                            case "ammo":
+                                if (drop['name'] in self.player.weapons) {
+                                    self.player.weapons[drop['name']] += drop['size'];
+                                    self.showMessage("You picked up " + drop['size'] + " ammo for " + drop['name'], Level.MessageColor.Ammo);
+                                }
+                                break;
+                            case "key":
+                                if (!(drop['name'] in self.player.keys)) {
+                                    self.player.keys.push(drop['name']);
+                                    self.showMessage("You got a " + drop['name'], Level.MessageColor.NewItem);
+                                }
+                                break;
+                            default:
+                                if (drop['name']) {
+                                    self.player.inventory.push(drop['name']);
+                                }
+                        }
+                    });
+
+                    this.chests[i].storage = [];
+                    this.stage.removeChild(this.chests[i].dispObj);
+                    this.addToStage(this.chests[i], false, this.backgroundId+1);
+                }
+            }
+        },
+
+
+        dropsHandle: function() {
             for (var i = 0; i < this.drops.length; ++i) {
                 if (collider.checkPixelCollision(this.drops[i], this.player.dispObj)) {
                     switch (this.drops[i].data['type']) {
@@ -457,7 +532,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                             break;
                         default:
                             if (this.drops[i].data['name']) {
-                                self.player.inventory.push(this.drops[i].data['name']);
+                                this.player.inventory.push(this.drops[i].data['name']);
                                 this.showMessage(this.drops[i].data['name'] + " added to your inventory!");
                             }
                     }
@@ -466,54 +541,9 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                     this.drops.splice(i, 1);
                 }
             }
+        },
 
-            //TODO: decide ammo and health caches (size or amount or wut)
-            //Chests opening handling
-            for (var i = 0; i < this.chests.length; ++i) {
-                if (this.chests[i].justTried == true) {
-                    this.chests[i].justTried = false;
-                    this.showMessage(this.chests[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
-                }
-                else if (this.chests[i].justOpened == true) {
-
-                    this.chests[i].justOpened = false;
-                    this.chests[i].storage.forEach(function(drop) {
-
-                        switch (drop['type']) {
-                            case "medkit":
-                                self.player.health += drop['size'];
-                                if (self.player.health > self.player.maxHealth)
-                                    self.player.health = self.player.maxHealth;
-
-                                self.showMessage("You healed " + drop['size'], Level.MessageColor.Medkit);
-                                break;
-                            case "ammo":
-                                if (drop['name'] in self.player.weapons) {
-                                    self.player.weapons[drop['name']] += drop['size'];
-                                    self.showMessage("You picked up " + drop['size'] + " ammo for " + drop['name'], Level.MessageColor.Ammo);
-                                }
-                                break;
-                            case "key":
-                                if (!(drop['key'] in self.player.keys)) {
-                                    self.player.keys.push(drop['key']);
-                                    self.showMessage("You got a " + drop['name'], Level.MessageColor.NewItem);
-                                }
-                                break;
-                            default:
-                                if (drop['name']) {
-                                    self.player.inventory.push(drop['name']);
-                                }
-                        }
-                    });
-
-
-                    this.chests[i].storage = [];
-                    this.stage.removeChild(this.chests[i].dispObj);
-                    this.addToStage(this.chests[i], false, this.backgroundId+1);
-                }
-            }
-
-            //Doors opening handling
+        doorsOpeningHandle: function() {
             for (var i = 0; i < this.doors.length; ++i) {
                 if (this.doors[i].justTried == true) {
                     this.doors[i].justTried = false;
