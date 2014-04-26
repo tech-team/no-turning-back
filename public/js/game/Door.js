@@ -13,7 +13,7 @@ define([
                 this.tex = ( this.state === "open") ? "door-open" : "door-closed";
                 this.activationRadius = 80;
                 this.requires = obj.requires;
-                this.requiresMessage = this.requires.toString() + " required.";
+                this.requiresMessage = this.requires.toString() + " required";
                 this.justOpened = false;
                 this.justTried = false;
                 this.messageCooldown = 0;
@@ -34,7 +34,7 @@ define([
                 };
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
-                    if (event.keys[KeyCoder.Z]) {
+                    if (event.keys[KeyCoder.E]) {
                         if (this.state === "closed" && _.contains(player.keys, this.requires)) {
                             this.justOpened = true;
                             this.state = "open";

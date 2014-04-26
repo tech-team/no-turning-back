@@ -66,7 +66,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 NewItem: "#A1BF26",
                 Medkit: "#1397F0",
                 Ammo: "#A7FA16",
-                DoorClosed: "#FF0000"
+                DoorClosed: "#0FFFF0"
             },
 
             weaponPower: {

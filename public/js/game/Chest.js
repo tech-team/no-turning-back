@@ -12,7 +12,7 @@ define([
                 this.storage = obj.storage;
                 this.state = ( obj.state === "open" ) ? "open" : "closed" ;
                 this.requires = obj.requires;
-                this.requiresMessage = this.requires.toString() + " required.";
+                this.requiresMessage = this.requires.toString() + " required";
                 this.activationRadius = 50;
                 this.tex = ( this.state === "open") ? "chest-open" : "chest";
                 this.justTried = false;
