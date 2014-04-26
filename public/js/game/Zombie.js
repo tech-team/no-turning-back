@@ -1,9 +1,11 @@
 define([
     'classy',
     'game/AliveObject',
+    'game/ResourceManager',
+    'sound',
     'collision'
 ],
-    function(Class, AliveObject, collider) {
+    function(Class, AliveObject, ResourceManager, soundjs, collider) {
         var Zombie = AliveObject.$extend({
             __init__: function(obj) {
                 this.waypoints = obj.waypoints;
@@ -47,6 +49,7 @@ define([
                     this.target = player.dispObj;
                     if (this.canAttack && vectorToPlayer.distance() < this.attackDistance) {
                         player.damage(this.damage);
+                        soundjs.Sound.play(ResourceManager.soundList.PlayerHurt[Math.floor(Math.random() * 3)]);
                         this.canAttack = false;
                         var self = this;
 
