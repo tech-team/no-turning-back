@@ -16,6 +16,10 @@
         </form>
         <div id="message"></div>
 
+        <div id="scene">
+            <canvas id="canvas">You have a very old browser, dude.</canvas>
+        </div>
+
         <fest:if test="json.development">
             <script data-main="js/main_joystick" src="js/lib/require.js"></script>
             <script src="http://localhost:35729/livereload.js?snipver=1"></script>

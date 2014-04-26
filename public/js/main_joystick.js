@@ -5,6 +5,8 @@ require.config({
         jquery: "lib/jquery",
         underscore: "lib/underscore",
         backbone: "lib/backbone",
+        classy: "lib/classy",
+        easel: "lib/game/easeljs",
         Connector: "lib/Connector",
         FnQuery: "lib/FnQuery",
         'socket.io': "/socket.io/socket.io",
@@ -21,6 +23,12 @@ require.config({
         },
         'socket.io': {
             exports: 'io'
+        },
+        'classy': {
+            exports: 'Class'
+        },
+        'easel': {
+            exports: 'createjs'
         }
     }
 });
@@ -30,14 +38,20 @@ define([
     'jquery',
     'move',
     'hammer',
-    'joystick/joystick'
-], function($, move, Hammer, Joystick) {
+    'joystick/joystick',
+    'joystick/Controller'
+], function($, move, Hammer, Joystick, Controller) {
     var inputField = document.getElementById('token');
     var message = document.getElementById('message');
 
     function main() {
-//        window.server.send({test: "testFromJoystick"});
+        //window.server.send({test: "testFromJoystick"});
+        console.log("main");
+        var controller = new Controller($('canvas')[0]);
     }
+
+    //TODO: somebody should call it
+    main();
 
     function onMessage(data) {
         console.log('message', data);
