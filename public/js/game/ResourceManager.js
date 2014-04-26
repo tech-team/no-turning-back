@@ -3,16 +3,17 @@ define([
     'underscore',
     'easel',
     'preload',
+    'sound',
     'game/ImageTiler'
 ],
-function(Class, _, createjs, preloadjs, ImageTiler) {
+function(Class, _, createjs, preloadjs, sound, ImageTiler) {
 	var ResourceManager = Class.$extend({
         __classvars__: {
             texList: ["ground", "zombie", "player", "player-pistol", "wall", "brick_wall1", "brick_wall2",
                 "brick_wall3", "brick_wall4", "chest", "chest-open", "door-open", "door-closed", "rubbish",
                 "waypoint", "pistol", "pistol-bullet", "effects/fog", "effects/damage", "zombie_corpse",
                 "golden-key", "silver-key"],
-
+            audioList: ["fortunate_son", "ambiance"],
             instance: null,
 
             load: function(onComplete, onCompleteContext) {
@@ -69,6 +70,7 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
                 $progressBarLabel.text(val + '%');
             }
 		},
+
 
         getSpriteSheet: function(tex) {
             var spriteSheet = this.spriteSheets[tex];

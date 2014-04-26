@@ -472,7 +472,11 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             //TODO: decide ammo and health caches (size or amount or wut)
             //Chests opening handling
             for (var i = 0; i < this.chests.length; ++i) {
-                if (this.chests[i].justOpened == true) {
+                if (this.chests[i].justTried == true) {
+                    this.chests[i].justTried = false;
+                    this.showMessage(this.chests[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
+                }
+                else if (this.chests[i].justOpened == true) {
 
                     this.chests[i].justOpened = false;
                     this.chests[i].storage.forEach(function(drop) {
@@ -488,7 +492,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                             case "ammo":
                                 if (drop['name'] in self.player.weapons) {
                                     self.player.weapons[drop['name']] += drop['size'];
-                                    self.showMessage("You picked up " + drop['ammo'] + " ammo for " + drop['name'], Level.MessageColor.Ammo);
+                                    self.showMessage("You picked up " + drop['size'] + " ammo for " + drop['name'], Level.MessageColor.Ammo);
                                 }
                                 break;
                             case "key":
@@ -513,7 +517,11 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
             //Doors opening handling
             for (var i = 0; i < this.doors.length; ++i) {
-                if (this.doors[i].justOpened == true) {
+                if (this.doors[i].justTried == true) {
+                    this.doors[i].justTried = false;
+                    this.showMessage(this.doors[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
+                }
+                else if (this.doors[i].justOpened == true) {
 
                     this.doors[i].justOpened = false;
                     for (var j = 0; j < this.collisionObjects.length; ++j) {
