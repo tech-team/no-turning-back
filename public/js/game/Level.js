@@ -17,7 +17,7 @@ define([
 
 function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Zombie, Chest, Door, Bullet) {
     var Level = Class.$extend({
-		__init__: function(stage, data, player, resourceManager, editorMode) {
+		__init__: function(stage, data, player, resourceManager, editorMode, sound) {
             this.data = data;
 
             this.editorMode = editorMode;
@@ -371,12 +371,13 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         var xToZombie = this.player.dispObj.x - this.zombies[i].dispObj.x;
                         var yToZombie = this.player.dispObj.y - this.zombies[i].dispObj.y;
                         var distanceToZombie = Math.sqrt(xToZombie * xToZombie + yToZombie * yToZombie);
+                       // var angleToZombie = this.player.dispObj.angle - 1 / Math.atan2(yToZombie, xToZombie);
 
                         if (distanceToZombie <= this.player.reach) {
                             this.zombies[i].health -= Level.weaponPower.knife;
                             ResourceManager.playSound(ResourceManager.soundList.KnifeHit);
                         }
-                        else {
+                        else if (distanceToZombie <= this.player.reach) {
                             ResourceManager.playSound(ResourceManager.soundList.KnifeMiss);
                         }
                     }
@@ -412,6 +413,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
                             this.zombies[j].health -= this.bullets[i].power;
                             this.stage.removeChild(this.bullets[i].dispObj);
+                            if (Game.sound)
                             ResourceManager.playSound(ResourceManager.soundList.PistolHit);
                             this.bullets.splice(i, 1);
                             break out;
