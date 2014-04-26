@@ -49,9 +49,11 @@ define([
                 this._updatePointerPosition(this._primaryPointerID, e.gesture.center.pageX, e.gesture.center.pageY);
 
                 var pos = this.canvas.getBoundingClientRect();
+                pos.x = e.gesture.center.pageX - pos.left;
+                pos.y = e.gesture.center.pageY - pos.top;
 
                 // Finds the front-most inner-most child
-                target = original_target = this._getObjectsUnderPoint(e.gesture.center.pageX - pos.left, e.gesture.center.pageY - pos.top, null, null, true);
+                target = original_target = this._getObjectsUnderPoint(pos.x, pos.y, null, null, true);
                 if (!target) {
                     target = this; // Stage will always receive touch events
                 }
@@ -59,7 +61,7 @@ define([
                 while (target) { // Event propagation loop
                     if (target["on" + event_name] || target.hasEventListener(event_name.toLowerCase())) {
                         // Call any event handlers
-                        evt = new TouchEvent(event_name.toLowerCase(), target, original_target, e, this.mouseX, this.mouseY);
+                        evt = new TouchEvent(event_name.toLowerCase(), target, original_target, e, pos.x, pos.y);
                         if (target["on" + event_name]) {
                             target["on" + event_name](evt);
                         }

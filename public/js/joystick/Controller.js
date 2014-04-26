@@ -58,8 +58,22 @@ define([
                 this.mover.graphics.beginFill(Controller.COLOR.mover).drawCircle(0, 0, Controller.SIZE.moverRadius);
                 this.stage.addChild(this.mover);
 
-                this.mover.on("drag", function(event) {
-                    console.log("drag!");
+                var self = this;
+                //like this
+                /*Hammer(window).on("drag", function(e) { //ot this.canvas instead of window
+                    //TODO: limitations
+                    var pos = self.canvas.getBoundingClientRect();
+                    pos.x = e.gesture.center.pageX - pos.left;
+                    pos.y = e.gesture.center.pageY - pos.top;
+
+                    self.mover.x = pos.x;
+                    self.mover.y = pos.y;
+                });*/
+
+                //or like this (using MultiTouchStage thingy)
+                this.mover.on("drag", function(e) {
+                    self.mover.x = e.stageX;
+                    self.mover.y = e.stageY;
                 });
 
                 this.rightPad = new createjs.Shape();
@@ -68,8 +82,8 @@ define([
             },
 
             resize: function() {
-                this.canvas.width = this.$window.width();
-                this.canvas.height = this.$window.height();
+                this.canvas.width = this.$window.width() - 30;
+                this.canvas.height = this.$window.height() - 170;
 
                 var stageSize = {
                     width: this.stage.canvas.width,
