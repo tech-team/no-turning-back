@@ -332,6 +332,10 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
             this.chestsOpeningHandle(self);
             this.doorsOpeningHandle();
+
+            if(event.keys[KeyCoder.M]) {
+                ResourceManager.toggleSound();
+            }
         },
 
         weaponsHandle: function(event) {

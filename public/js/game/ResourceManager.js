@@ -27,7 +27,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 DoorOpen: "",
                 ChestOpen: "",
                 GameOver: "game_over.mp3",
-                Victory: "fortunate_son.mp3"
+                Victory: ""//"fortunate_son.mp3"
             },
 
             instance: null,
@@ -41,7 +41,17 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 return this.instance;
             },
 
+            soundDisabled: localStorage["soundDisabled"],
+
+            toggleSound: function() {
+                localStorage["soundDisabled"] = !this.soundDisabled;
+                this.soundDisabled = !this.soundDisabled;
+            },
+
             playSound: function(sound) {
+                if (this.soundDisabled)
+                    return;
+
                 if (_.isArray(sound)) {
                     var randId = _.random(0, sound.length);
                     soundjs.Sound.play(sound[randId]);
