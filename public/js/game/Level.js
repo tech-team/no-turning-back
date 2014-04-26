@@ -23,7 +23,10 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             if (this.editorMode)
                 this.editor = new Editor(this, stage);
 
+            this.showingMessagesCount = 0;
+
             this.stage = stage;
+
             this.background = null;
             this.effects = {
                 fog: null,
@@ -42,12 +45,24 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             this.collisionObjects = [];
             this.drops = [];
 
+            this.isJoystick = false;
+            this.joystickServer = null;
+
             this.reload(data);
 		},
 
         __classvars__: {
             SCORES: {
                 KILL: 5
+            },
+
+            MessageColor: {
+                Default: "#00FF00",
+                NewWeapon: "#0BB389",
+                NewItem: "#A1BF26",
+                Medkit: "#1397F0",
+                Ammo: "#A7FA16",
+                DoorClosed: "#FF0000"
             }
         },
 
@@ -130,12 +145,15 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
             if (!this.editorMode) {
                 var healthText = new easeljs.Text("Health: 100", "20px Arial", "#00FF00");
+                healthText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
                 this.healthText = this.stage.addChild(healthText);
 
                 var weaponText = new easeljs.Text("Ammo: 0", "20px Arial", "#00FF00");
+                weaponText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
                 this.weaponText = this.stage.addChild(weaponText);
 
                 var scoreText = new easeljs.Text("Score: 0", "20px Arial", "#00FF00");
+                scoreText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
                 this.scoreText = this.stage.addChild(scoreText);
 
                 this.resize(); //recalculate overlay positions
@@ -158,6 +176,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
             this.scoreText.x = this.stage.canvas.width - 100;
             this.scoreText.y = toolbarHeight;
+
+            this.updateEffects();
         },
 
         createCollisionObjects: function() {
@@ -174,15 +194,13 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 }
             }
 
-            //Порядок добавления важен!!!!!!!!!!!!!!!
+            //Порядок добавления важен
             for (var i = 0; i < this.chests.length; ++i) {
                 this.collisionObjects.push(this.chests[i].dispObj);
             }
         },
 
         addToStage: function(objData, doNotCenter, id) {
-            var self = this;
-
             var spriteSheet =
                 this.resourceManager.getTiledSpriteSheet(objData.tex, objData.w, objData.h);
 
@@ -216,6 +234,10 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
         },
 
 		update: function(event) {
+            if (this.isJoystick) {
+//                this.joystickServer.send({test: "testFromLevel"});
+            }
+
             if (!this.editorMode) {
 
                 this.keyFunc(event);
@@ -225,7 +247,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 if (this.zombies.length === 0) {
                     $.event.trigger({
                         type: "levelFinished",
-                        score: this.player.score
+                        score: this.player.score,
+                        message: "You Win"
                     });
                 }
 
@@ -248,7 +271,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                     console.log("Game over.");
                     $.event.trigger({
                         type: "levelFinished",
-                        score: this.player.score
+                        score: this.player.score,
+                        message: "Game over"
                     });
                 }
 
@@ -269,7 +293,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             else {
                 this.editor.keyFunc(event);
             }
-
 		},
 
         keyFunc: function(event) {
@@ -307,10 +330,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                         this.player.setDispObj(this.addToStage(this.player.dispObj, false, this.fogId));
                     }
                 }
-            }
-
-            if(event.keys[KeyCoder.E]) {
-                this.showMessage("You pressed E!", "#00FF00");
             }
 
             //Shooting handling
@@ -353,9 +372,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 }
             }
 
-
-
-
             //Bullets collisions handling
             out:
             for (var i = 0; i < this.bullets.length; ++i) {
@@ -390,7 +406,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                         x: this.zombies[i].dispObj.x,
                         y: this.zombies[i].dispObj.y,
                         r: this.zombies[i].dispObj.rotation
-                    })
+                    });
 
                     this.addToStage(corpse, false, this.backgroundId+1);
                     this.stage.removeChild(this.zombies[i].dispObj);
@@ -415,6 +431,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             }
 
             //Drops handling
+            //TODO: handle all the possible drops and chest storage items
             //TODO: ammo drops
             for (var i = 0; i < this.drops.length; ++i) {
                 if (collider.checkPixelCollision(this.drops[i], this.player.dispObj)) {
@@ -422,23 +439,24 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                         case "key":
                             if (!(this.drops[i].data['name'] in this.player.keys)) {
                                 this.player.keys.push(this.drops[i].data['name']);
-                                this.showMessage("You picked up a " + this.drops[i].data['name'], "#EE0");
+                                this.showMessage("You picked up a " + this.drops[i].data['name'], Level.MessageColor.NewItem);
                             }
                             break;
                         case "weapon":
                             var name = this.drops[i].data['name'];
                             if (name in this.player.weapons) {
                                 this.player.weapons[name] += this.drops[i].data['ammo'];
+                                this.showMessage("You picked up " + this.drops[i].data['ammo'] + " ammo for " + this.drops[i].data['name'], Level.MessageColor.Ammo);
                             }
                             else {
                                 this.player.weapons[name] = this.drops[i].data['ammo'];
-                                this.showMessage("You picked up a new weapon: " + this.drops[i].data['name'], "#DDD");
+                                this.showMessage("You picked up a new weapon: " + this.drops[i].data['name'], Level.MessageColor.NewWeapon);
                             }
                             break;
                         default:
                             if (this.drops[i].data['name']) {
                                 self.player.inventory.push(this.drops[i].data['name']);
-                                this.showMessage(this.drops[i].data['name'] + " added to your inventory!", "#FFF");
+                                this.showMessage(this.drops[i].data['name'] + " added to your inventory!");
                             }
                     }
 
@@ -450,7 +468,11 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             //TODO: decide ammo and health caches (size or amount or wut)
             //Chests opening handling
             for (var i = 0; i < this.chests.length; ++i) {
-                if (this.chests[i].justOpened == true) {
+                if (this.chests[i].justTried == true) {
+                    this.chests[i].justTried = false;
+                    this.showMessage(this.chests[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
+                }
+                else if (this.chests[i].justOpened == true) {
 
                     this.chests[i].justOpened = false;
                     this.chests[i].storage.forEach(function(drop) {
@@ -458,19 +480,21 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                         switch (drop['type']) {
                             case "medkit":
                                 self.player.health += drop['size'];
-                                self.showMessage("You healed " + drop['size']);
-                                self.player.health = (self.player.health > self.player.maxHealth) ? self.player.maxHealth : self.player.health;
+                                if (self.player.health > self.player.maxHealth)
+                                    self.player.health = self.player.maxHealth;
+
+                                self.showMessage("You healed " + drop['size'], Level.MessageColor.Medkit);
                                 break;
                             case "ammo":
-                                if (drop['weapon'] in self.player.weapons) {
-                                    self.player.weapons[drop['weapon']] += drop['size'];
-                                    self.showMessage("You got a " + drop['name'], "#DDD");
+                                if (drop['name'] in self.player.weapons) {
+                                    self.player.weapons[drop['name']] += drop['size'];
+                                    self.showMessage("You picked up " + drop['size'] + " ammo for " + drop['name'], Level.MessageColor.Ammo);
                                 }
                                 break;
                             case "key":
-                                if (!(drop['name'] in self.player.keys)) {
-                                    self.player.keys.push(drop['name']);
-                                    self.showMessage("You got a " + drop['name'], "#EE0");
+                                if (!(drop['key'] in self.player.keys)) {
+                                    self.player.keys.push(drop['key']);
+                                    self.showMessage("You got a " + drop['name'], Level.MessageColor.NewItem);
                                 }
                                 break;
                             default:
@@ -480,14 +504,20 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                         }
                     });
 
+
                     this.chests[i].storage = [];
                     this.stage.removeChild(this.chests[i].dispObj);
                     this.addToStage(this.chests[i], false, this.backgroundId+1);
                 }
             }
+
             //Doors opening handling
             for (var i = 0; i < this.doors.length; ++i) {
-                if (this.doors[i].justOpened == true) {
+                if (this.doors[i].justTried == true) {
+                    this.doors[i].justTried = false;
+                    this.showMessage(this.doors[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
+                }
+                else if (this.doors[i].justOpened == true) {
 
                     this.doors[i].justOpened = false;
                     for (var j = 0; j < this.collisionObjects.length; ++j) {
@@ -499,8 +529,6 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                     this.addToStage(this.doors[i], false, this.backgroundId+1);
                 }
             }
-
-
         },
 
         checkBounds: function(obj) {
@@ -518,6 +546,18 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 y: this.player.dispObj.y,
                 rotation: this.player.dispObj.rotation
             };
+        },
+
+        updateEffects: function() {
+            this.updateFog(true);
+
+            this.stage.removeChild(this.effects.damage);
+            this.effects.damage = this.addToStage({
+                tex: "effects/damage",
+                x: 0, y: 0,
+                w: this.stage.canvas.width,
+                h: this.stage.canvas.height}, true);
+            this.effects.damage.visible = false;
         },
 
         updateFog: function(forceUpdate) {
@@ -550,7 +590,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
                     fogBox.rect(
                         0,
-                        playerPos.y - frameSize/2,
+                        0,
                         playerPos.x - frameSize/2,
                         stageSize.height
                     ); //left
@@ -575,20 +615,26 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             }
         },
 
-        showMessage: function(message, color) {
-            var text = new easeljs.Text(message, "20px Arial", color || "#00FF00");
+        showMessage: function(message, color, period) {
+            this.showingMessagesCount++;
+
+            var text = new easeljs.Text(message, "20px Arial", color || Level.MessageColor.Default);
             text.x = this.stage.canvas.width / 2 - text.getMeasuredWidth() / 2;
-            text.y = text.getMeasuredHeight();
+            text.y = text.getMeasuredHeight() * this.showingMessagesCount;
+            text.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
 
             var dispObjText = this.stage.addChild(text);
 
             var self = this;
-            new UntilTimer(1000,
+            period = period || 3000;
+
+            new UntilTimer(period,
                 function() {
-                    text.alpha -= 0.1;
+                    text.alpha = (period - this.elapsed)/period;
                 },
                 function() {
                     self.stage.removeChild(dispObjText);
+                    self.showingMessagesCount--;
                 }
             );
         }

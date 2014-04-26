@@ -11,9 +11,12 @@ define([
                 this.storage = obj.storage;
                 this.state = ( obj.state === "open" ) ? "open" : "closed" ;
                 this.requires = obj.requires;
+                this.requiresMessage = this.requires.toString() + " required.";
                 this.activationRadius = 50;
                 this.tex = ( this.state === "open") ? "chest-open" : "chest";
+                this.justTried = false;
                 this.justOpened = false;
+                this.messageCooldown = 0;
             },
 
             __classvars__: {
@@ -31,15 +34,21 @@ define([
                 };
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
-                    if (event.keys[KeyCoder.Z]) {
-                        for (var i = 0; i < player.keys.length; ++i) {
-                            if (this.state = "closed" && player.keys[i] === this.requires) {
-                                this.justOpened = true;
-                                this.state = "open";
-                                this.tex = "chest-open";
-                            }
+                    if (event.keys[KeyCoder.E]) {
+                        if (this.state === "closed" && this.requires in player.keys) {
+                            this.justOpened = true;
+                            this.state = "open";
+                            this.tex = "chest-open";
+                        }
+                        else if (!(this.requires in player.keys) && this.messageCooldown <= 0) {
+                            this.justTried = true;
+                            this.messageCooldown = 100;
                         }
                     }
+                }
+
+                if (this.messageCooldown > 0) {
+                    --this.messageCooldown;
                 }
             }
         });

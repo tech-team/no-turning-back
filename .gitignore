@@ -1,4 +1,10 @@
 node_modules/
 .sass-cache/
 .idea/
+
 public/css/*.css
+public/joystick/css/*.css
+
+public/js/build
+public/joystick/js/build
+public/js/tmpl

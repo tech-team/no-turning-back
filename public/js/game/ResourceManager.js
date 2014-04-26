@@ -11,7 +11,18 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
             texList: ["ground", "zombie", "player", "player-pistol", "wall", "brick_wall1", "brick_wall2",
                 "brick_wall3", "brick_wall4", "chest", "chest-open", "door-open", "door-closed", "rubbish",
                 "waypoint", "pistol", "pistol-bullet", "effects/fog", "effects/damage", "zombie_corpse",
-                "golden-key", "silver-key"]
+                "golden-key", "silver-key"],
+
+            instance: null,
+
+            load: function(onComplete, onCompleteContext) {
+                if (this.instance)
+                    onComplete.call(onCompleteContext);
+                else
+                    this.instance = new ResourceManager(onComplete, onCompleteContext);
+
+                return this.instance;
+            }
         },
 
 
@@ -22,7 +33,9 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
 
             var self = this;
 
-            var $progressBar = $('#game-load-progress');
+            var $progressBarDiv = $('#game-load-progress');
+            var $progressBar = $('#progressbar');
+            var $progressBarLabel = $('#progressbar-value');
 
             var queue = new preloadjs.LoadQueue();
             queue.on("complete", handleComplete, this);
@@ -45,7 +58,7 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
                 onComplete.call(onCompleteContext);
 
                 //hide progressBar
-                $progressBar.hide();
+                $progressBarDiv.hide();
                 //show game canvas
                 $('#game-field').show();
             }
@@ -53,6 +66,7 @@ function(Class, _, createjs, preloadjs, ImageTiler) {
             function handleProgress(event) {
                 var val = Math.floor(event.progress*100);
                 $progressBar.val(val);
+                $progressBarLabel.text(val + '%');
             }
 		},
 

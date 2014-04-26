@@ -1,0 +1,23 @@
+$circle-size: 200px;
+$inner-circle-size: 80px;
+
+
+.circle {
+  width: $circle-size;
+  height: $circle-size;
+  border-radius: 50%;
+  background-color: green;
+}
+
+.inner-circle {
+  width: $inner-circle-size;
+  height: $inner-circle-size;
+  border-radius: 50%;
+  background-color: yellow;
+  margin: 0 auto;
+  position: relative;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}

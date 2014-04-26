@@ -23,7 +23,9 @@
     "grunt-contrib-sass": "~0.7.3",
     "artist": "~0.1.5",
     "grunt-contrib-requirejs": "~0.4.3",
-    "grunt-contrib-uglify": "~0.4.0"
+    "grunt-contrib-uglify": "~0.4.0",
+    "guid": "0.0.10",
+    "socket.io": "~0.9.16"
   },
   "dependencies": {}
 }

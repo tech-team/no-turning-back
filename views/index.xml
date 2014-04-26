@@ -13,6 +13,7 @@
 		<div id="pages" class="pages"></div>
 		<fest:if test="json.development">
 			<script data-main="js/main" src="js/lib/require.js"></script>
+            <script src="http://localhost:35729/livereload.js?snipver=1"></script>
 		</fest:if>
 		<fest:if test="!json.development">
 			<script>

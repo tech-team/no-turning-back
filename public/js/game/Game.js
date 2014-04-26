@@ -7,9 +7,10 @@ define([
 	'game/LevelManager',
 	'game/Level',
 	'game/Player',
-	'game/ResourceManager'
+	'game/ResourceManager',
+    'console'
 ],
-function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager) {
+function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager, Console) {
 	var Game = Class.$extend({
 		__init__: function(canvas, editorMode, onLoadedCallback) {
             this.editorMode = editorMode;
@@ -23,7 +24,7 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 			this.levelManager = new LevelManager();
 			this.level = null;
 			this.player = new Player();
-			this.resourceManager = new ResourceManager(this.onResourcesLoaded, this);
+			this.resourceManager = ResourceManager.load(this.onResourcesLoaded, this);
 			this.keyCoder = new KeyCoder(editorMode);
 			this.onLoadedCallback = onLoadedCallback;
 		},
@@ -33,7 +34,8 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
               	Loading: 0,
               	Game: 1,
               	GameOver: 2
-          	}
+          	},
+            console: Console
         },
 
         onResourcesLoaded: function() {
@@ -68,6 +70,11 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
                 this.stage.update(event);
             }
 		},
+
+        startJoystickSession: function(server) {
+            this.level.isJoystick = true;
+            this.level.joystickServer = server;
+        },
 
         resize: function() {
             this.level.resize();

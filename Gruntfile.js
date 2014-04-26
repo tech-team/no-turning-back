@@ -30,7 +30,7 @@ module.exports = function (grunt) {
 			}
 		},
 		sass: {
-			css: {
+			main_game: {
 				files: [{
 					expand: true,
 					cwd: 'public/css',
@@ -38,10 +38,20 @@ module.exports = function (grunt) {
 					dest: 'public/css',
 					ext: '.css'
 				}]
-			}
+			},
+
+            joystick: {
+                files: [{
+                    expand: true,
+                    cwd: 'public/css/joystick',
+                    src: '*.scss',
+                    dest: 'public/css/joystick',
+                    ext: '.css'
+                }]
+            }
 		},
 		requirejs: {
-			build: {
+			build_main_game: {
 				options: {
 					almond: true,
 					baseUrl: 'public/js',
@@ -50,24 +60,46 @@ module.exports = function (grunt) {
 					optimize: 'none',
 					out: 'public/js/build/main.js'
 				}
-			}
+			},
+
+            build_joystick: {
+                options: {
+                    almond: true,
+                    baseUrl: 'public/js',
+                    mainConfigFile: 'public/js/main_joystick.js',
+                    name: 'main_joystick',
+                    optimize: 'none',
+                    out: 'public/js/joystick/build/main.js'
+                }
+            }
 		},
 		concat: {
 			options: {
 				separator: ';\n'
 			},
-			build: {
+            build_main_game: {
 				src: ['public/js/lib/almond.js', 'public/js/build/main.js'],
 				dest: 'public/js/build/build.js'
-			}
+			},
+
+            build_joystick: {
+                src: ['public/js/lib/almond.js', 'public/js/joystick/build/main.js'],
+                dest: 'public/js/joystick/build/build.js'
+            }
 		},
 		uglify: {
-			build: {
+            build_main_game: {
 				files: [{
 			        src: ['public/js/build/build.js'],
 			        dest: 'public/js/build/build.min.js'
 			    }]
-			}
+			},
+            build_joystick: {
+                files: [{
+                    src: ['public/js/joystick/build/build.js'],
+                    dest: 'public/js/joystick/build/build.min.js'
+                }]
+            }
 		},
 		watch: {
 			express: {
@@ -79,7 +111,6 @@ module.exports = function (grunt) {
                 options: {
                     spawn: false,
                     atBegin: true
-
                 }
             },
 			fest: {
@@ -91,19 +122,37 @@ module.exports = function (grunt) {
 			    }
 			},
             frontend: {
-                files: jsFiles.concat(['public/css/*.css']),
+                files: ['public/js/**/*.js',
+                        'public/css/*.css'],
                 tasks: [],
                 options: {
                     interrupt: true,
 			        livereload: liveReload
                 }
             },
-            scss: {
-                files: ['public/css/*.scss'],
-                tasks: ['sass'],
+            joystick: {
+                files: ['public/js/joystick/**/*.js',
+                        'public/css/joystick/*.css'],
+                tasks: [],
                 options: {
-                	atBegin: true,
-                	livereload: false
+                    interrupt: true,
+                    livereload: liveReload
+                }
+            },
+            scss_main: {
+                files: ['public/css/*.scss'],
+                tasks: ['sass:main_game'],
+                options: {
+                    atBegin: true,
+                    livereload: false
+                }
+            },
+            scss_joystick: {
+                files: ['public/css/joystick/*.scss'],
+                tasks: ['sass:joystick'],
+                options: {
+                    atBegin: true,
+                    livereload: false
                 }
             }
 		}
@@ -121,10 +170,27 @@ module.exports = function (grunt) {
 	grunt.registerTask('default', ['express', 'watch']);
 
 	grunt.registerTask(
-	    'build',
+	    'build_main',
 	    [
-	        'fest', 'requirejs:build',
-	        'concat:build', 'uglify:build'
+	        'fest', 'requirejs:build_main_game',
+	        'concat:build_main_game', 'uglify:build_main_game'
 	    ]
 	);
+
+    grunt.registerTask(
+        'build_joystick',
+        [
+            'requirejs:build_joystick',
+            'concat:build_joystick', 'uglify:build_joystick'
+        ]
+    );
+
+    grunt.registerTask(
+        'build',
+        [
+            'build_joystick',
+            'build_main'
+        ]
+    );
+
 }
