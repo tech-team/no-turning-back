@@ -341,15 +341,13 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                 var currentWeapon = this.player.currentWeapon;
 
                 if (currentWeapon === "knife") {
-                    //TODO: set knife power somewhere else
-                    var knifePower = 5;
                     for (var i = 0; i < this.zombies.length; ++i) {
                         var xToZombie = this.player.dispObj.x - this.zombies[i].dispObj.x;
                         var yToZombie = this.player.dispObj.y - this.zombies[i].dispObj.y;
                         var distanceToZombie = Math.sqrt(xToZombie * xToZombie + yToZombie * yToZombie);
 
                         if (distanceToZombie <= 50) {
-                            this.zombies[i].health -= knifePower;
+                            this.zombies[i].health -= this.player.power;
                         }
                     }
                     this.player.cooldown = 40;
