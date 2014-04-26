@@ -78,9 +78,9 @@ var mo = {
 // set up some constants
 var accel_multi = 1; // used to normalise the accel values if firefox
 
-$(function() {
-    ;
-});
+//$(function() {
+//    ;
+//});
 
 function deviceMotion(e) {
 

@@ -1,14 +1,17 @@
 define([
     'underscore',
     'classy',
-    'easel'
+    'easel',
+    'hammer',
+    'joystick/MultiTouchStage'
 ],
-    function(_, Class, createjs) {
+    function(_, Class, createjs, Hammer, MultiTouchStage) {
         var Controller = Class.$extend({
             __init__: function($window, canvas) {
                 this.$window = $window;
                 this.canvas = canvas;
-                this.stage = new createjs.Stage(this.canvas);
+                this.stage = _.extend(new createjs.Stage(this.canvas), MultiTouchStage);
+                this.stage.enableDOMEvents(true);
                 this.FPS = 30;
 
                 var self = this;
@@ -21,6 +24,10 @@ define([
                 });
 
                 this.createControls();
+
+                /*Hammer(canvas).on("drag", function(event) {
+                    console.log(event);
+                })*/
 
                 this.$window.resize(function() { self.resize(); });
                 this.resize();
@@ -50,6 +57,10 @@ define([
                 this.mover = new createjs.Shape();
                 this.mover.graphics.beginFill(Controller.COLOR.mover).drawCircle(0, 0, Controller.SIZE.moverRadius);
                 this.stage.addChild(this.mover);
+
+                this.mover.on("drag", function(event) {
+                    console.log("drag!");
+                });
 
                 this.rightPad = new createjs.Shape();
                 this.rightPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius);

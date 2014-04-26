@@ -1,5 +1,5 @@
 require.config({
-    urlArgs: "_=" + (new Date()).getTime(),
+    urlArgs: "_=",// + (new Date()).getTime(),
     baseUrl: "js",
     paths: {
         jquery: "lib/jquery",
@@ -58,8 +58,9 @@ define([
     function main() {
         //window.server.send({test: "testFromJoystick"});
         console.log("main");
-        var controller = new Controller($(window), $('canvas')[0]);
         mo.init();
+        var controller = new Controller($(window), $('canvas')[0]);
+
 //        window.server.send({test: "testFromJoystick"}, function(data) {
 //            console.log("answer" + data);
 //        });
