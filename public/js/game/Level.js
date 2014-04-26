@@ -376,6 +376,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                             this.zombies[i].health -= Level.weaponPower.knife;
                             soundjs.Sound.play(ResourceManager.soundList.KnifeHit);
                         }
+                        else {
+                            soundjs.Sound.play(ResourceManager.soundList.KnifeMiss);
+                        }
                     }
                     this.player.cooldown = Level.weaponCooldown.knife;
                 }

@@ -15,11 +15,11 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 "waypoint", "pistol", "pistol-bullet", "effects/fog", "effects/damage", "zombie_corpse",
                 "golden-key", "silver-key"],
             soundList: {
-                PistolDraw: "",
+                PistolDraw: "pistol_draw.mp3",
                 PistolFire: "shoot.mp3",
                 PistolHit: "bullet_hit.mp3",
                 KnifeDraw: "knife.mp3",
-                KnifeMiss: "",
+                KnifeMiss: "knife_miss.mp3",
                 KnifeHit: "knife_stab.mp3",
                 ZombieHurt: "ambiance.mp3",
                 PlayerHurt: ["hurt1.wav", "hurt2.wav", "hurt3.wav"],
