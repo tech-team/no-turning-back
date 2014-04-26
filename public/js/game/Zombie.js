@@ -49,17 +49,7 @@ define([
                     this.target = player.dispObj;
                     if (this.canAttack && vectorToPlayer.distance() < this.attackDistance) {
                         player.damage(this.damage);
-                        switch (Math.floor(Math.random() * 3)) {
-                            case 0:
-                                soundjs.Sound.play(ResourceManager.soundList.PlayerHurt1);
-                                break;
-                            case 1:
-                                soundjs.Sound.play(ResourceManager.soundList.PlayerHurt2);
-                                break;
-                            case 2:
-                                soundjs.Sound.play(ResourceManager.soundList.PlayerHurt3);
-                                break;
-                        }
+
                         this.canAttack = false;
                         var self = this;
 
