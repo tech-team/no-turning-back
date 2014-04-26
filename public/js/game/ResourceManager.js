@@ -134,6 +134,16 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             }
             else
                 return this.getSpriteSheet(tex);
+        },
+
+        getRandomSound: function(sound) {
+            var sounds = ResourceManager.soundList[sound];
+            if (_.isArray(sounds)) {
+                var randId = _.random(0, sounds.length - 1);
+                return sounds[randId];
+            }
+            else
+                return sounds;
         }
 	});
 
