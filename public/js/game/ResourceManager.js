@@ -43,7 +43,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
 
             playSound: function(sound) {
                 if (_.isArray(sound)) {
-                    var randId = _.random(0, sound.length - 1);
+                    var randId = _.random(0, sound.length);
                     soundjs.Sound.play(sound[randId]);
                 }
                 else
