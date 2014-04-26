@@ -17,7 +17,7 @@ define([
 
 function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Zombie, Chest, Door, Bullet) {
     var Level = Class.$extend({
-		__init__: function(stage, data, player, resourceManager, editorMode) {
+		__init__: function(stage, data, player, resourceManager, editorMode, sound) {
             this.data = data;
 
             this.editorMode = editorMode;
@@ -246,8 +246,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             return dispObj;
         },
 
-        onJoystickMessage: function(data) {
-
+        onJoystickMessage: function(data, answer) {
+//            answer("hello");
         },
 
 		update: function(event) {
@@ -262,7 +262,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
                 this.player.update(event, this.collisionObjects);
                 if (this.zombies.length === 0) {
-                    soundjs.Sound.play(ResourceManager.soundList.Victory);
+                    ResourceManager.playSound(ResourceManager.soundList.Victory);
                     $.event.trigger({
                         type: "levelFinished",
                         score: this.player.score,
@@ -287,7 +287,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 if (this.player.health <= 0 && !this.player.dead) {
                     this.player.dead = true;
                     console.log("Game over.");
-                    soundjs.Sound.play(ResourceManager.soundList.GameOver);
+                    ResourceManager.playSound(ResourceManager.soundList.GameOver);
                     $.event.trigger({
                         type: "levelFinished",
                         score: this.player.score,
@@ -344,7 +344,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         this.stage.removeChild(this.player.dispObj);
                         this.player.setDispObj(this.addToStage(this.player.dispObj, false, this.fogId));
                     }
-                    soundjs.Sound.play(ResourceManager.soundList.KnifeDraw);
+                    ResourceManager.playSound(ResourceManager.soundList.KnifeDraw);
                 }
             }
             if(event.keys[KeyCoder.TWO]) {
@@ -357,7 +357,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         this.player.setDispObj(this.addToStage(this.player.dispObj, false, this.fogId));
                     }
 
-                    soundjs.Sound.play(ResourceManager.soundList.PistolDraw);
+                    ResourceManager.playSound(ResourceManager.soundList.PistolDraw);
                 }
             }
         },
@@ -371,10 +371,14 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         var xToZombie = this.player.dispObj.x - this.zombies[i].dispObj.x;
                         var yToZombie = this.player.dispObj.y - this.zombies[i].dispObj.y;
                         var distanceToZombie = Math.sqrt(xToZombie * xToZombie + yToZombie * yToZombie);
+                       // var angleToZombie = this.player.dispObj.angle - 1 / Math.atan2(yToZombie, xToZombie);
 
                         if (distanceToZombie <= this.player.reach) {
                             this.zombies[i].health -= Level.weaponPower.knife;
-                            soundjs.Sound.play(ResourceManager.soundList.KnifeHit);
+                            ResourceManager.playSound(ResourceManager.soundList.KnifeHit);
+                        }
+                        else if (distanceToZombie <= this.player.reach) {
+                            ResourceManager.playSound(ResourceManager.soundList.KnifeMiss);
                         }
                     }
                     this.player.cooldown = Level.weaponCooldown.knife;
@@ -409,7 +413,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
                             this.zombies[j].health -= this.bullets[i].power;
                             this.stage.removeChild(this.bullets[i].dispObj);
-                            soundjs.Sound.play(ResourceManager.soundList.PistolHit);
+                            ResourceManager.playSound(ResourceManager.soundList.PistolHit);
                             this.bullets.splice(i, 1);
                             break out;
                         }
@@ -417,7 +421,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                     for(var j = 0; j < this.collisionObjects.length; ++j) {
                         if (collider.checkPixelCollision(this.bullets[i].dispObj,this.collisionObjects[j])) {
                             this.stage.removeChild(this.bullets[i].dispObj);
-                            soundjs.Sound.play(ResourceManager.soundList.BulletRicochet);
+                            ResourceManager.playSound(ResourceManager.soundList.BulletRicochet);
                             this.bullets.splice(i, 1);
                             break out;
                         }

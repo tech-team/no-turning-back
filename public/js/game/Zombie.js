@@ -49,6 +49,7 @@ define([
                     this.target = player.dispObj;
                     if (this.canAttack && vectorToPlayer.distance() < this.attackDistance) {
                         player.damage(this.damage);
+
                         ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
                         this.canAttack = false;
                         var self = this;

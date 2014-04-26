@@ -33,6 +33,11 @@ function(Class, AliveObject, KeyCoder, collider) {
             var offsetRotation = 4;
             var offsetX, offsetY;
 
+            while (Math.abs(this.dispObj.rotation) >= 360) {
+                this.dispObj.rotation -= (this.dispObj.rotation > 0) ? (360) : (-360);
+            }
+            this.dispObj.angle = (Math.PI / 180) * this.dispObj.rotation;
+
             if (event.keys[KeyCoder.W]) {
                 if (event.keys[KeyCoder.SHIFT]) { speedModifier = 4; }
                 offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.dispObj.rotation);

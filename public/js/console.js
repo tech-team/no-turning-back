@@ -72,8 +72,8 @@ define([
 
         // Обмен сообщениями
         server.on('message', function (data, answer) {
-            callbacks.onMessage(data);
-            answer('answer');
+            callbacks.onMessage(data, answer);
+//            answer('answer');
         });
         window.server = server;
 

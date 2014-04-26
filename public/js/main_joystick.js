@@ -11,7 +11,8 @@ require.config({
         FnQuery: "lib/FnQuery",
         'socket.io': "/socket.io/socket.io",
         hammer: "lib/hammer",
-        move: "lib/move"
+        move: "lib/move",
+        device_normalizer: "lib/deviceapi-normaliser"
     },
     shim: {
         'backbone': {
@@ -30,6 +31,16 @@ require.config({
         'easel': {
             exports: 'createjs'
         }
+        },
+        'hammer': {
+            exports: 'hammer'
+        },
+        'move': {
+            exports: 'move'
+        },
+        'device_normalizer': {
+            exports: 'device_normalizer'
+        },
     }
 });
 
@@ -38,9 +49,10 @@ define([
     'jquery',
     'move',
     'hammer',
+    'device_normalizer',
     'joystick/joystick',
     'joystick/Controller'
-], function($, move, Hammer, Joystick, Controller) {
+], function($, move, Hammer, device_normalizer, Joystick, Controller) {
     var inputField = document.getElementById('token');
     var message = document.getElementById('message');
 
@@ -48,6 +60,16 @@ define([
         //window.server.send({test: "testFromJoystick"});
         console.log("main");
         var controller = new Controller($('canvas')[0]);
+        mo.init();
+//        window.server.send({test: "testFromJoystick"}, function(data) {
+//            console.log("answer" + data);
+//        });
+
+        window.addEventListener("deviceorientation", function(e) {
+            var obj = deviceOrientation(e);
+            console.log(obj);
+            message.innerHTML = "orientation changed";
+        }, false);
     }
 
     //TODO: somebody should call it

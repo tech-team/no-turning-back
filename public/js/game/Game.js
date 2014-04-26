@@ -15,6 +15,7 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 		__init__: function(canvas, editorMode, onLoadedCallback) {
             this.editorMode = editorMode;
 			this.FPS = 30;
+
 			this.canvas = canvas;
             this.state = Game.GameState.Loading;
 			this.width = canvas.width;
@@ -75,8 +76,8 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
             this.level.joystickServer = server;
         },
 
-        onJoystickMessage: function(data) {
-            this.level.onJoystickMessage(data);
+        onJoystickMessage: function(data, answer) {
+            this.level.onJoystickMessage(data, answer);
         },
 
         resize: function() {
