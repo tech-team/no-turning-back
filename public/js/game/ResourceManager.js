@@ -15,13 +15,21 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 "waypoint", "pistol", "pistol-bullet", "effects/fog", "effects/damage", "zombie_corpse",
                 "golden-key", "silver-key"],
             soundList: {
-                PistolFire: "fortunate_son.mp3",
+                PistolDraw: "",
+                PistolFire: "shoot.mp3",
+                PistolHit: "bullet_hit.mp3",
+                KnifeDraw: "knife.mp3",
                 KnifeMiss: "",
-                KnifeHit: "",
-                ZombieHeart: "ambiance.mp3",
-                PlayerHeart: "",
+                KnifeHit: "knife_stab.mp3",
+                ZombieHurt: "ambiance.mp3",
+                PlayerHurt1: "hurt1.wav",
+                PlayerHurt2: "hurt2.wav",
+                PlayerHurt3: "hurt3.wav",
+                BulletRicochet: "ricochet.mp3",
                 DoorOpen: "",
-                ChestOpen: ""
+                ChestOpen: "",
+                GameOver: "game_over.mp3",
+                Victory: "fortunate_son.mp3"
             },
 
             instance: null,
