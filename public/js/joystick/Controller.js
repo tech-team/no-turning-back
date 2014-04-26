@@ -5,7 +5,8 @@ define([
 ],
     function(_, Class, createjs) {
         var Controller = Class.$extend({
-            __init__: function(canvas) {
+            __init__: function($window, canvas) {
+                this.$window = $window;
                 this.canvas = canvas;
                 this.stage = new createjs.Stage(this.canvas);
                 this.FPS = 30;
@@ -21,18 +22,18 @@ define([
 
                 this.createControls();
 
-                $(window).resize(function() { self.resize(); });
-                this.resize($(window));
+                this.$window.resize(function() { self.resize(); });
+                this.resize();
             },
 
             __classvars__: {
                 SIZE: {
-                    padRadius: 200,
-                    moverRadius: 80
+                    padRadius: 150,
+                    moverRadius: 60
                 },
 
                 POS: {
-                    padOffset: 60
+                    padOffset: 180
                 },
 
                 COLOR: {
@@ -55,9 +56,10 @@ define([
                 this.stage.addChild(this.rightPad);
             },
 
-            resize: function($window) {
-                this.canvas.width = $window.width();
-                this.canvas.height = $window.height();
+            resize: function() {
+                this.canvas.width = this.$window.width();
+                this.canvas.height = this.$window.height();
+
                 var stageSize = {
                     width: this.stage.canvas.width,
                     height: this.stage.canvas.height

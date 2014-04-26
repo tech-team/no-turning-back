@@ -30,7 +30,6 @@ require.config({
         },
         'easel': {
             exports: 'createjs'
-        }
         },
         'hammer': {
             exports: 'hammer'
@@ -40,7 +39,7 @@ require.config({
         },
         'device_normalizer': {
             exports: 'device_normalizer'
-        },
+        }
     }
 });
 
@@ -59,7 +58,7 @@ define([
     function main() {
         //window.server.send({test: "testFromJoystick"});
         console.log("main");
-        var controller = new Controller($('canvas')[0]);
+        var controller = new Controller($(window), $('canvas')[0]);
         mo.init();
 //        window.server.send({test: "testFromJoystick"}, function(data) {
 //            console.log("answer" + data);
