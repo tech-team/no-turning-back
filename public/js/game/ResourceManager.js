@@ -39,6 +39,16 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                     this.instance = new ResourceManager(onComplete, onCompleteContext);
 
                 return this.instance;
+            },
+
+            getSound: function(sound) {
+                var sounds = ResourceManager.soundList[sound];
+                if (_.isArray(sounds)) {
+                    var randId = _.random(0, sounds.length - 1);
+                    return sounds[randId];
+                }
+                else
+                    return sounds;
             }
         },
 
@@ -67,10 +77,21 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
 
             _.each(ResourceManager.soundList, function(sound) {
                 if (sound && sound != "") {
-                    manifest.push({
-                        id: sound,
-                        src: "sound/" + sound
-                    });
+
+                    if (_.isArray(sound)) {
+                        _.each(sound, function(snd) {
+                            manifest.push({
+                                id: snd,
+                                src: "sound/" + snd
+                            });
+                        });
+                    }
+                    else {
+                        manifest.push({
+                            id: sound,
+                            src: "sound/" + sound
+                        });
+                    }
                 }
             });
 
@@ -140,16 +161,6 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             }
             else
                 return this.getSpriteSheet(tex);
-        },
-
-        getSound: function(sound) {
-            var sounds = ResourceManager.soundList[sound];
-            if (_.isArray(sounds)) {
-                var randId = _.random(0, sounds.length - 1);
-                return sounds[randId];
-            }
-            else
-                return sounds;
         }
 	});
 
