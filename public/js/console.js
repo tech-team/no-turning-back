@@ -1,28 +1,3 @@
-//require.config({
-//    urlArgs: "_=" + (new Date()).getTime(),
-//    baseUrl: "js",
-//    paths: {
-//	    jquery: "/js/lib/jquery",
-//        underscore: "/js/lib/underscore",
-//        backbone: "/js/lib/backbone",
-//        Connector: "/js/lib/Connector",
-//        FnQuery: "/js/lib/FnQuery",
-//        "socket.io": "/socket.io/socket.io"
-//    },
-//    shim: {
-//	    'backbone': {
-//            deps: ['underscore', 'jquery'],
-//            exports: 'Backbone'
-//        },
-//        'underscore': {
-//            exports: '_'
-//        },
-//        "socket.io": {
-//            exports: "io"
-//        }
-//    }
-//});
-
 define([
     'Connector'
 ], function(Connector){

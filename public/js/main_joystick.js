@@ -32,17 +32,33 @@ define([
     'hammer',
     'joystick/joystick'
 ], function($, move, Hammer, Joystick) {
+    var inputField = document.getElementById('token');
+    var message = document.getElementById('message');
+
     function main() {
-//        window.server.send({test: "testFromJoystick"});
+        window.server.send({test: "testFromJoystick"});
     }
 
     function onMessage(data) {
         console.log('message', data);
     }
 
-    Joystick({
+    function onStatusChanged(status) {
+        message.innerHTML = status;
+        switch(status) {
+            case 'ready':
+                break;
+            case 'game':
+                break;
+            default:
+                break;
+        }
+    }
+
+    Joystick(inputField, {
         onStart: main,
-        onMessage: onMessage
+        onMessage: onMessage,
+        onStatusChanged: onStatusChanged
     });
 
 // TODO: supposed to be in main()

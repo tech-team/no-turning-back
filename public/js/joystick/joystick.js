@@ -1,13 +1,12 @@
 define([
     'Connector'
 ], function(Connector) {
-    var Joystick = function(callbacks) {
+    var Joystick = function(inputField, callbacks) {
         callbacks = callbacks ? callbacks : {};
         callbacks.onStart = callbacks.onStart ? callbacks.onStart : function() {};
         callbacks.onMessage = callbacks.onMessage ? callbacks.onMessage : function(data) {};
+        callbacks.onStatusChanged = callbacks.onStatusChanged ? callbacks.onStatusChanged : function(status) {};
 
-        var message = document.getElementById('message');
-        var input = document.getElementById('token');
         var start, init, reconnect;
 
         // Создаем связь с сервером
@@ -19,15 +18,15 @@ define([
 
         // Инициализация
         init = function () {
-            message.innerHTML = 'ready';
+            callbacks.onStatusChanged('ready');
             // Если id нет
             if (!localStorage.getItem('playerguid')) {
                 // Ждем ввода токена
-                input.parentNode.addEventListener('submit', function (e) {
+                inputField.parentNode.addEventListener('submit', function (e) {
                     e.preventDefault();
 
                     // И отправляем его на сервер
-                    server.bind({token: input.value}, function (data) {
+                    server.bind({token: inputField.value}, function (data) {
                         if (data.status == 'success') { //  В случае успеха
                             // Стартуем джостик
                             start(data.guid);
@@ -63,7 +62,7 @@ define([
             console.log('start player');
             // Сохраняем id связки
             localStorage.setItem('playerguid', guid);
-            message.innerHTML = 'game';
+            callbacks.onStatusChanged('game');
             callbacks.onStart();
         };
 

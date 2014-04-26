@@ -52,9 +52,14 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                     self.guid.attr('value', guid);
                 },
                 onMessage: function(data) {
-                    console.log(data);
+                    self.onJoystickMessage(data);
+                    self.game.onJoystickMessage(data);
                 }
             });
+        },
+
+        onJoystickMessage: function(data) {
+
         },
 
         hide: function () {
