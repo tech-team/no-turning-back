@@ -136,7 +136,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 return this.getSpriteSheet(tex);
         },
 
-        getRandomSound: function(sound) {
+        getSound: function(sound) {
             var sounds = ResourceManager.soundList[sound];
             if (_.isArray(sounds)) {
                 var randId = _.random(0, sounds.length - 1);
