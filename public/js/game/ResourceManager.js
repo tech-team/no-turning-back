@@ -41,13 +41,13 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 return this.instance;
             },
 
-            getSound: function(sound) {
+            playSound: function(sound) {
                 if (_.isArray(sound)) {
                     var randId = _.random(0, sound.length - 1);
-                    return sound[randId];
+                    soundjs.Sound.play(sound[randId]);
                 }
                 else
-                    return sound;
+                    soundjs.Sound.play(sound);
             }
         },
 
