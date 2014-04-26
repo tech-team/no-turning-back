@@ -239,7 +239,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
 		update: function(event) {
             if (this.isJoystick) {
-                this.joystickServer.send({test: "testFromLevel"});
+//                this.joystickServer.send({test: "testFromLevel"});
             }
 
             if (!this.editorMode) {
