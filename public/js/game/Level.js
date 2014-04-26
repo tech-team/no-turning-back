@@ -2,7 +2,9 @@ define([
 	'classy',
     'underscore',
     'easel',
+    'sound',
     'collision',
+    'game/ResourceManager',
     'game/DefaultObjects',
     'game/KeyCoder',
     'game/Editor',
@@ -13,8 +15,8 @@ define([
     'game/Bullet'
 ],
 
-function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTimer, Zombie, Chest, Door, Bullet) {
-	var Level = Class.$extend({
+function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Zombie, Chest, Door, Bullet) {
+    var Level = Class.$extend({
 		__init__: function(stage, data, player, resourceManager, editorMode) {
             this.data = data;
 
@@ -367,6 +369,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
                         if (distanceToZombie <= this.player.reach) {
                             this.zombies[i].health -= Level.weaponPower.knife;
+                            soundjs.Sound.play(ResourceManager.soundList.ZombieHeart);
                         }
                     }
                     this.player.cooldown = Level.weaponCooldown.knife;
