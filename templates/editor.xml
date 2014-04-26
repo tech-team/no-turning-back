@@ -1,11 +1,18 @@
 <fest:template xmlns:fest="http://fest.mail.ru"
     context_name="json">
     <div id="editor-scene" class="content-wrapper game-wrapper editor-scene">
-            <a href="#main" class="back-button back-button_cornered">
-                <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
-                <span class="back-button__caption">Back</span>
-            </a>
-            <canvas id="editor-field" tabindex="1">You have a very old browser, dude.</canvas>
+        <a href="#main" class="back-button back-button_cornered">
+            <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
+            <span class="back-button__caption">Back</span>
+        </a>
+        <div class="game-load-progress">
+            <div class="progress-bar-wrapper">
+                <h2>Loading resources...</h2>
+                <progress class="progress" value="10" max="100" />
+                <b><span class="progress-value">0%</span></b>
+            </div>
+        </div>
+        <canvas id="editor-field" tabindex="1">You have a very old browser, dude.</canvas>
     </div>
     <div id="editor-sidebar" class="editor-sidebar">
         <!-- TODO: BEM required! -->

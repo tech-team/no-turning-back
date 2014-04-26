@@ -67,9 +67,9 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
 
             var self = this;
 
-            var $progressBarDiv = $('#game-load-progress');
-            var $progressBar = $('#progressbar');
-            var $progressBarLabel = $('#progressbar-value');
+            var $progressBarDiv = $('.game-load-progress');
+            var $progressBar = $('.progress');
+            var $progressBarLabel = $('.progress-value');
 
             var queue = new preloadjs.LoadQueue();
             queue.installPlugin(soundjs.Sound);
@@ -116,6 +116,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 $progressBarDiv.hide();
                 //show game canvas
                 $('#game-field').show();
+                $('#editor-field').show();
             }
 
             function handleProgress(event) {

@@ -5,11 +5,11 @@
                 <div class="left-arrow-wrapper"><div class="left-arrow" /></div>
                 <span class="back-button__caption">Back</span>
             </a>
-            <div id="game-load-progress" class="html5-progress-bar">
+            <div class="game-load-progress">
                 <div class="progress-bar-wrapper">
                     <h2>Loading resources...</h2>
-                    <progress id="progressbar" value="10" max="100" />
-                    <b><span id="progressbar-value" class="progress-value">0%</span></b>
+                    <progress class="progress" value="10" max="100" />
+                    <b><span class="progress-value">0%</span></b>
                 </div>
             </div>
             <canvas id="game-field">You have a very old browser, dude.</canvas>
