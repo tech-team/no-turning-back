@@ -76,7 +76,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             weaponCooldown: {
                 knife: 40,
                 pistol: 30
-            },
+            }
         },
 
         reload: function(data) {

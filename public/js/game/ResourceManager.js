@@ -47,7 +47,6 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
 		__init__: function(onComplete, onCompleteContext) {
             this.images = [];
             this.spriteSheets = [];
-            this.sounds = [];
 
             var self = this;
 
@@ -143,6 +142,16 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             }
             else
                 return this.getSpriteSheet(tex);
+        },
+
+        getSound: function(sound) {
+            var sounds = ResourceManager.soundList[sound];
+            if (_.isArray(sounds)) {
+                var randId = _.random(0, sounds.length - 1);
+                return sounds[randId];
+            }
+            else
+                return sounds;
         }
 	});
 
