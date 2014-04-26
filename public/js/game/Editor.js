@@ -61,8 +61,14 @@ define([
 
                         if (field[0] == 'object') {
                             var prop = field[1];
-                            if ($input.data('isArray') == true)
-                                data[prop] = $input.val().split(',');
+                            if ($input.data('isArray') == true) {
+                                try {
+                                    data[prop] = JSON.parse($input.val());
+                                }
+                                catch(e) {
+                                    alert("Unable to parse array for '" + prop + "' property. Changes will be rejected.");
+                                }
+                            }
                             else
                                 data[prop] = parseInt($input.val()) || $input.val();
                         }
@@ -394,11 +400,18 @@ define([
                     tr.append($("<td />").text(field + ':'));
                     var td = $("<td />");
                     if (field != 'tex') {
+                        var value = null;
+                        var isArray = _.isArray(data[field]);
+                        if (isArray)
+                            value = JSON.stringify(data[field]);
+                        else
+                            value = data[field];
+
                         td.append($("<input />")
                             .attr('type', 'text')
                             .attr('id', idPrefix + '-' + field)
-                            .data('isArray', _.isArray(data[field]))
-                            .val(data[field]));
+                            .data('isArray', isArray)
+                            .val(value));
                     }
                     else {
                         var select = $("<select />")
