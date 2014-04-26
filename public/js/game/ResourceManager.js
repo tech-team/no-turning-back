@@ -6,7 +6,7 @@ define([
     'sound',
     'game/ImageTiler'
 ],
-function(Class, _, createjs, preloadjs, sound, ImageTiler) {
+function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
 	var ResourceManager = Class.$extend({
         __classvars__: {
             //all textures should have .png format
@@ -35,7 +35,7 @@ function(Class, _, createjs, preloadjs, sound, ImageTiler) {
                 return this.instance;
             }
         },
-        
+
 		__init__: function(onComplete, onCompleteContext) {
             this.images = [];
             this.spriteSheets = [];
@@ -48,6 +48,7 @@ function(Class, _, createjs, preloadjs, sound, ImageTiler) {
             var $progressBarLabel = $('#progressbar-value');
 
             var queue = new preloadjs.LoadQueue();
+            queue.installPlugin(soundjs.Sound);
             queue.on("complete", handleComplete, this);
             queue.on("progress", handleProgress, this);
 
@@ -59,11 +60,13 @@ function(Class, _, createjs, preloadjs, sound, ImageTiler) {
                 });
             });
 
-            _.values(ResourceManager.soundList, function(sound) {
-                manifest.push({
-                    id: sound,
-                    src: "sounds/" + sound
-                });
+            _.each(ResourceManager.soundList, function(sound) {
+                if (sound && sound != "") {
+                    manifest.push({
+                        id: sound,
+                        src: "sound/" + sound
+                    });
+                }
             });
 
             queue.loadManifest(manifest, true, "res/");

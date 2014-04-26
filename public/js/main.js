@@ -37,7 +37,7 @@ require.config({
             exports: 'createjs'
         },
         'sound': {
-            exports: 'soundjs'
+            exports: 'createjs'
         },
         'tween': {
             deps: ['easel'],
