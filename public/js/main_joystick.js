@@ -9,7 +9,8 @@ require.config({
         FnQuery: "lib/FnQuery",
         'socket.io': "/socket.io/socket.io",
         hammer: "lib/hammer",
-        move: "lib/move"
+        move: "lib/move",
+        device_normalizer: "lib/deviceapi-normaliser"
     },
     shim: {
         'backbone': {
@@ -21,7 +22,16 @@ require.config({
         },
         'socket.io': {
             exports: 'io'
-        }
+        },
+        'hammer': {
+            exports: 'hammer'
+        },
+        'move': {
+            exports: 'move'
+        },
+        'device_normalizer': {
+            exports: 'device_normalizer'
+        },
     }
 });
 
@@ -30,13 +40,24 @@ define([
     'jquery',
     'move',
     'hammer',
-    'joystick/joystick'
-], function($, move, Hammer, Joystick) {
+    'joystick/joystick',
+    'device_normalizer'
+], function($, move, Hammer, Joystick, device_normalizer) {
+
     var inputField = document.getElementById('token');
     var message = document.getElementById('message');
 
     function main() {
-//        window.server.send({test: "testFromJoystick"});
+        mo.init();
+//        window.server.send({test: "testFromJoystick"}, function(data) {
+//            console.log("answer" + data);
+//        });
+
+        window.addEventListener("deviceorientation", function(e) {
+            var obj = deviceOrientation(e);
+            console.log(obj);
+            message.innerHTML = "orientation changed";
+        }, false);
     }
 
     function onMessage(data) {

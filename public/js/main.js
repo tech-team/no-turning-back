@@ -46,6 +46,7 @@ require.config({
         'collision': {
             exports: 'ndgmr'
         },
+
         "socket.io": {
             exports: "io"
         }
