@@ -9,11 +9,21 @@ define([
 function(Class, _, createjs, preloadjs, sound, ImageTiler) {
 	var ResourceManager = Class.$extend({
         __classvars__: {
+            //all textures should have .png format
             texList: ["ground", "zombie", "player", "player-pistol", "wall", "brick_wall1", "brick_wall2",
                 "brick_wall3", "brick_wall4", "chest", "chest-open", "door-open", "door-closed", "rubbish",
                 "waypoint", "pistol", "pistol-bullet", "effects/fog", "effects/damage", "zombie_corpse",
                 "golden-key", "silver-key"],
-            audioList: ["fortunate_son", "ambiance"],
+            soundList: {
+                PistolFire: "fortunate_son.mp3",
+                KnifeMiss: "",
+                KnifeHit: "",
+                ZombieHeart: "ambiance.mp3",
+                PlayerHeart: "",
+                DoorOpen: "",
+                ChestOpen: ""
+            },
+
             instance: null,
 
             load: function(onComplete, onCompleteContext) {
@@ -25,8 +35,7 @@ function(Class, _, createjs, preloadjs, sound, ImageTiler) {
                 return this.instance;
             }
         },
-
-
+        
 		__init__: function(onComplete, onCompleteContext) {
             this.images = [];
             this.spriteSheets = [];
@@ -46,11 +55,18 @@ function(Class, _, createjs, preloadjs, sound, ImageTiler) {
             _.each(ResourceManager.texList, function(tex) {
                 manifest.push({
                     id: tex,
-                    src: tex + ".png"
+                    src: "gfx/" + tex + ".png"
                 });
             });
 
-            queue.loadManifest(manifest, true, "res/gfx/");
+            _.values(ResourceManager.soundList, function(sound) {
+                manifest.push({
+                    id: sound,
+                    src: "sounds/" + sound
+                });
+            });
+
+            queue.loadManifest(manifest, true, "res/");
 
             function handleComplete() {
                 _.each(manifest, function(tex) {
