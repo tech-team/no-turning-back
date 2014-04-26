@@ -36,13 +36,12 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             },
 
             getSound: function(sound) {
-                var sounds = ResourceManager.soundList[sound];
-                if (_.isArray(sounds)) {
-                    var randId = _.random(0, sounds.length - 1);
-                    return sounds[randId];
+                if (_.isArray(sound)) {
+                    var randId = _.random(0, sound.length - 1);
+                    return sound[randId];
                 }
                 else
-                    return sounds;
+                    return sound;
             }
         },
 
