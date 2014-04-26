@@ -413,7 +413,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
                             this.zombies[j].health -= this.bullets[i].power;
                             this.stage.removeChild(this.bullets[i].dispObj);
-                            if (Game.sound)
                             ResourceManager.playSound(ResourceManager.soundList.PistolHit);
                             this.bullets.splice(i, 1);
                             break out;
