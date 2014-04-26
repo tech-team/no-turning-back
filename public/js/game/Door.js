@@ -1,9 +1,10 @@
 define([
     'classy',
+    'underscore',
     'game/GameObject',
     'game/KeyCoder'
 ],
-    function(Class, GameObject, KeyCoder) {
+    function(Class, _, GameObject, KeyCoder) {
         var Door = GameObject.$extend({
             __init__: function(obj) {
                 this.x = obj.x;
@@ -34,12 +35,12 @@ define([
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
                     if (event.keys[KeyCoder.Z]) {
-                        if (this.state === "closed" && this.requires in player.keys) {
+                        if (this.state === "closed" && _.contains(player.keys, this.requires)) {
                             this.justOpened = true;
                             this.state = "open";
                             this.tex = "door-open";
                         }
-                        else if (!(this.requires in player.keys) && this.messageCooldown <= 0) {
+                        else if (!(_.contains(player.keys, this.requires)) && this.messageCooldown <= 0) {
                             this.justTried = true;
                             this.messageCooldown = 100;
                         }
