@@ -81,7 +81,8 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
         },
 
         resize: function() {
-            this.level.resize();
+            if (this.level)
+                this.level.resize();
         }
 	});
 
