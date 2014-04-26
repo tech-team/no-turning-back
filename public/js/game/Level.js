@@ -34,9 +34,10 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
             };
 
             this.player = player;
+            this.prevPlayerPos = {};
             this.resourceManager = resourceManager;
 
-            this.prevPlayerPos = {};
+
             this.walls = [];
             this.doors = [];
             this.chests = [];
@@ -53,7 +54,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
 
         __classvars__: {
             SCORES: {
-                KILL: 5
+                KILL: 10,
+                DOOR_OPEN: 5
             },
 
             MessageColor: {
@@ -336,7 +338,7 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                     if (this.player.dispObj.tex != "player") {
                         this.player.dispObj.tex = "player";
                         this.stage.removeChild(this.player.dispObj);
-                        this.player.setDispObj(this.addToStage(this.player.dispObj));
+                        this.player.setDispObj(this.addToStage(this.player.dispObj, false, this.fogId));
                     }
                 }
             }
@@ -559,6 +561,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                     }
                     this.stage.removeChild(this.doors[i].dispObj);
                     this.addToStage(this.doors[i], false, this.backgroundId+1);
+
+                    this.player.score += Level.SCORES.DOOR_OPEN;
                 }
             }
         },
