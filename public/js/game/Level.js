@@ -468,8 +468,8 @@ function(Class, _, easeljs, collider, DefaultObjects, KeyCoder, Editor, UntilTim
                                 }
                                 break;
                             case "key":
-                                if (!(drop['key'] in self.player.keys)) {
-                                    self.player.keys.push(drop['key']);
+                                if (!(drop['name'] in self.player.keys)) {
+                                    self.player.keys.push(drop['name']);
                                     self.showMessage("You got a " + drop['name'], "#EE0");
                                 }
                                 break;
