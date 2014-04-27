@@ -1,6 +1,10 @@
 $circle-size: 200px;
 $inner-circle-size: 80px;
 
+body {
+  margin: 0;
+  overflow: hidden;
+}
 
 .circle {
   width: $circle-size;

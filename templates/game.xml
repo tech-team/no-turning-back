@@ -3,7 +3,7 @@
     <div id="scene" class="content-wrapper game-wrapper">
             <a href="#main" class="back-button back-button_cornered">
                 <div class="left-arrow-wrapper"><div class="left-arrow" /></div>
-                <span class="back-button__caption">Back</span>
+                <span class="back-button__caption">Menu</span>
             </a>
             <div class="game-load-progress">
                 <div class="progress-bar-wrapper">
@@ -13,7 +13,7 @@
                 </div>
             </div>
             <canvas id="game-field">You have a very old browser, dude.</canvas>
-            <input id="token" value="guid" disabled="disabled"/>
+            <input id="token" value="guid" disabled="disabled" style="position:absolute; top:0; right:0;" />
             <!--<button id="connect" type="submit">connect</button>-->
     </div>
 </fest:template>

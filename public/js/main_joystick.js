@@ -1,5 +1,5 @@
 require.config({
-    urlArgs: "_=",// + (new Date()).getTime(),
+    urlArgs: "_=" + (new Date()).getTime(),
     baseUrl: "js",
     paths: {
         jquery: "lib/jquery",
@@ -54,6 +54,7 @@ define([
 ], function($, move, Hammer, device_normalizer, Joystick, Controller) {
     var inputField = document.getElementById('token');
     var message = document.getElementById('message');
+    var test = document.getElementById('test');
 
     function main() {
         //window.server.send({test: "testFromJoystick"});
@@ -66,9 +67,17 @@ define([
 //        });
 
         window.addEventListener("deviceorientation", function(e) {
-            var obj = deviceOrientation(e);
-            console.log(obj);
-            message.innerHTML = "orientation changed";
+            var orientation = deviceOrientation(e);
+            test.innerHTML = "alpha: " + orientation.alpha + "<br />";
+            test.innerHTML += "gamma: " + orientation.gamma + "<br />";
+            test.innerHTML += "beta: " + orientation.beta + "<br />";
+            test.innerHTML += "orientation: " + window.orientation + "<br />";
+        }, false);
+
+        window.addEventListener("orientationchange", function(e) {
+            var orient = window.orientation % 180 === 0 ? "portrait" : "landscape";
+
+            window.server.send({orientation: orient});
         }, false);
     }
 

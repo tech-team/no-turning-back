@@ -3,8 +3,8 @@ node_modules/
 .idea/
 
 public/css/*.css
-public/joystick/css/*.css
+public/css/joystick/*.css
 
 public/js/build
-public/joystick/js/build
+public/js/joystick/build
 public/js/tmpl

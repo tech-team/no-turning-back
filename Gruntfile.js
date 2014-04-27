@@ -101,6 +101,22 @@ module.exports = function (grunt) {
                 }]
             }
 		},
+        cssmin: {
+            main_game: {
+                expand: true,
+                cwd: 'public/css/',
+                src: ['*.css', '!*.min.css'],
+                dest: 'public/css/',
+                ext: '.min.css'
+            },
+            joystick: {
+                expand: true,
+                cwd: 'public/css/joystick',
+                src: ['*.css', '!*.min.css'],
+                dest: 'public/css/joystick',
+                ext: '.min.css'
+            }
+        },
 		watch: {
 			express: {
                 files:  [
@@ -124,7 +140,7 @@ module.exports = function (grunt) {
             frontend: {
                 files: ['public/js/**/*.js',
                         'public/css/*.css'],
-                tasks: [],
+                tasks: ['cssmin:main_game'],
                 options: {
                     interrupt: true,
 			        livereload: liveReload
@@ -133,7 +149,7 @@ module.exports = function (grunt) {
             joystick: {
                 files: ['public/js/joystick/**/*.js',
                         'public/css/joystick/*.css'],
-                tasks: [],
+                tasks: ['cssmin:joystick'],
                 options: {
                     interrupt: true,
                     livereload: liveReload
@@ -165,15 +181,17 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-requirejs');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
 	
 	
-	grunt.registerTask('default', ['express', 'watch']);
+	grunt.registerTask('default', ['express', 'cssmin', 'watch']);
 
 	grunt.registerTask(
 	    'build_main',
 	    [
 	        'fest', 'requirejs:build_main_game',
-	        'concat:build_main_game', 'uglify:build_main_game'
+	        'concat:build_main_game', 'uglify:build_main_game',
+            'cssmin:main_game'
 	    ]
 	);
 
@@ -181,7 +199,8 @@ module.exports = function (grunt) {
         'build_joystick',
         [
             'requirejs:build_joystick',
-            'concat:build_joystick', 'uglify:build_joystick'
+            'concat:build_joystick', 'uglify:build_joystick',
+            'cssmin:joystick'
         ]
     );
 

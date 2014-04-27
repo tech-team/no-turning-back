@@ -42,24 +42,6 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                 pageId: this.pageId
             });
             this.runGame();
-
-            var self = this;
-            Game.console({
-                onStarted: function() {
-                    self.game.startJoystickSession(window.server);
-                },
-                saveToken: function(guid) {
-                    self.guid.attr('value', guid);
-                },
-                onMessage: function(data, answer) {
-                    self.onJoystickMessage(data, answer);
-                    self.game.onJoystickMessage(data, answer);
-                }
-            });
-        },
-
-        onJoystickMessage: function(data) {
-            console.log(data);
         },
 
         hide: function () {
@@ -70,6 +52,27 @@ function(Backbone, tmpl, Game, GameFinishedView) {
             }
         },
 
+        onJoystickMessage: function(data, answer) {
+            console.log(data);
+        },
+
+        startJoystick: function() {
+            var self = this;
+            Game.console({
+                onStarted: function() {
+                    self.game.startJoystickSession(window.server);
+                },
+                saveToken: function(guid) {
+                    self.guid.attr('value', guid);
+                },
+                onMessage: function(data, answer) {
+                    console.log("receive!");
+                    self.onJoystickMessage(data, answer);
+                    self.game.onJoystickMessage(data, answer);
+                }
+            });
+        },
+
         runGame: function() {
             var ctx = this.canvas.getContext("2d");
             //ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -78,6 +81,7 @@ function(Backbone, tmpl, Game, GameFinishedView) {
 
             this.game = new Game(this.canvas, false, 
                 function() {
+                    self.startJoystick();
                     self.game.run();
                 }
             );
@@ -95,17 +99,17 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                 return;
             }
 
-            var horizontalMargin = 50;
+            var horizontalMargin = 10;
             var verticalMargin = 10;
             var self = this;
             $(window).resize(function() {
-                var width = $(this).width() - 2 * horizontalMargin;
-                var height = $(this).height() - 2 * verticalMargin;
+                var width = $(this).width();// - 2 * horizontalMargin;
+                var height = $(this).height();// - 2 * verticalMargin;
                 var cssSizes = {
                     'width': width + "px",
                     'height' : height + "px"
                 };
-                self.scene.css(cssSizes).css({'margin-top': verticalMargin});
+                self.scene.css(cssSizes);//.css({'margin-top': verticalMargin});
                 self.canvas.width = width;
                 self.canvas.height = height;
 
