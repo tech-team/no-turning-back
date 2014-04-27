@@ -33,6 +33,11 @@ define([
 
                 this.createControls();
 
+                navigator.vibrate = navigator.vibrate ||
+                    navigator.webkitVibrate ||
+                    navigator.mozVibrate ||
+                    navigator.msVibrate;
+
                 /*Hammer(canvas).on("drag", function(event) {
                     console.log(event);
                 })*/
@@ -179,6 +184,8 @@ define([
 
                 this.toolBar.selection.x = this.currentWeapon.x;
                 this.toolBar.selection.y = this.currentWeapon.y;
+
+                this.update = true;
             },
 
             addToStage: function(obj, width, height) {
@@ -256,7 +263,10 @@ define([
                 this.rightPad.on("mousedown", function(evt) {
                     var target = evt.target;
                     target.graphics.clear().beginFill(Controller.SHOOTCOLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
-//                    alert("send");
+
+                    if (navigator.vibrate) {
+                        navigator.vibrate(10);
+                    }
 
                     setTimeout(function() {
                         target.graphics.clear().beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
@@ -306,7 +316,12 @@ define([
                 this.toolBar.selection.x = this.currentWeapon.x;
                 this.toolBar.selection.y = this.currentWeapon.y;
                 this.forceUpdate();
-                alert(name);
+
+                server.send({
+                    type: "info",
+                    action: "weaponchange",
+                    weapon: name
+                });
             }
         });
 

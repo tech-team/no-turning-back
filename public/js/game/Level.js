@@ -246,7 +246,30 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
                             console.log("shoot!!!");
                             this.lastShootTime = data.timestamp;
+
+                            var event = (new KeyCoder()).getKeys();
+                            event.keys[KeyCoder.SPACE] = true;
+                            this.shootingHandle(event);
                         }
+                    }
+
+                    if (data.action === "weaponchange") {
+                        var weapon = data.weapon;
+                        console.log(weapon);
+                        var event = (new KeyCoder()).getKeys();
+                        switch (weapon) {
+                            case "knife":
+                                event.keys[KeyCoder.ONE] = true;
+                                break;
+                            case "pistol":
+                                event.keys[KeyCoder.TWO] = true;
+                                break;
+                            case "shotgun":
+                                event.keys[KeyCoder.THREE] = true;
+                                break;
+                        }
+                        this.weaponsHandle(event);
+
                     }
                     break;
                 case "move":
