@@ -10,8 +10,16 @@ define([
             __init__: function($window, canvas) {
                 this.$window = $window;
                 this.canvas = canvas;
-                this.stage = _.extend(new createjs.Stage(this.canvas), MultiTouchStage);
+                //this.stage = _.extend(new createjs.Stage(this.canvas), MultiTouchStage);
+                this.stage = new createjs.Stage(this.canvas);
                 this.stage.enableDOMEvents(true);
+                createjs.Touch.enable(this.stage);
+                this.stage.enableMouseOver(10);
+                this.container = new createjs.Container();
+                this.stage.addChild(this.container);
+//                stage.mouseMoveOutside = true; // keep tracking the mouse even when it leaves the canvas
+
+                this.update = true;
                 this.FPS = 30;
 
                 var self = this;
@@ -20,7 +28,7 @@ define([
                 this.ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
                 this.ticker.setFPS(this.FPS);
                 this.ticker.on("tick", function(event) {
-                    self.update(event);
+                    self.updateFunc(event);
                 });
 
                 this.createControls();
@@ -52,13 +60,12 @@ define([
             createControls: function() {
                 this.leftPad = new createjs.Shape();
                 this.leftPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
-                this.stage.addChild(this.leftPad);
+                this.container.addChild(this.leftPad);
 
                 this.mover = new createjs.Shape();
                 this.mover.graphics.beginFill(Controller.COLOR.mover).drawCircle(0, 0, Controller.SIZE.moverRadius);
-                this.stage.addChild(this.mover);
+                this.container.addChild(this.mover);
 
-                var self = this;
                 //like this
                 /*Hammer(window).on("drag", function(e) { //ot this.canvas instead of window
                     //TODO: limitations
@@ -71,14 +78,37 @@ define([
                 });*/
 
                 //or like this (using MultiTouchStage thingy)
-                this.mover.on("drag", function(e) {
+                /*this.mover.on("drag", function(e) {
                     self.mover.x = e.stageX;
                     self.mover.y = e.stageY;
-                });
+                });*/
 
                 this.rightPad = new createjs.Shape();
                 this.rightPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius);
-                this.stage.addChild(this.rightPad);
+                this.container.addChild(this.rightPad);
+
+                var self = this;
+                this.mover.on("mousedown", function(evt) {
+                    this.parent.addChild(this);
+                    this.offset = {x:this.x-evt.stageX, y:this.y-evt.stageY};
+                });
+
+                this.mover.on("pressmove", function(evt) {
+                    this.x = evt.stageX + this.offset.x;
+                    this.y = evt.stageY + this.offset.y;
+                    // indicate that the stage should be updated on the next tick:
+                    self.update = true;
+                });
+
+                this.mover.on("rollover", function(evt) {
+                    this.scaleX = this.scaleY = this.scale*1.2;
+                    self.update = true;
+                });
+
+                this.mover.on("rollout", function(evt) {
+                    this.scaleX = this.scaleY = this.scale;
+                    self.update = true;
+                });
             },
 
             resize: function() {
@@ -102,8 +132,11 @@ define([
                 this.rightPad.y = offset;
             },
 
-            update: function(event) {
-                this.stage.update(event);
+            updateFunc: function(event) {
+                if (this.update) {
+                    this.update = false;
+                    this.stage.update(event);
+                }
             }
         });
 
