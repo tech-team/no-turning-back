@@ -1,4 +1,4 @@
-@import "macondoregular/macondo-font";
+@import "min/macondoregular/macondo-font";
 
 $background-color: #5C5C5C;
 $content-wrapper-width: 500px;
@@ -6,6 +6,8 @@ $content-wrapper-height: 600px;
 $content-width: 450px;
 $orange-color: #F7AF28;
 $font: 'macondoregular', cursive;
+$input-width: 350px;
+$button-width: 70px;
 
 html, body {
 	margin: 0;
