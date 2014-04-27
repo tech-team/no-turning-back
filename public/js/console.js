@@ -72,6 +72,7 @@ define([
 
         // Обмен сообщениями
         server.on('message', function (data, answer) {
+            console.log("msg");
             callbacks.onMessage(data, answer);
 //            answer('answer');
         });

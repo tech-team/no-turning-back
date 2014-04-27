@@ -52,19 +52,19 @@ define([
     'joystick/joystick',
     'joystick/Controller'
 ], function($, move, Hammer, device_normalizer, Joystick, Controller) {
+    var inputs = $('.inputs');
+    var canvasHolder = $('.canvasHolder');
     var inputField = document.getElementById('token');
     var message = document.getElementById('message');
     var test = document.getElementById('test');
 
     function main() {
-        //window.server.send({test: "testFromJoystick"});
-        console.log("main");
+        inputs.hide();
+        canvasHolder.show();
         mo.init();
-        var controller = new Controller($(window), $('canvas')[0]);
 
-//        window.server.send({test: "testFromJoystick"}, function(data) {
-//            console.log("answer" + data);
-//        });
+        var controller = new Controller($(window), $('canvas')[0]);
+        //window.server.send({test: "testFromJoystick"});
 
         window.addEventListener("deviceorientation", function(e) {
             var orientation = deviceOrientation(e);
@@ -82,7 +82,7 @@ define([
     }
 
     //TODO: somebody should call it
-    main();
+//    main();
 
     function onMessage(data) {
         console.log('message', data);

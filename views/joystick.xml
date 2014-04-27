@@ -11,17 +11,17 @@
         <link rel="stylesheet" type="text/css" href="css/joystick/joystick.min.css" />
 	</head>
 	<body>
-        <!--<form>-->
-            <!--<input id="token" />-->
-            <!--<button id="connect" type="submit">connect</button>-->
-        <!--</form>-->
-        <!--<div id="message"></div>-->
-        <!--<div id="test"></div>-->
-
-        <canvas id="canvas">You have a very old browser, dude.</canvas>
-        <!--<div id="scene">-->
-            <!--<canvas id="canvas">You have a very old browser, dude.</canvas>-->
-        <!--</div>-->
+        <div class="inputs">
+            <form>
+                <input id="token" />
+                <button id="connect" type="submit">connect</button>
+            </form>
+            <div id="message"></div>
+            <div id="test"></div>
+        </div>
+        <div class="canvasHolder" style="display:none;">
+            <canvas id="canvas">You have a very old browser, dude.</canvas>
+        </div>
 
         <fest:if test="json.development">
             <script data-main="js/main_joystick" src="js/lib/require.js"></script>

@@ -53,7 +53,7 @@ function(Backbone, tmpl, Game, GameFinishedView) {
         },
 
         onJoystickMessage: function(data, answer) {
-            console.log(data);
+
         },
 
         startJoystick: function() {
@@ -66,7 +66,6 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                     self.guid.attr('value', guid);
                 },
                 onMessage: function(data, answer) {
-                    console.log("receive!");
                     self.onJoystickMessage(data, answer);
                     self.game.onJoystickMessage(data, answer);
                 }

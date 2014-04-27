@@ -44,7 +44,7 @@ define([
             __classvars__: {
                 SIZE: {
                     padRadius: 150,
-                    moverRadius: 60
+                    moverRadius: 70
                 },
 
                 POS: {
@@ -53,7 +53,11 @@ define([
 
                 COLOR: {
                     pad: "#DDDDDD",
-                    mover: "#FF0000"
+                    mover: "#0000FF"
+                },
+
+                SHOOTCOLOR: {
+                    pad: "#FF0000"
                 }
             },
 
@@ -63,7 +67,7 @@ define([
                 this.container.addChild(this.leftPad);
 
                 this.mover = new createjs.Shape();
-                this.mover.graphics.beginFill(Controller.COLOR.mover).drawCircle(0, 0, Controller.SIZE.moverRadius);
+                this.mover.graphics.beginFill(Controller.COLOR.mover).drawCircle(0, 0, Controller.SIZE.moverRadius).endFill();
                 this.container.addChild(this.mover);
 
                 //like this
@@ -84,40 +88,60 @@ define([
                 });*/
 
                 this.rightPad = new createjs.Shape();
-                this.rightPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius);
+                this.rightPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
                 this.container.addChild(this.rightPad);
 
                 var self = this;
                 this.mover.on("mousedown", function(evt) {
-                    this.parent.addChild(this);
-                    this.offset = {x:this.x-evt.stageX, y:this.y-evt.stageY};
+                    var target = evt.target;
+                    target.parent.addChild(target);
+                    target.offset = {x:target.x-evt.stageX, y:target.y-evt.stageY};
                 });
 
                 this.mover.on("pressmove", function(evt) {
-                    this.x = evt.stageX + this.offset.x;
-                    this.y = evt.stageY + this.offset.y;
+                    var target = evt.target;
+                    target.x = evt.stageX + target.offset.x;
+                    target.y = evt.stageY + target.offset.y;
                     // indicate that the stage should be updated on the next tick:
                     self.update = true;
                 });
 
-                this.mover.on("rollover", function(evt) {
-                    this.scaleX = this.scaleY = this.scale*1.2;
-                    self.update = true;
-                });
 
-                this.mover.on("rollout", function(evt) {
-                    this.scaleX = this.scaleY = this.scale;
+                this.rightPad.on("click", function(evt) {
+                    var target = evt.target;
+                    target.graphics.clear().beginFill(Controller.SHOOTCOLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
+//                    alert("send");
+
+                    setTimeout(function() {
+                        target.graphics.clear().beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
+                        self.update = true;
+                    }, 400);
+
+
+
                     self.update = true;
+
+                    server.send({
+                        type: "info",
+                        action: "shoot",
+                        timestamp: evt.timeStamp
+                    });
                 });
             },
 
-            resize: function() {
-                this.canvas.width = this.$window.width() - 30;
-                this.canvas.height = this.$window.height() - 170;
+            drawCircle: function(object, color, x, y, radius) {
+                object.graphics.clear().beginFill(color).drawCircle(x, y, radius).endFill();
+                self.update = true;
+            },
 
+            resize: function() {
+                this.canvas.width = this.$window.width();
+                this.canvas.height = this.$window.height();
+
+                var self = this;
                 var stageSize = {
-                    width: this.stage.canvas.width,
-                    height: this.stage.canvas.height
+                    width: self.stage.canvas.width,
+                    height: self.stage.canvas.height
                 };
 
                 var offset = Controller.POS.padOffset;

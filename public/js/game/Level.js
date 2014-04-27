@@ -50,6 +50,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
             this.isJoystick = false;
             this.joystickServer = null;
+            this.lastShootTime = 0;
+            this.shootDelta = 350;
 
             this.reload(data);
 		},
@@ -67,7 +69,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 Medkit: "#1397F0",
                 Ammo: "#A7FA16",
                 DoorClosed: "#0FFFF0"
-            },
+            }
         },
 
         reload: function(data) {
@@ -238,7 +240,20 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
         },
 
         onJoystickMessage: function(data, answer) {
-//            answer("hello");
+            switch (data.type) {
+                case "info":
+                    if (data.action === "shoot") {
+                        if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
+                            console.log("shoot!!!");
+                            this.lastShootTime = data.timestamp;
+                        }
+                    }
+                    break;
+                case "move":
+                    break;
+                default:
+                    break;
+            }
         },
 
 		update: function(event) {
