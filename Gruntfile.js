@@ -106,14 +106,14 @@ module.exports = function (grunt) {
                 expand: true,
                 cwd: 'public/css/',
                 src: ['*.css', '!*.min.css'],
-                dest: 'public/css/',
+                dest: 'public/css/min',
                 ext: '.min.css'
             },
             joystick: {
                 expand: true,
                 cwd: 'public/css/joystick',
                 src: ['*.css', '!*.min.css'],
-                dest: 'public/css/joystick',
+                dest: 'public/css/min',
                 ext: '.min.css'
             }
         },
@@ -139,20 +139,11 @@ module.exports = function (grunt) {
 			},
             frontend: {
                 files: ['public/js/**/*.js',
-                        'public/css/*.css'],
-                tasks: ['cssmin:main_game'],
+                        'public/css/**/*.css'],
+                tasks: ['cssmin'],
                 options: {
                     interrupt: true,
 			        livereload: liveReload
-                }
-            },
-            joystick: {
-                files: ['public/js/joystick/**/*.js',
-                        'public/css/joystick/*.css'],
-                tasks: ['cssmin:joystick'],
-                options: {
-                    interrupt: true,
-                    livereload: liveReload
                 }
             },
             scss_main: {
@@ -184,7 +175,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-cssmin');
 	
 	
-	grunt.registerTask('default', ['express', 'cssmin', 'watch']);
+	grunt.registerTask('default', ['express', 'watch']);
 
 	grunt.registerTask(
 	    'build_main',

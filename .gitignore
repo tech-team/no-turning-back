@@ -2,8 +2,7 @@ node_modules/
 .sass-cache/
 .idea/
 
-public/css/*.css
-public/css/joystick/*.css
+public/css/**/*.css
 
 public/js/build
 public/js/joystick/build

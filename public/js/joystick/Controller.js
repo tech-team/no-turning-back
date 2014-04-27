@@ -32,10 +32,16 @@ define([
                 });
 
                 this.createControls();
+                this.isMoverHolding = false;
 
                 /*Hammer(canvas).on("drag", function(event) {
                     console.log(event);
                 })*/
+
+                navigator.vibrate = navigator.vibrate ||
+                    navigator.webkitVibrate ||
+                    navigator.mozVibrate ||
+                    navigator.msVibrate;
 
                 this.$window.resize(function() { self.resize(); });
                 this.resize();
@@ -92,16 +98,30 @@ define([
                 this.container.addChild(this.rightPad);
 
                 var self = this;
+
+                var returnMoverToOrigin = function(target) {
+                    target.x = self.leftPad.x;
+                    target.y = self.leftPad.y;
+                    self.update = true;
+                };
+
                 this.mover.on("mousedown", function(evt) {
                     evt.preventDefault();
                     var target = evt.target;
                     target.parent.addChild(target);
                     target.offset = {x:target.x-evt.stageX, y:target.y-evt.stageY};
+                    self.isMoverHolding = true;
+//                    setTimeout(function(){
+//                        if (self.isMoverHolding) {
+//                            returnMoverToOrigin(target);
+//                            self.isMoverHolding = false;
+//                        }
+//                    }, 200);
 
                     evt.on("mouseup", function(evt) {
                         var target = evt.target;
-                        target.x = self.leftPad.x;
-                        target.y = self.leftPad.y;
+                        returnMoverToOrigin(target);
+                        self.isMoverHolding = false;
                     });
                 });
 
@@ -146,8 +166,10 @@ define([
                 this.rightPad.on("mousedown", function(evt) {
                     var target = evt.target;
                     target.graphics.clear().beginFill(Controller.SHOOTCOLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
-//                    alert("send");
 
+                    if (navigator.vibrate) {
+                        navigator.vibrate(10);
+                    }
                     setTimeout(function() {
                         target.graphics.clear().beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
                         self.update = true;
@@ -207,6 +229,8 @@ define([
 
                 this.rightPad.x = stageSize.width - offset;
                 this.rightPad.y = offset;
+
+                this.update = true;
             },
 
             updateFunc: function(event) {

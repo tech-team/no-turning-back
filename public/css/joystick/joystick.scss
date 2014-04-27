@@ -1,10 +1,20 @@
+@import "../min/macondoregular/macondo-font";
+
+$background-color: #5C5C5C;
+$orange-color: #F7AF28;
+$font: 'macondoregular', cursive;
+
 $circle-size: 200px;
 $inner-circle-size: 80px;
 
-body {
+html, body {
   margin: 0;
   overflow: hidden;
+  height: 100%;
+  width: 100%;
+  background-color: white;
 }
+
 
 .circle {
   width: $circle-size;
@@ -27,5 +37,20 @@ body {
 }
 
 canvas {
+
+}
+
+$input-width: 300px;
+$button-width: 70px;
+@import "../_oneFieldInput";
+
+.inputs {
+  width: $input-width + $button-width + 10px;
+  margin: 0 auto;
+  position: relative;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
 
 }

@@ -7,7 +7,7 @@
 			<fest:value>json.title</fest:value>
 		</title>
 		<meta name="viewport" content="user-scalable=no, initial-scale=1.0" />
-		<link rel="stylesheet" type="text/css" href="css/styles.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/min/styles.min.css" />
 	</head>
 	<body>
 		<div id="pages" class="pages"></div>

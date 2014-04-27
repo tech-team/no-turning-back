@@ -17,10 +17,10 @@
 	    			Score: <fest:space></fest:space><fest:value>json.score</fest:value>
 	    		</span>
 	    	</div>
-	    	<form id="scoreForm" method='post'>
+	    	<form id="scoreForm" method='post' class="one-field-input">
 	    		<input type="hidden" id="score" value="{json.score}" name="score"/>
-	    		<input type="text" id="user" class="score-content__username-field" placeholder="Enter your name" autocomplete="off" name="name"/>
-	    		<input type="submit" id="sendSubmit" class="score-content__sendScore-button" value="Submit" />
+	    		<input type="text" id="user" class="one-field-input__input-field" placeholder="Enter your name" autocomplete="off" name="name"/>
+	    		<input type="submit" id="sendSubmit" class="one-field-input__send-button" value="Submit" />
 	    	</form>
 	    	<div class="error_message sending-score__error">
 				
