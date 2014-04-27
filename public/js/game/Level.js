@@ -68,15 +68,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 Ammo: "#A7FA16",
                 DoorClosed: "#0FFFF0"
             },
-
-            weaponPower: {
-                knife: 5,
-                pistol: 10
-            },
-            weaponCooldown: {
-                knife: 40,
-                pistol: 30
-            }
         },
 
         reload: function(data) {
@@ -364,6 +355,19 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                     ResourceManager.playSound(ResourceManager.soundList.PistolDraw);
                 }
             }
+            if(event.keys[KeyCoder.THREE]) {
+                if ("shotgun" in this.player.weapons) {
+                    this.player.currentWeapon = "shotgun";
+
+                    if (this.player.dispObj.tex != "player-shotgun") {
+                        this.player.dispObj.tex = "player-shotgun";
+                        this.stage.removeChild(this.player.dispObj);
+                        this.player.setDispObj(this.addToStage(this.player.dispObj, false, this.fogId));
+                    }
+
+                    ResourceManager.playSound(ResourceManager.soundList.ShotgunDraw);
+                }
+            }
         },
 
         shootingHandle: function(event) {
@@ -378,14 +382,14 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                        // var angleToZombie = this.player.dispObj.angle - 1 / Math.atan2(yToZombie, xToZombie);
 
                         if (distanceToZombie <= this.player.reach) {
-                            this.zombies[i].health -= Level.weaponPower.knife;
+                            this.zombies[i].health -= ResourceManager.weaponData.knife.power;
                             ResourceManager.playSound(ResourceManager.soundList.KnifeHit);
                         }
                         else if (distanceToZombie <= this.player.reach) {
                             ResourceManager.playSound(ResourceManager.soundList.KnifeMiss);
                         }
                     }
-                    this.player.cooldown = Level.weaponCooldown.knife;
+                    this.player.cooldown = ResourceManager.weaponData.knife.coolDown;
                 }
                 else if (currentWeapon === "pistol") {
                     if (this.player.weapons['pistol'] > 0) {
@@ -393,19 +397,40 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                             x: this.player.dispObj.x,
                             y: this.player.dispObj.y,
                             r: this.player.dispObj.rotation,
-                            power: Level.weaponPower.pistol,
+                            power: ResourceManager.weaponData.pistol.power,
                             tex: "pistol-bullet"
                         };
 
-                        //TODO: bullet types
                         var bullet = new Bullet(
                             this.addToStage(bulletData, false, this.backgroundId+1),
                             bulletData);
 
                         this.bullets.push(bullet);
 
-                        this.player.cooldown = Level.weaponCooldown.pistol;
+                        this.player.cooldown = ResourceManager.weaponData.pistol.coolDown;
                         --this.player.weapons['pistol'];
+                    }
+                }
+                else if (currentWeapon === "shotgun") {
+                    if (this.player.weapons['shotgun'] > 0) {
+
+                        for (var i = 0; i < ResourceManager.weaponData.shotgun.bulletNum; ++i) {
+
+                            var bulletData = {
+                                x: this.player.dispObj.x,
+                                y: this.player.dispObj.y,
+                                r: this.player.dispObj.rotation - (Math.floor(ResourceManager.weaponData.shotgun.bulletNum/2) - i) * ResourceManager.weaponData.shotgun.dispersion,
+                                power: ResourceManager.weaponData.shotgun.power,
+                                tex: "shotgun-bullet",
+                                ttl: 8
+                            };
+                            var bullet = new Bullet(this.addToStage(bulletData, false, this.backgroundId+1), bulletData);
+
+                            this.bullets.push(bullet);
+                        }
+
+                        this.player.cooldown = ResourceManager.weaponData.shotgun.coolDown;
+                        --this.player.weapons['shotgun'];
                     }
                 }
             }
@@ -413,6 +438,14 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             //Bullets collisions handling
             out:
                 for (var i = 0; i < this.bullets.length; ++i) {
+                    console.log(this.bullets[i].ttl);
+                    if (this.bullets[i].ttl){
+                        if (--this.bullets[i].ttl <= 0) {
+                            this.stage.removeChild(this.bullets[i].dispObj);
+                            this.bullets.splice(i, 1);
+                            break;
+                        }
+                    }
                     for(var j = 0; j < this.zombies.length; ++j) {
                         if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
                             this.zombies[j].health -= this.bullets[i].power;

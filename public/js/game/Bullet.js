@@ -6,8 +6,9 @@ define([
         var Bullet = GameObject.$extend({
             __init__: function(dispObj, data) {
                 this.setDispObj(dispObj); //or kinda super(dispObj)
-                this.power = 10;
+                this.power = data['power'];
                 this.speed = 10;
+                this.ttl = data['ttl'] || null;
             },
 
             update: function(event) {

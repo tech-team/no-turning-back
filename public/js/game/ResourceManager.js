@@ -10,24 +10,43 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
 	var ResourceManager = Class.$extend({
         __classvars__: {
             //all textures should have .png format
-            texList: ["ground", "zombie", "player", "player-pistol", "wall", "brick_wall1", "brick_wall2",
+            texList: ["ground", "zombie", "player", "player-pistol", "player-shotgun", "wall", "brick_wall1", "brick_wall2",
                 "brick_wall3", "brick_wall4", "chest", "chest-open", "door-open", "door-closed", "rubbish",
-                "waypoint", "pistol", "pistol-bullet", "effects/fog", "effects/damage", "zombie_corpse",
-                "golden-key", "silver-key"],
+                "waypoint", "pistol", "pistol-bullet", "shotgun", "shotgun-bullet", "golden-key", "silver-key",
+                "effects/fog", "effects/damage", "zombie_corpse"],
             soundList: {
-                PistolDraw: "pistol_draw.mp3",
-                PistolFire: "shoot.mp3",
-                PistolHit: "bullet_hit.mp3",
                 KnifeDraw: "knife.mp3",
                 KnifeMiss: "knife_miss.mp3",
                 KnifeHit: "knife_stab.mp3",
+                PistolDraw: "pistol_draw.mp3",
+                PistolFire: "shoot.mp3",
+                PistolHit: "bullet_hit.mp3",
+                ShotgunDraw: "",
+                ShotgunFire: "",
                 ZombieHurt: "ambiance.mp3",
                 PlayerHurt: ["hurt1.wav", "hurt2.wav", "hurt3.wav"],
                 BulletRicochet: "ricochet.mp3",
                 DoorOpen: "",
                 ChestOpen: "",
                 GameOver: "game_over.mp3",
-                Victory: ""//"fortunate_son.mp3"
+                Victory: ""//"fortunate_son.mp3",
+            },
+            weaponData: {
+                knife: {
+                    power: 5,
+                    coolDown: 40
+                },
+                pistol: {
+                    power: 10,
+                    coolDown: 30
+                },
+                shotgun: {
+                    power: 20,
+                    coolDown: 60,
+                    bulletNum: 5,
+                    dispersion: 10,
+                    ttl: 8
+                }
             },
 
             instance: null,
