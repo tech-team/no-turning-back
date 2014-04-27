@@ -39,6 +39,7 @@ function(Class, $) {
 			DOWN_ARROW: 40,
             ONE: 49,
             TWO: 50,
+            THREE: 51,
             A: 65,
             D: 68,
             E: 69,

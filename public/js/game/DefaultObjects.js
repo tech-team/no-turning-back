@@ -87,7 +87,6 @@ define([
                 },
 
                 weapon: {
-                   name: "pistol",
                    ammo: 5
                 },
 

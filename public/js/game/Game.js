@@ -42,6 +42,7 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
         onResourcesLoaded: function() {
         	console.log("Resources loaded");
             this.state = Game.GameState.Game;
+            createjs.Sound.stop();
 
             var self = this;
             this.levelManager.loadNextLevel(function(event) {
