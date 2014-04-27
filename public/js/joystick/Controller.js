@@ -210,6 +210,40 @@ define([
                 }
             },
 
+            sendMoving: function() {
+                var target = this.mover;
+                var target_prime = {};
+                target_prime.x = target.x - this.leftPad.x;
+                target_prime.y = target.y - this.leftPad.y;
+
+//                var r = Math.sqrt(target_prime.x * target_prime.x + target_prime.y * target_prime.y);
+                var r = -1;
+                var eps = 5;
+                var deltaActual = this.distance(this.leftPad, target);
+
+                if (deltaActual <= eps) {
+                    r = 0;
+                }
+                else {
+                    var deltaIdeal = Controller.SIZE.padRadius - Controller.SIZE.moverRadius;
+                    if (deltaIdeal - deltaActual <= eps) {
+                        r = 2;
+                    }
+                    else {
+                        r = 1;
+                    }
+                }
+
+                var phi = -Math.atan2(target_prime.y, target_prime.x);
+
+                server.send({
+                    type: "game",
+                    action: "move",
+                    r: r,
+                    phi: phi
+                })
+            },
+
             createEvents: function() {
                 var self = this;
                 this.mover.on("mousedown", function(evt) {
@@ -222,6 +256,8 @@ define([
                         var target = evt.target;
                         target.x = self.leftPad.x;
                         target.y = self.leftPad.y;
+                        self.forceUpdate();
+                        self.sendMoving();
                     });
                 });
 
@@ -257,7 +293,9 @@ define([
                         target.y -= g.y;
                     }
 
-                    self.update = true;
+                    self.sendMoving();
+
+                    self.forceUpdate();
                 });
 
                 this.rightPad.on("mousedown", function(evt) {
@@ -275,10 +313,10 @@ define([
 
 
 
-                    self.update = true;
+                    self.forceUpdate();
 
                     server.send({
-                        type: "info",
+                        type: "game",
                         action: "shoot",
                         timestamp: evt.timeStamp
                     });
@@ -304,7 +342,7 @@ define([
 
             drawCircle: function(object, color, x, y, radius) {
                 object.graphics.clear().beginFill(color).drawCircle(x, y, radius).endFill();
-                self.update = true;
+                self.forceUpdate();
             },
 
             forceUpdate: function() {
@@ -318,7 +356,7 @@ define([
                 this.forceUpdate();
 
                 server.send({
-                    type: "info",
+                    type: "game",
                     action: "weaponchange",
                     weapon: name
                 });

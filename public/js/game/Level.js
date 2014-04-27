@@ -240,9 +240,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
         },
 
         onJoystickMessage: function(data, answer) {
-            switch (data.type) {
-                case "info":
-                    if (data.action === "shoot") {
+            if (data.type === "game") {
+                switch (data.action) {
+                    case "shoot":
                         if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
                             console.log("shoot!!!");
                             this.lastShootTime = data.timestamp;
@@ -251,9 +251,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                             event.keys[KeyCoder.SPACE] = true;
                             this.shootingHandle(event);
                         }
-                    }
-
-                    if (data.action === "weaponchange") {
+                        break;
+                    case "weaponchange":
                         var weapon = data.weapon;
                         console.log(weapon);
                         var event = (new KeyCoder()).getKeys();
@@ -269,13 +268,13 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                 break;
                         }
                         this.weaponsHandle(event);
-
-                    }
-                    break;
-                case "move":
-                    break;
-                default:
-                    break;
+                        break;
+                    case "move":
+                        console.log(data);
+                        break;
+                    default:
+                        break;
+                }
             }
         },
 
