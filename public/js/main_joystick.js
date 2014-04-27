@@ -58,6 +58,21 @@ define([
     var message = document.getElementById('message');
     var test = document.getElementById('test');
 
+    function getOrientation() {
+        return window.orientation % 180 === 0 ? "portrait" : "landscape";
+    }
+
+    function checkOrientation() {
+        if (getOrientation() === "portrait") {
+            console.log("change orientation");
+        }
+
+        window.server.send({
+            type: "orientation",
+            orientation: getOrientation()
+        });
+    }
+
     function main() {
         inputs.hide();
         canvasHolder.show();
@@ -75,10 +90,12 @@ define([
         }, false);
 
         window.addEventListener("orientationchange", function(e) {
-            var orient = window.orientation % 180 === 0 ? "portrait" : "landscape";
-
-            window.server.send({orientation: orient});
+            e.preventDefault();
+            checkOrientation();
+            controller.forceUpdate();
         }, false);
+
+        checkOrientation();
     }
 
     //TODO: somebody should call it

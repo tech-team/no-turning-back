@@ -7,6 +7,7 @@ define([
         callbacks.onStarted = callbacks.onStarted ? callbacks.onStarted : function(token) {};
         callbacks.saveToken = callbacks.saveToken ? callbacks.saveToken : function(token) {};
         callbacks.onMessage = callbacks.onMessage ? callbacks.onMessage : function(data) {};
+        callbacks.onDisconnect = callbacks.onDisconnect ? callbacks.onDisconnect : function() {};
 
 
 //        var message = document.getElementById('message');
@@ -76,6 +77,8 @@ define([
             callbacks.onMessage(data, answer);
 //            answer('answer');
         });
+
+        server.on('disconnect', callbacks.onDisconnect);
         window.server = server;
 
 

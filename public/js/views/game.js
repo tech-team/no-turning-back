@@ -53,10 +53,22 @@ function(Backbone, tmpl, Game, GameFinishedView) {
         },
 
         onJoystickMessage: function(data, answer) {
+            switch (data.type) {
+                case "orientation":
+                    if (data.orientation === "portrait") {
+                        console.log("change orientation!");
+                    }
+                    else {
+                        console.log("thanks for changing orientation");
+                    }
+                    break;
+                default:
+                    break;
+            }
 
         },
 
-        startJoystick: function() {
+        startJoystick: function() { // TODO: add reconnect feature
             var self = this;
             Game.console({
                 onStarted: function() {
@@ -66,8 +78,15 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                     self.guid.attr('value', guid);
                 },
                 onMessage: function(data, answer) {
-                    self.onJoystickMessage(data, answer);
-                    self.game.onJoystickMessage(data, answer);
+                    if (data.type === "orientation") {
+                        self.onJoystickMessage(data, answer);
+                    }
+                    else {
+                        self.game.onJoystickMessage(data, answer);
+                    }
+                },
+                onDisconnect: function() {
+                    console.log("joystick disconnected");
                 }
             });
         },

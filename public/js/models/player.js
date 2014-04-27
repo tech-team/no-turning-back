@@ -9,8 +9,6 @@ function(Backbone) {
 	  	},
 
 	  	initialize: function() {
-
-	  		//TODO: add validation, i.e. this.validate()
 	  	}
     });
 

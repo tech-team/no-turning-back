@@ -1,12 +1,12 @@
 define([
     'backbone',
+    'views/viewmanager',
     'views/main',
     'views/scoreboard',
     'views/game',
-    'views/editor',
-    'views/viewmanager'
+    'views/editor'
 ], 
-function(Backbone, MainView, ScoreboardView, GameView, EditorView, ViewManager) {
+function(Backbone, ViewManager, MainView, ScoreboardView, GameView, EditorView) {
     var Router = Backbone.Router.extend({
         routes: {
             'scoreboard': 'scoreboardAction',
