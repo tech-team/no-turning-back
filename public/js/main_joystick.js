@@ -99,7 +99,7 @@ define([
     }
 
     //TODO: somebody should call it
-//    main();
+    main();
 
     function onMessage(data) {
         console.log('message', data);

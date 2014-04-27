@@ -127,6 +127,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
 
             function handleComplete() {
                 _.each(manifest, function(tex) {
+                    //TODO: should separate sounds and textures
                     self.images[tex.id] = queue.getResult(tex.id);
                 });
                 onComplete.call(onCompleteContext);

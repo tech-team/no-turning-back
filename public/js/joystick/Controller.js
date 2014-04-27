@@ -44,7 +44,11 @@ define([
             __classvars__: {
                 SIZE: {
                     padRadius: 150,
-                    moverRadius: 70
+                    moverRadius: 70,
+                    toolBarHeight: 50,
+                    toolBarWidth: 200,
+                    toolBarItemSize: 32,
+                    weaponSelection: 46
                 },
 
                 POS: {
@@ -53,7 +57,9 @@ define([
 
                 COLOR: {
                     pad: "#DDDDDD",
-                    mover: "#0000FF"
+                    mover: "#0000FF",
+                    toolBar: "#AAAAAA",
+                    weaponSelection: "#BBCCBB"
                 },
 
                 SHOOTCOLOR: {
@@ -91,6 +97,113 @@ define([
                 this.rightPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
                 this.container.addChild(this.rightPad);
 
+                var rightPadText = new createjs.Text("Fire!", "50px Arial", "#FF0000");
+                rightPadText.shadow = new createjs.Shadow("#000000", 5, 5, 10);
+                this.rightPadText = this.container.addChild(rightPadText);
+
+                this.toolBar = new createjs.Shape();
+                this.toolBar.graphics
+                    .beginFill(Controller.COLOR.toolBar)
+                    .drawRoundRect(0, 0, Controller.SIZE.toolBarWidth, Controller.SIZE.toolBarHeight, 10)
+                    .endFill();
+
+                this.toolBar = this.container.addChild(this.toolBar);
+
+                this.toolBar.selection = new createjs.Shape();
+                this.toolBar.selection.graphics
+                    .beginFill(Controller.COLOR.weaponSelection)
+                    .drawRoundRect(0, 0, Controller.SIZE.weaponSelection, Controller.SIZE.weaponSelection, 10)
+                    .endFill();
+
+                this.toolBar.selection = this.addToStage(this.toolBar.selection, Controller.SIZE.weaponSelection, Controller.SIZE.weaponSelection);
+
+                var gfx = "/res/gfx/";
+                var knife = new createjs.Bitmap(gfx + "knife.png");
+                this.toolBar.knife = this.addToStage(knife, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
+                this.toolBar.knife.on("mousedown", this.selectWeapon.bind(this, "knife"));
+
+                var pistol = new createjs.Bitmap(gfx + "pistol.png");
+                this.toolBar.pistol = this.addToStage(pistol, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
+                this.toolBar.pistol.on("mousedown", this.selectWeapon.bind(this, "pistol"));
+
+                var shotgun = new createjs.Bitmap(gfx + "shotgun.png");
+                this.toolBar.shotgun = this.addToStage(shotgun, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
+                this.toolBar.shotgun.on("mousedown", this.selectWeapon.bind(this, "shotgun"));
+
+                this.currentWeapon = this.toolBar.knife;
+
+                this.createEvents();
+            },
+
+            resize: function() {
+                this.canvas.width = this.$window.width();
+                this.canvas.height = this.$window.height();
+
+                var self = this;
+                var stageSize = {
+                    width: self.stage.canvas.width,
+                    height: self.stage.canvas.height
+                };
+
+                var offset = Controller.POS.padOffset;
+
+                this.leftPad.x = offset;
+                this.leftPad.y = offset;
+
+                this.mover.x = offset;
+                this.mover.y = offset;
+
+                this.rightPad.x = stageSize.width - offset;
+                this.rightPad.y = offset;
+
+                this.rightPadText.x = this.rightPad.x - this.rightPadText.getBounds().width/2;
+                this.rightPadText.y = this.rightPad.y - this.rightPadText.getBounds().height/2;
+
+
+                this.toolBar.regX = Controller.SIZE.toolBarWidth / 2;
+                this.toolBar.regY = Controller.SIZE.toolBarHeight / 2;
+
+                this.toolBar.x = stageSize.width / 2;
+                this.toolBar.y = stageSize.height - Controller.SIZE.toolBarHeight * 1.5;
+
+                var itemSize = Controller.SIZE.toolBarItemSize;
+
+                this.toolBar.knife.x = this.toolBar.x - Controller.SIZE.toolBarWidth / 3;
+                this.toolBar.knife.y = this.toolBar.y;
+
+                this.toolBar.pistol.x = this.toolBar.x;
+                this.toolBar.pistol.y = this.toolBar.y;
+
+                this.toolBar.shotgun.x = this.toolBar.x + Controller.SIZE.toolBarWidth / 3;
+                this.toolBar.shotgun.y = this.toolBar.y;
+
+                this.toolBar.selection.x = this.currentWeapon.x;
+                this.toolBar.selection.y = this.currentWeapon.y;
+            },
+
+            addToStage: function(obj, width, height) {
+                obj = this.container.addChild(obj);
+
+                if (!width || !height) {
+                    obj.regX = obj.getBounds().width / 2;
+                    obj.regY = obj.getBounds().height / 2;
+                }
+                else {
+                    obj.regX = width / 2;
+                    obj.regY = height / 2;
+                }
+
+                return obj;
+            },
+
+            updateFunc: function(event) {
+                if (this.update) {
+                    this.update = false;
+                    this.stage.update(event);
+                }
+            },
+
+            createEvents: function() {
                 var self = this;
                 this.mover.on("mousedown", function(evt) {
                     evt.preventDefault();
@@ -140,9 +253,6 @@ define([
                     self.update = true;
                 });
 
-
-
-
                 this.rightPad.on("mousedown", function(evt) {
                     var target = evt.target;
                     target.graphics.clear().beginFill(Controller.SHOOTCOLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
@@ -187,37 +297,16 @@ define([
                 self.update = true;
             },
 
-            resize: function() {
-                this.canvas.width = this.$window.width();
-                this.canvas.height = this.$window.height();
-
-                var self = this;
-                var stageSize = {
-                    width: self.stage.canvas.width,
-                    height: self.stage.canvas.height
-                };
-
-                var offset = Controller.POS.padOffset;
-
-                this.leftPad.x = offset;
-                this.leftPad.y = offset;
-
-                this.mover.x = offset;
-                this.mover.y = offset;
-
-                this.rightPad.x = stageSize.width - offset;
-                this.rightPad.y = offset;
-            },
-
-            updateFunc: function(event) {
-                if (this.update) {
-                    this.update = false;
-                    this.stage.update(event);
-                }
-            },
-
             forceUpdate: function() {
                 this.update = true;
+            },
+
+            selectWeapon: function(name, evt) {
+                this.currentWeapon = evt.target;
+                this.toolBar.selection.x = this.currentWeapon.x;
+                this.toolBar.selection.y = this.currentWeapon.y;
+                this.forceUpdate();
+                alert(name);
             }
         });
 
