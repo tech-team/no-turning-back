@@ -55,7 +55,9 @@ define([
                     toolBarHeight: 50,
                     toolBarWidth: 200,
                     toolBarItemSize: 32,
-                    weaponSelection: 46
+                    weaponSelection: 46,
+                    usePadWidth: 100,
+                    usePadHeight: 50
                 },
 
                 POS: {
@@ -107,6 +109,13 @@ define([
 
                 var rightPadText = new createjs.Text("Fire!", "50px Arial", "#FF0000");
                 this.rightPadText = this.addToStage(rightPadText);
+
+                this.usePad = new createjs.Shape();
+                this.usePad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
+                this.addToStage(this.usePad, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight);
+
+                var usePadText = new createjs.Text("Use", "40px Arial", "#FF0000");
+                this.usePadText = this.addToStage(usePadText);
 
                 this.toolBar = new createjs.Shape();
                 this.toolBar.graphics
@@ -182,6 +191,12 @@ define([
 
                 this.toolBar.selection.x = this.currentWeapon.x;
                 this.toolBar.selection.y = this.currentWeapon.y;
+
+                this.usePad.x = this.rightPad.x;
+                this.usePad.y = this.toolBar.y;
+
+                this.usePadText.x = this.usePad.x;
+                this.usePadText.y = this.usePad.y;
 
                 this.update = true;
             },
@@ -324,6 +339,28 @@ define([
                     server.send({
                         type: "game",
                         action: "shoot",
+                        timestamp: evt.timeStamp
+                    });
+                });
+
+                this.usePad.on("mousedown", function(evt) {
+                    var target = evt.target;
+                    target.graphics.beginFill(Controller.SHOOTCOLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
+
+                    if (navigator.vibrate) {
+                        navigator.vibrate(10);
+                    }
+
+                    setTimeout(function() {
+                        target.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
+                        self.update = true;
+                    }, 400);
+
+                    self.forceUpdate();
+
+                    server.send({
+                        type: "game",
+                        action: "use",
                         timestamp: evt.timeStamp
                     });
                 });
