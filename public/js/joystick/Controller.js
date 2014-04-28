@@ -59,13 +59,13 @@ define([
                     weaponSelection: 46,
                     usePadWidth: 100,
                     usePadHeight: 50,
-                    reconnectPadWidth: 200,
-                    reconnectPadHeight: 50,
+                    reconnectPadWidth: 140,
+                    reconnectPadHeight: 40,
                     parallaxOffset: 20
                 },
 
                 POS: {
-                    padOffset: 30,
+                    padOffset: 15,
                     toolBarOffset: 10,
                     reconnectOffset: 30
                 },
@@ -77,8 +77,10 @@ define([
                     weaponSelection: "#BBCCBB"
                 },
 
-                SHOOTCOLOR: {
-                    pad: "#FF0000"
+                PRESSCOLOR: {
+                    pad: "#FF0000",
+                    use: "#AAAAAA",
+                    reconnect: "#AAAAAA"
                 }
             },
 
@@ -142,14 +144,14 @@ define([
                 this.usePad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
                 this.addToStage(this.usePad, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight);
 
-                var usePadText = new createjs.Text("Use", "40px Arial", "#FF0000");
+                var usePadText = new createjs.Text("Use", "30px Arial", "#000000");
                 this.usePadText = this.addToStage(usePadText);
 
                 this.reconnectPad = new createjs.Shape();
                 this.reconnectPad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
                 this.addToStage(this.reconnectPad, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight);
 
-                var reconnectPadText = new createjs.Text("Reconnect", "40px Arial", "#FF0000");
+                var reconnectPadText = new createjs.Text("Reconnect", "25px Arial", "#000000");
                 this.reconnectPadText = this.addToStage(reconnectPadText);
 
                 this.toolBar = new createjs.Shape();
@@ -361,7 +363,7 @@ define([
 
                 this.rightPad.on("mousedown", function(evt) {
                     var target = evt.target;
-                    target.graphics.clear().beginFill(Controller.SHOOTCOLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
+                    target.graphics.clear().beginFill(Controller.PRESSCOLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
 
                     if (navigator.vibrate) {
                         navigator.vibrate(10);
@@ -383,7 +385,7 @@ define([
 
                 this.usePad.on("mousedown", function(evt) {
                     var target = evt.target;
-                    target.graphics.beginFill(Controller.SHOOTCOLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
+                    target.graphics.beginFill(Controller.PRESSCOLOR.use).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
 
                     if (navigator.vibrate) {
                         navigator.vibrate(10);
@@ -405,7 +407,7 @@ define([
 
                 this.reconnectPad.on("mousedown", function(evt) {
                     var target = evt.target;
-                    target.graphics.beginFill(Controller.SHOOTCOLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
+                    target.graphics.beginFill(Controller.PRESSCOLOR.reconnect).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
 
                     if (navigator.vibrate) {
                         navigator.vibrate(10);
