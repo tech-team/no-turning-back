@@ -97,18 +97,6 @@ define([
                     height: self.stage.canvas.height
                 };
 
-                var parallax = new createjs.Bitmap(gfx + "parallax.jpg");
-                parallax.image.onload = function() {
-                    parallax.image.onload = null;
-                    parallax.image.src = ImageTiler(parallax.image,
-                        (stageSize.width + Controller.SIZE.parallaxOffset*2)/parallax.image.width,
-                        (stageSize.height + Controller.SIZE.parallaxOffset*2)/parallax.image.height);
-
-                    self.parallax = self.container.addChildAt(parallax, 0);
-                    self.parallax.regX = 0;//Controller.SIZE.parallaxOffset;
-                    self.parallax.regY = 0;//Controller.SIZE.parallaxOffset;
-                };
-
                 this.leftPad = new createjs.Shape();
                 this.leftPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
                 this.addToStage(this.leftPad, 0, 0);
@@ -192,6 +180,8 @@ define([
                 this.canvas.width = this.$window.width();
                 this.canvas.height = this.$window.height();
 
+                this.createParallax();
+
                 var self = this;
                 var stageSize = {
                     width: self.stage.canvas.width,
@@ -242,6 +232,30 @@ define([
                 this.usePadText.y = this.usePad.y;
 
                 this.update = true;
+            },
+
+            createParallax: function() {
+                var self = this;
+
+                var stageSize = {
+                    width: self.stage.canvas.width,
+                    height: self.stage.canvas.height
+                };
+
+                var gfx = "/res/gfx/";
+
+                var parallax = new createjs.Bitmap(gfx + "parallax.jpg");
+                parallax.image.onload = function() {
+                    parallax.image.onload = null;
+                    parallax.image.src = ImageTiler(parallax.image,
+                        (stageSize.width + Controller.SIZE.parallaxOffset*2)/parallax.image.width,
+                        (stageSize.height + Controller.SIZE.parallaxOffset*2)/parallax.image.height);
+
+                    self.container.removeChild(self.parallax);
+                    self.parallax = self.container.addChildAt(parallax, 0);
+                    self.parallax.regX = 0;//Controller.SIZE.parallaxOffset;
+                    self.parallax.regY = 0;//Controller.SIZE.parallaxOffset;
+                };
             },
 
             addToStage: function(obj, width, height, noShadow) {
