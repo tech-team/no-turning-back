@@ -8,10 +8,10 @@ define([
 ],
     function(_, Class, createjs, Hammer, MultiTouchStage, ImageTiler) {
         var Controller = Class.$extend({
-            __init__: function($window, canvas, restartJoystick) {
+            __init__: function($window, canvas, stopJoystick) {
                 this.$window = $window;
                 this.canvas = canvas;
-                this.startJoystick = restartJoystick;
+                this.startJoystick = stopJoystick;
                 //this.stage = _.extend(new createjs.Stage(this.canvas), MultiTouchStage);
                 this.stage = new createjs.Stage(this.canvas);
                 this.stage.enableDOMEvents(true);
@@ -469,8 +469,8 @@ define([
 
                 var offset = Controller.SIZE.parallaxOffset;
 
-                this.parallax.x = this.map(obj.gamma, 0, 360, -offset, offset);
-                this.parallax.y = this.map(obj.beta, 0, 360, -offset, offset);
+                this.parallax.x = this.map(obj.beta, 0, 360, -offset, offset);
+                this.parallax.y = this.map(obj.gamma, 0, 360, -offset, offset);
             },
 
             map: function(x, in_min, in_max, out_min, out_max) {

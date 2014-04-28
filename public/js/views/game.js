@@ -209,9 +209,9 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
                 saveToken: function(guid) {
                     self.$loadingIndicator.hide();
                     self.$mobileToken.text(guid);
-                    if (guid === "Already connected") {
-                        self.$reconnectButton.show();
-                    }
+//                    if (guid === "Already connected") {
+//                        self.$reconnectButton.show();
+//                    }
 
                 },
                 onMessage: function(data, answer) {

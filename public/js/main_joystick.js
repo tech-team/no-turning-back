@@ -187,7 +187,11 @@ define([
 
         var controller = new Controller($(window), $('canvas')[0], function() {
             localStorage.removeItem('playerguid');
-            hideJoystick();
+            console.log(server.disconnect);
+//            window.server.disconnect();
+            showMessage("You were disconnected", false, function() {
+                hideJoystick();
+            });
         });
 
         window.addEventListener("deviceorientation", function (e) {
