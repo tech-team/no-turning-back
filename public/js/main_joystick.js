@@ -127,17 +127,13 @@ define([
             hideMessage();
         }
 
-        window.server.send({
+        window.serverSend({
             type: "orientation",
             orientation: getOrientation()
         });
     }
 
-
-    /******************************** main ********************************/
-
-    function main() {
-        window.scrollTo(0,1);
+    function checkBrowserSupport() {
         console.log(Modernizr);
         console.log(createjs.Touch.isSupported());
         if (!Modernizr.canvas || !Modernizr.canvastext || !Modernizr.localstorage
@@ -145,25 +141,49 @@ define([
             || !Modernizr.csstransforms || !Modernizr.fontface || !createjs.Touch.isSupported()) {
             showMessage("Your browser is not supported. Sorry", true);
         }
-
-
     }
-    main();
+
+
+    /******************************** main ********************************/
+
+    function main() {
+        window.scrollTo(0,1);
+        mo.init();
+
+        checkBrowserSupport();
+
+        window.serverSend = function(objectToSend) {
+            if (window.server) {
+                window.server.send(objectToSend);
+            }
+        };
+
+        window.addEventListener("orientationchange", function (e) {
+            checkOrientation();
+        }, false);
+
+        checkOrientation();
+
+        //joystickMain();
+
+        Joystick(inputField, {
+            onStart: joystickMain,
+            onMessage: onMessage,
+            onStatusChanged: onStatusChanged,
+            onDisconnect: onDisconnect
+        });
+    }
+    //main();
+    joystickMain();
 
 
     /******************************** joystick stuff ********************************/
 
 
     function joystickMain() {
-        setTimeout(function(){
-            // Hide the address bar!
-            window.scrollTo(0, 1);
-        }, 0);
         showJoystick();
-        mo.init();
 
         var controller = new Controller($(window), $('canvas')[0]);
-        //window.server.send({test: "testFromJoystick"});
 
         window.addEventListener("deviceorientation", function (e) {
             var orientation = deviceOrientation(e);
@@ -173,16 +193,15 @@ define([
             test.innerHTML += "orientation: " + window.orientation + "<br />";
         }, false);
 
+        window.removeEventListener("orientationchange");
         window.addEventListener("orientationchange", function (e) {
-            e.preventDefault();
             checkOrientation();
             controller.forceUpdate();
         }, false);
-
         checkOrientation();
     }
 
-    //joystickMain();
+
 
     function onMessage(data) {
         console.log('message', data);
@@ -207,11 +226,6 @@ define([
 
     }
 
-    Joystick(inputField, {
-        onStart: joystickMain,
-        onMessage: onMessage,
-        onStatusChanged: onStatusChanged,
-        onDisconnect: onDisconnect
-    });
+
 
 });

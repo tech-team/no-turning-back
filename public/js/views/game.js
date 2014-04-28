@@ -1,10 +1,11 @@
 define([
     'backbone',
+    'modernizr',
     'tmpl/game',
     'game/Game',
     'views/gamefinished'
 ], 
-function(Backbone, tmpl, Game, GameFinishedView) {
+function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
     var GameView = Backbone.View.extend({
 
         template: tmpl,
@@ -63,6 +64,18 @@ function(Backbone, tmpl, Game, GameFinishedView) {
             this.$messageDimmer.hide();
         },
 
+        checkBrowserSupport: function() {
+            console.log(Modernizr);
+            console.log(createjs.Touch.isSupported());
+            if (Modernizr) {
+                if (!Modernizr.canvas || !Modernizr.canvastext || !Modernizr.localstorage
+                    || !Modernizr.audio || !Modernizr.multiplebgs
+                    || !Modernizr.csstransforms || !Modernizr.fontface) {
+                    this.showMessage("Your browser is not supported. Sorry", true);
+                }
+            }
+        },
+
         render: function () {
             this.$el.html(this.template());
             this.$el.attr('id', this.pageId.slice(1));
@@ -87,6 +100,7 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                 type: "showPageEvent",
                 pageId: this.pageId
             });
+            this.checkBrowserSupport();
             this.runGame();
         },
 

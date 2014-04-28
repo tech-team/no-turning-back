@@ -59,12 +59,15 @@ define([
                     weaponSelection: 46,
                     usePadWidth: 100,
                     usePadHeight: 50,
+                    reconnectPadWidth: 140,
+                    reconnectPadHeight: 40,
                     parallaxOffset: 20
                 },
 
                 POS: {
-                    padOffset: 30,
-                    toolBarOffset: 10
+                    padOffset: 15,
+                    toolBarOffset: 10,
+                    reconnectOffset: 30
                 },
 
                 COLOR: {
@@ -74,8 +77,10 @@ define([
                     weaponSelection: "#BBCCBB"
                 },
 
-                SHOOTCOLOR: {
-                    pad: "#FF0000"
+                PRESSCOLOR: {
+                    pad: "#FF0000",
+                    use: "#AAAAAA",
+                    reconnect: "#AAAAAA"
                 }
             },
 
@@ -139,8 +144,15 @@ define([
                 this.usePad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
                 this.addToStage(this.usePad, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight);
 
-                var usePadText = new createjs.Text("Use", "40px Arial", "#FF0000");
+                var usePadText = new createjs.Text("Use", "30px Arial", "#000000");
                 this.usePadText = this.addToStage(usePadText);
+
+                this.reconnectPad = new createjs.Shape();
+                this.reconnectPad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
+                this.addToStage(this.reconnectPad, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight);
+
+                var reconnectPadText = new createjs.Text("Reconnect", "25px Arial", "#000000");
+                this.reconnectPadText = this.addToStage(reconnectPadText);
 
                 this.toolBar = new createjs.Shape();
                 this.toolBar.graphics
@@ -216,8 +228,14 @@ define([
                 this.toolBar.selection.x = this.currentWeapon.x;
                 this.toolBar.selection.y = this.currentWeapon.y;
 
-                this.usePad.x = this.rightPad.x;
-                this.usePad.y = this.toolBar.y;
+                this.reconnectPad.x = stageSize.width/2;
+                this.reconnectPad.y = Controller.POS.reconnectOffset;
+
+                this.reconnectPadText.x = this.reconnectPad.x;
+                this.reconnectPadText.y = this.reconnectPad.y;
+
+                this.usePad.x = stageSize.width/2;
+                this.usePad.y = stageSize.height - (Controller.POS.toolBarOffset * 2 + Controller.SIZE.toolBarHeight * 2);
 
                 this.usePadText.x = this.usePad.x;
                 this.usePadText.y = this.usePad.y;
@@ -277,7 +295,7 @@ define([
 
                 var phi = (180 / Math.PI) * Math.atan2(target_prime.y, target_prime.x);
 
-                server.send({
+                window.serverSend({
                     type: "game",
                     action: "move",
                     r: r,
@@ -342,7 +360,7 @@ define([
 
                 this.rightPad.on("mousedown", function(evt) {
                     var target = evt.target;
-                    target.graphics.clear().beginFill(Controller.SHOOTCOLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
+                    target.graphics.clear().beginFill(Controller.PRESSCOLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
 
                     if (navigator.vibrate) {
                         navigator.vibrate(10);
@@ -355,7 +373,7 @@ define([
 
                     self.forceUpdate();
 
-                    server.send({
+                    window.serverSend({
                         type: "game",
                         action: "shoot",
                         timestamp: evt.timeStamp
@@ -364,7 +382,7 @@ define([
 
                 this.usePad.on("mousedown", function(evt) {
                     var target = evt.target;
-                    target.graphics.beginFill(Controller.SHOOTCOLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
+                    target.graphics.beginFill(Controller.PRESSCOLOR.use).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
 
                     if (navigator.vibrate) {
                         navigator.vibrate(10);
@@ -377,9 +395,33 @@ define([
 
                     self.forceUpdate();
 
-                    server.send({
+                    window.serverSend({
                         type: "game",
                         action: "use",
+                        timestamp: evt.timeStamp
+                    });
+                });
+
+                this.reconnectPad.on("mousedown", function(evt) {
+                    var target = evt.target;
+                    target.graphics.beginFill(Controller.PRESSCOLOR.reconnect).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
+
+                    if (navigator.vibrate) {
+                        navigator.vibrate(10);
+                    }
+
+                    setTimeout(function() {
+                        target.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
+                        self.update = true;
+                    }, 400);
+
+                    self.forceUpdate();
+
+                    //TODO: reconnect
+
+                    window.serverSend({
+                        type: "game",
+                        action: "disconnect", //TODO: ?
                         timestamp: evt.timeStamp
                     });
                 });
@@ -415,7 +457,7 @@ define([
                 this.toolBar.selection.y = this.currentWeapon.y;
                 this.forceUpdate();
 
-                server.send({
+                window.serverSend({
                     type: "game",
                     action: "weaponchange",
                     weapon: name
