@@ -149,8 +149,9 @@ function(Class, AliveObject, KeyCoder, collider) {
         },
 
         movementHandle: function(movementData, collisionObjects) {
-            var reboundModifier = (movementData.speedModifier === 1) ? (1.1) : (1.2);
+            var reboundModifier = (movementData.speedModifier === 2) ? (1.1) : (1.2);
 
+            console.log("I'm alive!");
             while (Math.abs(this.dispObj.rotation) >= 180) {
                 this.dispObj.rotation -= (this.dispObj.rotation > 0) ? (360) : (-360);
             }
@@ -161,17 +162,23 @@ function(Class, AliveObject, KeyCoder, collider) {
             var offsetY = movementData.speedModifier * Math.sin(this.dispObj.angle);
             this.dispObj.x += offsetX;
             this.dispObj.y += offsetY;
+/*
             for (var i = 0; i < collisionObjects.length; ++i) {
-                if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                    this.dispObj.x -= reboundModifier * offsetX;
-                    this.dispObj.y -= reboundModifier * offsetY;
+                var xToObject = this.dispObj.x - collisionObjects[i].x;
+                var yToObject = this.dispObj.y - collisionObjects[i].y;
+                if (Math.sqrt(xToObject*xToObject + yToObject*yToObject) <= 50) {
                     if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                        this.dispObj.x += (reboundModifier - 1) * offsetX;
-                        this.dispObj.y += (reboundModifier - 1) * offsetY;
+                        this.dispObj.x -= reboundModifier * offsetX;
+                        this.dispObj.y -= reboundModifier * offsetY;
+                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                            this.dispObj.x += (reboundModifier - 1) * offsetX;
+                            this.dispObj.y += (reboundModifier - 1) * offsetY;
+                        }
                     }
                 }
             }
-
+*/
+            console.log("I'm still alive!");
         },
 
         damage: function(howMuch) {

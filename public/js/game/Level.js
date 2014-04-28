@@ -270,7 +270,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         this.weaponsHandle(event);
                         break;
                     case "move":
-                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (1) : (2);
+                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (2) : (4);
+                        console.log("I'm moving!");
                         if (speedModifier) {
                             var movementData = {
                                 speedModifier: speedModifier,
