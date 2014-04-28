@@ -158,11 +158,11 @@ function(Class, AliveObject, KeyCoder, collider) {
             this.dispObj.rotation = movementData.angle;
             this.dispObj.angle = (Math.PI / 180) * this.dispObj.rotation;
 
-//            var offsetX = movementData.speedModifier * Math.cos(this.dispObj.angle);
-//            var offsetY = movementData.speedModifier * Math.sin(this.dispObj.angle);
-//            this.dispObj.x += offsetX;
-//            this.dispObj.y += offsetY;
-/*
+            var offsetX = movementData.speedModifier * Math.cos(this.dispObj.angle);
+            var offsetY = movementData.speedModifier * Math.sin(this.dispObj.angle);
+            this.dispObj.x += offsetX;
+            this.dispObj.y += offsetY;
+
             for (var i = 0; i < collisionObjects.length; ++i) {
                 var xToObject = this.dispObj.x - collisionObjects[i].x;
                 var yToObject = this.dispObj.y - collisionObjects[i].y;
@@ -177,7 +177,7 @@ function(Class, AliveObject, KeyCoder, collider) {
                     }
                 }
             }
-*/
+
             console.log("I'm still alive!");
         },
 

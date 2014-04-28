@@ -297,7 +297,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 this.keyFunc(event);
                 this.setPrevPlayerPos();
 
-                this.player.update(event, this.collisionObjects);
+//                this.player.update(event, this.collisionObjects);
                 if (this.zombies.length === 0) {
                     ResourceManager.playSound(ResourceManager.soundList.Victory);
                     $.event.trigger({
