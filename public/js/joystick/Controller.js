@@ -277,7 +277,7 @@ define([
 
                 var phi = (180 / Math.PI) * Math.atan2(target_prime.y, target_prime.x);
 
-                server.send({
+                window.serverSend({
                     type: "game",
                     action: "move",
                     r: r,
@@ -358,7 +358,7 @@ define([
 
                     self.forceUpdate();
 
-                    server.send({
+                    window.serverSend({
                         type: "game",
                         action: "shoot",
                         timestamp: evt.timeStamp
@@ -380,7 +380,7 @@ define([
 
                     self.forceUpdate();
 
-                    server.send({
+                    window.serverSend({
                         type: "game",
                         action: "use",
                         timestamp: evt.timeStamp
@@ -418,7 +418,7 @@ define([
                 this.toolBar.selection.y = this.currentWeapon.y;
                 this.forceUpdate();
 
-                server.send({
+                window.serverSend({
                     type: "game",
                     action: "weaponchange",
                     weapon: name
