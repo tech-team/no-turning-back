@@ -59,7 +59,8 @@ define([
                 },
 
                 POS: {
-                    padOffset: 110
+                    padOffset: 30,
+                    toolBarOffset: 10
                 },
 
                 COLOR: {
@@ -77,11 +78,11 @@ define([
             createControls: function() {
                 this.leftPad = new createjs.Shape();
                 this.leftPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
-                this.container.addChild(this.leftPad);
+                this.addToStage(this.leftPad, 0, 0);
 
                 this.mover = new createjs.Shape();
                 this.mover.graphics.beginFill(Controller.COLOR.mover).drawCircle(0, 0, Controller.SIZE.moverRadius).endFill();
-                this.container.addChild(this.mover);
+                this.addToStage(this.mover, 0, 0);
 
                 //like this
                 /*Hammer(window).on("drag", function(e) { //ot this.canvas instead of window
@@ -102,11 +103,10 @@ define([
 
                 this.rightPad = new createjs.Shape();
                 this.rightPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
-                this.container.addChild(this.rightPad);
+                this.addToStage(this.rightPad, 0, 0);
 
                 var rightPadText = new createjs.Text("Fire!", "50px Arial", "#FF0000");
-                rightPadText.shadow = new createjs.Shadow("#000000", 5, 5, 10);
-                this.rightPadText = this.container.addChild(rightPadText);
+                this.rightPadText = this.addToStage(rightPadText);
 
                 this.toolBar = new createjs.Shape();
                 this.toolBar.graphics
@@ -114,7 +114,7 @@ define([
                     .drawRoundRect(0, 0, Controller.SIZE.toolBarWidth, Controller.SIZE.toolBarHeight, 10)
                     .endFill();
 
-                this.toolBar = this.container.addChild(this.toolBar);
+                this.toolBar = this.addToStage(this.toolBar, Controller.SIZE.toolBarWidth, Controller.SIZE.toolBarHeight);
 
                 this.toolBar.selection = new createjs.Shape();
                 this.toolBar.selection.graphics
@@ -154,24 +154,20 @@ define([
 
                 var offset = Controller.POS.padOffset;
 
-                this.leftPad.x = offset;
-                this.leftPad.y = offset;
+                this.leftPad.x = offset + Controller.SIZE.padRadius;
+                this.leftPad.y = offset + Controller.SIZE.padRadius;
 
-                this.mover.x = offset;
-                this.mover.y = offset;
+                this.mover.x = this.leftPad.x;
+                this.mover.y = this.leftPad.y;
 
-                this.rightPad.x = stageSize.width - offset;
-                this.rightPad.y = offset;
+                this.rightPad.x = stageSize.width - this.leftPad.x;
+                this.rightPad.y = this.leftPad.y;
 
-                this.rightPadText.x = this.rightPad.x - this.rightPadText.getBounds().width/2;
-                this.rightPadText.y = this.rightPad.y - this.rightPadText.getBounds().height/2;
-
-
-                this.toolBar.regX = Controller.SIZE.toolBarWidth / 2;
-                this.toolBar.regY = Controller.SIZE.toolBarHeight / 2;
+                this.rightPadText.x = this.rightPad.x;
+                this.rightPadText.y = this.rightPad.y;
 
                 this.toolBar.x = stageSize.width / 2;
-                this.toolBar.y = stageSize.height - Controller.SIZE.toolBarHeight * 1.5;
+                this.toolBar.y = stageSize.height - Controller.SIZE.toolBarHeight / 2 - Controller.POS.toolBarOffset;
 
                 var itemSize = Controller.SIZE.toolBarItemSize;
 
@@ -190,10 +186,10 @@ define([
                 this.update = true;
             },
 
-            addToStage: function(obj, width, height) {
+            addToStage: function(obj, width, height, noShadow) {
                 obj = this.container.addChild(obj);
 
-                if (!width || !height) {
+                if (_.isUndefined(width) || _.isUndefined(height)) {
                     obj.regX = obj.getBounds().width / 2;
                     obj.regY = obj.getBounds().height / 2;
                 }
@@ -202,14 +198,18 @@ define([
                     obj.regY = height / 2;
                 }
 
+                if (!noShadow)
+                    obj.shadow = new createjs.Shadow("#000000", 5, 5, 10);
+
                 return obj;
             },
 
             updateFunc: function(event) {
-                if (this.update) {
+                //TODO: see icq conversation
+                //if (this.update) {
                     this.update = false;
                     this.stage.update(event);
-                }
+                //}
             },
 
             sendMoving: function() {
