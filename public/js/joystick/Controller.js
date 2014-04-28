@@ -59,12 +59,15 @@ define([
                     weaponSelection: 46,
                     usePadWidth: 100,
                     usePadHeight: 50,
+                    reconnectPadWidth: 200,
+                    reconnectPadHeight: 50,
                     parallaxOffset: 20
                 },
 
                 POS: {
                     padOffset: 30,
-                    toolBarOffset: 10
+                    toolBarOffset: 10,
+                    reconnectOffset: 30
                 },
 
                 COLOR: {
@@ -142,6 +145,13 @@ define([
                 var usePadText = new createjs.Text("Use", "40px Arial", "#FF0000");
                 this.usePadText = this.addToStage(usePadText);
 
+                this.reconnectPad = new createjs.Shape();
+                this.reconnectPad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
+                this.addToStage(this.reconnectPad, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight);
+
+                var reconnectPadText = new createjs.Text("Reconnect", "40px Arial", "#FF0000");
+                this.reconnectPadText = this.addToStage(reconnectPadText);
+
                 this.toolBar = new createjs.Shape();
                 this.toolBar.graphics
                     .beginFill(Controller.COLOR.toolBar)
@@ -216,8 +226,14 @@ define([
                 this.toolBar.selection.x = this.currentWeapon.x;
                 this.toolBar.selection.y = this.currentWeapon.y;
 
-                this.usePad.x = this.rightPad.x;
-                this.usePad.y = this.toolBar.y;
+                this.reconnectPad.x = stageSize.width/2;
+                this.reconnectPad.y = Controller.POS.reconnectOffset;
+
+                this.reconnectPadText.x = this.reconnectPad.x;
+                this.reconnectPadText.y = this.reconnectPad.y;
+
+                this.usePad.x = stageSize.width/2;
+                this.usePad.y = stageSize.height - (Controller.POS.toolBarOffset * 2 + Controller.SIZE.toolBarHeight * 2);
 
                 this.usePadText.x = this.usePad.x;
                 this.usePadText.y = this.usePad.y;
@@ -383,6 +399,30 @@ define([
                     window.serverSend({
                         type: "game",
                         action: "use",
+                        timestamp: evt.timeStamp
+                    });
+                });
+
+                this.reconnectPad.on("mousedown", function(evt) {
+                    var target = evt.target;
+                    target.graphics.beginFill(Controller.SHOOTCOLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
+
+                    if (navigator.vibrate) {
+                        navigator.vibrate(10);
+                    }
+
+                    setTimeout(function() {
+                        target.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
+                        self.update = true;
+                    }, 400);
+
+                    self.forceUpdate();
+
+                    //TODO: reconnect
+
+                    window.serverSend({
+                        type: "game",
+                        action: "disconnect", //TODO: ?
                         timestamp: evt.timeStamp
                     });
                 });

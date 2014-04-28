@@ -173,7 +173,8 @@ define([
             onDisconnect: onDisconnect
         });
     }
-    main();
+    //main();
+    joystickMain();
 
 
     /******************************** joystick stuff ********************************/
