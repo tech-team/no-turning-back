@@ -137,6 +137,10 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                 },
                 onDisconnect: function() {
                     console.log("joystick disconnected");
+                    self.showMessage("You were disconnected", false, function() {
+                        self.game.continueGame();
+                    });
+                    self.game.pause();
                 }
             });
         },
