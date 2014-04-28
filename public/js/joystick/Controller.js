@@ -369,8 +369,8 @@ define([
                     var currentMoveTime = (new Date()).getTime();
                     if (self.lastMoveSent === 0 || currentMoveTime - self.lastMoveSent >= self.moveTimeDelta) {
                         console.log("sending");
-                        self.sendMoving();
                         self.lastMoveSent = currentMoveTime;
+                        self.sendMoving();
                     }
 
                     self.forceUpdate();
