@@ -57,6 +57,55 @@ define([
     var inputField = document.getElementById('token');
     var message = document.getElementById('message');
     var test = document.getElementById('test');
+    var $message = $('.message');
+    var $messageText = $message.find('.message__textbox__text');
+    var $messageDimmer = $('.message-dimmer');
+
+    function hideJoystick() {
+        canvasHolder.hide();
+        inputs.show();
+    }
+
+    function showJoystick() {
+        inputs.hide();
+        canvasHolder.show();
+    }
+
+
+    function onMessageEvents(callback) {
+        $messageDimmer.on('click', function () {
+            hideMessage();
+            if (callback)
+                callback();
+        });
+
+        $message.on('click', function () {
+            hideMessage();
+            if (callback)
+                callback();
+        });
+    }
+
+    function offMessageEvents() {
+        $messageDimmer.off('click');
+        $message.off('click');
+    }
+
+
+    function showMessage(messageText, disallowHide, callback) {
+        if (disallowHide)
+            offMessageEvents();
+        else
+            onMessageEvents(callback);
+        $messageText.text(messageText);
+        $messageDimmer.show();
+        $message.show();
+    }
+
+    function hideMessage() {
+        $message.hide();
+        $messageDimmer.hide();
+    }
 
     function getOrientation() {
         return window.orientation % 180 === 0 ? "portrait" : "landscape";
@@ -65,6 +114,10 @@ define([
     function checkOrientation() {
         if (getOrientation() === "portrait") {
             console.log("change orientation");
+            showMessage("Change device orientation to landscape", true);
+        }
+        else {
+            hideMessage();
         }
 
         window.server.send({
@@ -74,14 +127,13 @@ define([
     }
 
     function main() {
-        inputs.hide();
-        canvasHolder.show();
+        showJoystick();
         mo.init();
 
         var controller = new Controller($(window), $('canvas')[0]);
         //window.server.send({test: "testFromJoystick"});
 
-        window.addEventListener("deviceorientation", function(e) {
+        window.addEventListener("deviceorientation", function (e) {
             var orientation = deviceOrientation(e);
             test.innerHTML = "alpha: " + orientation.alpha + "<br />";
             test.innerHTML += "gamma: " + orientation.gamma + "<br />";
@@ -89,7 +141,7 @@ define([
             test.innerHTML += "orientation: " + window.orientation + "<br />";
         }, false);
 
-        window.addEventListener("orientationchange", function(e) {
+        window.addEventListener("orientationchange", function (e) {
             e.preventDefault();
             checkOrientation();
             controller.forceUpdate();
@@ -107,7 +159,7 @@ define([
 
     function onStatusChanged(status) {
         message.innerHTML = status;
-        switch(status) {
+        switch (status) {
             case 'ready':
                 break;
             case 'game':
@@ -117,11 +169,21 @@ define([
         }
     }
 
+    function onDisconnect() {
+        showMessage("You were disconnected", false, function() {
+            hideJoystick();
+        });
+
+    }
+
     Joystick(inputField, {
         onStart: main,
         onMessage: onMessage,
-        onStatusChanged: onStatusChanged
+        onStatusChanged: onStatusChanged,
+        onDisconnect: onDisconnect
     });
+
+});
 
 // TODO: supposed to be in main()
 //    move.defults = {
@@ -163,14 +225,4 @@ define([
 ////        inner.style.webkitTransform = transform;
 //
 //        $('#inner').css({
-//            "-webkit-transform": transform
-//        });
-//    });
-//
-//    hammertime.on("dragend", function(event) {
-//        var gesture = event.gesture;
-//        lastPosX = posX;
-//        lastPosY = posY;
-//
-//    });
-});
+//            "-webkit-transform": tran

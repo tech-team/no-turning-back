@@ -6,6 +6,7 @@ define([
         callbacks.onStart = callbacks.onStart ? callbacks.onStart : function() {};
         callbacks.onMessage = callbacks.onMessage ? callbacks.onMessage : function(data) {};
         callbacks.onStatusChanged = callbacks.onStatusChanged ? callbacks.onStatusChanged : function(status) {};
+        callbacks.onDisconnect = callbacks.onDisconnect ? callbacks.onDisconnect : function() {};
 
         var start, init, reconnect;
 
@@ -75,6 +76,8 @@ define([
             callbacks.onMessage(data);
             answer('answer');
         });
+
+        server.on('disconnect', callbacks.onDisconnect);
 
         window.server = server;
     };

@@ -21,6 +21,13 @@
         <div class="canvasHolder" style="display:none;">
             <canvas id="canvas">You have a very old browser, dude.</canvas>
         </div>
+        <div class="message-dimmer"></div>
+        <div class="message">
+
+            <div class="message__textbox">
+                <div class="message__textbox__text">Some text</div>
+            </div>
+        </div>
 
         <fest:if test="json.development">
             <script data-main="js/main_joystick" src="js/lib/require.js"></script>

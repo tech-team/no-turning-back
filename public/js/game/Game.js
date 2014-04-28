@@ -34,7 +34,8 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
           	GameState: {
               	Loading: 0,
               	Game: 1,
-              	GameOver: 2
+              	GameOver: 2,
+                Pause: 3
           	},
             console: Console
         },
@@ -64,6 +65,14 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
 		stop: function() {
 			this.state = Game.GameState.GameOver;
 		},
+
+        pause: function() {
+            this.state = Game.GameState.Pause;
+        },
+
+        continueGame: function() {
+            this.state = Game.GameState.Game;
+        },
 
 		update: function(event) {
             if (this.state == Game.GameState.Game) {

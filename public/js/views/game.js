@@ -17,9 +17,50 @@ function(Backbone, tmpl, Game, GameFinishedView) {
         scene: null,
         game: null,
         guid: null,
+        $message: null,
+        $messageText: null,
+        $messageDimmer: null,
 
         initialize: function () {
             this.render();
+        },
+
+
+        onMessageEvents: function(callback) {
+            var self = this;
+            this.$messageDimmer.on('click', function () {
+                self.hideMessage();
+                if (callback)
+                    callback();
+            });
+
+            this.$message.on('click', function () {
+                self.hideMessage();
+                if (callback)
+                    callback();
+            });
+        },
+
+        offMessageEvents: function() {
+            this.$messageDimmer.off('click');
+            this.$message.off('click');
+        },
+
+
+        showMessage: function(messageText, disallowHide, callback) {
+            console.log("showing message");
+            if (disallowHide)
+                this.offMessageEvents();
+            else
+                this.onMessageEvents(callback);
+            this.$messageText.text(messageText);
+            this.$messageDimmer.show();
+            this.$message.show();
+        },
+
+        hideMessage: function() {
+            this.$message.hide();
+            this.$messageDimmer.hide();
         },
 
         render: function () {
@@ -29,6 +70,11 @@ function(Backbone, tmpl, Game, GameFinishedView) {
             this.canvas = this.$el.find('#game-field')[0];
             this.scene = this.$el.find('#scene');
             this.guid = this.$el.find('#token');
+
+            this.$message = this.$el.find('.message');
+            this.$messageText = this.$message.find('.message__textbox__text');
+            this.$messageDimmer = this.$el.find('.message-dimmer');
+
             this.calcDimensions();
 
             return this;
@@ -57,9 +103,13 @@ function(Backbone, tmpl, Game, GameFinishedView) {
                 case "orientation":
                     if (data.orientation === "portrait") {
                         console.log("change orientation!");
+                        this.showMessage("Change device orientation to landsape", true);
+                        this.game.pause();
                     }
                     else {
                         console.log("thanks for changing orientation");
+                        this.hideMessage();
+                        this.game.continueGame();
                     }
                     break;
                 default:

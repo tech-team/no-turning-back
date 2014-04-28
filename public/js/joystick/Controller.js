@@ -17,7 +17,6 @@ define([
                 this.stage.enableMouseOver(10);
                 this.container = new createjs.Container();
                 this.stage.addChild(this.container);
-//                stage.mouseMoveOutside = true; // keep tracking the mouse even when it leaves the canvas
 
                 this.update = true;
                 this.FPS = 30;
