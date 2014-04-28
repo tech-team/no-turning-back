@@ -27,105 +27,7 @@ function(Class, AliveObject, KeyCoder, collider) {
             this.effects = effects;
         },
 
-		update: function(event, collisionObjects) {
-            var speedModifier = 2;
-            var reboundModifier = 1.1;
-            var offsetRotation = 4;
-            var offsetX, offsetY;
-
-
-
-            if (event.keys[KeyCoder.W]) {
-                if (event.keys[KeyCoder.SHIFT]) { speedModifier = 4; }
-                offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.dispObj.rotation);
-                offsetY = speedModifier * Math.sin( (Math.PI / 180) * this.dispObj.rotation);
-                this.dispObj.x += offsetX;
-                this.dispObj.y += offsetY;
-                for (var i = 0; i < collisionObjects.length; ++i) {
-                    if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                        this.dispObj.x -= reboundModifier * offsetX;
-                        this.dispObj.y -= reboundModifier * offsetY;
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                            this.dispObj.x += (reboundModifier - 1) * offsetX;
-                            this.dispObj.y += (reboundModifier - 1) * offsetY;
-                        }
-                    }
-                }
-                if (event.keys[KeyCoder.D]) {
-                    this.dispObj.rotation += offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                            this.dispObj.rotation -= reboundModifier * offsetRotation;
-
-                        }
-                    }
-                }
-                if (event.keys[KeyCoder.A]) {
-                    this.dispObj.rotation -= offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                            this.dispObj.rotation += reboundModifier * offsetRotation;
-                        }
-                    }
-                }
-             }
-            if (event.keys[KeyCoder.S]) {
-                offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.dispObj.rotation);
-                offsetY = speedModifier * Math.sin( (Math.PI / 180) * this.dispObj.rotation);
-                this.dispObj.x -= offsetX;
-                this.dispObj.y -= offsetY;
-                for (var i = 0; i < collisionObjects.length; ++i) {
-                    if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                        this.dispObj.x += reboundModifier * offsetX;
-                        this.dispObj.y += reboundModifier * offsetY;
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                            this.dispObj.x -= (reboundModifier - 1) * offsetX;
-                            this.dispObj.y -= (reboundModifier - 1) * offsetY;
-                        }
-                    }
-                }
-                if (event.keys[KeyCoder.D]) {
-                    this.dispObj.rotation -= offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                            this.dispObj.rotation += reboundModifier * offsetRotation;
-
-                        }
-                    }
-                }
-                if (event.keys[KeyCoder.A]) {
-                    this.dispObj.rotation += offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                            this.dispObj.rotation -= reboundModifier * offsetRotation;
-                        }
-                    }
-                }
-            }
-
-            if (!(event.keys[KeyCoder.W] || event.keys[KeyCoder.S])) {
-                if (event.keys[KeyCoder.D]) {
-                    offsetRotation *= 2;
-                    this.dispObj.rotation += offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                            this.dispObj.rotation -= offsetRotation;
-
-                        }
-                    }
-                }
-                if (event.keys[KeyCoder.A]) {
-                    offsetRotation *= 2;
-                    this.dispObj.rotation -= offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                            this.dispObj.rotation += offsetRotation;
-
-                        }
-                    }
-                }
-            }
-
+		update: function(event) {
 
             if(event.keys[KeyCoder.K]) {
                 this.keys.forEach(function(key) {
@@ -149,36 +51,33 @@ function(Class, AliveObject, KeyCoder, collider) {
         },
 
         movementHandle: function(movementData, collisionObjects) {
-            var reboundModifier = (movementData.speedModifier === 2) ? (1.1) : (1.2);
+            var reboundModifier = (movementData.speedModifier === 1) ? (1.1) : (1.2);
 
-            console.log("I'm alive!");
-//            while (Math.abs(this.dispObj.rotation) >= 180) {
-//                this.dispObj.rotation -= (this.dispObj.rotation > 0) ? (360) : (-360);
-//            }
+            while (Math.abs(this.dispObj.rotation) > 180) {
+                this.dispObj.rotation -= (this.dispObj.rotation > 0) ? (360) : (-360);
+            }
             this.dispObj.rotation = movementData.angle;
             this.dispObj.angle = (Math.PI / 180) * this.dispObj.rotation;
 
-//            var offsetX = movementData.speedModifier * Math.cos(this.dispObj.angle);
-//            var offsetY = movementData.speedModifier * Math.sin(this.dispObj.angle);
-//            this.dispObj.x += offsetX;
-//            this.dispObj.y += offsetY;
-//
-//            for (var i = 0; i < collisionObjects.length; ++i) {
-//                var xToObject = this.dispObj.x - collisionObjects[i].x;
-//                var yToObject = this.dispObj.y - collisionObjects[i].y;
-//                if (Math.sqrt(xToObject*xToObject + yToObject*yToObject) <= 50) {
-//                    if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-//                        this.dispObj.x -= reboundModifier * offsetX;
-//                        this.dispObj.y -= reboundModifier * offsetY;
-//                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-//                            this.dispObj.x += (reboundModifier - 1) * offsetX;
-//                            this.dispObj.y += (reboundModifier - 1) * offsetY;
-//                        }
-//                    }
-//                }
-//            }
+            var offsetX = movementData.speedModifier * Math.cos(this.dispObj.angle);
+            var offsetY = movementData.speedModifier * Math.sin(this.dispObj.angle);
+            this.dispObj.x += offsetX;
+            this.dispObj.y += offsetY;
 
-            console.log("I'm still alive!");
+            for (var i = 0; i < collisionObjects.length; ++i) {
+                var xToObject = this.dispObj.x - collisionObjects[i].x;
+                var yToObject = this.dispObj.y - collisionObjects[i].y;
+                if (Math.sqrt(xToObject*xToObject + yToObject*yToObject) <= 50) {
+                    if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                        this.dispObj.x -= reboundModifier * offsetX;
+                        this.dispObj.y -= reboundModifier * offsetY;
+                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                            this.dispObj.x += (reboundModifier - 1) * offsetX;
+                            this.dispObj.y += (reboundModifier - 1) * offsetY;
+                        }
+                    }
+                }
+            }
         },
 
         damage: function(howMuch) {
