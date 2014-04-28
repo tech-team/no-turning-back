@@ -215,7 +215,13 @@ define([
 
 
     function onMessage(data) {
-        console.log('message', data);
+        switch (data.type) {
+            case "info":
+                if (data.action === "gamefinished") {
+                    showMessage(data.message, false);
+                }
+                break;
+        }
     }
 
     function onStatusChanged(status) {
