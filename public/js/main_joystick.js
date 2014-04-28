@@ -198,6 +198,8 @@ define([
             checkOrientation();
             controller.forceUpdate();
         }, false);
+
+        window.addEventListener("orientationchange", controller.onGyro.bind(controller), false);
         checkOrientation();
     }
 

@@ -465,7 +465,13 @@ define([
                     action: "weaponchange",
                     weapon: name
                 });
-            }
+            },
+
+            onGyro: function(e) {
+                var obj = deviceOrientation(e);
+
+                this.toolBar.x = obj.alpha;
+                this.toolBar.y = obj.beta;}
         });
 
         return Controller;
