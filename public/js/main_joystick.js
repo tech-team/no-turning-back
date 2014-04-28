@@ -173,7 +173,7 @@ define([
         checkOrientation();
     }
 
-//    main();
+    //main();
 
     function onMessage(data) {
         console.log('message', data);
