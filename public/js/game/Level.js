@@ -277,6 +277,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                 speedModifier: speedModifier,
                                 angle: data.phi
                             };
+//                            console.log(data);
                             this.player.movementHandle(movementData, this.collisionObjects);
                         }
                         break;

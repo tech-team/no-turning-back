@@ -282,7 +282,7 @@ define([
                     action: "move",
                     r: r,
                     phi: phi
-                })
+                });
             },
 
             createEvents: function() {
@@ -334,11 +334,11 @@ define([
                         target.y -= g.y;
                     }
 
-                    var currentMoveTime = (new Date()).getTime();
-                    if (self.lastMoveSent === 0 || currentMoveTime - self.lastMoveSent >= self.moveTimeDelta) {
+//                    var currentMoveTime = (new Date()).getTime();
+//                    if (self.lastMoveSent === 0 || currentMoveTime - self.lastMoveSent >= self.moveTimeDelta) {
                         self.sendMoving();
-                        self.lastMoveSent = currentMoveTime;
-                    }
+//                        self.lastMoveSent = currentMoveTime;
+//                    }
 
                     self.forceUpdate();
                 });
