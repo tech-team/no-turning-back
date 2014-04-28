@@ -172,7 +172,7 @@ define([
         });
     }
     main();
-//    joystickMain();
+    //joystickMain();
 
 
     /******************************** joystick stuff ********************************/

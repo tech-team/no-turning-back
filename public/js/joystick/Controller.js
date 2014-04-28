@@ -307,14 +307,12 @@ define([
                 var self = this;
                 this.mover.on("mousedown", function(evt) {
                     evt.preventDefault();
-                    var target = evt.target;
-                    target.parent.addChild(target);
-                    target.offset = {x:target.x-evt.stageX, y:target.y-evt.stageY};
+                    //target.parent.addChild(target);
+                    self.mover.offset = {x:self.mover.x-evt.stageX, y:self.mover.y-evt.stageY};
 
                     evt.on("mouseup", function(evt) {
-                        var target = evt.target;
-                        target.x = self.leftPad.x;
-                        target.y = self.leftPad.y;
+                        self.mover.x = self.leftPad.x;
+                        self.mover.y = self.leftPad.y;
                         self.forceUpdate();
                         self.sendMoving();
                     });
@@ -322,19 +320,18 @@ define([
 
                 this.mover.on("pressmove", function(evt) {
                     evt.preventDefault();
-                    var target = evt.target;
 
-                    target.x = evt.stageX + target.offset.x;
-                    target.y = evt.stageY + target.offset.y;
+                    self.mover.x = evt.stageX + self.mover.offset.x;
+                    self.mover.y = evt.stageY + self.mover.offset.y;
 
-                    if (!self.checkBounds(target)) {
+                    if (!self.checkBounds(self.mover)) {
                         var a = {
                             x: self.leftPad.x,
                             y: self.leftPad.y
                         };
                         var b = {
-                            x: target.x,
-                            y: target.y
+                            x: self.mover.x,
+                            y: self.mover.y
                         };
 
                         var g = {};
@@ -348,8 +345,8 @@ define([
                         g.x *= m / D;
                         g.y *= m / D;
 
-                        target.x -= g.x;
-                        target.y -= g.y;
+                        self.mover.x -= g.x;
+                        self.mover.y -= g.y;
                     }
 
                     var currentMoveTime = (new Date()).getTime();
@@ -362,15 +359,14 @@ define([
                 });
 
                 this.rightPad.on("mousedown", function(evt) {
-                    var target = evt.target;
-                    target.graphics.clear().beginFill(Controller.PRESSCOLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
+                    self.rightPad.graphics.clear().beginFill(Controller.PRESSCOLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
 
                     if (navigator.vibrate) {
                         navigator.vibrate(10);
                     }
 
                     setTimeout(function() {
-                        target.graphics.clear().beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
+                        self.rightPad.graphics.clear().beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
                         self.update = true;
                     }, 400);
 
@@ -384,15 +380,14 @@ define([
                 });
 
                 this.usePad.on("mousedown", function(evt) {
-                    var target = evt.target;
-                    target.graphics.beginFill(Controller.PRESSCOLOR.use).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
+                    self.usePad.graphics.beginFill(Controller.PRESSCOLOR.use).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
 
                     if (navigator.vibrate) {
                         navigator.vibrate(10);
                     }
 
                     setTimeout(function() {
-                        target.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
+                        self.usePad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
                         self.update = true;
                     }, 400);
 
@@ -406,15 +401,14 @@ define([
                 });
 
                 this.reconnectPad.on("mousedown", function(evt) {
-                    var target = evt.target;
-                    target.graphics.beginFill(Controller.PRESSCOLOR.reconnect).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
+                    self.reconnectPad.graphics.beginFill(Controller.PRESSCOLOR.reconnect).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
 
                     if (navigator.vibrate) {
                         navigator.vibrate(10);
                     }
 
                     setTimeout(function() {
-                        target.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
+                        self.reconnectPad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
                         self.update = true;
                     }, 400);
 
