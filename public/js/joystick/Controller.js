@@ -47,8 +47,8 @@ define([
 
             __classvars__: {
                 SIZE: {
-                    padRadius: 150,
-                    moverRadius: 70,
+                    padRadius: 100,
+                    moverRadius: 40,
                     toolBarHeight: 50,
                     toolBarWidth: 200,
                     toolBarItemSize: 32,
@@ -56,7 +56,7 @@ define([
                 },
 
                 POS: {
-                    padOffset: 180
+                    padOffset: 110
                 },
 
                 COLOR: {
@@ -233,7 +233,7 @@ define([
                     }
                 }
 
-                var phi = -Math.atan2(target_prime.y, target_prime.x);
+                var phi = Math.atan2(target_prime.y, target_prime.x);
 
                 server.send({
                     type: "game",

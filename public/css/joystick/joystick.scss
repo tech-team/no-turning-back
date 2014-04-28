@@ -15,6 +15,10 @@ html, body {
   background-color: white;
 }
 
+//body { min-height:540px; }
+//body[orient="portrait"] { min-height:540px; }
+//body[orient="landscape"] { min-height:400px; }
+
 canvas {
 
 }

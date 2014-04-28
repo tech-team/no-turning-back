@@ -61,6 +61,25 @@ define([
     var $messageText = $message.find('.message__textbox__text');
     var $messageDimmer = $('.message-dimmer');
 
+    window.scrollTo(0,1);
+
+    function toggleFullScreen() {
+        var doc = window.document;
+        var docEl = doc.documentElement;
+
+        var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+        var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+        if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+            requestFullScreen.call(docEl);
+        }
+        else {
+            cancelFullScreen.call(doc);
+        }
+    }
+    //toggleFullScreen(); // TODO: not working
+
+
     function hideJoystick() {
         canvasHolder.hide();
         inputs.show();
@@ -127,6 +146,10 @@ define([
     }
 
     function main() {
+        setTimeout(function(){
+            // Hide the address bar!
+            window.scrollTo(0, 1);
+        }, 0);
         showJoystick();
         mo.init();
 
@@ -150,8 +173,7 @@ define([
         checkOrientation();
     }
 
-    //TODO: somebody should call it
-    //main();
+//    main();
 
     function onMessage(data) {
         console.log('message', data);
