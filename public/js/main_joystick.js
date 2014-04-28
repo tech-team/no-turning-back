@@ -133,13 +133,7 @@ define([
         });
     }
 
-
-    /******************************** main ********************************/
-
-    function main() {
-        window.scrollTo(0,1);
-        mo.init();
-
+    function checkBrowserSupport() {
         console.log(Modernizr);
         console.log(createjs.Touch.isSupported());
         if (!Modernizr.canvas || !Modernizr.canvastext || !Modernizr.localstorage
@@ -147,6 +141,16 @@ define([
             || !Modernizr.csstransforms || !Modernizr.fontface || !createjs.Touch.isSupported()) {
             showMessage("Your browser is not supported. Sorry", true);
         }
+    }
+
+
+    /******************************** main ********************************/
+
+    function main() {
+        window.scrollTo(0,1);
+        mo.init();
+
+        checkBrowserSupport();
 
         window.serverSend = function(objectToSend) {
             if (window.server) {

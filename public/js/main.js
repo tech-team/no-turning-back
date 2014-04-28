@@ -14,7 +14,8 @@ require.config({
         collision: "lib/game/collision",
         Connector: "lib/Connector",
         FnQuery: "lib/FnQuery",
-        "socket.io": "/socket.io/socket.io"
+        "socket.io": "/socket.io/socket.io",
+        modernizr: "lib/modernizr"
     },
     shim: {
         'backbone': {
@@ -49,6 +50,9 @@ require.config({
 
         "socket.io": {
             exports: "io"
+        },
+        'modernizr': {
+            exports: 'modernizr'
         }
     }
 });

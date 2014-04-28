@@ -152,9 +152,9 @@ function(Class, AliveObject, KeyCoder, collider) {
             var reboundModifier = (movementData.speedModifier === 2) ? (1.1) : (1.2);
 
             console.log("I'm alive!");
-            while (Math.abs(this.dispObj.rotation) >= 180) {
-                this.dispObj.rotation -= (this.dispObj.rotation > 0) ? (360) : (-360);
-            }
+//            while (Math.abs(this.dispObj.rotation) >= 180) {
+//                this.dispObj.rotation -= (this.dispObj.rotation > 0) ? (360) : (-360);
+//            }
             this.dispObj.rotation = movementData.angle;
             this.dispObj.angle = (Math.PI / 180) * this.dispObj.rotation;
 
