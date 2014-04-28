@@ -21,6 +21,9 @@ define([
                 this.update = true;
                 this.FPS = 30;
 
+                this.lastMoveSent = 0;
+                this.moveTimeDelta = 30; // ms
+
                 var self = this;
 
                 this.ticker = createjs.Ticker;
@@ -233,7 +236,7 @@ define([
                     }
                 }
 
-                var phi = Math.atan2(target_prime.y, target_prime.x);
+                var phi = (180 / Math.PI) * Math.atan2(target_prime.y, target_prime.x);
 
                 server.send({
                     type: "game",
@@ -292,7 +295,11 @@ define([
                         target.y -= g.y;
                     }
 
-                    self.sendMoving();
+                    var currentMoveTime = (new Date()).getTime();
+                    if (self.lastMoveSent === 0 || currentMoveTime - self.lastMoveSent >= self.moveTimeDelta) {
+                        self.sendMoving();
+                        self.lastMoveSent = currentMoveTime;
+                    }
 
                     self.forceUpdate();
                 });
@@ -334,9 +341,7 @@ define([
 
             checkBounds: function(target) {
                 var eps = 0.01;
-                if (this.distance(target, this.leftPad) + Controller.SIZE.moverRadius - Controller.SIZE.padRadius <= eps)
-                    return true;
-                return false;
+                return (this.distance(target, this.leftPad) + Controller.SIZE.moverRadius - Controller.SIZE.padRadius <= eps);
             },
 
             drawCircle: function(object, color, x, y, radius) {

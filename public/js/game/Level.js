@@ -270,7 +270,14 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         this.weaponsHandle(event);
                         break;
                     case "move":
-                        console.log(data);
+                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (1) : (2);
+                        if (speedModifier) {
+                            var movementData = {
+                                speedModifier: speedModifier,
+                                angle: data.phi
+                            };
+                            this.player.movementHandle(movementData, this.collisionObjects);
+                        }
                         break;
                     default:
                         break;
@@ -416,7 +423,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         var xToZombie = this.player.dispObj.x - this.zombies[i].dispObj.x;
                         var yToZombie = this.player.dispObj.y - this.zombies[i].dispObj.y;
                         var distanceToZombie = Math.sqrt(xToZombie * xToZombie + yToZombie * yToZombie);
-                       // var angleToZombie = this.player.dispObj.angle - 1 / Math.atan2(yToZombie, xToZombie);
 
                         if (distanceToZombie <= this.player.reach) {
                             this.zombies[i].health -= ResourceManager.weaponData.knife.power;

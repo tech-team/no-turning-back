@@ -133,6 +133,7 @@ module.exports = {
 		var types = ['console', 'player'];
 
 		var io = require('socket.io').listen(app);
+        io.set('log level', 1);
 
 		for (var i = 0, l = types.length; i < l; i++){
 			var type = types[i];

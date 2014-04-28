@@ -10,7 +10,9 @@ define([
     function Connector(conf){
         conf || (conf = {});
 
+
         this.socket = io.connect(conf.remote);
+
         var self = this;
 
         this._readyFns = [];
