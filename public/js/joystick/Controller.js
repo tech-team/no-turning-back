@@ -3,9 +3,10 @@ define([
     'classy',
     'easel',
     'hammer',
-    'joystick/MultiTouchStage'
+    'joystick/MultiTouchStage',
+    'game/ImageTiler'
 ],
-    function(_, Class, createjs, Hammer, MultiTouchStage) {
+    function(_, Class, createjs, Hammer, MultiTouchStage, ImageTiler) {
         var Controller = Class.$extend({
             __init__: function($window, canvas) {
                 this.$window = $window;
@@ -57,7 +58,8 @@ define([
                     toolBarItemSize: 32,
                     weaponSelection: 46,
                     usePadWidth: 100,
-                    usePadHeight: 50
+                    usePadHeight: 50,
+                    parallaxOffset: 20
                 },
 
                 POS: {
@@ -78,6 +80,29 @@ define([
             },
 
             createControls: function() {
+                this.canvas.width = this.$window.width();
+                this.canvas.height = this.$window.height();
+
+                var self = this;
+                var gfx = "/res/gfx/";
+
+                var stageSize = {
+                    width: self.stage.canvas.width,
+                    height: self.stage.canvas.height
+                };
+
+                var parallax = new createjs.Bitmap(gfx + "parallax.jpg");
+                parallax.image.onload = function() {
+                    parallax.image.onload = null;
+                    parallax.image.src = ImageTiler(parallax.image,
+                        (stageSize.width + Controller.SIZE.parallaxOffset*2)/parallax.image.width,
+                        (stageSize.height + Controller.SIZE.parallaxOffset*2)/parallax.image.height);
+
+                    self.parallax = self.container.addChildAt(parallax, 0);
+                    self.parallax.regX = Controller.SIZE.parallaxOffset;
+                    self.parallax.regY = Controller.SIZE.parallaxOffset;
+                };
+
                 this.leftPad = new createjs.Shape();
                 this.leftPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
                 this.addToStage(this.leftPad, 0, 0);
@@ -133,7 +158,6 @@ define([
 
                 this.toolBar.selection = this.addToStage(this.toolBar.selection, Controller.SIZE.weaponSelection, Controller.SIZE.weaponSelection);
 
-                var gfx = "/res/gfx/";
                 var knife = new createjs.Bitmap(gfx + "knife.png");
                 this.toolBar.knife = this.addToStage(knife, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
                 this.toolBar.knife.on("mousedown", this.selectWeapon.bind(this, "knife"));
@@ -331,8 +355,6 @@ define([
                         target.graphics.clear().beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
                         self.update = true;
                     }, 400);
-
-
 
                     self.forceUpdate();
 
