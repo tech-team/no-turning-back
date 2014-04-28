@@ -204,7 +204,7 @@ define([
             controller.forceUpdate();
         }, false);
 
-        window.addEventListener("orientationchange", controller.onGyro.bind(controller), false);
+        window.addEventListener("deviceorientation", controller.onGyro.bind(controller), false);
         checkOrientation();
     }
 

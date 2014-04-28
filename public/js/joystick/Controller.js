@@ -62,7 +62,7 @@ define([
                     usePadHeight: 50,
                     reconnectPadWidth: 140,
                     reconnectPadHeight: 40,
-                    parallaxOffset: 20
+                    parallaxOffset: 50
                 },
 
                 POS: {
@@ -105,8 +105,8 @@ define([
                         (stageSize.height + Controller.SIZE.parallaxOffset*2)/parallax.image.height);
 
                     self.parallax = self.container.addChildAt(parallax, 0);
-                    self.parallax.regX = Controller.SIZE.parallaxOffset;
-                    self.parallax.regY = Controller.SIZE.parallaxOffset;
+                    self.parallax.regX = 0;//Controller.SIZE.parallaxOffset;
+                    self.parallax.regY = 0;//Controller.SIZE.parallaxOffset;
                 };
 
                 this.leftPad = new createjs.Shape();
@@ -319,6 +319,8 @@ define([
                     });
                 });
 
+
+
                 this.mover.on("pressmove", function(evt) {
                     evt.preventDefault();
 
@@ -465,8 +467,15 @@ define([
             onGyro: function(e) {
                 var obj = deviceOrientation(e);
 
-                this.toolBar.x = obj.alpha;
-                this.toolBar.y = obj.beta;}
+                var offset = Controller.SIZE.parallaxOffset;
+
+                this.parallax.x = this.map(obj.gamma, 0, 360, -offset, offset);
+                this.parallax.y = this.map(obj.beta, 0, 360, -offset, offset);
+            },
+
+            map: function(x, in_min, in_max, out_min, out_max) {
+                return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+            }
         });
 
         return Controller;
