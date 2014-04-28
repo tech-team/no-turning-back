@@ -8,9 +8,10 @@ define([
 ],
     function(_, Class, createjs, Hammer, MultiTouchStage, ImageTiler) {
         var Controller = Class.$extend({
-            __init__: function($window, canvas) {
+            __init__: function($window, canvas, restartJoystick) {
                 this.$window = $window;
                 this.canvas = canvas;
+                this.startJoystick = restartJoystick;
                 //this.stage = _.extend(new createjs.Stage(this.canvas), MultiTouchStage);
                 this.stage = new createjs.Stage(this.canvas);
                 this.stage.enableDOMEvents(true);
@@ -23,7 +24,7 @@ define([
                 this.FPS = 30;
 
                 this.lastMoveSent = 0;
-                this.moveTimeDelta = 30; // ms
+                this.moveTimeDelta = 10; // ms
 
                 var self = this;
 
@@ -351,6 +352,7 @@ define([
 
                     var currentMoveTime = (new Date()).getTime();
                     if (self.lastMoveSent === 0 || currentMoveTime - self.lastMoveSent >= self.moveTimeDelta) {
+                        console.log("sending");
                         self.sendMoving();
                         self.lastMoveSent = currentMoveTime;
                     }
@@ -414,13 +416,12 @@ define([
 
                     self.forceUpdate();
 
-                    //TODO: reconnect
-
-                    window.serverSend({
-                        type: "game",
-                        action: "disconnect", //TODO: ?
-                        timestamp: evt.timeStamp
-                    });
+                    self.startJoystick.call(self.joystickThis);
+                    // *************************************************
+                    // *************************************************
+                    // *************************************************
+                    // *************************************************
+                    // *************************************************
                 });
             },
 

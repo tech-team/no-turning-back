@@ -26,6 +26,8 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
         $mobileIconNormal: null,
         $mobileConnect: null,
         $mobileToken: null,
+        $reconnectButton: null,
+        $loadingIndicator: null,
         mobileConnectVisible: false,
 
 
@@ -100,6 +102,9 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
             this.$mobileIconNormal = this.$mobileIcon.find('.mobile-icon__normal');
             this.$mobileConnect = this.$el.find('.mobile-connect');
             this.$mobileToken = this.$el.find('.mobile-connect__token');
+
+            this.$reconnectButton = this.$el.find('.reconnect-button');
+            this.$loadingIndicator = this.$el.find('.loading-indicator');
             this.createEvents();
 
             this.calcDimensions();
@@ -146,6 +151,13 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
                     self.game.continueGame();
                 }
             });
+
+
+            this.$reconnectButton.on('click', function() {
+                localStorage.removeItem('consoleguid');
+                self.startJoystick();
+                self.$reconnectButton.hide();
+            });
         },
 
         show: function () {
@@ -188,14 +200,19 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
         },
 
         startJoystick: function() { // TODO: add reconnect feature
+            window.server = null;
             var self = this;
             Game.console({
                 onStarted: function() {
                     self.game.startJoystickSession(window.server);
                 },
                 saveToken: function(guid) {
-//                    self.guid.attr('value', guid);
+                    self.$loadingIndicator.hide();
                     self.$mobileToken.text(guid);
+                    if (guid === "Already connected") {
+                        self.$reconnectButton.show();
+                    }
+
                 },
                 onMessage: function(data, answer) {
                     if (data.type === "orientation") {

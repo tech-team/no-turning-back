@@ -48,6 +48,7 @@ define([
             server.bind({guid: localStorage.getItem('consoleguid')}, function (data) {
                 // Если все ок
                 if (data.status == 'success') {
+                    callbacks.saveToken("Already connected");
                     // Стартуем
                     start(data.guid);
                     // Если связки уже нет

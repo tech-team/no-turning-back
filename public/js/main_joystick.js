@@ -143,6 +143,15 @@ define([
         }
     }
 
+    function startJoystick() {
+        Joystick(inputField, {
+            onStart: joystickMain,
+            onMessage: onMessage,
+            onStatusChanged: onStatusChanged,
+            onDisconnect: onDisconnect
+        });
+    }
+
 
     /******************************** main ********************************/
 
@@ -164,12 +173,7 @@ define([
 
         checkOrientation();
 
-        Joystick(inputField, {
-            onStart: joystickMain,
-            onMessage: onMessage,
-            onStatusChanged: onStatusChanged,
-            onDisconnect: onDisconnect
-        });
+        startJoystick();
     }
     main();
     //joystickMain();
@@ -181,7 +185,10 @@ define([
     function joystickMain() {
         showJoystick();
 
-        var controller = new Controller($(window), $('canvas')[0]);
+        var controller = new Controller($(window), $('canvas')[0], function() {
+            localStorage.removeItem('playerguid');
+            hideJoystick();
+        });
 
         window.addEventListener("deviceorientation", function (e) {
             var orientation = deviceOrientation(e);

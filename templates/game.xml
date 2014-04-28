@@ -22,7 +22,10 @@
             <canvas id="game-field">You have a very old browser, dude.</canvas>
             <div class="mobile-connect">
                 <div class="mobile-connect__header">Enter this token on your mobile device:</div>
-                <div class="mobile-connect__token"></div>
+                <div class="mobile-connect__token"><div class="loading-indicator token-loading"></div></div>
+                <div class="reconnect-button">
+                    <img class="reconnect-button__image" src="/res/img/reconnect.png" width="50" height="50"></img>
+                </div>
             </div>
             <div class="mobile-icon">
                 <img class="mobile-icon__inverted" src="/res/img/mobile-inverted.png" width="50" height="60"></img>
