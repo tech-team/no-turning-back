@@ -176,7 +176,7 @@ define([
         startJoystick();
     }
     main();
-    //joystickMain();
+    joystickMain();
 
 
     /******************************** joystick stuff ********************************/
