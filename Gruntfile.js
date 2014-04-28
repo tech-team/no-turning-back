@@ -139,7 +139,8 @@ module.exports = function (grunt) {
 			},
             frontend: {
                 files: ['public/js/**/*.js',
-                        'public/css/**/*.css'],
+                        'public/css/*.css',
+                        'public/css/joystick/*.css'],
                 tasks: ['cssmin'],
                 options: {
                     interrupt: true,

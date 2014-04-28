@@ -15,13 +15,21 @@
 
             <div class="message-dimmer"></div>
             <div class="message">
-
                 <div class="message__textbox">
                     <div class="message__textbox__text">Some text</div>
                 </div>
             </div>
             <canvas id="game-field">You have a very old browser, dude.</canvas>
-            <input id="token" value="guid" disabled="disabled" style="position:absolute; top:0; right:0;" />
+            <div class="mobile-connect">
+                <div class="mobile-connect__header">Enter this token on your mobile device:</div>
+                <div class="mobile-connect__token"></div>
+            </div>
+            <div class="mobile-icon">
+                <img class="mobile-icon__inverted" src="/res/img/mobile-inverted.png" width="50" height="60"></img>
+                <img class="mobile-icon__normal" src="/res/img/mobile.png" width="50" height="60"></img>
+            </div>
+
+            <!--<input id="token" value="guid" disabled="disabled" style="position:absolute; top:0; right:0;" />-->
             <!--<button id="connect" type="submit">connect</button>-->
     </div>
 </fest:template>

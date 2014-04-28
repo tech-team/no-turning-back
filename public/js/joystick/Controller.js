@@ -353,7 +353,10 @@ define([
                     }
 
                     var currentMoveTime = (new Date()).getTime();
-                    self.sendMoving();
+                    if (self.lastMoveSent === 0 || currentMoveTime - self.lastMoveSent >= self.moveTimeDelta) {
+                        self.sendMoving();
+                        self.lastMoveSent = currentMoveTime;
+                    }
 
                     self.forceUpdate();
                 });

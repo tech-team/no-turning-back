@@ -21,6 +21,13 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
         $message: null,
         $messageText: null,
         $messageDimmer: null,
+        $mobileIcon: null,
+        $mobileIconInverted: null,
+        $mobileIconNormal: null,
+        $mobileConnect: null,
+        $mobileToken: null,
+        mobileConnectVisible: false,
+
 
         initialize: function () {
             this.render();
@@ -88,9 +95,57 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
             this.$messageText = this.$message.find('.message__textbox__text');
             this.$messageDimmer = this.$el.find('.message-dimmer');
 
+            this.$mobileIcon = this.$el.find('.mobile-icon');
+            this.$mobileIconInverted = this.$mobileIcon.find('.mobile-icon__inverted');
+            this.$mobileIconNormal = this.$mobileIcon.find('.mobile-icon__normal');
+            this.$mobileConnect = this.$el.find('.mobile-connect');
+            this.$mobileToken = this.$el.find('.mobile-connect__token');
+            this.createEvents();
+
             this.calcDimensions();
 
             return this;
+        },
+
+        createEvents: function() {
+            var self = this;
+            var showNormal = function() {
+                self.$mobileIconInverted.hide();
+                self.$mobileIconNormal.show();
+                self.$mobileIcon.addClass('white-background');
+            };
+
+            var showInverted = function() {
+                self.$mobileIconInverted.show();
+                self.$mobileIconNormal.hide();
+                self.$mobileIcon.removeClass('white-background');
+            };
+
+
+            this.$mobileIcon.on('mouseenter', function() {
+                showNormal();
+            });
+            this.$mobileIcon.on('mouseleave', function() {
+                if (!self.mobileConnectVisible)
+                    showInverted();
+            });
+
+            this.$mobileIcon.on('click', function() {
+                if (!self.mobileConnectVisible) {
+                    self.$mobileConnect.show();
+                    showNormal();
+                    self.mobileConnectVisible = true;
+                    self.$messageDimmer.show();
+                    self.game.pause();
+                }
+                else {
+                    self.$mobileConnect.hide();
+                    showInverted();
+                    self.mobileConnectVisible = false;
+                    self.$messageDimmer.hide();
+                    self.game.continueGame();
+                }
+            });
         },
 
         show: function () {
@@ -139,7 +194,8 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
                     self.game.startJoystickSession(window.server);
                 },
                 saveToken: function(guid) {
-                    self.guid.attr('value', guid);
+//                    self.guid.attr('value', guid);
+                    self.$mobileToken.text(guid);
                 },
                 onMessage: function(data, answer) {
                     if (data.type === "orientation") {

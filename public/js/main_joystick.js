@@ -164,8 +164,6 @@ define([
 
         checkOrientation();
 
-        //joystickMain();
-
         Joystick(inputField, {
             onStart: joystickMain,
             onMessage: onMessage,
@@ -173,8 +171,8 @@ define([
             onDisconnect: onDisconnect
         });
     }
-    //main();
-    joystickMain();
+    main();
+//    joystickMain();
 
 
     /******************************** joystick stuff ********************************/
