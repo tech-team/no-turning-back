@@ -12,7 +12,8 @@ require.config({
         'socket.io': "/socket.io/socket.io",
         hammer: "lib/hammer",
         move: "lib/move",
-        device_normalizer: "lib/deviceapi-normaliser"
+        device_normalizer: "lib/deviceapi-normaliser",
+        modernizr: "lib/modernizr"
     },
     shim: {
         'backbone': {
@@ -39,6 +40,9 @@ require.config({
         },
         'device_normalizer': {
             exports: 'device_normalizer'
+        },
+        'modernizr': {
+            exports: 'modernizr'
         }
     }
 });
@@ -46,12 +50,12 @@ require.config({
 
 define([
     'jquery',
-    'move',
-    'hammer',
+    'modernizr',
     'device_normalizer',
     'joystick/joystick',
-    'joystick/Controller'
-], function($, move, Hammer, device_normalizer, Joystick, Controller) {
+    'joystick/Controller',
+    'easel'
+], function($, modernizr, device_normalizer, Joystick, Controller, createjs) {
     var inputs = $('.inputs');
     var canvasHolder = $('.canvasHolder');
     var inputField = document.getElementById('token');
@@ -61,24 +65,8 @@ define([
     var $messageText = $message.find('.message__textbox__text');
     var $messageDimmer = $('.message-dimmer');
 
-    window.scrollTo(0,1);
 
-    function toggleFullScreen() {
-        var doc = window.document;
-        var docEl = doc.documentElement;
-
-        var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-        var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
-
-        if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-            requestFullScreen.call(docEl);
-        }
-        else {
-            cancelFullScreen.call(doc);
-        }
-    }
-    //toggleFullScreen(); // TODO: not working
-
+    /******************************** util functions ********************************/
 
     function hideJoystick() {
         canvasHolder.hide();
@@ -145,7 +133,28 @@ define([
         });
     }
 
+
+    /******************************** main ********************************/
+
     function main() {
+        window.scrollTo(0,1);
+        console.log(Modernizr);
+        console.log(createjs.Touch.isSupported());
+        if (!Modernizr.canvas || !Modernizr.canvastext || !Modernizr.localstorage
+            || !Modernizr.audio || !Modernizr.multiplebgs
+            || !Modernizr.csstransforms || !Modernizr.fontface || !createjs.Touch.isSupported()) {
+            showMessage("Your browser is not supported. Sorry", true);
+        }
+
+
+    }
+    main();
+
+
+    /******************************** joystick stuff ********************************/
+
+
+    function joystickMain() {
         setTimeout(function(){
             // Hide the address bar!
             window.scrollTo(0, 1);
@@ -173,7 +182,7 @@ define([
         checkOrientation();
     }
 
-    //main();
+    //joystickMain();
 
     function onMessage(data) {
         console.log('message', data);
@@ -199,52 +208,10 @@ define([
     }
 
     Joystick(inputField, {
-        onStart: main,
+        onStart: joystickMain,
         onMessage: onMessage,
         onStatusChanged: onStatusChanged,
         onDisconnect: onDisconnect
     });
 
 });
-
-// TODO: supposed to be in main()
-//    move.defults = {
-//        duration: 0
-//    };
-//
-//    var circle = $('.circle');
-//    var small_circle = $('.inner-circle');
-//
-//    var lastPosX = small_circle.position().left,
-//        lastPosY = small_circle.position().top;
-//    var posX = 0,
-//        posY = 0;
-//
-//    var hammertime = Hammer(small_circle[0], {
-//        transform_always_block: true,
-//        transform_min_scale: 1,
-//        drag_block_horizontal: true,
-//        drag_block_vertical: true,
-//        drag_min_distance: 0
-//    });
-//
-//
-//    hammertime.on("drag", function(event) {
-//        var gesture = event.gesture;
-//        posX = lastPosX + gesture.deltaX;
-//        posY = lastPosY + gesture.deltaY;
-////        move('.inner-circle')
-////            .to(posX, posY)
-////            .end();
-//
-//        var transform = "translate(" + posX + "px," + posY +" px)";
-//
-////        var inner = document.getElementById('inner');
-////        inner.style.transform = transform;
-////        inner.style.oTransform = transform;
-////        inner.style.msTransform = transform;
-////        inner.style.mozTransform = transform;
-////        inner.style.webkitTransform = transform;
-//
-//        $('#inner').css({
-//            "-webkit-transform": tran
