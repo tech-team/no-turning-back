@@ -240,6 +240,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
         },
 
         onJoystickMessage: function(data, answer) {
+            var self = this;
+
             if (data.type === "game") {
                 switch (data.action) {
                     case "shoot":
@@ -247,9 +249,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                             console.log("shoot!!!");
                             this.lastShootTime = data.timestamp;
 
-                            var event = (new KeyCoder()).getKeys();
-                            event.keys[KeyCoder.SPACE] = true;
-                            this.shootingHandle(event);
+                            this.shootingHandle();
                         }
                         break;
                     case "weaponchange":
@@ -270,8 +270,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         this.weaponsHandle(event);
                         break;
                     case "move":
-                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (2) : (4);
-                        console.log("I'm moving!");
+                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (1) : (2);
                         if (speedModifier) {
                             var movementData = {
                                 speedModifier: speedModifier,
@@ -280,6 +279,13 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 //                            console.log(data);
                             this.player.movementHandle(movementData, this.collisionObjects);
                         }
+                        break;
+                    case "use":
+                        var event = (new KeyCoder()).getKeys();
+                        event.keys[KeyCoder.E] = true;
+                        this.chestsOpeningHandle(self, event);
+                        this.doorsOpeningHandle(event);
+                        event.keys[KeyCoder.E] = false;
                         break;
                     default:
                         break;
@@ -297,7 +303,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 this.keyFunc(event);
                 this.setPrevPlayerPos();
 
-//                this.player.update(event, this.collisionObjects);
+                this.player.update(event);
                 if (this.zombies.length === 0) {
                     ResourceManager.playSound(ResourceManager.soundList.Victory);
                     $.event.trigger({
@@ -362,15 +368,18 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             }
 
             this.weaponsHandle(event);
-            this.shootingHandle(event);
+            if (event.keys[KeyCoder.SPACE]) {
+                this.shootingHandle();
+            }
 
+            this.bulletsCollisionsHandle();
             this.zombiesDeathHandle(self);
             this.dropsHandle();
 
-            this.chestsOpeningHandle(self);
-            this.doorsOpeningHandle();
+            //this.chestsOpeningHandle(self);
+            //this.doorsOpeningHandle();
 
-            if(event.keys[KeyCoder.M]) {
+            if (event.keys[KeyCoder.M]) {
                 ResourceManager.toggleSound();
             }
         },
@@ -416,8 +425,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             }
         },
 
-        shootingHandle: function(event) {
-            if(event.keys[KeyCoder.SPACE] && this.player.cooldown == 0) {
+        shootingHandle: function() {
+            if(this.player.cooldown == 0) {
                 var currentWeapon = this.player.currentWeapon;
 
                 if (currentWeapon === "knife") {
@@ -479,41 +488,40 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                     }
                 }
             }
-
-            //Bullets collisions handling
+        },
+        bulletsCollisionsHandle: function() {
             out:
-                for (var i = 0; i < this.bullets.length; ++i) {
-                    console.log(this.bullets[i].ttl);
-                    if (this.bullets[i].ttl){
-                        if (--this.bullets[i].ttl <= 0) {
-                            this.stage.removeChild(this.bullets[i].dispObj);
-                            this.bullets.splice(i, 1);
-                            break;
-                        }
-                    }
-                    for(var j = 0; j < this.zombies.length; ++j) {
-                        if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
-                            this.zombies[j].health -= this.bullets[i].power;
-                            this.stage.removeChild(this.bullets[i].dispObj);
-                            ResourceManager.playSound(ResourceManager.soundList.PistolHit);
-                            this.bullets.splice(i, 1);
-                            break out;
-                        }
-                    }
-                    for(var j = 0; j < this.collisionObjects.length; ++j) {
-                        if (collider.checkPixelCollision(this.bullets[i].dispObj,this.collisionObjects[j])) {
-                            this.stage.removeChild(this.bullets[i].dispObj);
-                            ResourceManager.playSound(ResourceManager.soundList.BulletRicochet);
-                            this.bullets.splice(i, 1);
-                            break out;
-                        }
-                    }
-                    if (this.checkBounds(this.bullets[i].dispObj)) {
+            for (var i = 0; i < this.bullets.length; ++i) {
+                if (this.bullets[i].ttl){
+                    if (--this.bullets[i].ttl <= 0) {
                         this.stage.removeChild(this.bullets[i].dispObj);
                         this.bullets.splice(i, 1);
                         break;
                     }
                 }
+                for(var j = 0; j < this.zombies.length; ++j) {
+                    if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
+                        this.zombies[j].health -= this.bullets[i].power;
+                        this.stage.removeChild(this.bullets[i].dispObj);
+                        ResourceManager.playSound(ResourceManager.soundList.PistolHit);
+                        this.bullets.splice(i, 1);
+                        break out;
+                    }
+                }
+                for(var j = 0; j < this.collisionObjects.length; ++j) {
+                    if (collider.checkPixelCollision(this.bullets[i].dispObj,this.collisionObjects[j])) {
+                        this.stage.removeChild(this.bullets[i].dispObj);
+                        ResourceManager.playSound(ResourceManager.soundList.BulletRicochet);
+                        this.bullets.splice(i, 1);
+                        break out;
+                    }
+                }
+                if (this.checkBounds(this.bullets[i].dispObj)) {
+                    this.stage.removeChild(this.bullets[i].dispObj);
+                    this.bullets.splice(i, 1);
+                    break;
+                }
+            }
         },
 
         zombiesDeathHandle: function(self) {
@@ -550,14 +558,14 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             }
         },
 
-        chestsOpeningHandle: function(self) {
+        chestsOpeningHandle: function(self, event) {
             for (var i = 0; i < this.chests.length; ++i) {
+                this.chests[i].update(event, this.player);
                 if (this.chests[i].justTried == true) {
                     this.chests[i].justTried = false;
                     this.showMessage(this.chests[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
                 }
                 else if (this.chests[i].justOpened == true) {
-
                     this.chests[i].justOpened = false;
                     this.chests[i].storage.forEach(function(drop) {
 
@@ -641,8 +649,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             }
         },
 
-        doorsOpeningHandle: function() {
+        doorsOpeningHandle: function(event) {
             for (var i = 0; i < this.doors.length; ++i) {
+                this.doors[i].update(event, this.player);
                 if (this.doors[i].justTried == true) {
                     this.doors[i].justTried = false;
                     this.showMessage(this.doors[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
