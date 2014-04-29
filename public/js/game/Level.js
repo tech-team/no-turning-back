@@ -298,12 +298,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
         },
 
 		update: function(event) {
-            if (this.isJoystick) {
-//                this.joystickServer.send({test: "testFromLevel"});
-            }
-
             if (!this.editorMode) {
-
                 this.keyFunc(event);
                 this.setPrevPlayerPos();
 
