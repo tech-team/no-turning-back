@@ -77,9 +77,14 @@ define([
             answer('answer');
         });
 
-        server.on('disconnect', callbacks.onDisconnect);
+        server.on('disconnect', function() {
+            window.server = null;
+            callbacks.onDisconnect();
+        });
 
         window.server = server;
+
+
     };
     return Joystick;
 });

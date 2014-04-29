@@ -26,7 +26,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
         $mobileIconNormal: null,
         $mobileConnect: null,
         $mobileToken: null,
-        $reconnectButton: null,
+        $closeButton: null,
         $loadingIndicator: null,
         mobileConnectVisible: false,
 
@@ -85,6 +85,16 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
             }
         },
 
+        disconnect: function(sendToJoystick) {
+            localStorage.removeItem('consoleguid');
+            if (sendToJoystick) {
+                window.server.send({
+                    type: "disconnect"
+                });
+            }
+            window.server.disconnect();
+        },
+
         render: function () {
             this.$el.html(this.template());
             this.$el.attr('id', this.pageId.slice(1));
@@ -103,7 +113,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
             this.$mobileConnect = this.$el.find('.mobile-connect');
             this.$mobileToken = this.$el.find('.mobile-connect__token');
 
-            this.$reconnectButton = this.$el.find('.reconnect-button');
+            this.$closeButton = this.$el.find('.reconnect-button');
             this.$loadingIndicator = this.$el.find('.loading-indicator');
             this.createEvents();
 
@@ -153,10 +163,9 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
             });
 
 
-            this.$reconnectButton.on('click', function() {
-                localStorage.removeItem('consoleguid');
-                self.startJoystick();
-                self.$reconnectButton.hide();
+            this.$closeButton.on('click', function() {
+                self.disconnect(true);
+                self.$closeButton.hide();
             });
         },
 
@@ -193,6 +202,10 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
                         this.game.continueGame();
                     }
                     break;
+
+                case "disconnect":
+                    this.disconnect();
+                    break;
                 default:
                     break;
             }
@@ -209,13 +222,13 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
                 saveToken: function(guid) {
                     self.$loadingIndicator.hide();
                     self.$mobileToken.text(guid);
-//                    if (guid === "Already connected") {
-//                        self.$reconnectButton.show();
-//                    }
+                    if (guid === "Already connected") {
+                        self.$closeButton.show();
+                    }
 
                 },
                 onMessage: function(data, answer) {
-                    if (data.type === "orientation") {
+                    if (data.type === "orientation" || data.type === "disconnect") {
                         self.onJoystickMessage(data, answer);
                     }
                     else {

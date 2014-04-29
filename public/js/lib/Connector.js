@@ -67,6 +67,10 @@ define([
             })
         },
 
+        disconnect: function() {
+            this.socket.disconnect('unauthorized');
+        },
+
         isReady: function(){
             return this._isReady;
         },
