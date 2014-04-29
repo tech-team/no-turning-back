@@ -29,7 +29,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 DoorOpen: "door_open.mp3",
                 ChestOpen: "chest_open.mp3",
                 GameOver: "game_over.mp3",
-                Victory: "fortunate_son.mp3"
+                Victory: ""//"fortunate_son.mp3",
             },
             weaponData: {
                 knife: {
@@ -60,15 +60,15 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 return this.instance;
             },
 
-            soundEnabled: localStorage["soundEnabled"],
+            soundDisabled: localStorage["soundDisabled"],
 
             toggleSound: function() {
-                localStorage["soundEnabled"] = !this.soundEnabled;
-                this.soundEnabled = !this.soundEnabled;
+                localStorage["soundDisabled"] = !this.soundDisabled;
+                this.soundDisabled = !this.soundDisabled;
             },
 
             playSound: function(sound) {
-                if (!this.soundEnabled)
+                if (this.soundDisabled)
                     return;
 
                 if (_.isArray(sound)) {
