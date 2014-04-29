@@ -60,15 +60,15 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 return this.instance;
             },
 
-            soundDisabled: localStorage["soundDisabled"],
+            soundEnabled: localStorage["soundEnabled"],
 
             toggleSound: function() {
-                localStorage["soundDisabled"] = !this.soundDisabled;
-                this.soundDisabled = !this.soundDisabled;
+                localStorage["soundEnabled"] = !this.soundEnabled;
+                this.soundEnabled = !this.soundEnabled;
             },
 
             playSound: function(sound) {
-                if (this.soundDisabled)
+                if (!this.soundEnabled)
                     return;
 
                 if (_.isArray(sound)) {
