@@ -446,6 +446,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 }
                 else if (currentWeapon === "pistol") {
                     if (this.player.weapons['pistol'] > 0) {
+                        ResourceManager.playSound(ResourceManager.soundList.PistolFire);
                         var bulletData = {
                             x: this.player.dispObj.x,
                             y: this.player.dispObj.y,
@@ -466,7 +467,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 }
                 else if (currentWeapon === "shotgun") {
                     if (this.player.weapons['shotgun'] > 0) {
-
+                        ResourceManager.playSound(ResourceManager.soundList.ShotgunFire);
                         for (var i = 0; i < ResourceManager.weaponData.shotgun.bulletNum; ++i) {
 
                             var bulletData = {
@@ -567,6 +568,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         break;
                     }
                     else if (this.chests[i].justOpened == true) {
+                        ResourceManager.playSound(ResourceManager.soundList.ChestOpen);
                         this.chests[i].justOpened = false;
                         this.chests[i].storage.forEach(function(drop) {
 
@@ -663,6 +665,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         this.showMessage(this.doors[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
                     }
                     else if (this.doors[i].justOpened == true) {
+                        ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
 
                         this.doors[i].justOpened = false;
                         for (var j = 0; j < this.collisionObjects.length; ++j) {
