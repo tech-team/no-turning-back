@@ -360,7 +360,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             }
 
             if (event.keys[KeyCoder.X]) {
-                ResourceManager.playSound(ResourceManager.soundList.Victory);
+                ResourceManager.playSound(ResourceManager.soundList.CheaterVictory);
                 $.event.trigger({
                     type: "levelFinished",
                     score: this.player.score,

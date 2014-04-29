@@ -29,7 +29,8 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 DoorOpen: "door_open.mp3",
                 ChestOpen: "chest_open.mp3",
                 GameOver: "game_over.mp3",
-                Victory: ""//"fortunate_son.mp3",
+                Victory: "fortunate_son.mp3",
+                CheaterVictory: "cheater_victory.mp3"
             },
             weaponData: {
                 knife: {
@@ -75,8 +76,10 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                     var randId = _.random(0, sound.length);
                     soundjs.Sound.play(sound[randId]);
                 }
-                else
+                else {
+                    soundjs.Sound.stop(sound);
                     soundjs.Sound.play(sound);
+                }
             }
         },
 
