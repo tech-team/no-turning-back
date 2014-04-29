@@ -38,9 +38,9 @@
             <script>
                 console.time('load');
             </script>
-            <script src="joystick/js/build/build.min.js"></script>
+            <script src="js/joystick/build/build.min.js"></script>
             <script>
-                require(['main'], function(){
+                require(['main_joystick'], function(){
                 console.timeEnd('load');
                 });
             </script>

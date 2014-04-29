@@ -9,7 +9,7 @@ require.config({
         easel: "lib/game/easeljs",
         Connector: "lib/Connector",
         FnQuery: "lib/FnQuery",
-        'socket.io': "/socket.io/socket.io",
+        'socket.io': "lib/socket.io",
         hammer: "lib/hammer",
         move: "lib/move",
         device_normalizer: "lib/deviceapi-normaliser",

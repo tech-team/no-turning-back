@@ -14,7 +14,7 @@ require.config({
         collision: "lib/game/collision",
         Connector: "lib/Connector",
         FnQuery: "lib/FnQuery",
-        "socket.io": "/socket.io/socket.io",
+        "socket.io": "lib/socket.io",
         modernizr: "lib/modernizr"
     },
     shim: {
