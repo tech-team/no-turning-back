@@ -28,12 +28,127 @@ function(Class, AliveObject, KeyCoder, collider) {
             this.effects = effects;
         },
 
-		update: function() {
+		update: function(event, collisionObjects) {
             if (this.cooldown > 0) {
                 --this.cooldown;
             }
             if (this.messageCooldown > 0) {
                 --this.messageCooldown;
+            }
+
+            var speedModifier = 2;
+            var reboundModifier = 1.1;
+            var offsetRotation = 4;
+            var offsetX, offsetY;
+
+
+
+            if (event.keys[KeyCoder.W]) {
+                if (event.keys[KeyCoder.SHIFT]) { speedModifier = 4; }
+                offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.dispObj.rotation);
+                offsetY = speedModifier * Math.sin( (Math.PI / 180) * this.dispObj.rotation);
+                this.dispObj.x += offsetX;
+                this.dispObj.y += offsetY;
+                for (var i = 0; i < collisionObjects.length; ++i) {
+                    if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                        this.dispObj.x -= reboundModifier * offsetX;
+                        this.dispObj.y -= reboundModifier * offsetY;
+                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                            this.dispObj.x += (reboundModifier - 1) * offsetX;
+                            this.dispObj.y += (reboundModifier - 1) * offsetY;
+                        }
+                    }
+                }
+                if (event.keys[KeyCoder.D]) {
+                    this.dispObj.rotation += offsetRotation;
+                    for (var i = 0; i < collisionObjects.length; ++i) {
+                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                            this.dispObj.rotation -= reboundModifier * offsetRotation;
+
+                        }
+                    }
+                }
+                if (event.keys[KeyCoder.A]) {
+                    this.dispObj.rotation -= offsetRotation;
+                    for (var i = 0; i < collisionObjects.length; ++i) {
+                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                            this.dispObj.rotation += reboundModifier * offsetRotation;
+                        }
+                    }
+                }
+            }
+            if (event.keys[KeyCoder.S]) {
+                offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.dispObj.rotation);
+                offsetY = speedModifier * Math.sin( (Math.PI / 180) * this.dispObj.rotation);
+                this.dispObj.x -= offsetX;
+                this.dispObj.y -= offsetY;
+                for (var i = 0; i < collisionObjects.length; ++i) {
+                    if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                        this.dispObj.x += reboundModifier * offsetX;
+                        this.dispObj.y += reboundModifier * offsetY;
+                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                            this.dispObj.x -= (reboundModifier - 1) * offsetX;
+                            this.dispObj.y -= (reboundModifier - 1) * offsetY;
+                        }
+                    }
+                }
+                if (event.keys[KeyCoder.D]) {
+                    this.dispObj.rotation -= offsetRotation;
+                    for (var i = 0; i < collisionObjects.length; ++i) {
+                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                            this.dispObj.rotation += reboundModifier * offsetRotation;
+
+                        }
+                    }
+                }
+                if (event.keys[KeyCoder.A]) {
+                    this.dispObj.rotation += offsetRotation;
+                    for (var i = 0; i < collisionObjects.length; ++i) {
+                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                            this.dispObj.rotation -= reboundModifier * offsetRotation;
+                        }
+                    }
+                }
+            }
+
+            if (!(event.keys[KeyCoder.W] || event.keys[KeyCoder.S])) {
+                if (event.keys[KeyCoder.D]) {
+                    offsetRotation *= 2;
+                    this.dispObj.rotation += offsetRotation;
+                    for (var i = 0; i < collisionObjects.length; ++i) {
+                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                            this.dispObj.rotation -= offsetRotation;
+
+                        }
+                    }
+                }
+                if (event.keys[KeyCoder.A]) {
+                    offsetRotation *= 2;
+                    this.dispObj.rotation -= offsetRotation;
+                    for (var i = 0; i < collisionObjects.length; ++i) {
+                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                            this.dispObj.rotation += offsetRotation;
+
+                        }
+                    }
+                }
+            }
+
+
+            if(event.keys[KeyCoder.K]) {
+                this.keys.forEach(function(key) {
+                    console.log(key + " ");
+                });
+            }
+            if(event.keys[KeyCoder.I]) {
+                this.inventory.forEach(function(item) {
+                    console.log(item + " ");
+                });
+            }
+            if(event.keys[KeyCoder.O]) {
+                for (var weapon in this.weapons) {
+                    console.log(weapon + " : " + this.weapons[weapon]);
+                }
             }
         },
 

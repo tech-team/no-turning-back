@@ -302,7 +302,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 this.keyFunc(event);
                 this.setPrevPlayerPos();
 
-                this.player.update();
+                this.player.update(event, this.collisionObjects);
                 if (this.zombies.length === 0) {
                     ResourceManager.playSound(ResourceManager.soundList.Victory);
                     $.event.trigger({
@@ -351,7 +351,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 		},
 
         keyFunc: function(event) {
-
             var self = this;
 
             if (this.checkBounds(this.player.dispObj)) {
