@@ -11,7 +11,7 @@ define([
                 this.y = obj.y;
                 this.state = ( obj.state === "open" ) ? "open" : "closed" ;
                 this.tex = ( this.state === "open") ? "door-open" : "door-closed";
-                this.activationRadius = 80;
+                this.activationRadius = 100;
                 this.requires = obj.requires;
                 this.requiresMessage = this.requires.toString() + " required";
                 this.justOpened = false;

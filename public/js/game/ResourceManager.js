@@ -13,7 +13,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             texList: ["ground", "zombie", "player", "player-pistol", "player-shotgun", "wall", "brick_wall1", "brick_wall2",
                 "brick_wall3", "brick_wall4", "chest", "chest-open", "door-open", "door-closed", "rubbish",
                 "waypoint", "pistol", "pistol-bullet", "shotgun", "shotgun-bullet", "golden-key", "silver-key",
-                "effects/fog", "effects/damage", "zombie_corpse"],
+                "effects/fog", "effects/damage", "zombie_corpse", "golden_apple"],
             soundList: {
                 KnifeDraw: "knife.mp3",
                 KnifeMiss: "knife_miss.mp3",

@@ -158,7 +158,9 @@ function(Class, AliveObject, KeyCoder, collider) {
             while (Math.abs(this.dispObj.rotation) > 180) {
                 this.dispObj.rotation -= (this.dispObj.rotation > 0) ? (360) : (-360);
             }
+            var currentRotation = this.dispObj.rotation;
             this.dispObj.rotation = movementData.angle;
+
             this.dispObj.angle = (Math.PI / 180) * this.dispObj.rotation;
 
             var offsetX = movementData.speedModifier * Math.cos(this.dispObj.angle);
@@ -173,6 +175,7 @@ function(Class, AliveObject, KeyCoder, collider) {
                     if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
                         this.dispObj.x -= reboundModifier * offsetX;
                         this.dispObj.y -= reboundModifier * offsetY;
+                        this.dispObj.rotation = currentRotation;
                         if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
                             this.dispObj.x += (reboundModifier - 1) * offsetX;
                             this.dispObj.y += (reboundModifier - 1) * offsetY;

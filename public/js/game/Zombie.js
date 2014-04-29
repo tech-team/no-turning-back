@@ -17,7 +17,7 @@ define([
                 this.attackInterval = 1000;
                 this.health = 20;
                 this.damage = 5;
-                this.followDistance = 150;
+                this.followDistance = obj.followDistance || 150;
                 this.attackDistance = 28;
             },
 

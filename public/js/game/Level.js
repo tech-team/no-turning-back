@@ -589,11 +589,13 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                     }
                                     break;
                                 case "medkit":
+                                    var healed = drop['size'];
                                     self.player.health += drop['size'];
-                                    if (self.player.health > self.player.maxHealth)
+                                    if (self.player.health > self.player.maxHealth) {
+                                        healed -= self.player.health - self.player.maxHealth;
                                         self.player.health = self.player.maxHealth;
-
-                                    self.showMessage("You healed " + drop['size'] + " health", Level.MessageColor.Medkit);
+                                    }
+                                    self.showMessage("You healed " + healed + " health" + ((healed === 0) ? (", dumbass.") : ("")), Level.MessageColor.Medkit);
                                     break;
                                 case "ammo":
                                     if (drop['name'] in self.player.weapons) {
@@ -645,6 +647,15 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                     this.player.weapons[name] = this.drops[i].data['ammo'];
                                     this.showMessage("You picked up a new weapon: " + this.drops[i].data['name'], Level.MessageColor.NewWeapon);
                                 }
+                                break;
+                            case "medkit":
+                                var healed = this.drops[i].data['size'];
+                                this.player.health += this.drops[i].data['size'];
+                                if (this.player.health > this.player.maxHealth) {
+                                    healed -= this.player.health - this.player.maxHealth;
+                                    this.player.health = this.player.maxHealth;
+                                }
+                                this.showMessage("You healed " + healed + " health" + ((healed === 0) ? (", dumbass.") : ("")), Level.MessageColor.Medkit);
                                 break;
                             default:
                                 if (this.drops[i].data['name']) {
