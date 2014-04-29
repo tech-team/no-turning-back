@@ -29,7 +29,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 DoorOpen: "door_open.mp3",
                 ChestOpen: "chest_open.mp3",
                 GameOver: "game_over.mp3",
-                Victory: "fortunate_son.mp3"
+                Victory: ""//"fortunate_son.mp3",
             },
             weaponData: {
                 knife: {
