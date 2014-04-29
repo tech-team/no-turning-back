@@ -171,6 +171,10 @@ define([
             checkOrientation();
         }, false);
 
+        $('#token').on('keyup', function(){
+            this.value = this.value.toLocaleUpperCase();
+        });
+
         checkOrientation();
 
         startJoystick();

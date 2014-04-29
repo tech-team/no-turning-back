@@ -27,7 +27,7 @@ define([
                     e.preventDefault();
 
                     // И отправляем его на сервер
-                    server.bind({token: inputField.value}, function (data) {
+                    server.bind({token: inputField.value.toLowerCase()}, function (data) {
                         if (data.status == 'success') { //  В случае успеха
                             // Стартуем джостик
                             start(data.guid);
