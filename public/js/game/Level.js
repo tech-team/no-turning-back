@@ -68,7 +68,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 NewItem: "#A1BF26",
                 Medkit: "#1397F0",
                 Ammo: "#A7FA16",
-                DoorClosed: "#0FFFF0"
+                DoorClosed: "#0FFFF0",
+                NoAmmo: "#459DBA"
             },
 
             SpeedModifier: {
@@ -341,7 +342,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 var ammo = this.player.weapons[currentWeapon];
 
                 var weaponText = currentWeapon;
-                if (ammo >= 0)
+                if (weaponText != "knife")
                     weaponText += ": " + ammo;
                 this.weaponText.text = weaponText;
 
@@ -427,25 +428,24 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
         shootingHandle: function() {
             if(this.player.cooldown == 0) {
                 var currentWeapon = this.player.currentWeapon;
+                if (this.player.weapons[currentWeapon] > 0) {
+                    if (currentWeapon === "knife") {
+                        for (var i = 0; i < this.zombies.length; ++i) {
+                            var xToZombie = this.player.dispObj.x - this.zombies[i].dispObj.x;
+                            var yToZombie = this.player.dispObj.y - this.zombies[i].dispObj.y;
+                            var distanceToZombie = Math.sqrt(xToZombie * xToZombie + yToZombie * yToZombie);
 
-                if (currentWeapon === "knife") {
-                    for (var i = 0; i < this.zombies.length; ++i) {
-                        var xToZombie = this.player.dispObj.x - this.zombies[i].dispObj.x;
-                        var yToZombie = this.player.dispObj.y - this.zombies[i].dispObj.y;
-                        var distanceToZombie = Math.sqrt(xToZombie * xToZombie + yToZombie * yToZombie);
-
-                        if (distanceToZombie <= this.player.reach) {
-                            this.zombies[i].health -= ResourceManager.weaponData.knife.power;
-                            ResourceManager.playSound(ResourceManager.soundList.KnifeHit);
+                            if (distanceToZombie <= this.player.reach) {
+                                this.zombies[i].health -= ResourceManager.weaponData.knife.power;
+                                ResourceManager.playSound(ResourceManager.soundList.KnifeHit);
+                            }
+                            else if (distanceToZombie <= this.player.reach) {
+                                ResourceManager.playSound(ResourceManager.soundList.KnifeMiss);
+                            }
                         }
-                        else if (distanceToZombie <= this.player.reach) {
-                            ResourceManager.playSound(ResourceManager.soundList.KnifeMiss);
-                        }
+                        this.player.cooldown = ResourceManager.weaponData.knife.coolDown;
                     }
-                    this.player.cooldown = ResourceManager.weaponData.knife.coolDown;
-                }
-                else if (currentWeapon === "pistol") {
-                    if (this.player.weapons['pistol'] > 0) {
+                    else if (currentWeapon === "pistol") {
                         ResourceManager.playSound(ResourceManager.soundList.PistolFire);
                         var bulletData = {
                             x: this.player.dispObj.x,
@@ -464,9 +464,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         this.player.cooldown = ResourceManager.weaponData.pistol.coolDown;
                         --this.player.weapons['pistol'];
                     }
-                }
-                else if (currentWeapon === "shotgun") {
-                    if (this.player.weapons['shotgun'] > 0) {
+                    else if (currentWeapon === "shotgun") {
                         ResourceManager.playSound(ResourceManager.soundList.ShotgunFire);
                         for (var i = 0; i < ResourceManager.weaponData.shotgun.bulletNum; ++i) {
 
@@ -486,6 +484,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         this.player.cooldown = ResourceManager.weaponData.shotgun.coolDown;
                         --this.player.weapons['shotgun'];
                     }
+                }
+                else {
+                    this.showMessage("You are out of ammo!", Level.MessageColor.NoAmmo);
                 }
             }
         },

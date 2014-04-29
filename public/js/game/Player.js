@@ -14,7 +14,7 @@ function(Class, AliveObject, KeyCoder, collider) {
             this.cooldown = 0;
             this.messageCooldown = 0;
             this.effects = null;
-            this.weapons = {"knife": -1};
+            this.weapons = {"knife": 1};
             this.currentWeapon = "knife";
             this.inventory = [];
             this.keys = [];
