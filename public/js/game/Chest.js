@@ -28,14 +28,15 @@ define([
             },
 
             update: function(event, player) {
-                var vectorToPlayer = {
+                if (event.keys[KeyCoder.E]) {
+
+                    var vectorToPlayer = {
                     x: player.dispObj.x - this.dispObj.x,
                     y: player.dispObj.y - this.dispObj.y,
                     distance: function() { return Math.sqrt(this.x*this.x + this.y*this.y); }
-                };
+                    };
 
-                if (vectorToPlayer.distance() <= this.activationRadius) {
-                    if (event.keys[KeyCoder.E]) {
+                    if (vectorToPlayer.distance() <= this.activationRadius) {
                         if (this.state === "closed" && _.contains(player.keys, this.requires)) {
                             this.justOpened = true;
                             this.state = "open";

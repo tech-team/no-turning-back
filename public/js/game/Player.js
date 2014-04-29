@@ -51,7 +51,7 @@ function(Class, AliveObject, KeyCoder, collider) {
         },
 
         movementHandle: function(movementData, collisionObjects) {
-            var reboundModifier = (movementData.speedModifier === 1) ? (1.1) : (1.2);
+            var reboundModifier = (movementData.speedModifier === 0.75) ? (1.1) : (1.2);
 
             while (Math.abs(this.dispObj.rotation) > 180) {
                 this.dispObj.rotation -= (this.dispObj.rotation > 0) ? (360) : (-360);
