@@ -12,6 +12,7 @@ function(Class, AliveObject, KeyCoder, collider) {
             this.dead = false;
 			this.score = 0;
             this.cooldown = 0;
+            this.messageCooldown = 0;
             this.effects = null;
             this.weapons = {"knife": -1};
             this.currentWeapon = "knife";
@@ -27,26 +28,12 @@ function(Class, AliveObject, KeyCoder, collider) {
             this.effects = effects;
         },
 
-		update: function(event) {
-
-            if(event.keys[KeyCoder.K]) {
-                this.keys.forEach(function(key) {
-                    console.log(key + " ");
-                });
-            }
-            if(event.keys[KeyCoder.I]) {
-                this.inventory.forEach(function(item) {
-                    console.log(item + " ");
-                });
-            }
-            if(event.keys[KeyCoder.O]) {
-                for (var weapon in this.weapons) {
-                    console.log(weapon + " : " + this.weapons[weapon]);
-                }
-            }
-
+		update: function() {
             if (this.cooldown > 0) {
                 --this.cooldown;
+            }
+            if (this.messageCooldown > 0) {
+                --this.messageCooldown;
             }
         },
 

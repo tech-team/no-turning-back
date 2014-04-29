@@ -251,7 +251,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 switch (data.action) {
                     case "shoot":
                         if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
-                            console.log("shoot!!!");
                             this.lastShootTime = data.timestamp;
 
                             this.shootingHandle();
@@ -281,7 +280,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                 speedModifier: speedModifier,
                                 angle: data.phi
                             };
-//                            console.log(data);
                             this.player.movementHandle(movementData, this.collisionObjects);
                         }
                         break;
@@ -308,7 +306,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 this.keyFunc(event);
                 this.setPrevPlayerPos();
 
-                this.player.update(event);
+                this.player.update();
                 if (this.zombies.length === 0) {
                     ResourceManager.playSound(ResourceManager.soundList.Victory);
                     $.event.trigger({
@@ -323,12 +321,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 }
                 for (var i = 0; i < this.bullets.length; ++i) {
                     this.bullets[i].update(event);
-                }
-                for (var i = 0; i < this.chests.length; ++i) {
-                    this.chests[i].update(event, this.player);
-                }
-                for (var i = 0; i < this.doors.length; ++i) {
-                    this.doors[i].update(event, this.player);
                 }
 
 
