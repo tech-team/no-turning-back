@@ -11,7 +11,8 @@ define([
             __init__: function($window, canvas, stopJoystick) {
                 this.$window = $window;
                 this.canvas = canvas;
-                this.startJoystick = stopJoystick;
+                this.stopJoystick = stopJoystick;
+                console.log(this.stopJoystick);
                 //this.stage = _.extend(new createjs.Stage(this.canvas), MultiTouchStage);
                 this.stage = new createjs.Stage(this.canvas);
                 this.stage.enableDOMEvents(true);
@@ -434,7 +435,7 @@ define([
 
                     self.forceUpdate();
 
-                    self.startJoystick.call(self.joystickThis);
+                    self.stopJoystick();
                     // **********************what***********************
                     // **********************the************************
                     // **********************hell***********************

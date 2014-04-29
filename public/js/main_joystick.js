@@ -1,5 +1,5 @@
 require.config({
-    urlArgs: "_=" + (new Date()).getTime(),
+    urlArgs: "_=", //+ (new Date()).getTime(),
     baseUrl: "js",
     paths: {
         jquery: "lib/jquery",
@@ -64,6 +64,8 @@ define([
     var $message = $('.message');
     var $messageText = $message.find('.message__textbox__text');
     var $messageDimmer = $('.message-dimmer');
+    var $tokenForm = $('#tokenForm');
+    var isReconnecting = false;
 
 
     /******************************** util functions ********************************/
@@ -160,7 +162,6 @@ define([
         mo.init();
 
         checkBrowserSupport();
-
         window.serverSend = function(objectToSend) {
             if (window.server) {
                 window.server.send(objectToSend);
@@ -171,8 +172,11 @@ define([
             checkOrientation();
         }, false);
 
-        checkOrientation();
+        $('#token').on('keyup', function(){
+            this.value = this.value.toLocaleUpperCase();
+        });
 
+        checkOrientation();
         startJoystick();
     }
     main();
@@ -181,18 +185,23 @@ define([
 
     /******************************** joystick stuff ********************************/
 
+    function disconnect(sendToClient) {
+        localStorage.removeItem('playerguid');
+        if (sendToClient) {
+            window.serverSend({
+                type: "disconnect"
+            });
+        }
+        window.server.disconnect();
+    }
 
     function joystickMain() {
         showJoystick();
 
         var controller = new Controller($(window), $('canvas')[0], function() {
-            localStorage.removeItem('playerguid');
-            console.log(server.disconnect);
-//            window.server.disconnect();
-            showMessage("You were disconnected", false, function() {
-                hideJoystick();
-            });
-        });
+            disconnect(true);
+            startJoystick();
+        }.bind(window));
 
         window.addEventListener("deviceorientation", function (e) {
             var orientation = deviceOrientation(e);
@@ -221,6 +230,9 @@ define([
                     showMessage(data.message, false);
                 }
                 break;
+            case "disconnect":
+                disconnect();
+                break;
         }
     }
 
@@ -238,7 +250,7 @@ define([
 
     function onDisconnect() {
         showMessage("You were disconnected", false, function() {
-            hideJoystick();
+            location.reload();
         });
 
     }

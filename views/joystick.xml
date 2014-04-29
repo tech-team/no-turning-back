@@ -11,7 +11,7 @@
 	</head>
 	<body>
         <div class="inputs">
-            <form id="scoreForm" method='post' class="one-field-input">
+            <form id="tokenForm" method='post' class="one-field-input">
                 <input type="text" id="token" class="one-field-input__input-field" placeholder="Enter a token" autocomplete="off" name="token"/>
                 <input type="submit" id="connect" class="one-field-input__send-button" value="Submit" />
             </form>
