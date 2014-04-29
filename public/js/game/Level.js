@@ -359,6 +359,15 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 this.player.dispObj.rotation = this.prevPlayerPos.rotation;
             }
 
+            if (event.keys[KeyCoder.X]) {
+                ResourceManager.playSound(ResourceManager.soundList.Victory);
+                $.event.trigger({
+                    type: "levelFinished",
+                    score: this.player.score,
+                    message: "Cheater!"
+                });
+            }
+
             this.weaponsHandle(event);
             if (event.keys[KeyCoder.SPACE]) {
                 this.shootingHandle();
