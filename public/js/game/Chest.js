@@ -27,25 +27,23 @@ define([
             },
 
             update: function(event, player) {
-                if (event.keys[KeyCoder.E]) {
 
-                    var vectorToPlayer = {
-                    x: player.dispObj.x - this.dispObj.x,
-                    y: player.dispObj.y - this.dispObj.y,
-                    distance: function() { return Math.sqrt(this.x*this.x + this.y*this.y); }
-                    };
+                var vectorToPlayer = {
+                x: player.dispObj.x - this.dispObj.x,
+                y: player.dispObj.y - this.dispObj.y,
+                distance: function() { return Math.sqrt(this.x*this.x + this.y*this.y); }
+                };
 
-                    if (vectorToPlayer.distance() <= this.activationRadius) {
-                        if (this.state === "closed") {
-                            if(_.contains(player.keys, this.requires)) {
-                                this.justOpened = true;
-                                this.state = "open";
-                                this.tex = "chest-open";
-                            }
-                            else if (player.messageCooldown <= 0) {
-                                this.justTried = true;
-                                player.messageCooldown = 100;
-                            }
+                if (vectorToPlayer.distance() <= this.activationRadius) {
+                    if (this.state === "closed") {
+                        if(_.contains(player.keys, this.requires)) {
+                            this.justOpened = true;
+                            this.state = "open";
+                            this.tex = "chest-open";
+                        }
+                        else if (player.messageCooldown <= 0) {
+                            this.justTried = true;
+                            player.messageCooldown = 100;
                         }
                     }
                 }

@@ -373,8 +373,10 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.zombiesDeathHandle(self);
             this.dropsHandle();
 
-            //this.chestsOpeningHandle(self);
-            //this.doorsOpeningHandle();
+            if (event.keys[KeyCoder.E]) {
+                this.chestsOpeningHandle(self, event);
+                this.doorsOpeningHandle(event);
+            }
 
             if (event.keys[KeyCoder.M]) {
                 ResourceManager.toggleSound();
