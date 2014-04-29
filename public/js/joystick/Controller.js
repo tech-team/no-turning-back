@@ -270,7 +270,7 @@ define([
                     obj.regY = height / 2;
                 }
 
-                if (!noShadow)
+                if (!noShadow && false)
                     obj.shadow = new createjs.Shadow("#000000", 5, 5, 10);
 
                 return obj;
@@ -366,6 +366,8 @@ define([
                         self.mover.y -= g.y;
                     }
 
+                    self.forceUpdate();
+
                     var currentMoveTime = (new Date()).getTime();
                     if (self.lastMoveSent === 0 || currentMoveTime - self.lastMoveSent >= self.moveTimeDelta) {
                         console.log("sending");
@@ -373,7 +375,7 @@ define([
                         self.sendMoving();
                     }
 
-                    self.forceUpdate();
+
                 });
 
                 this.rightPad.on("mousedown", function(evt) {
@@ -398,14 +400,14 @@ define([
                 });
 
                 this.usePad.on("mousedown", function(evt) {
-                    self.usePad.graphics.beginFill(Controller.PRESSCOLOR.use).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
+                    self.usePad.graphics.clear().beginFill(Controller.PRESSCOLOR.use).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
 
                     if (navigator.vibrate) {
                         navigator.vibrate(10);
                     }
 
                     setTimeout(function() {
-                        self.usePad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
+                        self.usePad.graphics.clear().beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
                         self.update = true;
                     }, 400);
 
