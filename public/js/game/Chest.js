@@ -36,7 +36,7 @@ define([
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
                     if (this.state === "closed") {
-                        if(_.contains(player.keys, this.requires)) {
+                        if(_.contains(player.keys, this.requires) || !this.requires) {
                             this.justOpened = true;
                             this.state = "open";
                             this.tex = "chest-open";
