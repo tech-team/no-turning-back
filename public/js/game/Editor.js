@@ -578,7 +578,7 @@ define([
                     collection = this.showingWpsOwner.data.waypoints;
                 }
 
-                var id = collection.indexOf(dispObj);
+                var id = collection.indexOf(dispObj.data);
                 collection.splice(id, 1);
                 this.stage.removeChild(dispObj);
             }
