@@ -244,8 +244,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 alert("objData.type should be specified!");
             }
 
-            console.log(objData.type);
-
             var spriteSheet =
                 this.resourceManager.getTiledSpriteSheet(objData.tex, objData.w, objData.h);
 
