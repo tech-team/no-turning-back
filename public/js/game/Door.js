@@ -10,10 +10,11 @@ define([
                 this.x = obj.x;
                 this.y = obj.y;
                 this.state = ( obj.state === "open" ) ? "open" : "closed" ;
-                this.tex = ( this.state === "open") ? "door-open" : "door-closed";
+                this.tex = obj.tex;
                 this.activationRadius = 100;
                 this.requires = obj.requires;
-                this.requiresMessage = this.requires.toString() + " required";
+                this.requiresMessage = "";
+                this.role = obj.role || null;
                 this.justOpened = false;
                 this.justTried = false;
             },
@@ -25,7 +26,8 @@ define([
                 }
             },
 
-            update: function(event, player) {
+            update: function(event, player, zombiesLeft) {
+                var self = this;
                 var vectorToPlayer = {
                     x: player.dispObj.x - this.dispObj.x,
                     y: player.dispObj.y - this.dispObj.y,
@@ -34,11 +36,41 @@ define([
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
                     if (this.state === "closed") {
-                        if(_.contains(player.keys, this.requires)) {
-                            this.justOpened = true;
-                            this.state = "open";
-                            this.tex = "door-open";
+                        this.requiresMessage = "";
+
+                        if(_.isArray(this.requires)) {
+                            _.each(this.requires, function(requirement) {
+                                if (self.requiresMessage === "") {
+                                    if (requirement === "kill_all") {
+                                        if (zombiesLeft !== 0) {
+                                            self.requiresMessage = "Kill all zombies first.";
+                                        }
+                                    }
+                                    else if(!_.contains(player.keys, requirement)) {
+                                        self.requiresMessage = requirement + " required.";
+                                    }
+                                }
+                            });
                         }
+                        else {
+                            if (this.requiresMessage === "") {
+                                if (this.requires === "kill_all") {
+                                    if (zombiesLeft !== 0) {
+                                        this.requiresMessage = "Kill all zombies first.";
+                                    }
+                                }
+                                else if(!_.contains(player.keys, this.requires)) {
+                                    this.requiresMessage = this.requires + " required.";
+                                }
+                            }
+                        }
+
+                        if (!this.requiresMessage) {
+                            self.justOpened = true;
+                            self.state = "open";
+                            self.tex = "door-open";
+                        }
+
                         else if (player.messageCooldown <= 0) {
                             this.justTried = true;
                             player.messageCooldown = 100;

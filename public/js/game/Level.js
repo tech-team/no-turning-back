@@ -303,6 +303,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 this.setPrevPlayerPos();
 
                 this.player.update(event, this.collisionObjects);
+
+                /*
                 if (this.zombies.length === 0) {
                     ResourceManager.playSound(ResourceManager.soundList.Victory);
                     $.event.trigger({
@@ -311,6 +313,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         message: "You Win"
                     });
                 }
+                */
 
                 for (var i = 0; i < this.zombies.length; ++i) {
                     this.zombies[i].update(event, this.player, this.collisionObjects);
@@ -674,7 +677,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
         doorsOpeningHandle: function(event) {
             for (var i = 0; i < this.doors.length; ++i) {
                 if (this.checkReach(this.doors[i])) {
-                    this.doors[i].update(event, this.player);
+                    this.doors[i].update(event, this.player, this.zombies.length);
                     if (this.doors[i].justTried == true) {
                         this.doors[i].justTried = false;
                         this.showMessage(this.doors[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
@@ -692,6 +695,15 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         this.addToStage(this.doors[i], false, this.backgroundId+1);
 
                         this.player.score += Level.SCORES.DOOR_OPEN;
+
+                        if (this.doors[i].role === "exit") {
+                            ResourceManager.playSound(ResourceManager.soundList.Victory);
+                            $.event.trigger({
+                                type: "levelFinished",
+                                score: this.player.score,
+                                message: "You win!"
+                            });
+                        }
                     }
                 }
             }
