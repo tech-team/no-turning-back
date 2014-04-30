@@ -7,6 +7,7 @@ define([
     function(Class, _, GameObject, KeyCoder) {
         var Chest = GameObject.$extend({
             __init__: function(obj) {
+                this.type = "chest";
                 this.x = obj.x;
                 this.y = obj.y;
                 this.storage = obj.storage;

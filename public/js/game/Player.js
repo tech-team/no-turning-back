@@ -7,6 +7,7 @@ define([
 function(Class, AliveObject, KeyCoder, collider) {
 	var Player = AliveObject.$extend({
 		__init__: function() {
+            this.type = "player"; //type should be specified in each class it its' objects will be passed to addToStage
             this.health = 100;
             this.maxHealth = 100;
             this.dead = false;
@@ -187,6 +188,7 @@ function(Class, AliveObject, KeyCoder, collider) {
 
         damage: function(howMuch) {
             this.health -= howMuch;
+            //TODO: should be replaced with UntilTimer
 
             var damageEffect = this.effects.damage;
             damageEffect.alpha = 1;

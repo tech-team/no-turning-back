@@ -86,15 +86,24 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.stage.removeAllChildren();
             this.stage.update();
 
+            this.containers = []; //wall, chest, waypoint and so on
+
             //add background
             this.background = this.addToStage(data, true);
-            this.backgroundId = this.stage.getChildIndex(this.background);
+            this.backgroundId = this.stage.getChildIndex(this.background); //TODO: deprecated
 
 
             //add walls
             _.each(data.walls, function(obj) {
                 self.walls.push(self.addToStage(obj));
             });
+
+            //create empty containers for future stuff
+            this.createContainer("corpse");
+            this.createContainer("medkit");
+            this.createContainer("weapon");
+            this.createContainer("key");
+            this.createContainer("bullet");
 
             //add doors
             _.each(data.doors, function(obj) {
@@ -143,11 +152,13 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 this.fogId = this.stage.getChildIndex(fogBox);
 
                 this.effects.fog = this.addToStage({
+                    type: "effect",
                     tex: "effects/fog",
                     x: this.player.dispObj.x,
                     y: this.player.dispObj.y});
 
                 this.effects.damage = this.addToStage({
+                    type: "effect",
                     tex: "effects/damage",
                     x: 0, y: 0,
                     w: this.stage.canvas.width,
@@ -192,6 +203,12 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.updateEffects();
         },
 
+        createContainer: function(name) {
+            var container = new createjs.Container();
+            this.containers[name] = container;
+            this.stage.addChild(container);
+        },
+
         createCollisionObjects: function() {
             for (var i = 0; i < this.walls.length; ++i) {
                 this.collisionObjects.push(this.walls[i]);
@@ -212,23 +229,40 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             }
         },
 
+        //objData requires to have {type, tex, x, y}
         addToStage: function(objData, doNotCenter, id) {
+            if (objData instanceof createjs.DisplayObject) {
+                objData.type = objData.data.type;
+            }
+
+            if (!_.isUndefined(id))
+                alert("Do you really need id?");
+
+            //TODO: fix undefined type issue
+            if (_.isUndefined(objData.type)) {
+                console.log(objData);
+                alert("objData.type should be specified!");
+            }
+
+            console.log(objData.type);
+
             var spriteSheet =
                 this.resourceManager.getTiledSpriteSheet(objData.tex, objData.w, objData.h);
 
             var sprite = new easeljs.Sprite(spriteSheet);
-            var objToAdd = sprite;
 
-            if (this.editorMode) {
+            if (_.isUndefined(this.containers[objData.type])) {
                 var container = new createjs.Container();
-                container.addChild(sprite);
-                objToAdd = container;
+                this.containers[objData.type] = container;
+                this.stage.addChild(container);
             }
+            var addTo = this.containers[objData.type];
+
             var dispObj = null;
             if (id)
-                dispObj = this.stage.addChildAt(objToAdd, id);
+                dispObj = addTo.addChildAt(sprite, id);
             else
-                dispObj = this.stage.addChild(objToAdd);
+                dispObj = addTo.addChild(sprite);
 
             dispObj.x = objData.x || objData.width/2 || 0;
             dispObj.y = objData.y || objData.height/2 || 0;
@@ -243,6 +277,12 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 this.editor.setContainerHandlers(dispObj);
 
             return dispObj;
+        },
+
+        removeFromStage: function(dispObj) {
+            console.log(dispObj);
+            var container = this.containers[dispObj.data.type];
+            container.removeChild(dispObj);
         },
 
         onJoystickMessage: function(data, answer) {
@@ -397,8 +437,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
                     if (this.player.dispObj.tex != "player") {
                         this.player.dispObj.tex = "player";
-                        this.stage.removeChild(this.player.dispObj);
-                        this.player.setDispObj(this.addToStage(this.player.dispObj, false, this.fogId));
+                        this.removeFromStage(this.player.dispObj);
+                        this.player.setDispObj(this.addToStage(this.player.dispObj));
                     }
                     ResourceManager.playSound(ResourceManager.soundList.KnifeDraw);
                 }
@@ -409,8 +449,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
                     if (this.player.dispObj.tex != "player-pistol") {
                         this.player.dispObj.tex = "player-pistol";
-                        this.stage.removeChild(this.player.dispObj);
-                        this.player.setDispObj(this.addToStage(this.player.dispObj, false, this.fogId));
+                        this.removeFromStage(this.player.dispObj);
+                        this.player.setDispObj(this.addToStage(this.player.dispObj));
                     }
 
                     ResourceManager.playSound(ResourceManager.soundList.PistolDraw);
@@ -422,8 +462,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
                     if (this.player.dispObj.tex != "player-shotgun") {
                         this.player.dispObj.tex = "player-shotgun";
-                        this.stage.removeChild(this.player.dispObj);
-                        this.player.setDispObj(this.addToStage(this.player.dispObj, false, this.fogId));
+                        this.removeFromStage(this.player.dispObj);
+                        this.player.setDispObj(this.addToStage(this.player.dispObj));
                     }
 
                     ResourceManager.playSound(ResourceManager.soundList.ShotgunDraw);
@@ -458,11 +498,12 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                             y: this.player.dispObj.y,
                             r: this.player.dispObj.rotation,
                             power: ResourceManager.weaponData.pistol.power,
-                            tex: "pistol-bullet"
+                            tex: "pistol-bullet",
+                            type: "bullet"
                         };
 
                         var bullet = new Bullet(
-                            this.addToStage(bulletData, false, this.backgroundId+1),
+                            this.addToStage(bulletData),
                             bulletData);
 
                         this.bullets.push(bullet);
@@ -480,9 +521,10 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                 r: this.player.dispObj.rotation - (Math.floor(ResourceManager.weaponData.shotgun.bulletNum/2) - i) * ResourceManager.weaponData.shotgun.dispersion,
                                 power: ResourceManager.weaponData.shotgun.power,
                                 tex: "shotgun-bullet",
-                                ttl: 8
+                                ttl: 8,
+                                type: "bullet"
                             };
-                            var bullet = new Bullet(this.addToStage(bulletData, false, this.backgroundId+1), bulletData);
+                            var bullet = new Bullet(this.addToStage(bulletData), bulletData);
 
                             this.bullets.push(bullet);
                         }
@@ -501,7 +543,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             for (var i = 0; i < this.bullets.length; ++i) {
                 if (this.bullets[i].ttl){
                     if (--this.bullets[i].ttl <= 0) {
-                        this.stage.removeChild(this.bullets[i].dispObj);
+                        this.removeFromStage(this.bullets[i].dispObj);
                         this.bullets.splice(i, 1);
                         break;
                     }
@@ -509,7 +551,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 for(var j = 0; j < this.zombies.length; ++j) {
                     if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
                         this.zombies[j].health -= this.bullets[i].power;
-                        this.stage.removeChild(this.bullets[i].dispObj);
+                        this.removeFromStage(this.bullets[i].dispObj);
                         ResourceManager.playSound(ResourceManager.soundList.BulletHit);
                         this.bullets.splice(i, 1);
                         break out;
@@ -517,14 +559,14 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 }
                 for(var j = 0; j < this.collisionObjects.length; ++j) {
                     if (collider.checkPixelCollision(this.bullets[i].dispObj,this.collisionObjects[j])) {
-                        this.stage.removeChild(this.bullets[i].dispObj);
+                        this.removeFromStage(this.bullets[i].dispObj);
                         ResourceManager.playSound(ResourceManager.soundList.BulletRicochet);
                         this.bullets.splice(i, 1);
                         break out;
                     }
                 }
                 if (this.checkBounds(this.bullets[i].dispObj)) {
-                    this.stage.removeChild(this.bullets[i].dispObj);
+                    this.removeFromStage(this.bullets[i].dispObj);
                     this.bullets.splice(i, 1);
                     break;
                 }
@@ -542,8 +584,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                             r: this.zombies[i].dispObj.rotation
                         });
 
-                    this.addToStage(corpse, false, this.backgroundId+1);
-                    this.stage.removeChild(this.zombies[i].dispObj);
+                    this.addToStage(corpse);
+                    this.removeFromStage(this.zombies[i].dispObj);
 
                     for (var j = 0; j < this.collisionObjects.length; ++j) {
                         if (this.collisionObjects[j] == this.zombies[i].dispObj) {
@@ -556,7 +598,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         dropped.y = self.zombies[i].dispObj.y;
 
                         var drop = DefaultObjects.build(dropped.type, dropped);
-                        self.drops.push(self.addToStage(drop, false, self.backgroundId+2))
+                        self.drops.push(self.addToStage(drop))
                     });
 
                     this.zombies.splice(i, 1);
@@ -620,8 +662,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         });
 
                         this.chests[i].storage = [];
-                        this.stage.removeChild(this.chests[i].dispObj);
-                        this.addToStage(this.chests[i], false, this.backgroundId+1);
+                        this.removeFromStage(this.chests[i].dispObj);
+                        this.addToStage(this.chests[i]);
                         break;
                     }
                 }
@@ -667,7 +709,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                 }
                         }
 
-                        this.stage.removeChild(this.drops[i]);
+                        this.removeFromStage(this.drops[i]);
                         this.drops.splice(i, 1);
                     }
                 }
@@ -691,8 +733,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                 this.collisionObjects.splice(j, 1);
                             }
                         }
-                        this.stage.removeChild(this.doors[i].dispObj);
-                        this.addToStage(this.doors[i], false, this.backgroundId+1);
+                        this.removeFromStage(this.doors[i].dispObj);
+                        this.addToStage(this.doors[i]);
 
                         this.player.score += Level.SCORES.DOOR_OPEN;
 
@@ -736,8 +778,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
         updateEffects: function() {
             this.updateFog(true);
 
-            this.stage.removeChild(this.effects.damage);
+            this.removeFromStage(this.effects.damage);
             this.effects.damage = this.addToStage({
+                type: "effect",
                 tex: "effects/damage",
                 x: 0, y: 0,
                 w: this.stage.canvas.width,

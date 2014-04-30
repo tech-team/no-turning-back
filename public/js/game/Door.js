@@ -7,6 +7,7 @@ define([
     function(Class, _, GameObject, KeyCoder) {
         var Door = GameObject.$extend({
             __init__: function(obj) {
+                this.type = "door";
                 this.x = obj.x;
                 this.y = obj.y;
                 this.state = ( obj.state === "open" ) ? "open" : "closed" ;

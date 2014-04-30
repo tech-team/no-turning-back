@@ -139,6 +139,7 @@ define([
                 });
             },
 
+            //it's not required to be container, sprite would be ok as well
             setContainerHandlers: function(container) {
                 var self = this;
 
