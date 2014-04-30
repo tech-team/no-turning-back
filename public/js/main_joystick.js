@@ -9,7 +9,7 @@ require.config({
         easel: "lib/game/easeljs",
         Connector: "lib/Connector",
         FnQuery: "lib/FnQuery",
-        'socket.io': "/socket.io/socket.io",
+        'socket.io': "lib/socket.io",
         hammer: "lib/hammer",
         move: "lib/move",
         device_normalizer: "lib/deviceapi-normaliser",
@@ -122,7 +122,7 @@ define([
 
     function checkOrientation() {
         if (getOrientation() === "portrait") {
-            console.log("change orientation");
+//            console.log("change orientation");
             showMessage("Change device orientation to landscape", true);
         }
         else {
@@ -136,8 +136,6 @@ define([
     }
 
     function checkBrowserSupport() {
-        console.log(Modernizr);
-        console.log(createjs.Touch.isSupported());
         if (!Modernizr.canvas || !Modernizr.canvastext || !Modernizr.localstorage
             || !Modernizr.audio || !Modernizr.multiplebgs
             || !Modernizr.csstransforms || !Modernizr.fontface || !createjs.Touch.isSupported()) {

@@ -74,8 +74,8 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
         },
 
         checkBrowserSupport: function() {
-            console.log(Modernizr);
-            console.log(createjs.Touch.isSupported());
+//            console.log(Modernizr);
+//            console.log(createjs.Touch.isSupported());
             if (Modernizr) {
                 if (!Modernizr.canvas || !Modernizr.canvastext || !Modernizr.localstorage
                     || !Modernizr.audio || !Modernizr.multiplebgs
