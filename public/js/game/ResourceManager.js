@@ -51,7 +51,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                     dispersion: 10,
                     ttl: 8
                 },
-                drawCooldown: 50
+                drawCooldown: 25
             },
             playingSounds: {},
 
