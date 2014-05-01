@@ -278,7 +278,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
         },
 
         removeFromStage: function(dispObj) {
-            console.log(dispObj);
             var container = this.containers[dispObj.data.type];
             container.removeChild(dispObj);
         },

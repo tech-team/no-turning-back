@@ -180,12 +180,9 @@ define([
                 var player = DefaultObjects.build('player');
                 var level = DefaultObjects.level;
                 level.player = player;
-                //warning, overriding Level's data
-                this.level.data = level;
 
-                this.stage.removeAllChildren();
-                this.level.addToStage(level, true, 0);
-                this.level.addToStage(player);
+                //TODO: test it
+                this.level.reload(level);
             },
 
             keyFunc: function(event) {
@@ -287,7 +284,6 @@ define([
                             dataType: 'json',
                             success: function(data) {
                                 self.level.reload(data);
-                                alert("Level successfully loaded!");
                             },
                             error: function(data) {
                                 alert("Unable to load level");
@@ -370,7 +366,6 @@ define([
                 }
 
                 var dispObj = this.addObjectByData(data);
-                this.showObjectWayPoints(dispObj);
             },
 
             duplicateObject: function(dispObj) {
@@ -379,10 +374,6 @@ define([
 
                 var newData = _.cloneDeep(dispObj.data);
                 newData.x += Editor.duplicateDelta;
-
-                //deep copy all inner arrays and objects
-                //if (newData.type == 'zombie')
-                //    newData.waypoints = _.clone(newData.waypoints);
 
                 if (newData.type == 'waypoint') {
                     this.addWayPoint(newData, dispObj.data);
@@ -506,21 +497,10 @@ define([
             },
 
             hideObjectWayPoints: function() {
-                var self = this;
-                var oldWps = [];
-
-                //find old waypoints
-                _.each(this.stage.children, function(child) {
-                    if (child.data && child.data.type == 'waypoint')
-                        oldWps.push(child);
-                });
-
-                //delete them
+                //remove old waypoints
                 this.showingWpsOwner = null;
                 this.stage.removeChild(this.wpPath);
-                _.each(oldWps, function(wp) {
-                    self.stage.removeChild(wp);
-                });
+                this.level.containers['waypoint'].removeAllChildren();
             },
 
             showObjectWayPoints: function(dispObj) {
@@ -547,6 +527,7 @@ define([
 
                 var waypoints = wps || this.showingWpsOwner.data.waypoints;
 
+                //NB: wpPath has no container
                 this.stage.removeChild(this.wpPath);
                 if (waypoints.length) {
                     var graphics = new easeljs.Graphics();
@@ -581,7 +562,8 @@ define([
 
                 var id = collection.indexOf(dispObj.data);
                 collection.splice(id, 1);
-                this.stage.removeChild(dispObj);
+
+                this.level.removeFromStage(dispObj);
             }
         });
 
