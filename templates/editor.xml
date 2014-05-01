@@ -20,6 +20,7 @@
             <h3 class="editor-sidebar__group__header">
                 Level:
                 <span class="editor-sidebar__group__controls">
+                    <button id="levelNew">New</button>
                     <button id="levelLoad">Load</button>
                     <button id="levelSave">Save</button>
                 </span>

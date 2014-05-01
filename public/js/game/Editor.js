@@ -34,6 +34,11 @@ define([
                     return false;
                 });
 
+                $('#levelNew').click(function(evt) {
+                    self.onLevelNewClick();
+                    return false;
+                });
+
                 $('#addObject').click(function() {
                     var type = $('#add-type-select').val();
                     var tex = $('#add-texture-select').val();
@@ -291,6 +296,12 @@ define([
                         });
                     }
                 }
+            },
+
+            onLevelNewClick: function() {
+                var res = confirm("All unsaved data wil be lost, load new level?");
+                if (res)
+                    this.loadDefaultLevel();
             },
 
             applyFilters: function(dispObj, filters) {
