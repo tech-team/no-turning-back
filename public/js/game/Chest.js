@@ -10,10 +10,11 @@ define([
                 this.type = "chest";
                 this.x = obj.x;
                 this.y = obj.y;
+                this.r = obj.r;
                 this.storage = obj.storage;
                 this.state = ( obj.state === "open" ) ? "open" : "closed" ;
                 this.requires = obj.requires;
-                this.requiresMessage = this.requires.toString() + " required";
+                this.requiresMessage = "";
                 this.activationRadius = 50;
                 this.tex = ( this.state === "open") ? "chest-open" : "chest";
                 this.justTried = false;
@@ -37,7 +38,22 @@ define([
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
                     if (this.state === "closed") {
-                        if(_.contains(player.keys, this.requires) || !this.requires) {
+                        this.requiresMessage = "";
+
+                        if (this.requires) {
+                            if(_.isArray(this.requires)) {
+                                _.each(this.requires, function(requirement) {
+                                    if (self.requiresMessage === "" && !(_.contains(player.keys, requirement))) {
+                                        self.requiresMessage = requirement + " required.";
+                                    }
+                                });
+                            }
+                            else if(!_.contains(player.keys, this.requires)) {
+                                this.requiresMessage = this.requires + " required.";
+                            }
+                        }
+
+                        if (!this.requiresMessage) {
                             this.justOpened = true;
                             this.state = "open";
                             this.tex = "chest-open";

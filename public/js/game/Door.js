@@ -10,6 +10,7 @@ define([
                 this.type = "door";
                 this.x = obj.x;
                 this.y = obj.y;
+                this.r = obj.r;
                 this.state = ( obj.state === "open" ) ? "open" : "closed" ;
                 this.tex = obj.tex;
                 this.activationRadius = 100;
@@ -47,7 +48,7 @@ define([
                                             self.requiresMessage = "Kill all zombies first.";
                                         }
                                     }
-                                    else if(!_.contains(player.keys, requirement)) {
+                                    else if(!(_.contains(player.keys, requirement))) {
                                         self.requiresMessage = requirement + " required.";
                                     }
                                 }

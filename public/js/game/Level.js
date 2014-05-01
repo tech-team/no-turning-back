@@ -621,12 +621,14 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             for (var i = 0; i < this.chests.length; ++i) {
                 if (this.checkReach(this.chests[i])) {
                     this.chests[i].update(event, this.player);
+
                     if (this.chests[i].justTried == true) {
                         this.chests[i].justTried = false;
                         this.showMessage(this.chests[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
                         break;
                     }
                     else if (this.chests[i].justOpened == true) {
+
                         ResourceManager.playSound(ResourceManager.soundList.ChestOpen);
                         this.chests[i].justOpened = false;
                         this.chests[i].storage.forEach(function(drop) {
@@ -634,18 +636,19 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                             switch (drop['type']) {
                                 case "weapon":
                                     var name = drop['name'];
+                                    var ammo = drop['ammo'] || 5;
                                     if (name in self.player.weapons) {
-                                        self.player.weapons[name] += drop['ammo'];
-                                        self.showMessage("You picked up " + drop['ammo'] + " ammo for " + drop['name'], Level.MessageColor.Ammo);
+                                        self.player.weapons[name] += ammo;
+                                        self.showMessage("You picked up " + ammo + " ammo for " + name, Level.MessageColor.Ammo);
                                     }
                                     else {
-                                        self.player.weapons[name] = drop['ammo'];
-                                        self.showMessage("You picked up a new weapon: " + drop['name'], Level.MessageColor.NewWeapon);
+                                        self.player.weapons[name] = ammo;
+                                        self.showMessage("You picked up a new weapon: " + name, Level.MessageColor.NewWeapon);
                                     }
                                     break;
                                 case "medkit":
                                     var healed = drop['size'];
-                                    self.player.health += drop['size'];
+                                    self.player.health += healed;
                                     if (self.player.health > self.player.maxHealth) {
                                         healed -= self.player.health - self.player.maxHealth;
                                         self.player.health = self.player.maxHealth;

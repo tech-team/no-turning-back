@@ -52,6 +52,7 @@ define([
                 zombie: {
                     health: 20,
                     speed: 2,
+                    followDistance: 150,
                     drops: [],
                     waypoints: []
                 },
@@ -62,11 +63,12 @@ define([
                 door: {
                     role: "exit",
                     state: "closed",
-                    require: []
+                    requires: []
                 },
 
                 chest: {
-                    requires: ""
+                    requires: [],
+                    storage: []
                 },
 
                 waypoint: {
@@ -82,7 +84,7 @@ define([
                 },
 
                 ammo: {
-                    name: "pistol",
+                    weapon: "pistol",
                     size: 0
                 },
 
