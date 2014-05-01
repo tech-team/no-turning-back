@@ -15,8 +15,11 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 "waypoint", "pistol", "pistol-bullet", "shotgun", "shotgun-bullet", "golden-key", "silver-key",
                 "effects/fog", "effects/damage", "zombie_corpse", "golden_apple"],
             soundList: {
+                Ammo: "ammo.mp3",
+                Medkit: "apple.mp3",
                 KnifeDraw: "knife.mp3",
                 KnifeMiss: "knife_miss.mp3",
+                KnifeMissShort: "knife_miss_short.mp3",
                 KnifeHit: "knife_stab.mp3",
                 PistolDraw: "pistol_draw.mp3",
                 PistolFire: "pistol_shoot.mp3",
@@ -47,8 +50,10 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                     bulletNum: 5,
                     dispersion: 10,
                     ttl: 8
-                }
+                },
+                drawCooldown: 50
             },
+            playingSounds: {},
 
             instance: null,
 
@@ -68,7 +73,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 this.soundDisabled = !this.soundDisabled;
             },
 
-            playSound: function(sound) {
+            playSound: function(sound, cooldown) {
                 if (this.soundDisabled)
                     return;
 
@@ -77,8 +82,10 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                     soundjs.Sound.play(sound[randId]);
                 }
                 else {
-                    soundjs.Sound.stop(sound);
-                    soundjs.Sound.play(sound);
+                    if (!(sound in ResourceManager.playingSounds) || (ResourceManager.playingSounds[sound] === 0)) {
+                        soundjs.Sound.play(sound);
+                        ResourceManager.playingSounds[sound] = cooldown || 0;
+                    }
                 }
             }
         },
