@@ -20,6 +20,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 		__init__: function(stage, data, player, resourceManager, editorMode, sound) {
             this.data = data;
 
+            this.keyCoder = new KeyCoder();
+            this.keyCoder.addEventListener("keyup", KeyCoder.M, ResourceManager.toggleSound);
+
             this.editorMode = editorMode;
 
             if (this.editorMode)
@@ -427,10 +430,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             if (event.keys[KeyCoder.E]) {
                 this.chestsOpeningHandle(self, event);
                 this.doorsOpeningHandle(event);
-            }
-
-            if (event.keys[KeyCoder.M]) {
-                ResourceManager.toggleSound();
             }
         },
 

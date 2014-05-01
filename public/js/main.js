@@ -59,8 +59,9 @@ require.config({
 
 define([
     'backbone',
-    'router'
-], function(Backbone, router) {
+    'router',
+    'utils/ArrayUtils'
+], function(Backbone, router, ArrayUtils) {
     Backbone.history.start();
-
+    ArrayUtils();
 });

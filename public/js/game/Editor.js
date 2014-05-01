@@ -17,6 +17,7 @@ define([
             __init__: function(level, stage) {
                 this.level = level;
 
+                this.keyCoder = new KeyCoder();
                 this.stage = stage;
                 this.showingWpsOwner = null;
                 this.selectedObject = null;
@@ -118,6 +119,14 @@ define([
                     self.regenerateObjectPropertiesTable();
 
                     return false;
+                });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.PLUS, function(event) {
+                    self.bringToFront(self.selectedObject);
+                });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.MINUS, function(event) {
+                    self.bringToBack(self.selectedObject);
                 });
 
                 this.regenerateLevelPropertiesTable();
@@ -575,6 +584,40 @@ define([
                 collection.splice(id, 1);
 
                 this.level.removeFromStage(dispObj);
+            },
+
+            bringToFront: function(dispObj) {
+                this.bringTo(dispObj, "front");
+            },
+
+            bringToBack: function(dispObj) {
+                this.bringTo(dispObj, "back");
+            },
+
+            bringTo: function(dispObj, to) {
+                //omit single objects
+                if (!dispObj || dispObj.data.type == 'player')
+                    return;
+
+                var collectionName = dispObj.data.type + 's';
+                var collection = this.level.data[collectionName];
+
+                if (_.isUndefined(collection) || collection.length <= 1)
+                    return;
+
+                var id = 0;
+                if (to === "front")
+                    id = collection.indexOf(dispObj.data);
+                collection.move(id, collection.length - 1);
+
+                var container = this.level.containers[dispObj.data.type];
+
+                if (to === "front") {
+                    var childrenCount = container.getNumChildren();
+                    container.setChildIndex(dispObj, childrenCount - 1);
+                }
+                else
+                    container.setChildIndex(dispObj, 0);
             }
         });
 
