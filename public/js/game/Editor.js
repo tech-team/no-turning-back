@@ -121,11 +121,11 @@ define([
                     return false;
                 });
 
-                this.keyCoder.addEventListener("keyup", KeyCoder.PLUS, function(event) {
+                this.keyCoder.addEventListener("keyup", KeyCoder.F, function(event) {
                     self.bringToFront(self.selectedObject);
                 });
 
-                this.keyCoder.addEventListener("keyup", KeyCoder.MINUS, function(event) {
+                this.keyCoder.addEventListener("keyup", KeyCoder.B, function(event) {
                     self.bringToBack(self.selectedObject);
                 });
 
