@@ -1,0 +1,10 @@
+<fest:template xmlns:fest="http://fest.mail.ru"
+               context_name="json">
+    <div class="game-load-progress">
+        <div class="game-load-progress__wrapper">
+            <h2 class="game-load-progress__wrapper__header">Loading resources...</h2>
+            <progress class="game-load-progress__wrapper__progress" value="10" max="100" />
+            <b><span class="game-load-progress__wrapper__progress-value">0%</span></b>
+        </div>
+    </div>
+</fest:template>

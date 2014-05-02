@@ -97,8 +97,8 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             var self = this;
 
             var $progressBarDiv = $('.game-load-progress');
-            var $progressBar = $('.progress');
-            var $progressBarLabel = $('.progress-value');
+            var $progressBar = $('.game-load-progress__wrapper__progress');
+            var $progressBarLabel = $('.game-load-progress__wrapper__progress-value');
 
             var queue = new preloadjs.LoadQueue();
             queue.installPlugin(soundjs.Sound);
