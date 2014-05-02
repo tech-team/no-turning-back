@@ -57,6 +57,16 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.shootDelta = 350;
 
             this.reload(data);
+
+            this.keyCoder.addEventListener("keyup", KeyCoder.X, function() {
+                //now this triggers levelFinished (not gameFinished), so no need to play sound
+                //ResourceManager.playSound(ResourceManager.soundList.CheaterVictory);
+                $.event.trigger({
+                    type: "levelFinished"
+                    //score: this.player.score,
+                    //message: "Cheater!"
+                });
+            });
 		},
 
         __classvars__: {
@@ -344,17 +354,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
                 this.player.update(event, this.collisionObjects);
 
-                /*
-                if (this.zombies.length === 0) {
-                    ResourceManager.playSound(ResourceManager.soundList.Victory);
-                    $.event.trigger({
-                        type: "levelFinished",
-                        score: this.player.score,
-                        message: "You Win"
-                    });
-                }
-                */
-
                 for (var i = 0; i < this.zombies.length; ++i) {
                     this.zombies[i].update(event, this.player, this.collisionObjects);
                 }
@@ -368,7 +367,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                     console.log("Game over.");
                     ResourceManager.playSound(ResourceManager.soundList.GameOver);
                     $.event.trigger({
-                        type: "levelFinished",
+                        type: "gameFinished",
                         score: this.player.score,
                         message: "Game over"
                     });
@@ -407,15 +406,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 this.player.dispObj.x = this.prevPlayerPos.x;
                 this.player.dispObj.y = this.prevPlayerPos.y;
                 this.player.dispObj.rotation = this.prevPlayerPos.rotation;
-            }
-
-            if (event.keys[KeyCoder.X]) {
-                ResourceManager.playSound(ResourceManager.soundList.CheaterVictory);
-                $.event.trigger({
-                    type: "levelFinished",
-                    score: this.player.score,
-                    message: "Cheater!"
-                });
             }
 
             this.weaponsHandle(event);
@@ -754,10 +744,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
                         if (this.doors[i].role === "exit") {
                             ResourceManager.playSound(ResourceManager.soundList.Victory);
+
                             $.event.trigger({
-                                type: "levelFinished",
-                                score: this.player.score,
-                                message: "You win!"
+                                type: "levelFinished"
                             });
                         }
                     }
