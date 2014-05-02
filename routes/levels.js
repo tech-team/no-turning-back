@@ -43,7 +43,8 @@ module.exports = {
 		}
 
 		var levelsDir = path.join('public', 'levels');
-		fs.exists(path.join(levelsDir, name + '.json'), function (exists) {
+        var levelPath = path.join(levelsDir, name + '.json');
+		fs.exists(levelPath, function (exists) {
 		  	resp.end(String(exists));
 		});
 	}

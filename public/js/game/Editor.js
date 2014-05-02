@@ -55,52 +55,12 @@ define([
                 });
 
                 $('#applyToObject').click(function() {
-                    if (!self.selectedObject)
-                        return false;
-
-                    var data = {};
-                    var inputs = $("#selected-object").find("input, select");
-                    inputs.each(function(i, input) {
-                        var $input = $(input);
-
-                        var field = input.id.split('-');
-
-                        if (field[0] == 'object') {
-                            var prop = field[1];
-                            if ($input.data('isArray') == true) {
-                                try {
-                                    data[prop] = JSON.parse($input.val());
-                                }
-                                catch(e) {
-                                    alert("Unable to parse array for '" + prop + "' property. Changes will be rejected.");
-                                }
-                            }
-                            else
-                                data[prop] = parseInt($input.val()) || $input.val();
-                        }
-                    });
-
-                    self.updateObjectData(self.selectedObject, data);
-                    self.regenerateObjectPropertiesTable();
-                    self.updateWpPath();
+                    self.applyToObject();
                     return false;
                 });
 
                 $('#applyToLevel').click(function() {
-                    var data = {};
-                    var inputs = $("#level-object").find("input, select");
-                    inputs.each(function(i, input) {
-                        var $input = $(input);
-                        var field = input.id.split('-');
-
-                        if (field[0] == 'level') {
-                            var prop = field[1];
-                            data[prop] = parseInt($input.val()) || $input.val();
-                        }
-                    });
-
-                    self.updatedata(data);
-                    self.regenerateLevelPropertiesTable();
+                    self.applyToLevel();
                     return false;
                 });
 
@@ -132,6 +92,54 @@ define([
                 this.regenerateLevelPropertiesTable();
                 this.populateTexSelect();
                 this.populateTypeSelect();
+            },
+
+            applyToObject: function() {
+                if (!self.selectedObject)
+                    return;
+
+                var data = {};
+                var inputs = $("#selected-object").find("input, select");
+                inputs.each(function(i, input) {
+                    var $input = $(input);
+
+                    var field = input.id.split('-');
+
+                    if (field[0] == 'object') {
+                        var prop = field[1];
+                        if ($input.data('isArray') == true) {
+                            try {
+                                data[prop] = JSON.parse($input.val());
+                            }
+                            catch(e) {
+                                alert("Unable to parse array for '" + prop + "' property. Changes will be rejected.");
+                            }
+                        }
+                        else
+                            data[prop] = parseInt($input.val()) || $input.val();
+                    }
+                });
+
+                self.updateObjectData(self.selectedObject, data);
+                self.regenerateObjectPropertiesTable();
+                self.updateWpPath();
+            },
+
+            applyToLevel: function() {
+                var data = {};
+                var inputs = $("#level-object").find("input, select");
+                inputs.each(function(i, input) {
+                    var $input = $(input);
+                    var field = input.id.split('-');
+
+                    if (field[0] == 'level') {
+                        var prop = field[1];
+                        data[prop] = parseInt($input.val()) || $input.val();
+                    }
+                });
+
+                this.updateObjectData(this.level.background, data);
+                this.regenerateLevelPropertiesTable();
             },
 
             populateTexSelect: function(select) {
@@ -195,8 +203,8 @@ define([
                 var level = DefaultObjects.level;
                 level.player = player;
 
-                //TODO: test it
                 this.level.reload(level);
+                this.regenerateLevelPropertiesTable();
             },
 
             keyFunc: function(event) {
@@ -245,6 +253,9 @@ define([
             },
 
             onLevelSaveClick: function() {
+                //ensure everything is saved
+                this.applyToLevel();
+
                 var levelStr = JSON.stringify(this.level.data);
 
                 var self = this;
@@ -271,7 +282,7 @@ define([
                     data: {name: this.level.data.name},
                     dataType: 'json',
                     success: function(data) {
-                        if (data == "false")
+                        if (data == false)
                             actualSaveLevel();
                         else {
                             if (confirm("Level " + self.level.data.name + " already exists.\nDo you want to rewrite it?"))
@@ -483,23 +494,6 @@ define([
                 dispObj.x = dispObj.data.x;
                 dispObj.y = dispObj.data.y;
                 dispObj.rotation = dispObj.data.r;
-            },
-
-            updatedata: function(newData) {
-                if (!newData)
-                    return;
-
-                var dispObj = this.level.background;
-
-                if (newData.tex != dispObj.data.tex
-                    || newData.w != dispObj.data.w
-                    || newData.h != dispObj.data.h) {
-                    this.replaceObject(dispObj, newData);
-                }
-
-                for (var field in newData) {
-                    dispObj.data[field] = newData[field];
-                }
             },
 
             replaceObject: function(dispObj, newData) {
