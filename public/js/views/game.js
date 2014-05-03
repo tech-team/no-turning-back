@@ -259,7 +259,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
             );
             
             var self = this;
-            $(document).on("levelFinished", function(event) {
+            $(document).on("gameFinished", function(event) {
                 self.game.stop();
                 GameFinishedView.show(event.score, event.message);
                 window.server.send({

@@ -1,4 +1,5 @@
 define([
+    'jquery',
 	'underscore',
 	'classy',
 	'easel',
@@ -10,7 +11,7 @@ define([
 	'game/ResourceManager',
     'console'
 ],
-function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager, Console) {
+function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager, Console) {
 	var Game = Class.$extend({
 		__init__: function(canvas, editorMode, onLoadedCallback) {
             this.editorMode = editorMode;
@@ -41,7 +42,6 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
         },
 
         onResourcesLoaded: function() {
-//        	console.log("Resources loaded");
             this.state = Game.GameState.Game;
             createjs.Sound.stop();
 
@@ -49,7 +49,26 @@ function(_, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Resou
             this.levelManager.loadNextLevel(function(event) {
         		self.level = new Level(self.stage, event.levelData, self.player, self.resourceManager, self.editorMode);
         		self.onLoadedCallback();
+
+                $(document).on("levelFinished", self.onLevelFinished.bind(self));
         	});
+        },
+
+        onLevelFinished: function() {
+            var self = this;
+            this.levelManager.loadNextLevel(function(event) {
+                if (event.levelData == null) {
+                    ResourceManager.playSound(ResourceManager.soundList.Victory);
+                    $.event.trigger({
+                        type: "gameFinished",
+                        score: self.player.score,
+                        message: "You win!"
+                    });
+                }
+                else {
+                    self.level = new Level(self.stage, event.levelData, self.player, self.resourceManager, self.editorMode);
+                }
+            });
         },
 
 		run: function() {

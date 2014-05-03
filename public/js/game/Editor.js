@@ -17,6 +17,7 @@ define([
             __init__: function(level, stage) {
                 this.level = level;
 
+                this.keyCoder = new KeyCoder();
                 this.stage = stage;
                 this.showingWpsOwner = null;
                 this.selectedObject = null;
@@ -54,52 +55,12 @@ define([
                 });
 
                 $('#applyToObject').click(function() {
-                    if (!self.selectedObject)
-                        return false;
-
-                    var data = {};
-                    var inputs = $("#selected-object").find("input, select");
-                    inputs.each(function(i, input) {
-                        var $input = $(input);
-
-                        var field = input.id.split('-');
-
-                        if (field[0] == 'object') {
-                            var prop = field[1];
-                            if ($input.data('isArray') == true) {
-                                try {
-                                    data[prop] = JSON.parse($input.val());
-                                }
-                                catch(e) {
-                                    alert("Unable to parse array for '" + prop + "' property. Changes will be rejected.");
-                                }
-                            }
-                            else
-                                data[prop] = parseInt($input.val()) || $input.val();
-                        }
-                    });
-
-                    self.updateObjectData(self.selectedObject, data);
-                    self.regenerateObjectPropertiesTable();
-                    self.updateWpPath();
+                    self.applyToObject();
                     return false;
                 });
 
                 $('#applyToLevel').click(function() {
-                    var data = {};
-                    var inputs = $("#level-object").find("input, select");
-                    inputs.each(function(i, input) {
-                        var $input = $(input);
-                        var field = input.id.split('-');
-
-                        if (field[0] == 'level') {
-                            var prop = field[1];
-                            data[prop] = parseInt($input.val()) || $input.val();
-                        }
-                    });
-
-                    self.updatedata(data);
-                    self.regenerateLevelPropertiesTable();
+                    self.applyToLevel();
                     return false;
                 });
 
@@ -120,9 +81,65 @@ define([
                     return false;
                 });
 
+                this.keyCoder.addEventListener("keyup", KeyCoder.F, function(event) {
+                    self.bringToFront(self.selectedObject);
+                });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.B, function(event) {
+                    self.bringToBack(self.selectedObject);
+                });
+
                 this.regenerateLevelPropertiesTable();
                 this.populateTexSelect();
                 this.populateTypeSelect();
+            },
+
+            applyToObject: function() {
+                if (!self.selectedObject)
+                    return;
+
+                var data = {};
+                var inputs = $("#selected-object").find("input, select");
+                inputs.each(function(i, input) {
+                    var $input = $(input);
+
+                    var field = input.id.split('-');
+
+                    if (field[0] == 'object') {
+                        var prop = field[1];
+                        if ($input.data('isArray') == true) {
+                            try {
+                                data[prop] = JSON.parse($input.val());
+                            }
+                            catch(e) {
+                                alert("Unable to parse array for '" + prop + "' property. Changes will be rejected.");
+                            }
+                        }
+                        else
+                            data[prop] = parseInt($input.val()) || $input.val();
+                    }
+                });
+
+                self.updateObjectData(self.selectedObject, data);
+                self.regenerateObjectPropertiesTable();
+                self.updateWpPath();
+            },
+
+            applyToLevel: function() {
+                var data = {};
+                var inputs = $("#level-object").find("input, select");
+                inputs.each(function(i, input) {
+                    var $input = $(input);
+                    var field = input.id.split('-');
+
+                    if (field[0] == 'level') {
+                        var prop = field[1];
+                        data[prop] = parseInt($input.val()) || $input.val();
+                    }
+                });
+
+                this.updateObjectData(this.level.background, data);
+                this.regenerateLevelPropertiesTable();
             },
 
             populateTexSelect: function(select) {
@@ -186,8 +203,8 @@ define([
                 var level = DefaultObjects.level;
                 level.player = player;
 
-                //TODO: test it
                 this.level.reload(level);
+                this.regenerateLevelPropertiesTable();
             },
 
             keyFunc: function(event) {
@@ -236,6 +253,9 @@ define([
             },
 
             onLevelSaveClick: function() {
+                //ensure everything is saved
+                this.applyToLevel();
+
                 var levelStr = JSON.stringify(this.level.data);
 
                 var self = this;
@@ -262,7 +282,7 @@ define([
                     data: {name: this.level.data.name},
                     dataType: 'json',
                     success: function(data) {
-                        if (data == "false")
+                        if (data == false)
                             actualSaveLevel();
                         else {
                             if (confirm("Level " + self.level.data.name + " already exists.\nDo you want to rewrite it?"))
@@ -476,23 +496,6 @@ define([
                 dispObj.rotation = dispObj.data.r;
             },
 
-            updatedata: function(newData) {
-                if (!newData)
-                    return;
-
-                var dispObj = this.level.background;
-
-                if (newData.tex != dispObj.data.tex
-                    || newData.w != dispObj.data.w
-                    || newData.h != dispObj.data.h) {
-                    this.replaceObject(dispObj, newData);
-                }
-
-                for (var field in newData) {
-                    dispObj.data[field] = newData[field];
-                }
-            },
-
             replaceObject: function(dispObj, newData) {
                 dispObj.removeAllChildren();
 
@@ -575,6 +578,40 @@ define([
                 collection.splice(id, 1);
 
                 this.level.removeFromStage(dispObj);
+            },
+
+            bringToFront: function(dispObj) {
+                this.bringTo(dispObj, "front");
+            },
+
+            bringToBack: function(dispObj) {
+                this.bringTo(dispObj, "back");
+            },
+
+            bringTo: function(dispObj, to) {
+                //omit single objects
+                if (!dispObj || dispObj.data.type == 'player')
+                    return;
+
+                var collectionName = dispObj.data.type + 's';
+                var collection = this.level.data[collectionName];
+
+                if (_.isUndefined(collection) || collection.length <= 1)
+                    return;
+
+                var id = 0;
+                if (to === "front")
+                    id = collection.indexOf(dispObj.data);
+                collection.move(id, collection.length - 1);
+
+                var container = this.level.containers[dispObj.data.type];
+
+                if (to === "front") {
+                    var childrenCount = container.getNumChildren();
+                    container.setChildIndex(dispObj, childrenCount - 1);
+                }
+                else
+                    container.setChildIndex(dispObj, 0);
             }
         });
 

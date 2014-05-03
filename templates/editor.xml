@@ -5,17 +5,10 @@
             <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>
             <span class="back-button__caption">Back</span>
         </a>
-        <div class="game-load-progress">
-            <div class="progress-bar-wrapper">
-                <h2>Loading resources...</h2>
-                <progress class="progress" value="10" max="100" />
-                <b><span class="progress-value">0%</span></b>
-            </div>
-        </div>
+        <fest:include context="json" src="./_progress.xml" />
         <canvas id="editor-field" tabindex="1">You have a very old browser, dude.</canvas>
     </div>
     <div id="editor-sidebar" class="editor-sidebar">
-        <!-- TODO: BEM required! -->
         <div class="editor-sidebar__group editor-sidebar__level">
             <h3 class="editor-sidebar__group__header">
                 Level:
@@ -40,8 +33,6 @@
             <table id="selected-object">
                 <tbody />
             </table>
-
-
             <button id="applyToObject">Apply</button>
         </div>
         <div class="editor-sidebar__group editor-sidebar__palette">

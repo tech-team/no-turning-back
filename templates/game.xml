@@ -1,38 +1,31 @@
 <fest:template xmlns:fest="http://fest.mail.ru"
     context_name="json">
     <div id="scene" class="content-wrapper game-wrapper">
-            <a href="#main" class="back-button back-button_cornered">
-                <div class="left-arrow-wrapper"><div class="left-arrow" /></div>
-                <span class="back-button__caption">Menu</span>
-            </a>
-            <div class="game-load-progress">
-                <div class="progress-bar-wrapper">
-                    <h2>Loading resources...</h2>
-                    <progress class="progress" value="10" max="100" />
-                    <b><span class="progress-value">0%</span></b>
-                </div>
+        <a href="#main" class="back-button back-button_cornered">
+            <div class="left-arrow-wrapper"><div class="left-arrow" /></div>
+            <span class="back-button__caption">Menu</span>
+        </a>
+        <fest:include context="json" src="./_progress.xml" />
+        <div class="message-dimmer"></div>
+        <div class="message">
+            <div class="message__textbox">
+                <div class="message__textbox__text">Some text</div>
             </div>
+        </div>
+        <canvas id="game-field">You have a very old browser, dude.</canvas>
+        <div class="mobile-connect">
+            <div class="mobile-connect__header">Enter this token on your mobile device:</div>
+            <div class="mobile-connect__token"><div class="loading-indicator token-loading"></div></div>
+            <div class="reconnect-button">
+                <img class="reconnect-button__image" src="/res/img/cross.png" width="50" height="50"></img>
+            </div>
+        </div>
+        <div class="mobile-icon">
+            <img class="mobile-icon__inverted" src="/res/img/mobile-inverted.png" width="50" height="60"></img>
+            <img class="mobile-icon__normal" src="/res/img/mobile.png" width="50" height="60"></img>
+        </div>
 
-            <div class="message-dimmer"></div>
-            <div class="message">
-                <div class="message__textbox">
-                    <div class="message__textbox__text">Some text</div>
-                </div>
-            </div>
-            <canvas id="game-field">You have a very old browser, dude.</canvas>
-            <div class="mobile-connect">
-                <div class="mobile-connect__header">Enter this token on your mobile device:</div>
-                <div class="mobile-connect__token"><div class="loading-indicator token-loading"></div></div>
-                <div class="reconnect-button">
-                    <img class="reconnect-button__image" src="/res/img/cross.png" width="50" height="50"></img>
-                </div>
-            </div>
-            <div class="mobile-icon">
-                <img class="mobile-icon__inverted" src="/res/img/mobile-inverted.png" width="50" height="60"></img>
-                <img class="mobile-icon__normal" src="/res/img/mobile.png" width="50" height="60"></img>
-            </div>
-
-            <!--<input id="token" value="guid" disabled="disabled" style="position:absolute; top:0; right:0;" />-->
-            <!--<button id="connect" type="submit">connect</button>-->
+        <!--<input id="token" value="guid" disabled="disabled" style="position:absolute; top:0; right:0;" />-->
+        <!--<button id="connect" type="submit">connect</button>-->
     </div>
 </fest:template>
