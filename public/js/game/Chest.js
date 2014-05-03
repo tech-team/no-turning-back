@@ -1,10 +1,9 @@
 define([
     'classy',
     'underscore',
-    'game/GameObject',
-    'game/KeyCoder'
+    'game/GameObject'
 ],
-    function(Class, _, GameObject, KeyCoder) {
+    function(Class, _, GameObject) {
         var Chest = GameObject.$extend({
             __init__: function(obj) {
                 this.type = "chest";

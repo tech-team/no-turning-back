@@ -71,6 +71,11 @@ define([
                     storage: []
                 },
 
+                button: {
+                    role: "",
+                    value: ""
+                },
+
                 waypoint: {
 
                 },
