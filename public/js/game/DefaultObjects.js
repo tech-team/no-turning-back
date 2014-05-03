@@ -61,7 +61,8 @@ define([
                 },
 
                 door: {
-                    role: "exit",
+                    puzzle: "",
+                    role: "",
                     state: "closed",
                     requires: []
                 },
@@ -72,7 +73,7 @@ define([
                 },
 
                 button: {
-                    role: "",
+                    puzzle: "",
                     value: ""
                 },
 

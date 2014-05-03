@@ -12,10 +12,11 @@ define([
     'game/Zombie',
     'game/Chest',
     'game/Door',
+    'game/Button',
     'game/Bullet'
 ],
 
-function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Zombie, Chest, Door, Bullet) {
+function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Zombie, Chest, Door, Button, Bullet) {
     var Level = Class.$extend({
 		__init__: function(stage, data, player, resourceManager, editorMode, sound) {
             this.data = data;
@@ -46,6 +47,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.walls = [];
             this.doors = [];
             this.chests = [];
+            this.buttons = [];
             this.zombies = [];
             this.bullets = [];
             this.collisionObjects = [];
@@ -132,6 +134,12 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 self.chests.push(chest);
             });
 
+            //add buttons
+            _.each(data.buttons, function(obj) {
+                var button = new Button(obj);
+                button.setDispObj(self.addToStage(obj));
+                self.buttons.push(button);
+            });
 
             //add enemies
             _.each(data.zombies, function(obj) {
@@ -155,6 +163,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 y: this.player.dispObj.y,
                 rotation: this.player.dispObj.rotation
             };
+            this.player.currentWeapon = "knife";
 
 
             //add effects
@@ -199,6 +208,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.player.setEffects(this.effects);
 
             this.createCollisionObjects();
+            soundjs.Sound.stop();
         },
 
         resize: function() {
@@ -336,10 +346,11 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         break;
                     case "use":
                         var event = (new KeyCoder()).getKeys();
-                        event.keys[KeyCoder.E] = true;
+                        //event.keys[KeyCoder.E] = true;
                         this.chestsOpeningHandle(self, event);
+                        this.buttonsPressingHandle(event);
                         this.doorsOpeningHandle(event);
-                        event.keys[KeyCoder.E] = false;
+                        //event.keys[KeyCoder.E] = false;
                         break;
                     default:
                         break;
@@ -419,6 +430,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
             if (event.keys[KeyCoder.E]) {
                 this.chestsOpeningHandle(self, event);
+                this.buttonsPressingHandle(event);
                 this.doorsOpeningHandle(event);
             }
         },
@@ -750,6 +762,17 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                             });
                         }
                     }
+                }
+            }
+        },
+
+        buttonsPressingHandle: function(event) {
+            for (var i = 0; i < this.buttons.length; ++i) {
+                this.buttons[i].update(event, this.player);
+                if (this.buttons[i].justPressed === true) {
+                    this.buttons[i].justPressed = false;
+                    this.removeFromStage(this.buttons[i].dispObj);
+                    this.addToStage(this.buttons[i]);
                 }
             }
         },

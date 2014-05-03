@@ -16,6 +16,8 @@ define([
                 this.requires = obj.requires;
                 this.requiresMessage = "";
                 this.role = obj.role || null;
+                this.puzzle = obj.puzzle || null;
+                this.inputCode = "";
                 this.justOpened = false;
                 this.justTried = false;
             },
