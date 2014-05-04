@@ -17,6 +17,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             soundList: {
                 Ammo: "ammo.mp3",
                 Medkit: "apple.mp3",
+                Click: "click.mp3",
                 KnifeDraw: "knife.mp3",
                 KnifeMiss: "knife_miss.mp3",
                 KnifeMissShort: "knife_miss_short.mp3",

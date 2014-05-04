@@ -49,6 +49,9 @@ define([
                                             self.requiresMessage = "Kill all zombies first.";
                                         }
                                     }
+                                    else if(requirement === "puzzle") {
+                                        self.requiresMessage = "This door should be opened from somewhere else.";
+                                    }
                                     else if(!(_.contains(player.keys, requirement))) {
                                         self.requiresMessage = requirement + " required.";
                                     }
@@ -61,6 +64,9 @@ define([
                                     if (zombiesLeft !== 0) {
                                         this.requiresMessage = "Kill all zombies first.";
                                     }
+                                }
+                                else if(this.requires === "puzzle") {
+                                    this.requiresMessage = "This door should be opened from somewhere else.";
                                 }
                                 else if(!_.contains(player.keys, this.requires)) {
                                     this.requiresMessage = this.requires + " required.";

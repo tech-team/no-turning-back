@@ -346,11 +346,11 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         break;
                     case "use":
                         var event = (new KeyCoder()).getKeys();
-                        //event.keys[KeyCoder.E] = true;
+                        event.keys[KeyCoder.E] = true;
                         this.chestsOpeningHandle(self, event);
                         this.buttonsPressingHandle(event);
                         this.doorsOpeningHandle(event);
-                        //event.keys[KeyCoder.E] = false;
+                        event.keys[KeyCoder.E] = false;
                         break;
                     default:
                         break;
@@ -371,7 +371,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 for (var i = 0; i < this.bullets.length; ++i) {
                     this.bullets[i].update(event);
                 }
-
 
                 if (this.player.health <= 0 && !this.player.dead) {
                     this.player.dead = true;
@@ -428,9 +427,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.zombiesDeathHandle(self);
             this.dropsHandle();
 
+            this.buttonsPressingHandle(event);
             if (event.keys[KeyCoder.E]) {
                 this.chestsOpeningHandle(self, event);
-                this.buttonsPressingHandle(event);
                 this.doorsOpeningHandle(event);
             }
         },
@@ -734,33 +733,31 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
         doorsOpeningHandle: function(event) {
             for (var i = 0; i < this.doors.length; ++i) {
-                if (this.checkReach(this.doors[i])) {
-                    this.doors[i].update(event, this.player, this.zombies.length);
-                    if (this.doors[i].justTried == true) {
-                        this.doors[i].justTried = false;
-                        this.showMessage(this.doors[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
+                this.doors[i].update(event, this.player, this.zombies.length);
+                if (this.doors[i].justTried == true) {
+                    this.doors[i].justTried = false;
+                    this.showMessage(this.doors[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
+                }
+                else if (this.doors[i].justOpened == true) {
+                    ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
+
+                    this.doors[i].justOpened = false;
+                    for (var j = 0; j < this.collisionObjects.length; ++j) {
+                        if (this.collisionObjects[j] == this.doors[i].dispObj) {
+                            this.collisionObjects.splice(j, 1);
+                        }
                     }
-                    else if (this.doors[i].justOpened == true) {
-                        ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
+                    this.removeFromStage(this.doors[i].dispObj);
+                    this.addToStage(this.doors[i]);
 
-                        this.doors[i].justOpened = false;
-                        for (var j = 0; j < this.collisionObjects.length; ++j) {
-                            if (this.collisionObjects[j] == this.doors[i].dispObj) {
-                                this.collisionObjects.splice(j, 1);
-                            }
-                        }
-                        this.removeFromStage(this.doors[i].dispObj);
-                        this.addToStage(this.doors[i]);
+                    this.player.score += Level.SCORES.DOOR_OPEN;
 
-                        this.player.score += Level.SCORES.DOOR_OPEN;
+                    if (this.doors[i].role === "exit") {
+                        ResourceManager.playSound(ResourceManager.soundList.Victory);
 
-                        if (this.doors[i].role === "exit") {
-                            ResourceManager.playSound(ResourceManager.soundList.Victory);
-
-                            $.event.trigger({
-                                type: "levelFinished"
-                            });
-                        }
+                        $.event.trigger({
+                            type: "levelFinished"
+                        });
                     }
                 }
             }
@@ -768,11 +765,21 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
         buttonsPressingHandle: function(event) {
             for (var i = 0; i < this.buttons.length; ++i) {
-                this.buttons[i].update(event, this.player);
+                this.buttons[i].update(event, this.player, this.doors);
                 if (this.buttons[i].justPressed === true) {
+                    ResourceManager.playSound(ResourceManager.soundList.Click);
                     this.buttons[i].justPressed = false;
                     this.removeFromStage(this.buttons[i].dispObj);
-                    this.addToStage(this.buttons[i]);
+                    this.buttons[i].setDispObj(this.addToStage(this.buttons[i]));
+                }
+                else if (this.buttons[i].justDepressed === true) {
+                    this.buttons[i].justDepressed = false;
+                    this.removeFromStage(this.buttons[i].dispObj);
+                    this.buttons[i].setDispObj(this.addToStage(this.buttons[i]));
+                }
+                if (this.buttons[i].message) {
+                    this.showMessage(this.buttons[i].message, Level.MessageColor.Default);
+                    this.buttons[i].message = "";
                 }
             }
         },
