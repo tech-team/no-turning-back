@@ -15,11 +15,11 @@ define([
                 this.currentWaypoint = 0;
                 this.canAttack = true;
                 this.attackInterval = 1000;
-                this.weapon = obj.weapon;
+                this.weapon = obj.weapon || "";
                 this.health = 20;
                 this.damage = 5;
                 this.followDistance = obj.followDistance || 150;
-                this.attackDistance = 40;
+                this.attackDistance = 30;
                 this.justFired = "";
             },
 
@@ -52,9 +52,8 @@ define([
                     this.target = player.dispObj;
                     if (this.canAttack) {
                         var self = this;
-                        if (this.weapon === "" && vectorToPlayer.distance() <= this.attackDistance) {
+                        if (!this.weapon && vectorToPlayer.distance() <= this.attackDistance) {
                             player.damage(this.damage);
-
                             ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
                             this.canAttack = false;
 
