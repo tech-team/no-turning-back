@@ -19,7 +19,7 @@ define([
                 this.health = 20;
                 this.damage = 5;
                 this.followDistance = obj.followDistance || 150;
-                this.attackDistance = 28;
+                this.attackDistance = 40;
                 this.justFired = "";
             },
 
@@ -51,12 +51,12 @@ define([
                 if (vectorToPlayer.distance() < this.followDistance) {
                     this.target = player.dispObj;
                     if (this.canAttack) {
-                        if (this.weapon === "" && vectorToPlayer.distance() < this.attackDistance) {
+                        var self = this;
+                        if (this.weapon === "" && vectorToPlayer.distance() <= this.attackDistance) {
                             player.damage(this.damage);
 
                             ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
                             this.canAttack = false;
-                            var self = this;
 
                             setTimeout(function() {
                                 self.canAttack = true;
@@ -66,7 +66,6 @@ define([
                             this.justFired = "pistol";
 
                             this.canAttack = false;
-                            var self = this;
 
                             setTimeout(function() {
                                 self.canAttack = true;

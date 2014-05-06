@@ -8,6 +8,7 @@ define([
                 this.setDispObj(dispObj); //or kinda super(dispObj)
                 this.power = data['power'];
                 this.speed = 10;
+                this.source = data['source'];
                 this.ttl = data['ttl'] || null;
             },
 

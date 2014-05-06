@@ -375,6 +375,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                             y: this.zombies[i].dispObj.y,
                             r: this.zombies[i].dispObj.rotation,
                             power: ResourceManager.weaponData.pistol.power,
+                            source: "zombie",
                             tex: "pistol-bullet",
                             type: "bullet"
                         };
@@ -526,6 +527,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                             y: this.player.dispObj.y,
                             r: this.player.dispObj.rotation,
                             power: ResourceManager.weaponData.pistol.power,
+                            source: "player",
                             tex: "pistol-bullet",
                             type: "bullet"
                         };
@@ -548,6 +550,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                 y: this.player.dispObj.y,
                                 r: this.player.dispObj.rotation - (Math.floor(ResourceManager.weaponData.shotgun.bulletNum/2) - i) * ResourceManager.weaponData.shotgun.dispersion,
                                 power: ResourceManager.weaponData.shotgun.power,
+                                source: "player",
                                 tex: "shotgun-bullet",
                                 ttl: 8,
                                 type: "bullet"
@@ -576,7 +579,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         break;
                     }
                 }
-                if(collider.checkPixelCollision(this.bullets[i].dispObj, this.player.dispObj)) {
+                if (this.bullets[i].source != "player" && collider.checkPixelCollision(this.bullets[i].dispObj, this.player.dispObj)) {
                     this.player.damage(this.bullets[i].power);
                     this.removeFromStage(this.bullets[i].dispObj);
                     ResourceManager.playSound([ResourceManager.soundList.BulletHit, ResourceManager.soundList.PlayerHurt]);
