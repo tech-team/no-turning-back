@@ -154,7 +154,7 @@ function(Class, AliveObject, KeyCoder, collider) {
         },
 
         movementHandle: function(movementData, collisionObjects) {
-            var reboundModifier = (movementData.speedModifier === 0.75) ? (1.1) : (1.2);
+            var reboundModifier = 1.1;
 
             while (Math.abs(this.dispObj.rotation) > 180) {
                 this.dispObj.rotation -= (this.dispObj.rotation > 0) ? (360) : (-360);
@@ -177,10 +177,6 @@ function(Class, AliveObject, KeyCoder, collider) {
                         this.dispObj.x -= reboundModifier * offsetX;
                         this.dispObj.y -= reboundModifier * offsetY;
                         this.dispObj.rotation = currentRotation;
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                            this.dispObj.x += (reboundModifier - 1) * offsetX;
-                            this.dispObj.y += (reboundModifier - 1) * offsetY;
-                        }
                     }
                 }
             }

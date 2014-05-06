@@ -12,7 +12,7 @@ define([
                 this.r = obj.r;
                 this.state = ( obj.state === "open" ) ? "open" : "closed" ;
                 this.tex = obj.tex;
-                this.activationRadius = 100;
+                this.activationRadius = 90;
                 this.requires = obj.requires;
                 this.requiresMessage = "";
                 this.role = obj.role || null;

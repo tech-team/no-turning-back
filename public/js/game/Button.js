@@ -16,7 +16,7 @@ define([
                 this.value = obj.value;
                 this.state = "depressed";
                 this.tex = obj.tex;
-                this.activationRadius = 40;
+                this.activationRadius = 30;
                 this.justPressed = false;
                 this.justDepressed = false;
 
