@@ -15,15 +15,18 @@ define([
                 this.currentWaypoint = 0;
                 this.canAttack = true;
                 this.attackInterval = 1000;
+                this.weapon = obj.weapon;
                 this.health = 20;
                 this.damage = 5;
                 this.followDistance = obj.followDistance || 150;
                 this.attackDistance = 28;
+                this.justFired = "";
             },
 
             update: function(event, player, collisionObjects) {
 
                 var epsilon = 5, offsetX = 0, offsetY = 0;
+                var pistolFireDelayModifier= 1.5;
 
                 if (this.target == null) {
                     this.target = this.dispObj;
@@ -47,16 +50,28 @@ define([
 
                 if (vectorToPlayer.distance() < this.followDistance) {
                     this.target = player.dispObj;
-                    if (this.canAttack && vectorToPlayer.distance() < this.attackDistance) {
-                        player.damage(this.damage);
+                    if (this.canAttack) {
+                        if (this.weapon === "" && vectorToPlayer.distance() < this.attackDistance) {
+                            player.damage(this.damage);
 
-                        ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
-                        this.canAttack = false;
-                        var self = this;
+                            ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
+                            this.canAttack = false;
+                            var self = this;
 
-                        setTimeout(function() {
-                            self.canAttack = true;
-                        }, this.attackInterval);
+                            setTimeout(function() {
+                                self.canAttack = true;
+                            }, this.attackInterval);
+                        }
+                        else if (this.weapon === "pistol") {
+                            this.justFired = "pistol";
+
+                            this.canAttack = false;
+                            var self = this;
+
+                            setTimeout(function() {
+                                self.canAttack = true;
+                            }, pistolFireDelayModifier * this.attackInterval);
+                        }
                     }
                 }
                 else if (this.waypoints.length > 0) {

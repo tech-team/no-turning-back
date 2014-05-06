@@ -10,7 +10,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
 	var ResourceManager = Class.$extend({
         __classvars__: {
             //all textures should have .png format
-            texList: ["ground", "zombie", "player", "player-pistol", "player-shotgun", "wall", "brick_wall1", "brick_wall2",
+            texList: ["ground", "zombie", "zombie-pistol", "player", "player-pistol", "player-shotgun", "wall", "brick_wall1", "brick_wall2",
                 "brick_wall3", "brick_wall4", "chest", "chest-open", "door-open", "door-closed", "door-exit", "button", "button_pressed",
                 "rubbish", "waypoint", "pistol", "pistol-bullet", "shotgun", "shotgun-bullet", "golden-key", "silver-key",
                 "effects/fog", "effects/damage", "zombie_corpse", "golden_apple"],

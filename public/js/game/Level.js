@@ -367,6 +367,24 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
                 for (var i = 0; i < this.zombies.length; ++i) {
                     this.zombies[i].update(event, this.player, this.collisionObjects);
+                    if (this.zombies[i].justFired === "pistol") {
+                        this.zombies[i].justFired = "";
+                        ResourceManager.playSound(ResourceManager.soundList.PistolFire);
+                        var bulletData = {
+                            x: this.zombies[i].dispObj.x,
+                            y: this.zombies[i].dispObj.y,
+                            r: this.zombies[i].dispObj.rotation,
+                            power: ResourceManager.weaponData.pistol.power,
+                            tex: "pistol-bullet",
+                            type: "bullet"
+                        };
+
+                        var bullet = new Bullet(
+                            this.addToStage(bulletData),
+                            bulletData);
+
+                        this.bullets.push(bullet);
+                    }
                 }
                 for (var i = 0; i < this.bullets.length; ++i) {
                     this.bullets[i].update(event);
@@ -557,6 +575,13 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         this.bullets.splice(i, 1);
                         break;
                     }
+                }
+                if(collider.checkPixelCollision(this.bullets[i].dispObj, this.player.dispObj)) {
+                    this.player.damage(this.bullets[i].power);
+                    this.removeFromStage(this.bullets[i].dispObj);
+                    ResourceManager.playSound([ResourceManager.soundList.BulletHit, ResourceManager.soundList.PlayerHurt]);
+                    this.bullets.splice(i, 1);
+                    break;
                 }
                 for(var j = 0; j < this.zombies.length; ++j) {
                     if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {

@@ -53,6 +53,7 @@ define([
                     health: 20,
                     speed: 2,
                     followDistance: 150,
+                    weapon: "",
                     drops: [],
                     waypoints: []
                 },
