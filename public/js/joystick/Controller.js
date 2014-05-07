@@ -3,17 +3,15 @@ define([
     'classy',
     'easel',
     'hammer',
-    'joystick/MultiTouchStage',
     'game/ImageTiler'
 ],
-    function(_, Class, createjs, Hammer, MultiTouchStage, ImageTiler) {
+    function(_, Class, createjs, Hammer, ImageTiler) {
         var Controller = Class.$extend({
             __init__: function($window, canvas, stopJoystick) {
                 this.$window = $window;
                 this.canvas = canvas;
                 this.stopJoystick = stopJoystick;
-                console.log(this.stopJoystick);
-                //this.stage = _.extend(new createjs.Stage(this.canvas), MultiTouchStage);
+                console.log(this.stopJoystick); //TODO: wtf is this, for some reason that is function
                 this.stage = new createjs.Stage(this.canvas);
                 this.stage.enableDOMEvents(true);
                 createjs.Touch.enable(this.stage);
@@ -42,10 +40,6 @@ define([
                     navigator.webkitVibrate ||
                     navigator.mozVibrate ||
                     navigator.msVibrate;
-
-                /*Hammer(canvas).on("drag", function(event) {
-                    console.log(event);
-                })*/
 
                 this.$window.resize(function() { self.resize(); });
                 this.resize();
@@ -106,23 +100,6 @@ define([
                 this.mover.graphics.beginFill(Controller.COLOR.mover).drawCircle(0, 0, Controller.SIZE.moverRadius).endFill();
                 this.addToStage(this.mover, 0, 0);
 
-                //like this
-                /*Hammer(window).on("drag", function(e) { //ot this.canvas instead of window
-                    //TODO: limitations
-                    var pos = self.canvas.getBoundingClientRect();
-                    pos.x = e.gesture.center.pageX - pos.left;
-                    pos.y = e.gesture.center.pageY - pos.top;
-
-                    self.mover.x = pos.x;
-                    self.mover.y = pos.y;
-                });*/
-
-                //or like this (using MultiTouchStage thingy)
-                /*this.mover.on("drag", function(e) {
-                    self.mover.x = e.stageX;
-                    self.mover.y = e.stageY;
-                });*/
-
                 this.rightPad = new createjs.Shape();
                 this.rightPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
                 this.addToStage(this.rightPad, 0, 0);
@@ -151,6 +128,7 @@ define([
                     .endFill();
 
                 this.toolBar = this.addToStage(this.toolBar, Controller.SIZE.toolBarWidth, Controller.SIZE.toolBarHeight);
+                this.toolBar.on("mousedown", this.selectWeapon.bind(this));
 
                 this.toolBar.selection = new createjs.Shape();
                 this.toolBar.selection.graphics
@@ -160,19 +138,22 @@ define([
 
                 this.toolBar.selection = this.addToStage(this.toolBar.selection, Controller.SIZE.weaponSelection, Controller.SIZE.weaponSelection);
 
+                this.weapons = [];
+
+                //TODO: can be converted to loop
                 var knife = new createjs.Bitmap(gfx + "knife.png");
-                this.toolBar.knife = this.addToStage(knife, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
-                this.toolBar.knife.on("mousedown", this.selectWeapon.bind(this, "knife"));
+                this.addToStage(knife, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
+                this.weapons.push({name: "knife", obj: knife});
 
                 var pistol = new createjs.Bitmap(gfx + "pistol.png");
-                this.toolBar.pistol = this.addToStage(pistol, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
-                this.toolBar.pistol.on("mousedown", this.selectWeapon.bind(this, "pistol"));
+                this.addToStage(pistol, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
+                this.weapons.push({name: "pistol", obj: pistol});
 
                 var shotgun = new createjs.Bitmap(gfx + "shotgun.png");
-                this.toolBar.shotgun = this.addToStage(shotgun, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
-                this.toolBar.shotgun.on("mousedown", this.selectWeapon.bind(this, "shotgun"));
+                this.addToStage(shotgun, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
+                this.weapons.push({name: "shotgun", obj: shotgun});
 
-                this.currentWeapon = this.toolBar.knife;
+                this.currentWeapon = knife;
 
                 this.createEvents();
             },
@@ -208,14 +189,13 @@ define([
 
                 var itemSize = Controller.SIZE.toolBarItemSize;
 
-                this.toolBar.knife.x = this.toolBar.x - Controller.SIZE.toolBarWidth / 3;
-                this.toolBar.knife.y = this.toolBar.y;
+                var weaponsCount = this.weapons.length;
+                for (var i = 0; i < weaponsCount; ++i) {
+                    var obj = this.weapons[i].obj;
 
-                this.toolBar.pistol.x = this.toolBar.x;
-                this.toolBar.pistol.y = this.toolBar.y;
-
-                this.toolBar.shotgun.x = this.toolBar.x + Controller.SIZE.toolBarWidth / 3;
-                this.toolBar.shotgun.y = this.toolBar.y;
+                    obj.x = this.toolBar.x + (i - Math.floor(weaponsCount / 2)) * Controller.SIZE.toolBarWidth / weaponsCount;
+                    obj.y = this.toolBar.y;
+                }
 
                 this.toolBar.selection.x = this.currentWeapon.x;
                 this.toolBar.selection.y = this.currentWeapon.y;
@@ -468,8 +448,20 @@ define([
                 this.update = true;
             },
 
-            selectWeapon: function(name, evt) {
-                this.currentWeapon = evt.target;
+            selectWeapon: function(evt) {
+                var x = evt.stageX - evt.target.x;
+
+                var id = Math.floor(this.map(
+                    x,
+                    -Controller.SIZE.toolBarWidth / 2,
+                    Controller.SIZE.toolBarWidth / 2,
+                    0,
+                    this.weapons.length
+                ));
+
+                var weapon = this.weapons[id];
+
+                this.currentWeapon = weapon.obj;
                 this.toolBar.selection.x = this.currentWeapon.x;
                 this.toolBar.selection.y = this.currentWeapon.y;
                 this.forceUpdate();
@@ -477,7 +469,7 @@ define([
                 window.serverSend({
                     type: "game",
                     action: "weaponchange",
-                    weapon: name
+                    weapon: weapon.name
                 });
             },
 
