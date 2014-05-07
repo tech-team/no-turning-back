@@ -34,7 +34,8 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 ChestOpen: "chest_open.mp3",
                 GameOver: "game_over.mp3",
                 Victory: "fortunate_son.mp3",
-                CheaterVictory: "cheater_victory.mp3"
+                CheaterVictory: "cheater_victory.mp3",
+                LevelFinished: "" //TODO: add some kind of short ta-da sound
             },
             weaponData: {
                 knife: {

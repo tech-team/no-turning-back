@@ -15,7 +15,7 @@ define([
                 var self = this;
                 this.updateHandler = function() {
                     self.update();
-                }
+                };
 
                 createjs.Ticker.addEventListener("tick", this.updateHandler);
             },

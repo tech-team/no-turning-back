@@ -57,18 +57,11 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.joystickServer = null;
             this.lastShootTime = 0;
             this.shootDelta = 350;
+            this.finished = false;
 
             this.reload(data);
 
-            this.keyCoder.addEventListener("keyup", KeyCoder.X, function() {
-                //now this triggers levelFinished (not gameFinished), so no need to play sound
-                //ResourceManager.playSound(ResourceManager.soundList.CheaterVictory);
-                $.event.trigger({
-                    type: "levelFinished"
-                    //score: this.player.score,
-                    //message: "Cheater!"
-                });
-            });
+            this.keyCoder.addEventListener("keyup", KeyCoder.X, this.finish.bind(this));
 		},
 
         __classvars__: {
@@ -84,7 +77,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 Medkit: "#1397F0",
                 Ammo: "#A7FA16",
                 DoorClosed: "#0FFFF0",
-                NoAmmo: "#459DBA"
+                NoAmmo: "#459DBA",
+                LevelLoaded: "#7755FF",
+                LevelFinished: "#00FF00"
             },
 
             SpeedModifier: {
@@ -202,6 +197,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 this.scoreText = this.stage.addChild(scoreText);
 
                 this.resize(); //recalculate overlay positions
+
+                this.showMessage(this.data.name + " started...", Level.MessageColor.LevelLoaded, 6000);
             }
 
             this.updateFog(true);
@@ -360,6 +357,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
 		update: function(event) {
             if (!this.editorMode) {
+                if (this.finished)
+                    return;
+
                 this.keyFunc(event);
                 this.setPrevPlayerPos();
 
@@ -781,11 +781,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                     this.player.score += Level.SCORES.DOOR_OPEN;
 
                     if (this.doors[i].role === "exit") {
-                        ResourceManager.playSound(ResourceManager.soundList.Victory);
-
-                        $.event.trigger({
-                            type: "levelFinished"
-                        });
+                        this.finish();
                     }
                 }
             }
@@ -926,6 +922,25 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                     self.showingMessagesCount--;
                 }
             );
+        },
+
+        finish: function() {
+            this.finished = true;
+            var finishTimeout = 7000;
+
+            ResourceManager.playSound(ResourceManager.soundList.LevelFinished);
+            this.showMessage("Level finished!", Level.MessageColor.LevelFinished, finishTimeout);
+
+            var self = this;
+            new UntilTimer(finishTimeout, function() {
+                    self.stage.alpha = 1 - this.elapsed / finishTimeout;
+                },
+                function() {
+                    $.event.trigger({
+                        type: "levelFinished"
+                    });
+                    self.stage.alpha = 1;
+                });
         }
 	});
 
