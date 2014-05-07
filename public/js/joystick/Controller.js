@@ -77,7 +77,9 @@ define([
                     pad: "#FF0000",
                     use: "#AAAAAA",
                     reconnect: "#AAAAAA"
-                }
+                },
+
+                WEAPON: ["knife", "pistol", "shotgun"]
             },
 
             createControls: function() {
@@ -140,20 +142,14 @@ define([
 
                 this.weapons = [];
 
-                //TODO: can be converted to loop
-                var knife = new createjs.Bitmap(gfx + "knife.png");
-                this.addToStage(knife, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
-                this.weapons.push({name: "knife", obj: knife});
+                _.each(Controller.WEAPON, function(name) {
+                    var weapon = new createjs.Bitmap(gfx + name + ".png");
+                    self.addToStage(weapon, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
+                    self.weapons.push({name: name, obj: weapon});
+                });
 
-                var pistol = new createjs.Bitmap(gfx + "pistol.png");
-                this.addToStage(pistol, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
-                this.weapons.push({name: "pistol", obj: pistol});
-
-                var shotgun = new createjs.Bitmap(gfx + "shotgun.png");
-                this.addToStage(shotgun, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
-                this.weapons.push({name: "shotgun", obj: shotgun});
-
-                this.currentWeapon = knife;
+                if (this.weapons.length != 0)
+                    this.currentWeapon = this.weapons[0].obj;
 
                 this.createEvents();
             },
