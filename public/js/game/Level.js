@@ -571,7 +571,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 if (this.bullets[i].source != "player" && collider.checkPixelCollision(this.bullets[i].dispObj, this.player.dispObj)) {
                     this.player.damage(this.bullets[i].power);
                     this.removeFromStage(this.bullets[i].dispObj);
-                    ResourceManager.playSound([ResourceManager.soundList.BulletHit, ResourceManager.soundList.PlayerHurt]);
+                    ResourceManager.playSound(ResourceManager.soundList.BulletHit);
+                    ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
                     this.bullets.splice(i, 1);
                     break;
                 }
