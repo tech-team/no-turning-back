@@ -9,6 +9,7 @@ define([
     'game/KeyCoder',
     'game/Editor',
     'game/UntilTimer',
+    'game/Messenger',
     'game/Zombie',
     'game/Chest',
     'game/Door',
@@ -16,7 +17,7 @@ define([
     'game/Bullet'
 ],
 
-function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Zombie, Chest, Door, Button, Bullet) {
+function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet) {
     var Level = Class.$extend({
 		__init__: function(stage, data, player, resourceManager, editorMode, sound) {
             this.data = data;
@@ -68,18 +69,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             SCORES: {
                 KILL: 10,
                 DOOR_OPEN: 5
-            },
-
-            MessageColor: {
-                Default: "#00FF00",
-                NewWeapon: "#0BB389",
-                NewItem: "#A1BF26",
-                Medkit: "#1397F0",
-                Ammo: "#A7FA16",
-                DoorClosed: "#0FFFF0",
-                NoAmmo: "#459DBA",
-                LevelLoaded: "#7755FF",
-                LevelFinished: "#00FF00"
             },
 
             SpeedModifier: {
@@ -198,7 +187,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
                 this.resize(); //recalculate overlay positions
 
-                this.showMessage(this.data.name + " started...", Level.MessageColor.LevelLoaded, 6000);
+                Messenger.showMessage(this.data.name + " started...", Messenger.MessageColor.LevelLoaded, 6000);
             }
 
             this.updateFog(true);
@@ -565,7 +554,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                     }
                 }
                 else {
-                    this.showMessage("You are out of ammo!", Level.MessageColor.NoAmmo);
+                    Messenger.showMessage("You are out of ammo!", Messenger.MessageColor.NoAmmo);
                 }
             }
         },
@@ -652,7 +641,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
                     if (this.chests[i].justTried == true) {
                         this.chests[i].justTried = false;
-                        this.showMessage(this.chests[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
+                        Messenger.showMessage(this.chests[i].requiresMessage.toString(), Messenger.MessageColor.DoorClosed);
                         break;
                     }
                     else if (this.chests[i].justOpened == true) {
@@ -667,11 +656,11 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                     var ammo = drop['ammo'] || 5;
                                     if (name in self.player.weapons) {
                                         self.player.weapons[name] += ammo;
-                                        self.showMessage("You picked up " + ammo + " ammo for " + name, Level.MessageColor.Ammo);
+                                        self.showMessage("You picked up " + ammo + " ammo for " + name, Messenger.MessageColor.Ammo);
                                     }
                                     else {
                                         self.player.weapons[name] = ammo;
-                                        self.showMessage("You picked up a new weapon: " + name, Level.MessageColor.NewWeapon);
+                                        self.showMessage("You picked up a new weapon: " + name, Messenger.MessageColor.NewWeapon);
                                     }
                                     break;
                                 case "medkit":
@@ -681,18 +670,18 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                         healed -= self.player.health - self.player.maxHealth;
                                         self.player.health = self.player.maxHealth;
                                     }
-                                    self.showMessage("You healed " + healed + " health" + ((healed === 0) ? (", dumbass.") : ("")), Level.MessageColor.Medkit);
+                                    self.showMessage("You healed " + healed + " health" + ((healed === 0) ? (", dumbass.") : ("")), Messenger.MessageColor.Medkit);
                                     break;
                                 case "ammo":
                                     if (drop['name'] in self.player.weapons) {
                                         self.player.weapons[drop['name']] += drop['size'];
-                                        self.showMessage("You picked up " + drop['size'] + " ammo for " + drop['name'], Level.MessageColor.Ammo);
+                                        self.showMessage("You picked up " + drop['size'] + " ammo for " + drop['name'], Messenger.MessageColor.Ammo);
                                     }
                                     break;
                                 case "key":
                                     if (!(drop['name'] in self.player.keys)) {
                                         self.player.keys.push(drop['name']);
-                                        self.showMessage("You got a " + drop['name'], Level.MessageColor.NewItem);
+                                        self.showMessage("You got a " + drop['name'], Messenger.MessageColor.NewItem);
                                     }
                                     break;
                                 default:
@@ -720,7 +709,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                             case "key":
                                 if (!(this.drops[i].data['name'] in this.player.keys)) {
                                     this.player.keys.push(this.drops[i].data['name']);
-                                    this.showMessage("You picked up a " + this.drops[i].data['name'], Level.MessageColor.NewItem);
+                                    Messenger.showMessage("You picked up a " + this.drops[i].data['name'], Messenger.MessageColor.NewItem);
                                 }
                                 break;
                             case "weapon":
@@ -728,27 +717,20 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                 var name = this.drops[i].data['name'];
                                 if (name in this.player.weapons) {
                                     this.player.weapons[name] += this.drops[i].data['ammo'];
-                                    this.showMessage("You picked up " + this.drops[i].data['ammo'] + " ammo for " + this.drops[i].data['name'], Level.MessageColor.Ammo);
+                                    Messenger.showMessage("You picked up " + this.drops[i].data['ammo'] + " ammo for " + this.drops[i].data['name'], Messenger.MessageColor.Ammo);
                                 }
                                 else {
                                     this.player.weapons[name] = this.drops[i].data['ammo'];
-                                    this.showMessage("You picked up a new weapon: " + this.drops[i].data['name'], Level.MessageColor.NewWeapon);
+                                    Messenger.showMessage("You picked up a new weapon: " + this.drops[i].data['name'], Messenger.MessageColor.NewWeapon);
                                 }
                                 break;
                             case "medkit":
-                                ResourceManager.playSound(ResourceManager.soundList.Medkit);
-                                var healed = this.drops[i].data['size'];
-                                this.player.health += this.drops[i].data['size'];
-                                if (this.player.health > this.player.maxHealth) {
-                                    healed -= this.player.health - this.player.maxHealth;
-                                    this.player.health = this.player.maxHealth;
-                                }
-                                this.showMessage("You healed " + healed + " health" + ((healed === 0) ? (", dumbass.") : ("")), Level.MessageColor.Medkit);
+                                this.player.heal();
                                 break;
                             default:
                                 if (this.drops[i].data['name']) {
                                     this.player.inventory.push(this.drops[i].data['name']);
-                                    this.showMessage(this.drops[i].data['name'] + " added to your inventory!");
+                                    Messenger.showMessage(this.drops[i].data['name'] + " added to your inventory!");
                                 }
                         }
 
@@ -764,7 +746,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 this.doors[i].update(event, this.player, this.zombies.length);
                 if (this.doors[i].justTried == true) {
                     this.doors[i].justTried = false;
-                    this.showMessage(this.doors[i].requiresMessage.toString(), Level.MessageColor.DoorClosed);
+                    Messenger.showMessage(this.doors[i].requiresMessage.toString(), Messenger.MessageColor.DoorClosed);
                 }
                 else if (this.doors[i].justOpened == true) {
                     ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
@@ -802,7 +784,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                     this.buttons[i].setDispObj(this.addToStage(this.buttons[i]));
                 }
                 if (this.buttons[i].message) {
-                    this.showMessage(this.buttons[i].message, Level.MessageColor.Default);
+                    Messenger.showMessage(this.buttons[i].message, Messenger.MessageColor.Default);
                     this.buttons[i].message = "";
                 }
             }
@@ -900,47 +882,25 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             }
         },
 
-        showMessage: function(message, color, period) {
-            this.showingMessagesCount++;
-
-            var text = new easeljs.Text(message, "20px Arial", color || Level.MessageColor.Default);
-            text.x = this.stage.canvas.width / 2 - text.getMeasuredWidth() / 2;
-            text.y = text.getMeasuredHeight() * this.showingMessagesCount;
-            text.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
-
-            var dispObjText = this.stage.addChild(text);
-
-            var self = this;
-            period = period || 3000;
-
-            new UntilTimer(period,
-                function() {
-                    text.alpha = (period - this.elapsed)/period;
-                },
-                function() {
-                    self.stage.removeChild(dispObjText);
-                    self.showingMessagesCount--;
-                }
-            );
-        },
-
         finish: function() {
-            this.finished = true;
-            var finishTimeout = 7000;
+            if (!this.finished) {
+                this.finished = true;
+                var finishTimeout = 7000;
 
-            ResourceManager.playSound(ResourceManager.soundList.LevelFinished);
-            this.showMessage("Level finished!", Level.MessageColor.LevelFinished, finishTimeout);
+                ResourceManager.playSound(ResourceManager.soundList.LevelFinished);
+                Messenger.showMessage("Level finished!", Messenger.MessageColor.LevelFinished, finishTimeout);
 
-            var self = this;
-            new UntilTimer(finishTimeout, function() {
-                    self.stage.alpha = 1 - this.elapsed / finishTimeout;
-                },
-                function() {
-                    $.event.trigger({
-                        type: "levelFinished"
+                var self = this;
+                new UntilTimer(finishTimeout, function() {
+                        self.stage.alpha = 1 - this.elapsed / finishTimeout;
+                    },
+                    function() {
+                        $.event.trigger({
+                            type: "levelFinished"
+                        });
+                        self.stage.alpha = 1;
                     });
-                    self.stage.alpha = 1;
-                });
+            }
         }
 	});
 

@@ -1,10 +1,11 @@
 define([
 	'classy',
 	'game/AliveObject',
+    'game/ResourceManager',
     'game/KeyCoder',
     'collision'
 ],
-function(Class, AliveObject, KeyCoder, collider) {
+function(Class, AliveObject, ResourceManager, KeyCoder, collider) {
 	var Player = AliveObject.$extend({
 		__init__: function() {
             this.type = "player"; //type should be specified in each class it its' objects will be passed to addToStage
@@ -197,6 +198,18 @@ function(Class, AliveObject, KeyCoder, collider) {
                     clearInterval(tid);
                 }
             }, 50);
+        },
+
+        heal: function(howMuch) {
+            ResourceManager.playSound(ResourceManager.soundList.Medkit);
+            var healed = this.drops[i].data['size'];
+            this.player.health += this.drops[i].data['size'];
+            if (this.player.health > this.player.maxHealth) {
+                healed -= this.player.health - this.player.maxHealth;
+                this.player.health = this.player.maxHealth;
+            }
+            Messenger.showMessage("You healed " + healed + " health" + ((healed === 0) ? (", dumbass.") : ("")), Messenge.MessageColor.Medkit);
+
         },
 
         isDead: function() {
