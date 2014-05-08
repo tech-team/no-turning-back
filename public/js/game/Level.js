@@ -832,10 +832,10 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
                     var fogBox = this.effects.fogBox.graphics;
                     var playerPos = {
-                        x: this.player.dispObj.x,
-                        y: this.player.dispObj.y
+                        x: Math.floor(this.player.dispObj.x),
+                        y: Math.floor(this.player.dispObj.y)
                     };
-                    var frameSize = 370;
+                    var frameSize = 380;
                     var stageSize = {
                         width: this.stage.canvas.width,
                         height: this.stage.canvas.height
@@ -872,8 +872,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         stageSize.height
                     ); //right
 
-                    this.effects.fog.x = this.player.dispObj.x;
-                    this.effects.fog.y = this.player.dispObj.y;
+                    this.effects.fog.x = playerPos.x;
+                    this.effects.fog.y = playerPos.y;
                 }
             }
         },
