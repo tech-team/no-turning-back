@@ -664,13 +664,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                     }
                                     break;
                                 case "medkit":
-                                    var healed = drop['size'];
-                                    self.player.health += healed;
-                                    if (self.player.health > self.player.maxHealth) {
-                                        healed -= self.player.health - self.player.maxHealth;
-                                        self.player.health = self.player.maxHealth;
-                                    }
-                                    Messenger.showMessage("You healed " + healed + " health" + ((healed === 0) ? (", dumbass.") : ("")), Messenger.MessageColor.Medkit);
+                                    self.player.heal(drop['size']);
                                     break;
                                 case "ammo":
                                     if (drop['name'] in self.player.weapons) {
