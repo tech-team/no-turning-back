@@ -656,11 +656,11 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                     var ammo = drop['ammo'] || 5;
                                     if (name in self.player.weapons) {
                                         self.player.weapons[name] += ammo;
-                                        self.showMessage("You picked up " + ammo + " ammo for " + name, Messenger.MessageColor.Ammo);
+                                        Messenger.showMessage("You picked up " + ammo + " ammo for " + name, Messenger.MessageColor.Ammo);
                                     }
                                     else {
                                         self.player.weapons[name] = ammo;
-                                        self.showMessage("You picked up a new weapon: " + name, Messenger.MessageColor.NewWeapon);
+                                        Messenger.showMessage("You picked up a new weapon: " + name, Messenger.MessageColor.NewWeapon);
                                     }
                                     break;
                                 case "medkit":
@@ -670,18 +670,18 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                         healed -= self.player.health - self.player.maxHealth;
                                         self.player.health = self.player.maxHealth;
                                     }
-                                    self.showMessage("You healed " + healed + " health" + ((healed === 0) ? (", dumbass.") : ("")), Messenger.MessageColor.Medkit);
+                                    Messenger.showMessage("You healed " + healed + " health" + ((healed === 0) ? (", dumbass.") : ("")), Messenger.MessageColor.Medkit);
                                     break;
                                 case "ammo":
                                     if (drop['name'] in self.player.weapons) {
                                         self.player.weapons[drop['name']] += drop['size'];
-                                        self.showMessage("You picked up " + drop['size'] + " ammo for " + drop['name'], Messenger.MessageColor.Ammo);
+                                        Messenger.showMessage("You picked up " + drop['size'] + " ammo for " + drop['name'], Messenger.MessageColor.Ammo);
                                     }
                                     break;
                                 case "key":
                                     if (!(drop['name'] in self.player.keys)) {
                                         self.player.keys.push(drop['name']);
-                                        self.showMessage("You got a " + drop['name'], Messenger.MessageColor.NewItem);
+                                        Messenger.showMessage("You got a " + drop['name'], Messenger.MessageColor.NewItem);
                                     }
                                     break;
                                 default:
@@ -725,7 +725,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                                 }
                                 break;
                             case "medkit":
-                                this.player.heal();
+                                var howMuch = this.drops[i].data['size'];
+                                this.player.heal(howMuch);
                                 break;
                             default:
                                 if (this.drops[i].data['name']) {

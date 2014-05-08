@@ -2,10 +2,11 @@ define([
 	'classy',
 	'game/AliveObject',
     'game/ResourceManager',
+    'game/Messenger',
     'game/KeyCoder',
     'collision'
 ],
-function(Class, AliveObject, ResourceManager, KeyCoder, collider) {
+function(Class, AliveObject, ResourceManager, Messenger, KeyCoder, collider) {
 	var Player = AliveObject.$extend({
 		__init__: function() {
             this.type = "player"; //type should be specified in each class it its' objects will be passed to addToStage
@@ -202,14 +203,13 @@ function(Class, AliveObject, ResourceManager, KeyCoder, collider) {
 
         heal: function(howMuch) {
             ResourceManager.playSound(ResourceManager.soundList.Medkit);
-            var healed = this.drops[i].data['size'];
-            this.player.health += this.drops[i].data['size'];
-            if (this.player.health > this.player.maxHealth) {
-                healed -= this.player.health - this.player.maxHealth;
-                this.player.health = this.player.maxHealth;
+            var healed = howMuch;
+            this.health += howMuch;
+            if (this.health > this.maxHealth) {
+                healed -= this.health - this.maxHealth;
+                this.health = this.maxHealth;
             }
-            Messenger.showMessage("You healed " + healed + " health" + ((healed === 0) ? (", dumbass.") : ("")), Messenge.MessageColor.Medkit);
-
+            Messenger.showMessage("You healed " + healed + " health" + ((healed === 0) ? (", dumbass.") : ("")), Messenger.MessageColor.Medkit);
         },
 
         isDead: function() {
