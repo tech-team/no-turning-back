@@ -183,7 +183,7 @@ module.exports = function (grunt) {
 	    [
 	        'fest', 'requirejs:build_main_game',
 	        'concat:build_main_game', 'uglify:build_main_game',
-            'cssmin:main_game'
+            'sass:main_game', 'cssmin:main_game'
 	    ]
 	);
 
@@ -192,7 +192,7 @@ module.exports = function (grunt) {
         [
             'requirejs:build_joystick',
             'concat:build_joystick', 'uglify:build_joystick',
-            'cssmin:joystick'
+            'sass:joystick', 'cssmin:joystick'
         ]
     );
 
