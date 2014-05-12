@@ -1,36 +1,75 @@
-var scores = [],
-	id = 0;
+var dbUrl = "NTBUser:NTB@localhost:27017/NTBdb";
+var collections = ["scores"];
+var db = require("mongojs").connect(dbUrl, collections);
 
-var test = {
-	name: "test",
-	score: 21
-};
-scores.push(test);
 
-function sortScores(){
-	scores.sort(function(a,b) {
-		return b.score - a.score;
-	});
+//var scores = [];
+//
+//db.scores.find({}, function(err, scoresRes) {
+//    if( err || !scoresRes) console.log("No scores found");
+//    else scoresRes.forEach( function(score) {
+//        scores.push(score);
+//    } );
+//});
+
+//function sortScores(){
+//	scores.sort(function(a,b) {
+//		return b.score - a.score;
+//	});
+//}
+
+function retrieveScores(callback, errorCallback, limit) {
+    var options = {
+        "sort": [['score', 'desc']]
+    };
+    if (limit) {
+        options['limit'] = limit;
+    }
+
+    return db.scores.find({}, options).toArray(function(err, objs) {
+        if (!err) {
+            callback(objs);
+        } else {
+            errorCallback("Couldn't load data");
+        }
+    });
+}
+
+function saveScore(callback, errorCallback, scoreInfo) {
+    db.scores.save(scoreInfo, function(err, saved) {
+        if( err || !saved ) errorCallback("Score was not saved");
+        else callback({
+            id: saved._id.valueOf(),
+            name: saved.name,
+            score: saved.score
+        });
+    });
 }
 
 module.exports = {
-	getFull: function(req, res){
+	getFull: function(req, res) {
+        var callback = function(s) {
+            s = JSON.stringify(s);
+            res.setHeader('Content-Type', 'application/javascript');
+            res.setHeader('Content-Length', Buffer.byteLength(s));
+            res.end(s);
+        };
+
+        var errorCallback = function(err) {
+            res.writeHead(500, 'Internal Server Error');
+            res.end(err);
+        };
+
 		var s;
 		if (req.query.limit && !isNaN(parseInt(req.query.limit, 10))){
-			s = [];
-			for (var i = 0, l = scores.length, li = req.query.limit; i < l && i < li; i++){
-				s.push(scores[i]);
-			}
+            s = retrieveScores(callback, errorCallback, req.query.limit);
 		} else {
-			s = scores;
+			s = retrieveScores(callback, errorCallback);
 		}
-		s = JSON.stringify(s);
-		res.setHeader('Content-Type', 'application/javascript');
-		res.setHeader('Content-Length', Buffer.byteLength(s));
-		res.end(s);
+
 	},
 
-	getOne: function(req, res){
+	/*getOne: function(req, res){
 		var id = req.params.id,
 			founded;
 
@@ -59,7 +98,7 @@ module.exports = {
 			res.writeHead(404, 'Not Found');
 			res.end();
 		}
-	},
+	},*/
 
 	post: function(req, res){
 		var newScore = req.body;
@@ -69,15 +108,22 @@ module.exports = {
 			res.end();
 			return;
 		}
+        newScore.score = parseInt(newScore.score, 10);
 
-		newScore.id = id++;
-		scores.push(newScore);
-		sortScores();
-		var s = JSON.stringify(newScore);
-		res.setHeader('Content-Type', 'application/javascript');
-		res.setHeader('Content-Length', Buffer.byteLength(s));
-		res.end(s);
-	},
+        var callback = function(newScore) {
+            var s = JSON.stringify(newScore);
+            res.setHeader('Content-Type', 'application/javascript');
+            res.setHeader('Content-Length', Buffer.byteLength(s));
+            res.end(s);
+        };
+
+        var errorCallback = function(err) {
+            res.writeHead(500, 'Internal Server Error');
+            res.end(err);
+        };
+
+        saveScore(callback, errorCallback, newScore);
+	}/*,
 
 	del :function(req, res){
 		var id = req.params.id,
@@ -144,5 +190,5 @@ module.exports = {
 
 		res.writeHead(404, 'Not Found');
 		res.end();
-	}
+	}*/
 };
