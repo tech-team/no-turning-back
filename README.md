@@ -9,6 +9,7 @@ No Turning Back
   * [grunt](gruntjs.com/)
   * [grunt-fest](https://github.com/eprev/grunt-fest/) with [fest](https://github.com/mailru/fest) template engine
   * [SASS](http://sass-lang.com/) preprocessor
+  * [socket.io](http://socket.io/)
 
 
 To deploy this game you will need to have ```node.js``` and ```npm``` already been installed. 
