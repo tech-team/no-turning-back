@@ -59,7 +59,7 @@ function check_node() {
 
 function check_ruby() {
 	RUBY_INSTALLED=1
-	hash node > /dev/null 2>&1 || RUBY_INSTALLED=0
+	hash irb > /dev/null 2>&1 || RUBY_INSTALLED=0
 	if [ $RUBY_INSTALLED == 1 ]; then
 		RUBY_VERSION=$(ruby -v)
 		echo "Ruby is already installed. version = $RUBY_VERSION"
