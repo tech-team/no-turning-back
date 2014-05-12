@@ -4,8 +4,8 @@ define([
 function(Class) {
 	var LevelManager = Class.$extend({
         levels: [
-            'Level2',
-            'Level1'
+            'Level1',
+            'Level2'
         ],
 		__init__: function() {
 			this.currentLevelId = null;
