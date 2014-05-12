@@ -1,10 +1,13 @@
 define([
 	'classy',
 	'game/AliveObject',
+    'game/ResourceManager',
+    'game/UntilTimer',
+    'game/Messenger',
     'game/KeyCoder',
     'collision'
 ],
-function(Class, AliveObject, KeyCoder, collider) {
+function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, collider) {
 	var Player = AliveObject.$extend({
 		__init__: function() {
             this.type = "player"; //type should be specified in each class it its' objects will be passed to addToStage
@@ -185,6 +188,8 @@ function(Class, AliveObject, KeyCoder, collider) {
         damage: function(howMuch) {
             this.health -= howMuch;
             //TODO: should be replaced with UntilTimer
+            //well that and heal() function cannot be replaced by UntilTimer
+            //because UntilTimer tick speed is uncontrollable
 
             var damageEffect = this.effects.damage;
             damageEffect.alpha = 1;
@@ -194,6 +199,33 @@ function(Class, AliveObject, KeyCoder, collider) {
                     damageEffect.alpha -= 0.05;
                 else {
                     damageEffect.visible = false;
+                    clearInterval(tid);
+                }
+            }, 50);
+        },
+
+        heal: function(howMuch) {
+            ResourceManager.playSound(ResourceManager.soundList.Medkit);
+
+            //please note, that amount of health to be healed is unpredictable
+            //because player can be hurt in process
+            var messages = [
+                "Oh, sweet lemonade!",
+                "That feels good!",
+                "Much health, very medkit, wow!"
+            ];
+            Messenger.showMessage(messages[_.random(messages.length - 1)], Messenger.MessageColor.Medkit);
+
+            var self = this;
+            var tid = setInterval(function() {
+                if (howMuch > 0) {
+                    howMuch--;
+
+                    if (self.health < self.maxHealth)
+                        self.health++;
+                }
+                else {
+                    //healing finished
                     clearInterval(tid);
                 }
             }, 50);

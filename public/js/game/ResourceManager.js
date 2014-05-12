@@ -75,19 +75,19 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 this.soundDisabled = !this.soundDisabled;
             },
 
-            playSound: function(sound, cooldown) {
+            playSound: function(snd, cooldown) {
                 if (this.soundDisabled)
                     return;
 
+                var sound = snd;
                 if (_.isArray(sound)) {
                     var randId = _.random(0, sound.length - 1);
-                    soundjs.Sound.play(sound[randId]);
+                    sound = sound[randId];
                 }
-                else {
-                    if (!(sound in ResourceManager.playingSounds) || (ResourceManager.playingSounds[sound] === 0)) {
-                        soundjs.Sound.play(sound);
-                        ResourceManager.playingSounds[sound] = cooldown || 0;
-                    }
+
+                if (!(sound in ResourceManager.playingSounds) || (ResourceManager.playingSounds[sound] === 0)) {
+                    soundjs.Sound.play(sound);
+                    ResourceManager.playingSounds[sound] = cooldown || 0;
                 }
             }
         },

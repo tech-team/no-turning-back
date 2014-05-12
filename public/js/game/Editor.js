@@ -309,6 +309,7 @@ define([
                             dataType: 'json',
                             success: function(data) {
                                 self.level.reload(data);
+                                self.regenerateLevelPropertiesTable();
                             },
                             error: function(data) {
                                 alert("Unable to load level");

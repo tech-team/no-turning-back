@@ -9,9 +9,10 @@ define([
 	'game/Level',
 	'game/Player',
 	'game/ResourceManager',
-    'console'
+    'console',
+    'game/Messenger'
 ],
-function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager, Console) {
+function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager, Console, Messenger) {
 	var Game = Class.$extend({
 		__init__: function(canvas, editorMode, onLoadedCallback) {
             this.editorMode = editorMode;
@@ -22,6 +23,7 @@ function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Re
 			this.width = canvas.width;
 			this.height = canvas.height;
 			this.stage = new createjs.Stage(this.canvas);
+            Messenger.setStage(this.stage);
 			this.ticker = createjs.Ticker;
 			this.levelManager = new LevelManager();
 			this.level = null;
