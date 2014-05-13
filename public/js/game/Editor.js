@@ -310,6 +310,7 @@ define([
                             success: function(data) {
                                 self.level.reload(data);
                                 self.regenerateLevelPropertiesTable();
+                                self.regenerateObjectPropertiesTable();
                             },
                             error: function(data) {
                                 alert("Unable to load level");
