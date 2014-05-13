@@ -157,7 +157,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
         },
 
         movementHandle: function(movementData, collisionObjects) {
-            var reboundModifier = 1.1;
+            var reboundModifier = 1;
 
             while (Math.abs(this.dispObj.rotation) > 180) {
                 this.dispObj.rotation -= (this.dispObj.rotation > 0) ? (360) : (-360);
