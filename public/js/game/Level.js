@@ -60,6 +60,11 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.shootDelta = 350;
             this.finished = false;
 
+            this.camera = {
+                x: 0,
+                y: 0
+            };
+
             this.reload(data);
 
             this.keyCoder.addEventListener("keyup", KeyCoder.X, this.finish.bind(this));
@@ -86,6 +91,10 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.stage.update();
 
             this.containers = []; //wall, chest, waypoint and so on
+
+            //create main container for camera feature
+            this.mainContainer = new createjs.Container();
+            this.stage.addChild(this.mainContainer);
 
             //add background
             this.background = this.addToStage(data, true);
@@ -154,8 +163,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             if (!this.editorMode) {
                 var graphics = new easeljs.Graphics();
                 this.effects.fogBox = new easeljs.Shape(graphics);
-                var fogBox = this.stage.addChild(this.effects.fogBox);
-                this.fogId = this.stage.getChildIndex(fogBox);
+                var fogBox = this.mainContainer.addChild(this.effects.fogBox);
 
                 this.effects.fog = this.addToStage({
                     type: "effect",
@@ -215,7 +223,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
         createContainer: function(name) {
             var container = new createjs.Container();
             this.containers[name] = container;
-            this.stage.addChild(container);
+            this.mainContainer.addChild(container);
         },
 
         createCollisionObjects: function() {
@@ -261,7 +269,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             if (_.isUndefined(this.containers[objData.type])) {
                 var container = new createjs.Container();
                 this.containers[objData.type] = container;
-                this.stage.addChild(container);
+                this.mainContainer.addChild(container);
             }
             var addTo = this.containers[objData.type];
 
@@ -411,11 +419,34 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                     }
                 }
 
+                this.updateCamera();
             }
             else {
                 this.editor.keyFunc(event);
             }
 		},
+
+        updateCamera: function() {
+            var stageSize = {
+                width: this.stage.canvas.width,
+                height: this.stage.canvas.height
+            };
+            var offset = 100;
+
+            if (this.player.dispObj.x > stageSize.width - offset) {
+                this.mainContainer.x = -(this.player.dispObj.x - (stageSize.width - offset));
+            }
+            else if (this.player.dispObj.x < offset) {
+                this.mainContainer.x = -this.player.dispObj.x + offset;
+            }
+
+            if (this.player.dispObj.y > stageSize.height - offset) {
+                this.mainContainer.y = -(this.player.dispObj.y - (stageSize.height - offset));
+            }
+            else if (this.player.dispObj.y < offset) {
+                this.mainContainer.y = -this.player.dispObj.y + offset;
+            }
+        },
 
         keyFunc: function(event) {
             var self = this;
