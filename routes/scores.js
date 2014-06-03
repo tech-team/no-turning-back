@@ -1,6 +1,4 @@
-var dbUrl = "NTBUser:NTB@localhost:27017/NTBdb";
-var collections = ["scores"];
-var db = require("mongojs").connect(dbUrl, collections);
+
 
 
 //var scores = [];
@@ -18,7 +16,7 @@ var db = require("mongojs").connect(dbUrl, collections);
 //	});
 //}
 
-function retrieveScores(callback, errorCallback, limit) {
+function retrieveScores(db, callback, errorCallback, limit) {
     var options = {
         "sort": [['score', 'desc']]
     };
@@ -35,7 +33,7 @@ function retrieveScores(callback, errorCallback, limit) {
     });
 }
 
-function saveScore(callback, errorCallback, scoreInfo) {
+function saveScore(db, callback, errorCallback, scoreInfo) {
     db.scores.save(scoreInfo, function(err, saved) {
         if( err || !saved ) errorCallback("Score was not saved");
         else callback({
@@ -46,149 +44,154 @@ function saveScore(callback, errorCallback, scoreInfo) {
     });
 }
 
-module.exports = {
-	getFull: function(req, res) {
-        var callback = function(s) {
-            s = JSON.stringify(s);
-            res.setHeader('Content-Type', 'application/javascript');
-            res.setHeader('Content-Length', Buffer.byteLength(s));
-            res.end(s);
-        };
+var scoresRoute = function(db) {
+    return {
+        getFull: function (req, res) {
+            var callback = function (s) {
+                s = JSON.stringify(s);
+                res.setHeader('Content-Type', 'application/javascript');
+                res.setHeader('Content-Length', Buffer.byteLength(s));
+                res.end(s);
+            };
 
-        var errorCallback = function(err) {
-            res.writeHead(500, 'Internal Server Error');
-            res.end(err);
-        };
+            var errorCallback = function (err) {
+                res.writeHead(500, 'Internal Server Error');
+                res.end(err);
+            };
 
-		var s;
-		if (req.query.limit && !isNaN(parseInt(req.query.limit, 10))){
-            s = retrieveScores(callback, errorCallback, req.query.limit);
-		} else {
-			s = retrieveScores(callback, errorCallback);
-		}
+            var s;
+            if (req.query.limit && !isNaN(parseInt(req.query.limit, 10))) {
+                s = retrieveScores(db, callback, errorCallback, req.query.limit);
+            } else {
+                s = retrieveScores(db, callback, errorCallback);
+            }
 
-	},
+        },
 
-	/*getOne: function(req, res){
-		var id = req.params.id,
-			founded;
+        /*getOne: function(req, res){
+         var id = req.params.id,
+         founded;
 
-		if (!id || isNaN(parseInt(id, 10))){
-			res.writeHead(400, 'Bad Request');
-			res.end();
-			return;
-		}
+         if (!id || isNaN(parseInt(id, 10))){
+         res.writeHead(400, 'Bad Request');
+         res.end();
+         return;
+         }
 
-		for (var i = 0, l = scores.length; i < l; i++){
-			var score = scores[i];
+         for (var i = 0, l = scores.length; i < l; i++){
+         var score = scores[i];
 
-			if (score.id == id){
-				founded = score;
-				break;
-			}
-		}
+         if (score.id == id){
+         founded = score;
+         break;
+         }
+         }
 
-		if (founded){
-			res.writeHead(200, 'OK');
-			founded = JSON.stringify(founded);
-			res.setHeader('Content-Type', 'application/javascript');
-			res.setHeader('Content-Length', Buffer.byteLength(founded));
-			res.end(founded);
-		} else {
-			res.writeHead(404, 'Not Found');
-			res.end();
-		}
-	},*/
+         if (founded){
+         res.writeHead(200, 'OK');
+         founded = JSON.stringify(founded);
+         res.setHeader('Content-Type', 'application/javascript');
+         res.setHeader('Content-Length', Buffer.byteLength(founded));
+         res.end(founded);
+         } else {
+         res.writeHead(404, 'Not Found');
+         res.end();
+         }
+         },*/
 
-	post: function(req, res){
-		var newScore = req.body;
+        post: function (req, res) {
+            var newScore = req.body;
 
-		if (!newScore || !newScore.name || !newScore.score || newScore.score && isNaN(parseInt(newScore.score, 10))){
-			res.writeHead(400, 'Bad Request');
-			res.end();
-			return;
-		}
-        newScore.score = parseInt(newScore.score, 10);
+            if (!newScore || !newScore.name || !newScore.score || newScore.score && isNaN(parseInt(newScore.score, 10))) {
+                res.writeHead(400, 'Bad Request');
+                res.end();
+                return;
+            }
+            newScore.score = parseInt(newScore.score, 10);
 
-        var callback = function(newScore) {
-            var s = JSON.stringify(newScore);
-            res.setHeader('Content-Type', 'application/javascript');
-            res.setHeader('Content-Length', Buffer.byteLength(s));
-            res.end(s);
-        };
+            var callback = function (newScore) {
+                var s = JSON.stringify(newScore);
+                res.setHeader('Content-Type', 'application/javascript');
+                res.setHeader('Content-Length', Buffer.byteLength(s));
+                res.end(s);
+            };
 
-        var errorCallback = function(err) {
-            res.writeHead(500, 'Internal Server Error');
-            res.end(err);
-        };
+            var errorCallback = function (err) {
+                res.writeHead(500, 'Internal Server Error');
+                res.end(err);
+            };
 
-        saveScore(callback, errorCallback, newScore);
-	}/*,
+            saveScore(db, callback, errorCallback, newScore);
+        }
+        /*,
 
-	del :function(req, res){
-		var id = req.params.id,
-			founded;
+         del :function(req, res){
+         var id = req.params.id,
+         founded;
 
-		if (!id || isNaN(parseInt(id, 10))){
-			res.writeHead(400, 'Bad Request');
-			res.end();
-			return;
-		}
+         if (!id || isNaN(parseInt(id, 10))){
+         res.writeHead(400, 'Bad Request');
+         res.end();
+         return;
+         }
 
-		for (var i = 0, l = scores.length; i < l; i++){
-			var score = scores[i];
+         for (var i = 0, l = scores.length; i < l; i++){
+         var score = scores[i];
 
-			if (score.id == id){
-				scores.splice(i, 1);
-				founded = true;
-				break;
-			}
-		}
+         if (score.id == id){
+         scores.splice(i, 1);
+         founded = true;
+         break;
+         }
+         }
 
-		sortScores();
+         sortScores();
 
-		if (founded){
-			res.writeHead(200, 'OK');
-			res.end();
-		} else {
-			res.writeHead(404, 'Not Found');
-			res.end();
-		}
-	},
+         if (founded){
+         res.writeHead(200, 'OK');
+         res.end();
+         } else {
+         res.writeHead(404, 'Not Found');
+         res.end();
+         }
+         },
 
-	put: function(req, res){
-		var id = req.params.id,
-			score;
+         put: function(req, res){
+         var id = req.params.id,
+         score;
 
-		if (!id || isNaN(parseInt(id, 10))){
-			res.writeHead(400, 'Bad Request');
-			res.end();
-			return;
-		}
+         if (!id || isNaN(parseInt(id, 10))){
+         res.writeHead(400, 'Bad Request');
+         res.end();
+         return;
+         }
 
-		var newScore = req.body;
+         var newScore = req.body;
 
-		if (!newScore || !newScore.name || !newScore.score || newScore.score && isNaN(parseInt(newScore.score, 10))){
-			res.writeHead(400, 'Bad Request');
-			res.end();
-			return;
-		}
+         if (!newScore || !newScore.name || !newScore.score || newScore.score && isNaN(parseInt(newScore.score, 10))){
+         res.writeHead(400, 'Bad Request');
+         res.end();
+         return;
+         }
 
-		for (var i = 0, l = scores.length; i < l; i++){
-			score = scores[i];
+         for (var i = 0, l = scores.length; i < l; i++){
+         score = scores[i];
 
-			if (score.id == id){
-				scores.splice(i, 1, newScore);
+         if (score.id == id){
+         scores.splice(i, 1, newScore);
 
-				var s = JSON.stringify(score);
-				res.setHeader('Content-Type', 'application/javascript');
-				res.setHeader('Content-Length', Buffer.byteLength(s));
-				res.end(s);
-				return;
-			}
-		}
+         var s = JSON.stringify(score);
+         res.setHeader('Content-Type', 'application/javascript');
+         res.setHeader('Content-Length', Buffer.byteLength(s));
+         res.end(s);
+         return;
+         }
+         }
 
-		res.writeHead(404, 'Not Found');
-		res.end();
-	}*/
+         res.writeHead(404, 'Not Found');
+         res.end();
+         }*/
+    }
 };
+
+module.exports = scoresRoute;

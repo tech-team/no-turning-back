@@ -45,7 +45,12 @@ app.configure('production', function(){
 	}));
 });
 
-var scores = require('./routes/scores');
+var dbUrl = "NTBUser:NTB@localhost:27017/NTBdb";
+var collections = ["scores", "levels"];
+var db = require("mongojs").connect(dbUrl, collections);
+
+
+var scores = require('./routes/scores')(db);
 var levels = require('./routes/levels');
 var routes = require('./routes/index');
 
