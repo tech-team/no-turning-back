@@ -95,19 +95,17 @@ define([
             },
 
             setMainContainer: function(container) {
+                var point = {x: 0, y: 0};
+
+                container.on("mousedown", function(evt) {
+                    point = container.globalToLocal(evt.stageX, evt.stageY);
+                });
+
                 container.on("pressmove", function(evt) {
                     if (evt.nativeEvent.shiftKey == true) {
-                        var point = container.globalToLocal(evt.stageX, evt.stageY);
-
-                        console.log(container.x + " : " + container.y + " | " + evt.stageX + " : " + evt.stageY);
-                        console.log(point.x + " : " + point.y);
-
-
                         container.x = evt.stageX - point.x;
                         container.y = evt.stageY - point.y;
                     }
-
-                    return false;
                 });
             },
 
