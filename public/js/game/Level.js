@@ -96,6 +96,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.mainContainer = new createjs.Container();
             this.stage.addChild(this.mainContainer);
 
+            if (this.editorMode)
+                this.editor.setMainContainer(this.mainContainer); //setter in JS, oh wow, lol
+
             //add background
             this.background = this.addToStage(data, true);
             this.backgroundId = this.stage.getChildIndex(this.background); //TODO: deprecated
@@ -161,9 +164,11 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
             //add effects
             if (!this.editorMode) {
+                this.createContainer("effect", true);
+
                 var graphics = new easeljs.Graphics();
                 this.effects.fogBox = new easeljs.Shape(graphics);
-                var fogBox = this.mainContainer.addChild(this.effects.fogBox);
+                var fogBox = this.containers["effect"].addChild(this.effects.fogBox);
 
                 this.effects.fog = this.addToStage({
                     type: "effect",
@@ -220,10 +225,14 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.updateEffects();
         },
 
-        createContainer: function(name) {
+        createContainer: function(name, toStage) {
             var container = new createjs.Container();
             this.containers[name] = container;
-            this.mainContainer.addChild(container);
+
+            if (toStage)
+                this.stage.addChild(container);
+            else
+                this.mainContainer.addChild(container);
         },
 
         createCollisionObjects: function() {
@@ -248,9 +257,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
         //objData requires to have {type, tex, x, y}
         addToStage: function(objData, doNotCenter, id) {
-            if (objData instanceof createjs.DisplayObject) {
+            if (objData instanceof createjs.DisplayObject)
                 objData.type = objData.data.type;
-            }
 
             if (!_.isUndefined(id))
                 alert("Do you really need id?");
@@ -431,7 +439,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 width: this.stage.canvas.width,
                 height: this.stage.canvas.height
             };
-            var offset = 100;
+            var offset = 200;
 
             if (this.player.dispObj.x > stageSize.width - offset) {
                 this.mainContainer.x = -(this.player.dispObj.x - (stageSize.width - offset));
@@ -856,16 +864,18 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
         updateFog: function(forceUpdate) {
             if (this.effects.fog) {
+                var playerPos = {
+                    x: Math.floor(this.player.dispObj.x + this.mainContainer.x),
+                    y: Math.floor(this.player.dispObj.y + this.mainContainer.y)
+                };
+
                 //if player moved
-                if (this.effects.fog.x != this.player.dispObj.x
-                    || this.effects.fog.y != this.player.dispObj.y
+                if (this.effects.fog.x != playerPos.x
+                    || this.effects.fog.y != playerPos.y
                     || forceUpdate) {
 
                     var fogBox = this.effects.fogBox.graphics;
-                    var playerPos = {
-                        x: Math.floor(this.player.dispObj.x),
-                        y: Math.floor(this.player.dispObj.y)
-                    };
+
                     var frameSize = 380;
                     var stageSize = {
                         width: this.stage.canvas.width,

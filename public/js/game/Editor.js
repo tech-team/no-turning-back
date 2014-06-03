@@ -94,6 +94,23 @@ define([
                 this.populateTypeSelect();
             },
 
+            setMainContainer: function(container) {
+                container.on("pressmove", function(evt) {
+                    if (evt.nativeEvent.shiftKey == true) {
+                        var point = container.globalToLocal(evt.stageX, evt.stageY);
+
+                        console.log(container.x + " : " + container.y + " | " + evt.stageX + " : " + evt.stageY);
+                        console.log(point.x + " : " + point.y);
+
+
+                        container.x = evt.stageX - point.x;
+                        container.y = evt.stageY - point.y;
+                    }
+
+                    return false;
+                });
+            },
+
             applyToObject: function() {
                 if (!self.selectedObject)
                     return;
