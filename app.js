@@ -51,7 +51,7 @@ var db = require("mongojs").connect(dbUrl, collections);
 
 
 var scores = require('./routes/scores')(db);
-var levels = require('./routes/levels');
+var levels = require('./routes/levels')(db);
 var routes = require('./routes/index');
 
 app.get('/', routes.index);

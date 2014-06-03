@@ -1,51 +1,86 @@
 var fs = require('fs');
 var path = require('path');
 
-module.exports = {
-	getLevel: function(req, resp) {
-		var name = req.query.name;
+function retrieveLevel(db, callback, errorCallback, name) {
+    return db.levels.find({name: name}, {_id: false}, {limit: 1}, function(err, level) {
+        if (!err && level && level[0]) {
+            callback(level[0]);
+        } else {
+            errorCallback("Couldn't load data");
+        }
+    });
+}
 
-		var levelsDir = path.join('public', 'levels');
-		fs.readFile(path.join(levelsDir, name + '.json'), 'utf8', function (err, data) {
-			if (err) {
-				resp.writeHead(404, 'Not Found');
-				resp.end(err);
-		  	}
-		  	resp.setHeader('Content-Type', 'application/json');
-		  	resp.end(data);
-		});
-	},
+function saveLevel(db, callback, errorCallback, levelInfo) {
+    console.log("saving");
+    db.levels.save(levelInfo, function(err, saved) {
+        if( err || !saved ) errorCallback("Level was not saved");
+        else callback("ok");
+    });
+}
 
-	addLevel: function(req, resp) {
-		if (!req.body || !req.body.name || !req.body.data) {
-			resp.writeHead(400, 'Bad Request');
-			resp.end("No data provided");
-		}
+var levelsRoute = function(db) {
+    return {
+        getLevel: function (req, resp) {
+            var name = req.query.name;
 
-        var levelName = req.body.name;
-        var levelStr = req.body.data;
+            var success = function(levelData) {
+                resp.setHeader('Content-Type', 'application/json');
+                resp.end(JSON.stringify(levelData));
+            };
 
-		var levelsDir = path.join('public', 'levels');
-		fs.writeFile(path.join(levelsDir, levelName + '.json'), levelStr, function (err) {
-		  	if (err)
-                resp.status(400).send();
+            var errorCallback = function(msg) {
+                resp.status(404).end(msg);
+            };
 
-		  	resp.status(200).send("ok");
-		});
-	},
+            retrieveLevel(db, success, errorCallback, name);
+        },
 
-	existLevel: function(req, resp) {
-		var name = req.query.name;
+        addLevel: function (req, resp) {
+            if (!req.body || !req.body.name || !req.body.data) {
+                resp.status(400).end("No data provided");
+            }
 
-		if (!name) {
-			resp.writeHead(400, 'Bad Request');
-			resp.end("Level name not provided");
-		}
+            var levelName = req.body.name;
+            var levelStr = req.body.data;
 
-		var levelsDir = path.join('public', 'levels');
-        var levelPath = path.join(levelsDir, name + '.json');
-		fs.exists(levelPath, function (exists) {
-		  	resp.end(String(exists));
-		});
-	}
+            var success = function(msg) {
+                /*************** Git purposes only ***************/
+                var levelsDir = path.join('public', 'levels');
+                fs.writeFile(path.join(levelsDir, levelName + '.json'), levelStr, function (err) {
+                });
+
+                resp.end(msg);
+
+            };
+
+            var errorCallback = function(msg) {
+                resp.status(400).end(msg);
+            };
+
+            saveLevel(db, success, errorCallback, JSON.parse(levelStr));
+
+
+        },
+
+        existLevel: function (req, resp) {
+            var name = req.query.name;
+
+            if (!name) {
+                resp.status(400).end("Level name not provided");
+            }
+
+            var success = function(levelData) {
+                resp.end(String(true));
+            };
+
+            var errorCallback = function(msg) {
+                resp.end(String(false));
+            };
+
+            retrieveLevel(db, success, errorCallback, name);
+        }
+    }
 };
+
+module.exports = levelsRoute;

@@ -55,8 +55,7 @@ var scoresRoute = function(db) {
             };
 
             var errorCallback = function (err) {
-                res.writeHead(500, 'Internal Server Error');
-                res.end(err);
+                res.status(503).end(err);
             };
 
             var s;
@@ -103,8 +102,7 @@ var scoresRoute = function(db) {
             var newScore = req.body;
 
             if (!newScore || !newScore.name || !newScore.score || newScore.score && isNaN(parseInt(newScore.score, 10))) {
-                res.writeHead(400, 'Bad Request');
-                res.end();
+                res.status(400).end();
                 return;
             }
             newScore.score = parseInt(newScore.score, 10);
@@ -117,8 +115,7 @@ var scoresRoute = function(db) {
             };
 
             var errorCallback = function (err) {
-                res.writeHead(500, 'Internal Server Error');
-                res.end(err);
+                res.status(503).end(err);
             };
 
             saveScore(db, callback, errorCallback, newScore);
