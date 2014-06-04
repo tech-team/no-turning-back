@@ -297,7 +297,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             dispObj.data = objData;
 
             if (this.editorMode)
-                this.editor.setContainerHandlers(dispObj);
+                this.editor.setContainerHandlers(dispObj); //TODO: rename to setEditorHandlers()
 
             return dispObj;
         },

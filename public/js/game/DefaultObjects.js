@@ -8,6 +8,8 @@ define([
                 build: function(type, params) {
                     var data = _.clone(DefaultObjects.object);
 
+                    //TODO: lodash, merge?
+
                     var typeData = DefaultObjects[type];
                     for (var field in typeData) {
                         data[field] = _.clone(typeData[field]);
