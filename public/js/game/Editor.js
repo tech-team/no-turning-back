@@ -514,17 +514,16 @@ define([
             },
 
             replaceObject: function(dispObj, newData) {
-                dispObj.removeAllChildren();
+                //TODO: is it ok to replace level object here?
+                var data = _.merge(dispObj.data, newData);
 
-                var spriteSheet =
-                    this.level.resourceManager.getTiledSpriteSheet(newData.tex, newData.w, newData.h);
+                this.level.removeFromStage(dispObj);
 
-                var sprite = new easeljs.Sprite(spriteSheet);
+                var doNotCenter = data.type == "background";
+                var newObj = this.level.addToStage(data, doNotCenter);
 
-                dispObj.addChild(sprite);
-
-                if (this.selectedObject == dispObj) //if it was selected
-                    this.selectObject(dispObj); //update it
+                if (newObj.data.draggable !== false)
+                    this.selectedObject(newObj);
             },
 
             hideObjectWayPoints: function() {
