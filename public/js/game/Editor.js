@@ -95,6 +95,8 @@ define([
             },
 
             setMainContainer: function(container) {
+                this.mainContainer = container;
+
                 var point = {x: 0, y: 0};
 
                 container.on("mousedown", function(evt) {
@@ -557,8 +559,7 @@ define([
 
                 var waypoints = wps || this.showingWpsOwner.data.waypoints;
 
-                //NB: wpPath has no container
-                this.stage.removeChild(this.wpPath);
+                this.mainContainer.removeChild(this.wpPath);
                 if (waypoints.length) {
                     var graphics = new easeljs.Graphics();
                     graphics.setStrokeStyle(3, "round");
@@ -573,7 +574,7 @@ define([
                     graphics.endStroke();
 
                     this.wpPath = new easeljs.Shape(graphics);
-                    this.stage.addChild(this.wpPath);
+                    this.mainContainer.addChild(this.wpPath);
                 }
             },
 
