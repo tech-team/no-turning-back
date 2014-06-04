@@ -101,8 +101,6 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
             //add background
             this.background = this.addToStage(data, true);
-            this.backgroundId = this.stage.getChildIndex(this.background); //TODO: deprecated
-
 
             //add walls
             _.each(data.walls, function(obj) {
