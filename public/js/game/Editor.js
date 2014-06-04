@@ -3,12 +3,13 @@ define([
     'lodash',
     'easel',
     'jquery',
+    'alertify',
     'game/KeyCoder',
     'game/ResourceManager',
     'game/LevelManager',
     'game/DefaultObjects'
 ],
-    function(Class, _, easeljs, $, KeyCoder, ResourceManager, LevelManager, DefaultObjects) {
+    function(Class, _, easeljs, $, alertify, KeyCoder, ResourceManager, LevelManager, DefaultObjects) {
         var Editor = Class.$extend({
             __classvars__: {
                 duplicateDelta: 30
@@ -92,6 +93,15 @@ define([
                 this.regenerateLevelPropertiesTable();
                 this.populateTexSelect();
                 this.populateTypeSelect();
+
+                alertify.alert(
+                    "<h2>Quick help</h2>" +
+                    "<div align='left'>Use mouse to select and move objects<br>" +
+                    "WASD to move<br>" +
+                    "QE to rotate<br>" +
+                    "Double click to clone object<br>" +
+                    "Shift + mouse to drag whole level<br>" +
+                    "Middle mouse button to select without moving</div>");
             },
 
             setMainContainer: function(container) {
@@ -129,7 +139,7 @@ define([
                                 data[prop] = JSON.parse($input.val());
                             }
                             catch(e) {
-                                alert("Unable to parse array for '" + prop + "' property. Changes will be rejected.");
+                                alertify.error("Unable to parse array for '" + prop + "' property. Changes will be rejected.");
                             }
                         }
                         else
@@ -285,10 +295,10 @@ define([
                             data: levelStr
                         },
                         success: function(data) {
-                            alert("Level successfully saved!");
+                            alertify.success("Level successfully saved!");
                         },
                         error: function(data) {
-                            alert("Unable to save level");
+                            alertify.error("Unable to save level");
                         }
                     });
                 };
@@ -302,45 +312,55 @@ define([
                         if (data == false)
                             actualSaveLevel();
                         else {
-                            if (confirm("Level " + self.level.data.name + " already exists.\nDo you want to rewrite it?"))
-                                actualSaveLevel();
+                            alertify.confirm("Level \"" + self.level.data.name + "\" already exists.\nDo you want to rewrite it?",
+                                function (e) {
+                                    if (e)
+                                        actualSaveLevel();
+                            });
                         }
                     },
                     error: function(data) {
-                        alert("Unable to save level");
+                        alertify.error("Unable to save level");
                     }
                 });
             },
 
             onLevelLoadClick: function() {
-                var res = prompt("Input level name, or leave it empty to load empty level");
-                if (res != null) {
-                    if (res == "")
-                        this.loadDefaultLevel();
-                    else {
-                        var self = this;
-                        $.ajax({
-                            type: 'GET',
-                            url: 'levels',
-                            data: {name: res},
-                            dataType: 'json',
-                            success: function(data) {
-                                self.level.reload(data);
-                                self.regenerateLevelPropertiesTable();
-                                self.regenerateObjectPropertiesTable();
-                            },
-                            error: function(data) {
-                                alert("Unable to load level");
+                var self = this;
+
+                alertify.prompt("Input level name, or leave it empty to load empty level",
+                    function (e, str) {
+                        if (e) {
+                            if (str == "")
+                                self.loadDefaultLevel();
+                            else {
+                                $.ajax({
+                                    type: 'GET',
+                                    url: 'levels',
+                                    data: {name: str},
+                                    dataType: 'json',
+                                    success: function(data) {
+                                        self.level.reload(data);
+                                        self.regenerateLevelPropertiesTable();
+                                        self.regenerateObjectPropertiesTable();
+                                    },
+                                    error: function(data) {
+                                        alertify.error("Unable to load level");
+                                    }
+                                });
                             }
-                        });
-                    }
-                }
+                        }
+                }, "Level1");
             },
 
             onLevelNewClick: function() {
-                var res = confirm("All unsaved data wil be lost, load new level?");
-                if (res)
-                    this.loadDefaultLevel();
+                var self = this;
+
+                alertify.confirm("All unsaved data wil be lost, load new level?",
+                    function (e) {
+                        if (e)
+                            self.loadDefaultLevel();
+                    });
             },
 
             applyFilters: function(dispObj, filters) {

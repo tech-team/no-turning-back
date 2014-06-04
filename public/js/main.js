@@ -15,7 +15,8 @@ require.config({
         Connector: "lib/Connector",
         FnQuery: "lib/FnQuery",
         "socket.io": "lib/socket.io",
-        modernizr: "lib/modernizr"
+        modernizr: "lib/modernizr",
+        alertify: "lib/alertify"
     },
     shim: {
         'backbone': {
