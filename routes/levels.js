@@ -1,19 +1,10 @@
 var fs = require('fs');
 var path = require('path');
+var utils = require('../server-utils/utils.js');
 
-function default_callbacks(callbacks, extra) {
-    callbacks.success = callbacks.success || function(data) {};
-    callbacks.error = callbacks.error || function(data) {};
-    if (extra) {
-        for (var i = 0; i < extra.length; ++i) {
-            callbacks[extra[i]] = callbacks[extra[i]] || function(data) {};
-        }
-    }
-    return callbacks;
-}
 
 function retrieveLevel(db, name, callbacks) {
-    callbacks = default_callbacks(callbacks);
+    callbacks = utils.default_callbacks(callbacks);
 
     return db.levels.find({name: name}, {_id: false}, {limit: 1}, function(err, level) {
         if (!err && level && level[0]) {
@@ -25,7 +16,7 @@ function retrieveLevel(db, name, callbacks) {
 }
 
 function removeLevel(db, levelName, callbacks) {
-    callbacks = default_callbacks(callbacks);
+    callbacks = utils.default_callbacks(callbacks);
 
     db.levels.remove({"name": levelName},
     function(err, removed) {
@@ -38,7 +29,7 @@ function removeLevel(db, levelName, callbacks) {
 }
 
 function saveLevel(db, levelInfo, callbacks) {
-    callbacks = default_callbacks(callbacks, ['before']);
+    callbacks = utils.default_callbacks(callbacks, ['before']);
 
     callbacks.before({
         success: function() {
