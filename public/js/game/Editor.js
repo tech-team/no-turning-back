@@ -110,7 +110,7 @@ define([
             },
 
             applyToObject: function() {
-                if (!self.selectedObject)
+                if (!this.selectedObject)
                     return;
 
                 var data = {};
@@ -135,9 +135,9 @@ define([
                     }
                 });
 
-                self.updateObjectData(self.selectedObject, data);
-                self.regenerateObjectPropertiesTable();
-                self.updateWpPath();
+                this.updateObjectData(this.selectedObject, data);
+                this.regenerateObjectPropertiesTable();
+                this.updateWpPath();
             },
 
             applyToLevel: function() {
