@@ -1,25 +1,30 @@
+var utils = require('../server-utils/utils.js');
 
-function retrieveScores(db, callback, errorCallback, limit) {
+function retrieveScores(db, limit, callbacks) {
+    callbacks = utils.default_callbacks(callbacks);
+
     var options = {
         "sort": [['score', 'desc']]
     };
-    if (limit) {
+    if (limit && !isNaN(parseInt(limit, 10))) {
         options['limit'] = limit;
     }
 
     return db.scores.find({}, options).toArray(function(err, objs) {
         if (!err) {
-            callback(objs);
+            callbacks.success(objs);
         } else {
-            errorCallback("Couldn't load data");
+            callbacks.error("Couldn't load data");
         }
     });
 }
 
-function saveScore(db, callback, errorCallback, scoreInfo) {
+function saveScore(db, scoreInfo, callbacks) {
+    callbacks = utils.default_callbacks(callbacks);
+
     db.scores.save(scoreInfo, function(err, saved) {
-        if( err || !saved ) errorCallback("Score was not saved");
-        else callback({
+        if( err || !saved ) callbacks.error("Score was not saved");
+        else callbacks.success({
             id: saved._id.valueOf(),
             name: saved.name,
             score: saved.score
@@ -30,24 +35,14 @@ function saveScore(db, callback, errorCallback, scoreInfo) {
 var scoresRoute = function(db) {
     return {
         getFull: function (req, res) {
-            var callback = function (s) {
-                s = JSON.stringify(s);
-                res.setHeader('Content-Type', 'application/javascript');
-                res.setHeader('Content-Length', Buffer.byteLength(s));
-                res.end(s);
-            };
-
-            var errorCallback = function (err) {
-                res.status(503).end(err);
-            };
-
-            var s;
-            if (req.query.limit && !isNaN(parseInt(req.query.limit, 10))) {
-                s = retrieveScores(db, callback, errorCallback, req.query.limit);
-            } else {
-                s = retrieveScores(db, callback, errorCallback);
-            }
-
+            retrieveScores(db, req.query.limit, {
+                success: function(s) {
+                    res.end(JSON.stringify(s));
+                },
+                error: function(err) {
+                    res.status(503).end(err);
+                }
+            });
         },
 
         post: function (req, res) {
@@ -59,18 +54,14 @@ var scoresRoute = function(db) {
             }
             newScore.score = parseInt(newScore.score, 10);
 
-            var callback = function (newScore) {
-                var s = JSON.stringify(newScore);
-                res.setHeader('Content-Type', 'application/javascript');
-                res.setHeader('Content-Length', Buffer.byteLength(s));
-                res.end(s);
-            };
-
-            var errorCallback = function (err) {
-                res.status(503).end(err);
-            };
-
-            saveScore(db, callback, errorCallback, newScore);
+            saveScore(db, newScore, {
+                success: function(newScore) {
+                    res.end(JSON.stringify(newScore));
+                },
+                error: function(err) {
+                    res.status(503).end(err);
+                }
+            });
         }
     }
 };

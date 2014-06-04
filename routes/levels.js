@@ -1,32 +1,47 @@
 var fs = require('fs');
 var path = require('path');
+var utils = require('../server-utils/utils.js');
 
-function retrieveLevel(db, callback, errorCallback, name) {
+
+function retrieveLevel(db, name, callbacks) {
+    callbacks = utils.default_callbacks(callbacks);
+
     return db.levels.find({name: name}, {_id: false}, {limit: 1}, function(err, level) {
         if (!err && level && level[0]) {
-            callback(level[0]);
+            callbacks.success(level[0]);
         } else {
-            errorCallback("Couldn't load data");
+            callbacks.error("Couldn't load data");
         }
     });
 }
 
-function removeLevel(db, callback, errorCallback, levelName) {
+function removeLevel(db, levelName, callbacks) {
+    callbacks = utils.default_callbacks(callbacks);
+
     db.levels.remove({"name": levelName},
     function(err, removed) {
         if (err) {
-            errorCallback("could not remove");
+            callbacks.error("could not remove");
         } else {
-            callback(removed);
+            callbacks.success(removed);
         }
     });
 }
 
-function saveLevel(db, callback, errorCallback, levelInfo) {
-    db.levels.save(levelInfo, function(err, saved) {
-        if( err || !saved ) errorCallback("Level was not saved");
-        else callback("ok");
+function saveLevel(db, levelInfo, callbacks) {
+    callbacks = utils.default_callbacks(callbacks, ['before']);
+
+    callbacks.before({
+        success: function() {
+            db.levels.save(levelInfo, function(err, saved) {
+                if( err || !saved ) callbacks.error("Level was not saved");
+                else callbacks.success("ok");
+            });
+        },
+        error: callbacks.error
     });
+
+
 }
 
 var levelsRoute = function(db) {
@@ -34,16 +49,14 @@ var levelsRoute = function(db) {
         getLevel: function (req, resp) {
             var name = req.query.name;
 
-            var success = function(levelData) {
-                resp.setHeader('Content-Type', 'application/json');
-                resp.end(JSON.stringify(levelData));
-            };
-
-            var errorCallback = function(msg) {
-                resp.status(404).end(msg);
-            };
-
-            retrieveLevel(db, success, errorCallback, name);
+            retrieveLevel(db, name, {
+                success: function(levelData) {
+                    resp.end(JSON.stringify(levelData));
+                },
+                error: function(msg) {
+                    resp.status(404).end(msg);
+                }
+            });
         },
 
         addLevel: function (req, resp) {
@@ -59,19 +72,33 @@ var levelsRoute = function(db) {
             };
 
 
-            removeLevel(db, function(removedNumber) {
-                var success = function(msg) {
+            saveLevel(db, JSON.parse(levelStr), {
+                before: function(callbacks) {
+                    removeLevel(db, levelName, callbacks);
+                },
+                success: function(msg) {
                     /*************** Git purposes only ***************/
                     var levelsDir = path.join('public', 'levels');
-                    fs.writeFile(path.join(levelsDir, levelName + '.json'), levelStr, function (err) {
-                    });
+                    fs.writeFile(path.join(levelsDir, levelName + '.json'), levelStr, function (err) {});
 
                     resp.end(msg);
-                };
+                },
+                error: errorCallback
+            });
 
-                saveLevel(db, success, errorCallback, JSON.parse(levelStr));
-
-            }, errorCallback, levelName);
+//            removeLevel(db, function(removedNumber) {
+//                var success = function(msg) {
+//                    /*************** Git purposes only ***************/
+//                    var levelsDir = path.join('public', 'levels');
+//                    fs.writeFile(path.join(levelsDir, levelName + '.json'), levelStr, function (err) {
+//                    });
+//
+//                    resp.end(msg);
+//                };
+//
+//                saveLevel(db, success, errorCallback, JSON.parse(levelStr));
+//
+//            }, errorCallback, levelName);
 
 
 
@@ -84,15 +111,14 @@ var levelsRoute = function(db) {
                 resp.status(400).end("Level name not provided");
             }
 
-            var success = function(levelData) {
-                resp.end(String(true));
-            };
-
-            var errorCallback = function(msg) {
-                resp.end(String(false));
-            };
-
-            retrieveLevel(db, success, errorCallback, name);
+            retrieveLevel(db, name, {
+                success: function() {
+                    resp.end(String(true));
+                },
+                error: function() {
+                    resp.end(String(false));
+                }
+            });
         }
     }
 };

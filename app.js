@@ -45,9 +45,14 @@ app.configure('production', function(){
 	}));
 });
 
-var dbUrl = "NTBUser:NTB@localhost:27017/NTBdb";
-var collections = ["scores", "levels"];
-var db = require("mongojs").connect(dbUrl, collections);
+var conn_info = {
+    host: 'localhost',
+    user: 'NTBUser',
+    password: 'NTB',
+    db: 'NTBdb',
+    collections: ["scores", "levels"]
+};
+var db = require("./server-utils/mongodb_helper").connect(conn_info);
 
 
 var scores = require('./routes/scores')(db);
