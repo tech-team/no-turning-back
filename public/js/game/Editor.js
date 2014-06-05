@@ -99,6 +99,7 @@ define([
                     "<div align='left'>Use mouse to select and move objects<br>" +
                     "WASD to move<br>" +
                     "QE to rotate<br>" +
+                    "FB to bring to front or back<br>" +
                     "Double click to clone object<br>" +
                     "Shift + mouse to drag whole level<br>" +
                     "Middle mouse button to select without moving</div>");
@@ -188,39 +189,55 @@ define([
                 });
             },
 
-            //it's not required to be container, sprite would be ok as well
-            setContainerHandlers: function(container) {
+            setObjectHandlers: function(dispObj) {
                 var self = this;
 
-                if (container.data.draggable === false) {
-                    container.on("click", function(evt) {
+                if (dispObj.data.draggable === false) {
+                    //clear selection
+                    dispObj.on("click", function(evt) {
                         self.selectObject(null);
                     });
-
                     return;
                 }
 
-                container.on("pressmove", function(evt) {
-                    //self.selectObject(evt.currentTarget);
+                var point = {x: 0, y: 0};
 
-                    if (evt.nativeEvent.button != 1) { //middle mouse button
-                        evt.currentTarget.x = evt.stageX;
-                        evt.currentTarget.y = evt.stageY;
+                dispObj.on("mousedown", function(evt) {
+                    var dispObj = evt.currentTarget;
 
-                        //TODO: properties, which will set .x and .data.x fields simultaneously, would be much appreciated
+                    self.selectObject(dispObj);
+                    point = dispObj.globalToLocal(evt.stageX + self.mainContainer.x, evt.stageY + self.mainContainer.y);
+
+
+                    var o = dispObj.rotation * Math.PI / 180;
+                    var w = dispObj.getBounds().width;
+                    var h = dispObj.getBounds().height;
+
+                    point.x -= w / 2;
+                    point.y -= h / 2;
+                });
+
+                dispObj.on("pressmove", function(evt) {
+                    if (evt.nativeEvent.button != 1) { //not middle mouse button
+                        var x = evt.stageX - point.x;
+                        var y = evt.stageY - point.y;
+
+                        //for visualization:
+                        evt.currentTarget.x = x;
+                        evt.currentTarget.y = y;
+
+                        //for editor
                         evt.currentTarget.data.x = evt.stageX;
                         evt.currentTarget.data.y = evt.stageY;
+
+                        //TODO: properties, which will set .x/.y and .data.x/.data.y fields simultaneously, would be much appreciated
 
                         self.updateWpPath();
                         self.regenerateObjectPropertiesTable();
                     }
                 });
 
-                container.on("mousedown", function(evt) {
-                    self.selectObject(evt.currentTarget);
-                });
-
-                container.on("dblclick", function(evt) {
+                dispObj.on("dblclick", function(evt) {
                     self.duplicateObject(self.selectedObject);
                 });
             },
