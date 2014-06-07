@@ -574,7 +574,7 @@ define([
                 var newObj = this.level.addToStage(data, doNotCenter);
 
                 if (newObj.data.draggable !== false)
-                    this.selectedObject(newObj);
+                    this.selectObject(newObj);
             },
 
             hideObjectWayPoints: function() {
