@@ -105,6 +105,8 @@ this.ndgmr = this.ndgmr || {};
   ndgmr.checkPixelCollision = checkPixelCollision;
 
   var _collisionDistancePrecheck = function(bitmap1,bitmap2) {
+    return true; //see and of function for details
+
     var ir1,ir2,b1,b2;
 
     b1 = bitmap1.localToGlobal(0,0);
@@ -118,8 +120,17 @@ this.ndgmr = this.ndgmr || {};
          : bitmap2.spriteSheet.getFrame(bitmap2.currentFrame).rect;
     
     //precheck if objects are even close enough
-    return ( Math.abs(b2.x-b1.x) < ir2.width *bitmap2.scaleX+ir1.width *bitmap1.scaleX
-          && Math.abs(b2.y-b1.y) < ir2.height*bitmap2.scaleY+ir1.height*bitmap2.scaleY )
+
+    //TODO: this thing doesn't aware of scaling and rotation
+    //return ( Math.abs(b2.x-b1.x) < ir2.width *bitmap2.scaleX+ir1.width *bitmap1.scaleX
+    //      && Math.abs(b2.y-b1.y) < ir2.height*bitmap2.scaleY+ir1.height*bitmap2.scaleY )
+
+    //TODO: this thing was suggested on StackOverflow, but still, it doesn't aware of rotation
+    //return(Math.abs(b2.x - b1.x) < ir2.width  * Math.abs(bitmap2.scaleX) + ir1.width  * Math.abs(bitmap1.scaleX)
+    //    && Math.abs(b2.y - b1.y) < ir2.height * Math.abs(bitmap2.scaleY) + ir1.height * Math.abs(bitmap2.scaleY));
+
+    //TODO: this thing works fine, but can give a big performance drop, but it is not :)
+    return true;
   }
 
   var _intersectingImagePart = function(intersetion,bitmap,ctx,i) {

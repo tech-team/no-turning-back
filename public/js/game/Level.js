@@ -196,6 +196,10 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 scoreText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
                 this.scoreText = this.stage.addChild(scoreText);
 
+                var fpsText = new easeljs.Text("Score: 0", "20px Arial", "#00FF00");
+                fpsText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
+                this.fpsText = this.stage.addChild(fpsText);
+
                 this.resize(); //recalculate overlay positions
 
                 Messenger.showMessage(this.data.name + " started...", Messenger.MessageColor.LevelLoaded, 6000);
@@ -219,6 +223,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
 
             this.scoreText.x = this.stage.canvas.width - 100;
             this.scoreText.y = toolbarHeight;
+
+            this.fpsText.x = this.stage.canvas.width - 150;
+            this.fpsText.y = 10;
 
             this.updateEffects();
         },
@@ -414,6 +421,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 if (weaponText != "knife")
                     weaponText += ": " + ammo;
                 this.weaponText.text = weaponText;
+
+                this.fpsText.text = "FPS: " + Math.round(easeljs.Ticker.getMeasuredFPS());
 
                 this.scoreText.text = "Score: " + this.player.score;
 
