@@ -646,6 +646,8 @@ define([
                 collection.splice(id, 1);
 
                 this.level.removeFromStage(dispObj);
+
+                this.selectObject(null);
             },
 
             bringToFront: function(dispObj) {
