@@ -16,6 +16,7 @@
                     <button id="levelNew">New</button>
                     <button id="levelLoad">Load</button>
                     <button id="levelSave">Save</button>
+                    <button id="help">?</button>
                 </span>
             </h3>
             <table id="level-object">

@@ -12,7 +12,15 @@ define([
     function(Class, _, easeljs, $, alertify, KeyCoder, ResourceManager, LevelManager, DefaultObjects) {
         var Editor = Class.$extend({
             __classvars__: {
-                duplicateDelta: 30
+                duplicateDelta: 30,
+                helpMessage:
+                        "<h2>Quick help</h2>" +
+                        "<div align='left'>Use mouse to select and move objects<br>" +
+                        "WASD to move<br>" +
+                        "QE to rotate<br>" +
+                        "FB to bring to front or back<br>" +
+                        "Double click to clone object<br>" +
+                        "Shift + mouse to drag whole level</div>"
             },
 
             __init__: function(level, stage) {
@@ -38,6 +46,11 @@ define([
 
                 $('#levelNew').click(function(evt) {
                     self.onLevelNewClick();
+                    return false;
+                });
+
+                $('#help').click(function(evt) {
+                    alertify.alert(Editor.helpMessage);
                     return false;
                 });
 
@@ -94,15 +107,7 @@ define([
                 this.populateTexSelect();
                 this.populateTypeSelect();
 
-                alertify.alert(
-                    "<h2>Quick help</h2>" +
-                    "<div align='left'>Use mouse to select and move objects<br>" +
-                    "WASD to move<br>" +
-                    "QE to rotate<br>" +
-                    "FB to bring to front or back<br>" +
-                    "Double click to clone object<br>" +
-                    "Shift + mouse to drag whole level<br>" +
-                    "Middle mouse button to select without moving</div>");
+                alertify.alert(Editor.helpMessage);
             },
 
             setMainContainer: function(container) {
@@ -218,17 +223,11 @@ define([
                 });
 
                 dispObj.on("pressmove", function(evt) {
-                    if (evt.nativeEvent.button != 1) { //not middle mouse button
-                        var x = evt.stageX;
-                        var y = evt.stageY;
+                    evt.currentTarget.x = evt.stageX;
+                    evt.currentTarget.y = evt.stageY;
 
-                        //for visualization:
-                        evt.currentTarget.x = x;
-                        evt.currentTarget.y = y;
-
-                        self.updateWpPath();
-                        self.regenerateObjectPropertiesTable();
-                    }
+                    self.updateWpPath();
+                    self.regenerateObjectPropertiesTable();
                 });
 
                 //for some reason mouseup doesn't work, but 'click' works well
@@ -249,8 +248,6 @@ define([
                     //save data
                     evt.currentTarget.data.x = dispObj.x;
                     evt.currentTarget.data.y = dispObj.y;
-
-                    console.log(oldReg);
                 });
 
                 dispObj.on("dblclick", function(evt) {
@@ -540,11 +537,10 @@ define([
             },
 
             regenerateObjectPropertiesTable: function() {
-                if (!this.selectedObject)
-                    return;
+                var data = this.selectedObject && this.selectedObject.data;
 
                 this.regeneratePropertiesTable('#selected-object', 'object',
-                    _.omit(this.selectedObject.data, ['waypoints']));
+                    _.omit(data, ['waypoints']));
 
                 $('#object-type').prop('disabled', true);
             },
