@@ -200,41 +200,57 @@ define([
                     return;
                 }
 
-                var point = {x: 0, y: 0};
+                var oldReg = {x: 0, y: 0};
 
                 dispObj.on("mousedown", function(evt) {
                     var dispObj = evt.currentTarget;
 
                     self.selectObject(dispObj);
-                    point = dispObj.globalToLocal(evt.stageX + self.mainContainer.x, evt.stageY + self.mainContainer.y);
+                    var point = dispObj.globalToLocal(evt.stageX + self.mainContainer.x, evt.stageY + self.mainContainer.y);
+                    oldReg.x = dispObj.regX;
+                    oldReg.y = dispObj.regY;
 
+                    dispObj.regX = point.x;
+                    dispObj.regY = point.y;
 
-                    var o = dispObj.rotation * Math.PI / 180;
-                    var w = dispObj.getBounds().width;
-                    var h = dispObj.getBounds().height;
-
-                    point.x -= w / 2;
-                    point.y -= h / 2;
+                    dispObj.x = evt.stageX;
+                    dispObj.y = evt.stageY;
                 });
 
                 dispObj.on("pressmove", function(evt) {
                     if (evt.nativeEvent.button != 1) { //not middle mouse button
-                        var x = evt.stageX - point.x;
-                        var y = evt.stageY - point.y;
+                        var x = evt.stageX;
+                        var y = evt.stageY;
 
                         //for visualization:
                         evt.currentTarget.x = x;
                         evt.currentTarget.y = y;
 
-                        //for editor
-                        evt.currentTarget.data.x = evt.stageX;
-                        evt.currentTarget.data.y = evt.stageY;
-
-                        //TODO: properties, which will set .x/.y and .data.x/.data.y fields simultaneously, would be much appreciated
-
                         self.updateWpPath();
                         self.regenerateObjectPropertiesTable();
                     }
+                });
+
+                //for some reason mouseup doesn't work, but 'click' works well
+                dispObj.on("click", function(evt) {
+                    var dispObj = evt.currentTarget;
+
+                    var dx = dispObj.regX - oldReg.x;
+                    var dy = dispObj.regY - oldReg.y;
+
+                    dispObj.regX = oldReg.x;
+                    dispObj.regY = oldReg.y;
+
+                    var a = dispObj.rotation * Math.PI / 180;
+
+                    dispObj.x -= dx*Math.cos(a) - dy*Math.sin(a);
+                    dispObj.y -= dy*Math.cos(a) + dx*Math.sin(a);
+
+                    //save data
+                    evt.currentTarget.data.x = dispObj.x;
+                    evt.currentTarget.data.y = dispObj.y;
+
+                    console.log(oldReg);
                 });
 
                 dispObj.on("dblclick", function(evt) {
