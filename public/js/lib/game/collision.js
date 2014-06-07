@@ -297,12 +297,14 @@ this.ndgmr = this.ndgmr || {};
       bounds.width = Math.max(Math.max(Math.max(gp.x,gp2.x),gp3.x),gp4.x) - bounds.x;
       bounds.height = Math.max(Math.max(Math.max(gp.y,gp2.y),gp3.y),gp4.y) - bounds.y;
 
-      /*var o = obj.rotation * Math.PI / 180;
+      /*
+      var o = obj.rotation * Math.PI / 180;
       var x = bounds.width;
       var y = bounds.height;
 
-      bounds.height = Math.abs(x * Math.sin(o)) + Math.abs(y * Math.cos(o));
-      bounds.width = Math.abs(x * Math.cos(o)) + Math.abs(y * Math.sin(o));*/
+      bounds.width  = x * Math.cos(o) - y * Math.sin(o);
+      bounds.height = x * Math.sin(o) + y * Math.cos(o);
+      //*/
     }
     return bounds;
   }

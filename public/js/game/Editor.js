@@ -581,7 +581,9 @@ define([
                 //remove old waypoints
                 this.showingWpsOwner = null;
                 this.stage.removeChild(this.wpPath);
-                this.level.containers['waypoint'].removeAllChildren();
+
+                var wpsContainer = this.level.containers['waypoint'];
+                wpsContainer && wpsContainer.removeAllChildren();
             },
 
             showObjectWayPoints: function(dispObj) {
