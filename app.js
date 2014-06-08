@@ -69,6 +69,9 @@ app.get('/levels', levels.getLevel);
 app.get('/levels/exists', levels.existLevel);
 app.post('/levels', levels.addLevel);
 
+app.get('/levels/campaigns', levels.getCampaignsNames);
+app.get('/levels/campaigns/:name', levels.getCampaignLevels);
+
 var server = http.createServer(app);
 
 require('./server/server').init(server);

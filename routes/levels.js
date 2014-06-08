@@ -40,9 +40,43 @@ function saveLevel(db, levelInfo, callbacks) {
         },
         error: callbacks.error
     });
-
-
 }
+
+function retrieveCampaigns(db, callbacks) {
+    callbacks = utils.default_callbacks(callbacks);
+
+    //db.levels.aggregate({$group: {_id: "$campaign", levelsCount: {$sum: 1}}}, {$project: {_id: 0, campaign: "$_id", levelsCount: "$levelsCount"}})
+    db.levels.aggregate([
+        { $group: {_id: "$campaign", levelsCount: {$sum: 1}} },
+        { $project: {_id: 0, campaign: "$_id", levelsCount: "$levelsCount"} }
+    ], function(err, data) {
+        if (err || !data) {
+            callbacks.error(err);
+        } else {
+            callbacks.success(data);
+        }
+    });
+}
+
+function retrieveCampaignLevelNames(db, campaignName, callbacks) {
+    callbacks = utils.default_callbacks(callbacks);
+
+    db.levels.find({campaign: campaignName}, {_id: 0, name: 1}, {sort: "name"}).toArray(function(err, levels) {
+        if (err || !levels) {
+            callbacks.error(err);
+        } else {
+            var levelsNames = [];
+            for (var i = 0; i < levels.length; ++i) {
+                levelsNames.push(levels[i].name);
+            }
+            callbacks.success(levelsNames);
+        }
+    });
+}
+
+
+
+
 
 var levelsRoute = function(db) {
     return {
@@ -85,23 +119,6 @@ var levelsRoute = function(db) {
                 },
                 error: errorCallback
             });
-
-//            removeLevel(db, function(removedNumber) {
-//                var success = function(msg) {
-//                    /*************** Git purposes only ***************/
-//                    var levelsDir = path.join('public', 'levels');
-//                    fs.writeFile(path.join(levelsDir, levelName + '.json'), levelStr, function (err) {
-//                    });
-//
-//                    resp.end(msg);
-//                };
-//
-//                saveLevel(db, success, errorCallback, JSON.parse(levelStr));
-//
-//            }, errorCallback, levelName);
-
-
-
         },
 
         existLevel: function (req, resp) {
@@ -117,6 +134,29 @@ var levelsRoute = function(db) {
                 },
                 error: function() {
                     resp.end(String(false));
+                }
+            });
+        },
+
+        getCampaignsNames: function(req, resp) {
+            retrieveCampaigns(db, {
+                success: function(levels) {
+                    resp.end(JSON.stringify(levels));
+                },
+                error: function(err) {
+                    resp.status(400).end(err);
+                }
+            });
+        },
+
+        getCampaignLevels: function(req, resp) {
+            var campaignName = req.params.name;
+            retrieveCampaignLevelNames(db, campaignName, {
+                success: function(levels) {
+                    resp.end(JSON.stringify(levels));
+                },
+                error: function(err) {
+                    resp.status(400).end(err);
                 }
             });
         }

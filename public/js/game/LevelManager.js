@@ -4,7 +4,6 @@ define([
 function(Class) {
 	var LevelManager = Class.$extend({
         levels: [
-            //'TestLevel',
             'Level1',
             'Level2'
         ],

@@ -31,6 +31,7 @@ define([
                     type: "background",
                     tex: "ground",
                     name: "Default level",
+                    campaign: "Workshop",
                     x: 0,
                     y: 0,
                     w: 1280,
