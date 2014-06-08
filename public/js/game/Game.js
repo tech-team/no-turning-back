@@ -25,10 +25,10 @@ function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Re
 			this.stage = new createjs.Stage(this.canvas);
             Messenger.setStage(this.stage);
 			this.ticker = createjs.Ticker;
-			this.levelManager = new LevelManager();
+			this.levelManager = new LevelManager(this.onLevelLoaded, this);
 			this.level = null;
 			this.player = new Player();
-			this.resourceManager = ResourceManager.load(this.onResourcesLoaded, this);
+            this.resourceManager = null;
 			this.keyCoder = new KeyCoder(editorMode);
 			this.onLoadedCallback = onLoadedCallback;
 		},
@@ -41,6 +41,10 @@ function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Re
                 Pause: 3
           	},
             console: Console
+        },
+
+        onLevelLoaded: function() {
+            this.resourceManager = ResourceManager.load(this.onResourcesLoaded, this);
         },
 
         onResourcesLoaded: function() {

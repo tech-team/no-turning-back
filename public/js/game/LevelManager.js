@@ -3,13 +3,49 @@ define([
 ],
 function(Class) {
 	var LevelManager = Class.$extend({
-        levels: [
-            'Level1',
-            'Level2'
-        ],
-		__init__: function() {
+		__init__: function(loadedCallback, onLoadedContext) {
 			this.currentLevelId = null;
+            this.campaigns = [];
+            this.activeCampaign = null;
+            this.levels = [];
+
+            var self = this;
+            $.ajax({
+                type: 'GET',
+                url: 'levels/campaigns',
+                dataType: 'json',
+                beforeSend: function() {
+                },
+                success: function(data) {
+                    self.campaigns = data;
+                    self.campaignPicker(loadedCallback, onLoadedContext);
+                },
+                error: function(data) {
+                    alert("Unable to load level. Error: " + data);
+                }
+            });
 		},
+
+        campaignPicker: function(loadedCallback, onLoadedContext) {
+            var randId = Math.floor((Math.random() * this.campaigns.length));
+            this.activeCampaign = this.campaigns[randId];
+
+            var self = this;
+            $.ajax({
+                type: 'GET',
+                url: 'levels/campaigns/' + this.activeCampaign.campaign,
+                dataType: 'json',
+                beforeSend: function() {
+                },
+                success: function(data) {
+                    self.levels = data;
+                    loadedCallback.call(onLoadedContext);
+                },
+                error: function(data) {
+                    alert("Unable to load level. Error: " + data);
+                }
+            });
+        },
 
         loadNextLevel: function(callback) {
 			if (this.currentLevelId === null)

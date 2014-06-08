@@ -48,6 +48,7 @@ function retrieveCampaigns(db, callbacks) {
     //db.levels.aggregate({$group: {_id: "$campaign", levelsCount: {$sum: 1}}}, {$project: {_id: 0, campaign: "$_id", levelsCount: "$levelsCount"}})
     db.levels.aggregate([
         { $group: {_id: "$campaign", levelsCount: {$sum: 1}} },
+        { $match: {_id: {$ne: "Workshop"}} },
         { $project: {_id: 0, campaign: "$_id", levelsCount: "$levelsCount"} }
     ], function(err, data) {
         if (err || !data) {
@@ -140,8 +141,8 @@ var levelsRoute = function(db) {
 
         getCampaignsNames: function(req, resp) {
             retrieveCampaigns(db, {
-                success: function(levels) {
-                    resp.end(JSON.stringify(levels));
+                success: function(data) {
+                    resp.end(JSON.stringify(data));
                 },
                 error: function(err) {
                     resp.status(400).end(err);
