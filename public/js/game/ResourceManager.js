@@ -60,10 +60,12 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             instance: null,
 
             load: function(onComplete, onCompleteContext) {
-                if (this.instance)
+                if (this.instance && this.instance.loaded)
                     onComplete.call(onCompleteContext);
-                else
+                else if (!this.instance)
                     this.instance = new ResourceManager(onComplete, onCompleteContext);
+                else
+                    this.instance.setOnComplete(onComplete, onCompleteContext);
 
                 return this.instance;
             },
@@ -93,6 +95,10 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
         },
 
 		__init__: function(onComplete, onCompleteContext) {
+            this.loaded = false;
+            this.onComplete = onComplete;
+            this.onCompleteContext = onCompleteContext;
+
             this.images = [];
             this.spriteSheets = [];
 
@@ -142,7 +148,9 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                     //TODO: should separate sounds and textures
                     self.images[tex.id] = queue.getResult(tex.id);
                 });
-                onComplete.call(onCompleteContext);
+                self.onComplete.call(self.onCompleteContext);
+
+                self.loaded = true;
 
                 //hide progressBar
                 $progressBarDiv.hide();
@@ -158,6 +166,10 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             }
 		},
 
+        setOnComplete: function(onComplete, onCompleteContext) {
+            this.onComplete = onComplete;
+            this.onCompleteContext = onCompleteContext;
+        },
 
         getSpriteSheet: function(tex) {
             var spriteSheet = this.spriteSheets[tex];
