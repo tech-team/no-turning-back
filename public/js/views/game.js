@@ -61,7 +61,6 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
 
 
         showMessage: function(messageText, disallowHide, callback) {
-            console.log("showing message");
             if (disallowHide)
                 this.offMessageEvents();
             else
@@ -137,30 +136,32 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
         createEvents: function() {
             var self = this;
 
+
+            var showNormal = function(image) {
+                CssUtils.uninvert(image);
+                CssUtils.addWhiteBackground(image);
+            };
+
+            var showInverted = function(image) {
+                CssUtils.invert(image);
+                CssUtils.removeWhiteBackground(image);
+            };
+
+
             var mobileConnectVisible = false;
-            var showMobileNormal = function() {
-                CssUtils.uninvert(self.$mobileIcon);
-                CssUtils.addWhiteBackground(self.$mobileIcon);
-            };
-
-            var showMobileInverted = function() {
-                CssUtils.invert(self.$mobileIcon);
-                CssUtils.removeWhiteBackground(self.$mobileIcon);
-            };
-
 
             this.$mobileIcon.on('mousemove', function() {
-                showMobileNormal();
+                showNormal(self.$mobileIcon);
             });
             this.$mobileIcon.on('mouseleave', function() {
                 if (!mobileConnectVisible)
-                    showMobileInverted();
+                    showInverted(self.$mobileIcon);
             });
 
             this.$mobileIcon.on('click', function() {
                 if (!mobileConnectVisible) {
                     self.$mobileConnect.show();
-                    showMobileNormal();
+                    showNormal(self.$mobileIcon);
                     mobileConnectVisible = true;
                     self.hidePauseButton();
                     self.game.pause();
@@ -168,7 +169,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
                 }
                 else {
                     self.$mobileConnect.hide();
-                    showMobileInverted();
+                    showInverted(self.$mobileIcon);
                     mobileConnectVisible = false;
                     self.showPauseButton();
                     self.game.continueGame();
@@ -196,36 +197,27 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
             });
 
             var pauseChangeVisible = true;
-            var showPauseNormal = function() {
-                CssUtils.uninvert(self.$pauseButton);
-                CssUtils.addWhiteBackground(self.$pauseButton);
-            };
-
-            var showPauseInverted = function() {
-                CssUtils.invert(self.$pauseButton);
-                CssUtils.removeWhiteBackground(self.$pauseButton);
-            };
 
             this.$pauseButton.on('mousemove', function() {
                 if (pauseChangeVisible) {
-                    showPauseNormal();
+                    showNormal(self.$pauseButton);
                 }
             });
             this.$pauseButton.on('mouseleave', function() {
                 if (pauseChangeVisible) {
-                    showPauseInverted();
+                    showInverted(self.$pauseButton);
                 }
             });
 
             this.$pauseButton.on('click', function() {
                 if (self.game.state === Game.GameState.Game) {
-                    showPauseNormal();
+                    showNormal(self.$pauseButton);
                     pauseChangeVisible = false;
                     self.$pauseIconPause.hide();
                     self.$pauseIconPlay.show();
                     self.game.pause();
                 } else {
-                    showPauseInverted();
+                    showInverted(self.$pauseButton);
                     pauseChangeVisible = true;
                     self.$pauseIconPause.show();
                     self.$pauseIconPlay.hide();
