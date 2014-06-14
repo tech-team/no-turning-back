@@ -1,6 +1,6 @@
 define([
     'classy',
-    'game/GameObject'
+    'game/entities/GameObject'
 ],
     function(Class, GameObject) {
         var Bullet = GameObject.$extend({

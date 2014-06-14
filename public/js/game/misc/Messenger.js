@@ -1,7 +1,7 @@
 define([
     'classy',
     'easel',
-    'game/UntilTimer'
+    'game/misc/UntilTimer'
 ],
     function(Class, easeljs, UntilTimer) {
         var Messenger = Class.$extend({

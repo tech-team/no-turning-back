@@ -4,7 +4,7 @@ define([
     'easel',
     'jquery',
     'alertify',
-    'game/KeyCoder',
+    'game/misc/KeyCoder',
     'game/ResourceManager',
     'game/LevelManager',
     'game/DefaultObjects'

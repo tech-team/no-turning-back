@@ -1,8 +1,8 @@
 define([
     'classy',
     'underscore',
-    'game/GameObject',
-    'game/KeyCoder'
+    'game/entities/GameObject',
+    'game/misc/KeyCoder'
 ],
     function(Class, _, GameObject, KeyCoder) {
         var Button = GameObject.$extend({

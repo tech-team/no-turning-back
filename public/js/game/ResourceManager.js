@@ -4,7 +4,7 @@ define([
     'easel',
     'preload',
     'sound',
-    'game/ImageTiler'
+    'game/misc/ImageTiler'
 ],
 function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
 	var ResourceManager = Class.$extend({

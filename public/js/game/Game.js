@@ -4,13 +4,13 @@ define([
 	'classy',
 	'easel',
     'collision',
-	'game/KeyCoder',
+	'game/misc/KeyCoder',
 	'game/LevelManager',
 	'game/Level',
-	'game/Player',
+	'game/entities/Player',
 	'game/ResourceManager',
     'console',
-    'game/Messenger'
+    'game/misc/Messenger'
 ],
 function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager, Console, Messenger) {
 	var Game = Class.$extend({

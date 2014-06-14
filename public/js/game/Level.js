@@ -6,15 +6,15 @@ define([
     'collision',
     'game/ResourceManager',
     'game/DefaultObjects',
-    'game/KeyCoder',
+    'game/misc/KeyCoder',
     'game/Editor',
-    'game/UntilTimer',
-    'game/Messenger',
-    'game/Zombie',
-    'game/Chest',
-    'game/Door',
-    'game/Button',
-    'game/Bullet'
+    'game/misc/UntilTimer',
+    'game/misc/Messenger',
+    'game/entities/Zombie',
+    'game/entities/Chest',
+    'game/entities/Door',
+    'game/entities/Button',
+    'game/entities/Bullet'
 ],
 
 function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet) {

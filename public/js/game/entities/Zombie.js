@@ -1,6 +1,6 @@
 define([
     'classy',
-    'game/AliveObject',
+    'game/entities/AliveObject',
     'game/ResourceManager',
     'sound',
     'collision'

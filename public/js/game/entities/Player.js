@@ -1,10 +1,10 @@
 define([
 	'classy',
-	'game/AliveObject',
+	'game/entities/AliveObject',
     'game/ResourceManager',
-    'game/UntilTimer',
-    'game/Messenger',
-    'game/KeyCoder',
+    'game/misc/UntilTimer',
+    'game/misc/Messenger',
+    'game/misc/KeyCoder',
     'collision'
 ],
 function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, collider) {

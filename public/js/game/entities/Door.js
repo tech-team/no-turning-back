@@ -1,7 +1,7 @@
 define([
     'classy',
     'underscore',
-    'game/GameObject'
+    'game/entities/GameObject'
 ],
     function(Class, _, GameObject) {
         var Door = GameObject.$extend({
