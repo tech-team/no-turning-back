@@ -21,6 +21,9 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
         $message: null,
         $messageText: null,
         $messageDimmer: null,
+        $pauseButton: null,
+        $pauseIconPause: null,
+        $pauseIconPlay: null,
         $mobileIcon: null,
         $mobileIconInverted: null,
         $mobileIconNormal: null,
@@ -74,8 +77,6 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
         },
 
         checkBrowserSupport: function() {
-//            console.log(Modernizr);
-//            console.log(createjs.Touch.isSupported());
             if (Modernizr) {
                 if (!Modernizr.canvas || !Modernizr.canvastext || !Modernizr.localstorage
                     || !Modernizr.audio || !Modernizr.multiplebgs
@@ -83,6 +84,10 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
                     this.showMessage("Your browser is not supported. Sorry", true);
                 }
             }
+        },
+
+        showPauseButton: function() {
+            this.$pauseButton.show();
         },
 
         disconnect: function(sendToJoystick) {
@@ -107,9 +112,13 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
             this.$messageText = this.$message.find('.message__textbox__text');
             this.$messageDimmer = this.$el.find('.message-dimmer');
 
+            this.$pauseButton = this.$el.find('.pause-icon');
+            this.$pauseIconPause = this.$pauseButton.find('.game-icon__pause');
+            this.$pauseIconPlay = this.$pauseButton.find('.game-icon__play');
+
             this.$mobileIcon = this.$el.find('.mobile-icon');
-            this.$mobileIconInverted = this.$mobileIcon.find('.mobile-icon__inverted');
-            this.$mobileIconNormal = this.$mobileIcon.find('.mobile-icon__normal');
+            this.$mobileIconInverted = this.$mobileIcon.find('.game-icon__inverted');
+            this.$mobileIconNormal = this.$mobileIcon.find('.game-icon__normal');
             this.$mobileConnect = this.$el.find('.mobile-connect');
             this.$mobileToken = this.$el.find('.mobile-connect__token');
 
@@ -124,40 +133,98 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
 
         createEvents: function() {
             var self = this;
-            var showNormal = function() {
+            var showMobileNormal = function() {
                 self.$mobileIconInverted.hide();
                 self.$mobileIconNormal.show();
                 self.$mobileIcon.addClass('white-background');
             };
 
-            var showInverted = function() {
+            var showMobileInverted = function() {
                 self.$mobileIconInverted.show();
                 self.$mobileIconNormal.hide();
                 self.$mobileIcon.removeClass('white-background');
             };
 
 
-            this.$mobileIcon.on('mouseenter', function() {
-                showNormal();
+            this.$mobileIcon.on('mousemove', function() {
+                showMobileNormal();
             });
             this.$mobileIcon.on('mouseleave', function() {
                 if (!self.mobileConnectVisible)
-                    showInverted();
+                    showMobileInverted();
             });
 
             this.$mobileIcon.on('click', function() {
                 if (!self.mobileConnectVisible) {
                     self.$mobileConnect.show();
-                    showNormal();
+                    showMobileNormal();
                     self.mobileConnectVisible = true;
-                    self.$messageDimmer.show();
+//                    self.$messageDimmer.show();
                     self.game.pause();
                 }
                 else {
                     self.$mobileConnect.hide();
-                    showInverted();
+                    showMobileInverted();
                     self.mobileConnectVisible = false;
+//                    self.$messageDimmer.hide();
+                    self.game.continueGame();
+                }
+            });
+
+            $(document).on("gameStateChanged", function(event) {
+                if (event.state === Game.GameState.Pause) {
+                    self.$messageDimmer.show();
+                    self.showMessage("Game paused", true);
+                    window.server.send({
+                        type: "info",
+                        action: "gameStateChanged",
+                        arg: "pause"
+                    });
+                } else if (event.state === Game.GameState.Game) {
+                    self.hideMessage();
                     self.$messageDimmer.hide();
+                    window.server.send({
+                        type: "info",
+                        action: "gameStateChanged",
+                        arg: "continue"
+                    });
+                }
+            });
+
+            var pauseChangeVisible = true;
+            var showPauseNormal = function() {
+                self.$pauseButton.addClass('white-background');
+                self.$pauseButton.removeClass('image-inverted');
+            };
+
+            var showPauseInverted = function() {
+                self.$pauseButton.removeClass('white-background');
+                self.$pauseButton.addClass('image-inverted');
+            };
+
+            this.$pauseButton.on('mousemove', function() {
+                if (pauseChangeVisible) {
+                    showPauseNormal();
+                }
+            });
+            this.$pauseButton.on('mouseleave', function() {
+                if (pauseChangeVisible) {
+                    showPauseInverted();
+                }
+            });
+
+            this.$pauseButton.on('click', function() {
+                if (self.game.state === Game.GameState.Game) {
+                    showPauseNormal();
+                    pauseChangeVisible = false;
+                    self.$pauseIconPause.hide();
+                    self.$pauseIconPlay.show();
+                    self.game.pause();
+                } else {
+                    showPauseInverted();
+                    pauseChangeVisible = true;
+                    self.$pauseIconPause.show();
+                    self.$pauseIconPlay.hide();
                     self.game.continueGame();
                 }
             });
@@ -253,6 +320,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
 
             this.game = new Game(this.canvas, false, 
                 function() {
+                    self.showPauseButton();
                     self.startJoystick();
                     self.game.run();
                 }

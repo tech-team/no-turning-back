@@ -87,16 +87,24 @@ function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Re
 			});
 		},
 
+        changeState: function(state) {
+            this.state = state;
+            $.event.trigger({
+                type: "gameStateChanged",
+                state: this.state
+            });
+        },
+
 		stop: function() {
-			this.state = Game.GameState.GameOver;
+			this.changeState(Game.GameState.GameOver);
 		},
 
         pause: function() {
-            this.state = Game.GameState.Pause;
+            this.changeState(Game.GameState.Pause);
         },
 
         continueGame: function() {
-            this.state = Game.GameState.Game;
+            this.changeState(Game.GameState.Game);
         },
 
 		update: function(event) {

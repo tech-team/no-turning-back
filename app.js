@@ -2,6 +2,7 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 
+var enableCache = false;
 var cacheAge = 60*60*24;
 
 
@@ -31,7 +32,11 @@ app.use(express.session({
 }));
 
 app.use(app.router);
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: cacheAge }));
+
+if (enableCache)
+    app.use(express.static(path.join(__dirname, 'public'), { maxAge: cacheAge }));
+else
+    app.use(express.static(path.join(__dirname, 'public')));
 
 app.configure('development', function(){
 	app.use(express.errorHandler());

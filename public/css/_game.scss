@@ -26,10 +26,18 @@ $dimmer-opacity: 0.7;
   background-color: white;
 }
 
+.image-inverted {
+  -webkit-filter: invert(100%);
+}
+
+.hidden {
+  display: none;
+}
+
 $icon-width: 100px;
 $icon-height: 100px;
 
-.mobile-icon {
+.game-icon {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -38,13 +46,18 @@ $icon-height: 100px;
   padding: 5px 0;
 
 
-  &__inverted {
+  &__pause, &__inverted {
 
   }
 
-  &__normal {
+  &__play, &__normal {
     display: none;
   }
+}
+
+.pause-icon {
+  position: absolute;
+  right: 80px;
 }
 
 .mobile-connect {
