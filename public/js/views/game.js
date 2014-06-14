@@ -4,9 +4,10 @@ define([
     'tmpl/game',
     'game/Game',
     'views/gamefinished',
-    'utils/CssUtils'
+    'utils/CssUtils',
+    'game/misc/KeyCoder'
 ], 
-function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
+function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) {
     var GameView = Backbone.View.extend({
 
         template: tmpl,
@@ -243,6 +244,8 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
                 self.disconnect(true);
                 self.$closeButton.hide();
             });
+
+            (new KeyCoder()).addEventListener("keyup", KeyCoder.P, this.triggerGamePause.bind(this));
         },
 
         show: function () {

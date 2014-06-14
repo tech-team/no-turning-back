@@ -99,14 +99,21 @@ function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Re
 
 		stop: function(ignore_notify) {
 			this.changeState(Game.GameState.GameOver, ignore_notify);
+            return this.state;
 		},
 
         pause: function(ignore_notify) {
-            this.changeState(Game.GameState.Pause, ignore_notify);
+            if (this.state != Game.GameState.Pause)
+                this.changeState(Game.GameState.Pause, ignore_notify);
+            else
+                this.changeState(Game.GameState.Game, ignore_notify);
+
+            return this.state;
         },
 
         continueGame: function(ignore_notify) {
             this.changeState(Game.GameState.Game, ignore_notify);
+            return this.state;
         },
 
 		update: function(event) {
