@@ -141,6 +141,7 @@ html, body {
 
 .image-inverted {
   -webkit-filter: invert(100%);
+  filter: invert(100%);
 }
 
 .hidden {
