@@ -97,37 +97,51 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
         },
 
         triggerConnectDialog: function() {
+
+            if (!this.gamePaused) {
+                this.triggerGamePause();
+            }
+
             if (!this.mobileOpened) {
                 this.$mobileConnect.show();
-                CssUtils.showNormal(this.$mobileIcon);
+                CssUtils.showBlackOnWhite(this.$mobileIcon);
                 this.mobileOpened = true;
                 this.hidePauseButton();
-                this.game.pause();
                 this.hideMessage(true);
             }
             else {
+                this.triggerGamePause();
                 this.$mobileConnect.hide();
-                CssUtils.showInverted(this.$mobileIcon);
+                CssUtils.showWhiteOnBlack(this.$mobileIcon);
                 this.mobileOpened = false;
                 this.showPauseButton();
-                this.game.continueGame();
+
             }
+
         },
 
         triggerGamePause: function() {
             if (this.game.state === Game.GameState.Game) {
-                CssUtils.showNormal(this.$pauseButton);
-                this.gamePaused = true;
+                CssUtils.showBlackOnWhite(this.$pauseButton);
                 this.$pauseIconPause.hide();
                 this.$pauseIconPlay.show();
-                this.game.pause();
+                this._pauseGame();
             } else {
-                CssUtils.showInverted(this.$pauseButton);
-                this.gamePaused = false;
+                CssUtils.showWhiteOnBlack(this.$pauseButton);
                 this.$pauseIconPause.show();
                 this.$pauseIconPlay.hide();
-                this.game.continueGame();
+                this._resumeGame();
             }
+        },
+
+        _pauseGame: function() {
+            this.gamePaused = true;
+            this.game.pause();
+        },
+
+        _resumeGame: function() {
+            this.gamePaused = false;
+            this.game.continueGame();
         },
 
         disconnect: function(sendToJoystick) {
@@ -174,11 +188,11 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
 
 
             this.$mobileIcon.on('mousemove', function() {
-                CssUtils.showNormal(self.$mobileIcon);
+                CssUtils.showBlackOnWhite(self.$mobileIcon);
             });
             this.$mobileIcon.on('mouseleave', function() {
                 if (!self.mobileOpened)
-                    CssUtils.showInverted(self.$mobileIcon);
+                    CssUtils.showWhiteOnBlack(self.$mobileIcon);
             });
 
             this.$mobileIcon.on('click', function() {
@@ -210,13 +224,13 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
             });
 
             this.$pauseButton.on('mousemove', function() {
-                if (!this.gamePaused) {
-                    CssUtils.showNormal(self.$pauseButton);
+                if (!self.gamePaused) {
+                    CssUtils.showBlackOnWhite(self.$pauseButton);
                 }
             });
             this.$pauseButton.on('mouseleave', function() {
-                if (!this.gamePaused) {
-                    CssUtils.showInverted(self.$pauseButton);
+                if (!self.gamePaused) {
+                    CssUtils.showWhiteOnBlack(self.$pauseButton);
                 }
             });
 

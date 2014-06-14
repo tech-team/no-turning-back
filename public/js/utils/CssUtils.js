@@ -18,12 +18,12 @@ function() {
             jqElem.removeClass('white-background');
         },
 
-        showNormal: function(image) {
+        showBlackOnWhite: function(image) {
             this.uninvert(image);
             this.addWhiteBackground(image);
         },
 
-        showInverted: function(image) {
+        showWhiteOnBlack: function(image) {
             this.invert(image);
             this.removeWhiteBackground(image);
         }
