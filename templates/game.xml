@@ -24,9 +24,8 @@
             <img class="game-icon__pause" src="/res/img/media-pause.png" width="50" height="60"></img>
             <img class="game-icon__play" src="/res/img/media-play.png" width="50" height="60"></img>
         </div>
-        <div class="game-icon mobile-icon">
-            <img class="game-icon__inverted" src="/res/img/mobile-inverted.png" width="50" height="60"></img>
-            <img class="game-icon__normal" src="/res/img/mobile.png" width="50" height="60"></img>
+        <div class="game-icon mobile-icon image-inverted">
+            <img src="/res/img/mobile.png" width="50" height="60"></img>
         </div>
 
         <!--<input id="token" value="guid" disabled="disabled" style="position:absolute; top:0; right:0;" />-->

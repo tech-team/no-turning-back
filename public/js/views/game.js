@@ -21,17 +21,16 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
         $message: null,
         $messageText: null,
         $messageDimmer: null,
+
         $pauseButton: null,
         $pauseIconPause: null,
         $pauseIconPlay: null,
+
         $mobileIcon: null,
-        $mobileIconInverted: null,
-        $mobileIconNormal: null,
         $mobileConnect: null,
         $mobileToken: null,
         $closeButton: null,
         $loadingIndicator: null,
-        mobileConnectVisible: false,
 
 
         initialize: function () {
@@ -90,6 +89,10 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
             this.$pauseButton.show();
         },
 
+        hidePauseButton: function() {
+            this.$pauseButton.hide();
+        },
+
         disconnect: function(sendToJoystick) {
             localStorage.removeItem('consoleguid');
             if (sendToJoystick) {
@@ -117,8 +120,6 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
             this.$pauseIconPlay = this.$pauseButton.find('.game-icon__play');
 
             this.$mobileIcon = this.$el.find('.mobile-icon');
-            this.$mobileIconInverted = this.$mobileIcon.find('.game-icon__inverted');
-            this.$mobileIconNormal = this.$mobileIcon.find('.game-icon__normal');
             this.$mobileConnect = this.$el.find('.mobile-connect');
             this.$mobileToken = this.$el.find('.mobile-connect__token');
 
@@ -133,15 +134,15 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
 
         createEvents: function() {
             var self = this;
+
+            var mobileConnectVisible = false;
             var showMobileNormal = function() {
-                self.$mobileIconInverted.hide();
-                self.$mobileIconNormal.show();
+                self.$mobileIcon.removeClass('image-inverted');
                 self.$mobileIcon.addClass('white-background');
             };
 
             var showMobileInverted = function() {
-                self.$mobileIconInverted.show();
-                self.$mobileIconNormal.hide();
+                self.$mobileIcon.addClass('image-inverted');
                 self.$mobileIcon.removeClass('white-background');
             };
 
@@ -150,23 +151,23 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
                 showMobileNormal();
             });
             this.$mobileIcon.on('mouseleave', function() {
-                if (!self.mobileConnectVisible)
+                if (!mobileConnectVisible)
                     showMobileInverted();
             });
 
             this.$mobileIcon.on('click', function() {
-                if (!self.mobileConnectVisible) {
+                if (!mobileConnectVisible) {
                     self.$mobileConnect.show();
                     showMobileNormal();
-                    self.mobileConnectVisible = true;
-//                    self.$messageDimmer.show();
+                    mobileConnectVisible = true;
+                    self.hidePauseButton();
                     self.game.pause();
                 }
                 else {
                     self.$mobileConnect.hide();
                     showMobileInverted();
-                    self.mobileConnectVisible = false;
-//                    self.$messageDimmer.hide();
+                    mobileConnectVisible = false;
+                    self.showPauseButton();
                     self.game.continueGame();
                 }
             });
