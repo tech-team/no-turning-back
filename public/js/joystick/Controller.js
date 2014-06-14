@@ -2,10 +2,9 @@ define([
     'underscore',
     'classy',
     'easel',
-    'hammer',
     'game/ImageTiler'
 ],
-    function(_, Class, createjs, Hammer, ImageTiler) {
+    function(_, Class, createjs, ImageTiler) {
         var Controller = Class.$extend({
             __init__: function($window, canvas, stopJoystick) {
                 this.$window = $window;

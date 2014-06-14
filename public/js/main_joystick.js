@@ -10,8 +10,6 @@ require.config({
         Connector: "lib/Connector",
         FnQuery: "lib/FnQuery",
         'socket.io': "lib/socket.io",
-        hammer: "lib/hammer",
-        move: "lib/move",
         device_normalizer: "lib/deviceapi-normaliser",
         modernizr: "lib/modernizr"
     },
@@ -31,12 +29,6 @@ require.config({
         },
         'easel': {
             exports: 'createjs'
-        },
-        'hammer': {
-            exports: 'hammer'
-        },
-        'move': {
-            exports: 'move'
         },
         'device_normalizer': {
             exports: 'device_normalizer'

@@ -16,7 +16,8 @@ require.config({
         FnQuery: "lib/FnQuery",
         "socket.io": "lib/socket.io",
         modernizr: "lib/modernizr",
-        alertify: "lib/alertify"
+        alertify: "lib/alertify",
+        signals: "lib/signals"
     },
     shim: {
         'backbone': {
@@ -48,12 +49,8 @@ require.config({
         'collision': {
             exports: 'ndgmr'
         },
-
-        "socket.io": {
-            exports: "io"
-        },
-        'modernizr': {
-            exports: 'modernizr'
+        'socket.io': {
+            exports: 'io'
         }
     }
 });

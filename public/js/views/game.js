@@ -200,30 +200,6 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
                 self.triggerConnectDialog();
             });
 
-            $(document).on("gameStateChanged", function(event) {
-                if (event.state === Game.GameState.Pause) {
-                    self.$messageDimmer.show();
-                    self.showMessage("Game paused", true);
-                    if (window.server) {
-                        window.server.send({
-                            type: "info",
-                            action: "gameStateChanged",
-                            arg: "pause"
-                        });
-                    }
-                } else if (event.state === Game.GameState.Game) {
-                    self.hideMessage();
-                    self.$messageDimmer.hide();
-                    if (window.server) {
-                        window.server.send({
-                            type: "info",
-                            action: "gameStateChanged",
-                            arg: "play"
-                        });
-                    }
-                }
-            });
-
             this.$pauseButton.on('mousemove', function() {
                 if (!self.gamePaused) {
                     CssUtils.showBlackOnWhite(self.$pauseButton);
@@ -344,7 +320,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
             );
             
             var self = this;
-            $(document).on("gameFinished", function(event) {
+            this.game.gameFinished.add(function(event) {
                 self.game.stop(true);
                 GameFinishedView.show(event.score, event.message);
                 window.server.send({
@@ -352,6 +328,30 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
                     action: "gamefinished",
                     message: event.message
                 });
+            });
+
+            this.game.gameStateChanged.add(function(event) {
+                if (event.state === Game.GameState.Pause) {
+                    self.$messageDimmer.show();
+                    self.showMessage("Game paused", true);
+                    if (window.server) {
+                        window.server.send({
+                            type: "info",
+                            action: "gameStateChanged",
+                            arg: "pause"
+                        });
+                    }
+                } else if (event.state === Game.GameState.Game) {
+                    self.hideMessage();
+                    self.$messageDimmer.hide();
+                    if (window.server) {
+                        window.server.send({
+                            type: "info",
+                            action: "gameStateChanged",
+                            arg: "play"
+                        });
+                    }
+                }
             });
         },
 
