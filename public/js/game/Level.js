@@ -196,7 +196,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                 scoreText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
                 this.scoreText = this.stage.addChild(scoreText);
 
-                var fpsText = new easeljs.Text("Score: 0", "20px Arial", "#00FF00");
+                var fpsText = new easeljs.Text("FPS: 0", "20px Arial", "#00FF00");
                 fpsText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
                 this.fpsText = this.stage.addChild(fpsText);
 
@@ -224,8 +224,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.scoreText.x = this.stage.canvas.width - 100;
             this.scoreText.y = toolbarHeight;
 
-            this.fpsText.x = this.stage.canvas.width - 150;
-            this.fpsText.y = 10;
+            this.fpsText.x = this.stage.canvas.width - 90;
+            this.fpsText.y = 100;
 
             this.updateEffects();
         },
