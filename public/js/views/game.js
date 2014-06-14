@@ -26,12 +26,14 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
         $pauseButton: null,
         $pauseIconPause: null,
         $pauseIconPlay: null,
+        gamePaused: false,
 
         $mobileIcon: null,
         $mobileConnect: null,
         $mobileToken: null,
         $closeButton: null,
         $loadingIndicator: null,
+        mobileOpened: false,
 
 
         initialize: function () {
@@ -94,6 +96,40 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
             this.$pauseButton.hide();
         },
 
+        triggerConnectDialog: function() {
+            if (!this.mobileOpened) {
+                this.$mobileConnect.show();
+                CssUtils.showNormal(this.$mobileIcon);
+                this.mobileOpened = true;
+                this.hidePauseButton();
+                this.game.pause();
+                this.hideMessage(true);
+            }
+            else {
+                this.$mobileConnect.hide();
+                CssUtils.showInverted(this.$mobileIcon);
+                this.mobileOpened = false;
+                this.showPauseButton();
+                this.game.continueGame();
+            }
+        },
+
+        triggerGamePause: function() {
+            if (this.game.state === Game.GameState.Game) {
+                CssUtils.showNormal(this.$pauseButton);
+                this.gamePaused = true;
+                this.$pauseIconPause.hide();
+                this.$pauseIconPlay.show();
+                this.game.pause();
+            } else {
+                CssUtils.showInverted(this.$pauseButton);
+                this.gamePaused = false;
+                this.$pauseIconPause.show();
+                this.$pauseIconPlay.hide();
+                this.game.continueGame();
+            }
+        },
+
         disconnect: function(sendToJoystick) {
             localStorage.removeItem('consoleguid');
             if (sendToJoystick) {
@@ -137,92 +173,55 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
             var self = this;
 
 
-            var showNormal = function(image) {
-                CssUtils.uninvert(image);
-                CssUtils.addWhiteBackground(image);
-            };
-
-            var showInverted = function(image) {
-                CssUtils.invert(image);
-                CssUtils.removeWhiteBackground(image);
-            };
-
-
-            var mobileConnectVisible = false;
-
             this.$mobileIcon.on('mousemove', function() {
-                showNormal(self.$mobileIcon);
+                CssUtils.showNormal(self.$mobileIcon);
             });
             this.$mobileIcon.on('mouseleave', function() {
-                if (!mobileConnectVisible)
-                    showInverted(self.$mobileIcon);
+                if (!self.mobileOpened)
+                    CssUtils.showInverted(self.$mobileIcon);
             });
 
             this.$mobileIcon.on('click', function() {
-                if (!mobileConnectVisible) {
-                    self.$mobileConnect.show();
-                    showNormal(self.$mobileIcon);
-                    mobileConnectVisible = true;
-                    self.hidePauseButton();
-                    self.game.pause();
-                    self.hideMessage(true);
-                }
-                else {
-                    self.$mobileConnect.hide();
-                    showInverted(self.$mobileIcon);
-                    mobileConnectVisible = false;
-                    self.showPauseButton();
-                    self.game.continueGame();
-                }
+                self.triggerConnectDialog();
             });
 
             $(document).on("gameStateChanged", function(event) {
                 if (event.state === Game.GameState.Pause) {
                     self.$messageDimmer.show();
                     self.showMessage("Game paused", true);
-                    window.server.send({
-                        type: "info",
-                        action: "gameStateChanged",
-                        arg: "pause"
-                    });
+                    if (window.server) {
+                        window.server.send({
+                            type: "info",
+                            action: "gameStateChanged",
+                            arg: "pause"
+                        });
+                    }
                 } else if (event.state === Game.GameState.Game) {
                     self.hideMessage();
                     self.$messageDimmer.hide();
-                    window.server.send({
-                        type: "info",
-                        action: "gameStateChanged",
-                        arg: "continue"
-                    });
+                    if (window.server) {
+                        window.server.send({
+                            type: "info",
+                            action: "gameStateChanged",
+                            arg: "play"
+                        });
+                    }
                 }
             });
 
-            var pauseChangeVisible = true;
-
             this.$pauseButton.on('mousemove', function() {
-                if (pauseChangeVisible) {
-                    showNormal(self.$pauseButton);
+                if (!this.gamePaused) {
+                    CssUtils.showNormal(self.$pauseButton);
                 }
             });
             this.$pauseButton.on('mouseleave', function() {
-                if (pauseChangeVisible) {
-                    showInverted(self.$pauseButton);
+                if (!this.gamePaused) {
+                    CssUtils.showInverted(self.$pauseButton);
                 }
             });
 
             this.$pauseButton.on('click', function() {
-                if (self.game.state === Game.GameState.Game) {
-                    showNormal(self.$pauseButton);
-                    pauseChangeVisible = false;
-                    self.$pauseIconPause.hide();
-                    self.$pauseIconPlay.show();
-                    self.game.pause();
-                } else {
-                    showInverted(self.$pauseButton);
-                    pauseChangeVisible = true;
-                    self.$pauseIconPause.show();
-                    self.$pauseIconPlay.hide();
-                    self.game.continueGame();
-                }
+                self.triggerGamePause();
             });
 
 
@@ -257,12 +256,12 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
                     if (data.orientation === "portrait") {
                         console.log("change orientation!");
                         this.showMessage("Change device orientation to landsape", true);
-                        this.game.pause();
+                        this.game.pause(true);
                     }
                     else {
                         console.log("thanks for changing orientation");
                         this.hideMessage();
-                        this.game.continueGame();
+                        this.game.continueGame(true);
                     }
                     break;
 
@@ -281,6 +280,9 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
             Game.console({
                 onStarted: function() {
                     self.game.startJoystickSession(window.server);
+                    if (self.mobileOpened) {
+                        self.triggerConnectDialog();
+                    }
                 },
                 saveToken: function(guid) {
                     self.$loadingIndicator.hide();
@@ -303,7 +305,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
                     self.showMessage("You were disconnected", false, function() {
                         self.game.continueGame();
                     });
-                    self.game.pause();
+                    self.game.pause(true);
                 }
             });
         },
@@ -316,7 +318,9 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
 
             this.game = new Game(this.canvas, false, 
                 function() {
-                    self.showPauseButton();
+                    if (!self.mobileOpened) {
+                        self.showPauseButton();
+                    }
                     self.startJoystick();
                     self.game.run();
                 }
@@ -324,7 +328,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
             
             var self = this;
             $(document).on("gameFinished", function(event) {
-                self.game.stop();
+                self.game.stop(true);
                 GameFinishedView.show(event.score, event.message);
                 window.server.send({
                     type: "info",

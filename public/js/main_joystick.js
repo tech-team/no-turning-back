@@ -124,15 +124,14 @@ define([
         if (getOrientation() === "portrait") {
 //            console.log("change orientation");
             showMessage("Change device orientation to landscape", true);
+            window.serverSend({
+                type: "orientation",
+                orientation: getOrientation()
+            });
         }
         else {
             hideMessage();
         }
-
-        window.serverSend({
-            type: "orientation",
-            orientation: getOrientation()
-        });
     }
 
     function checkBrowserSupport() {
@@ -226,6 +225,12 @@ define([
             case "info":
                 if (data.action === "gamefinished") {
                     showMessage(data.message, false);
+                }
+                else if (data.action === "gameStateChanged") {
+                    if (data.arg === "pause")
+                        showMessage("Game paused", true);
+                    else if (data.arg === "play")
+                        hideMessage();
                 }
                 break;
             case "disconnect":

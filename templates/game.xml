@@ -21,11 +21,11 @@
             </div>
         </div>
         <div class="game-icon pause-icon image-inverted hidden">
-            <img class="game-icon__pause" src="/res/img/media-pause.png" width="50" height="60"></img>
-            <img class="game-icon__play" src="/res/img/media-play.png" width="50" height="60"></img>
+            <img class="game-icon__pause" src="/res/img/media-pause.png"></img>
+            <img class="game-icon__play" src="/res/img/media-play.png"></img>
         </div>
         <div class="game-icon mobile-icon image-inverted">
-            <img src="/res/img/mobile.png" width="50" height="60"></img>
+            <img src="/res/img/mobile.png"></img>
         </div>
 
         <!--<input id="token" value="guid" disabled="disabled" style="position:absolute; top:0; right:0;" />-->
