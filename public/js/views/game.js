@@ -3,9 +3,10 @@ define([
     'modernizr',
     'tmpl/game',
     'game/Game',
-    'views/gamefinished'
+    'views/gamefinished',
+    'utils/CssUtils'
 ], 
-function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
+function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils) {
     var GameView = Backbone.View.extend({
 
         template: tmpl,
@@ -70,9 +71,10 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
             this.$message.show();
         },
 
-        hideMessage: function() {
+        hideMessage: function(keepDimmer) {
             this.$message.hide();
-            this.$messageDimmer.hide();
+            if (!keepDimmer)
+                this.$messageDimmer.hide();
         },
 
         checkBrowserSupport: function() {
@@ -137,13 +139,13 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
 
             var mobileConnectVisible = false;
             var showMobileNormal = function() {
-                self.$mobileIcon.removeClass('image-inverted');
-                self.$mobileIcon.addClass('white-background');
+                CssUtils.uninvert(self.$mobileIcon);
+                CssUtils.addWhiteBackground(self.$mobileIcon);
             };
 
             var showMobileInverted = function() {
-                self.$mobileIcon.addClass('image-inverted');
-                self.$mobileIcon.removeClass('white-background');
+                CssUtils.invert(self.$mobileIcon);
+                CssUtils.removeWhiteBackground(self.$mobileIcon);
             };
 
 
@@ -162,6 +164,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
                     mobileConnectVisible = true;
                     self.hidePauseButton();
                     self.game.pause();
+                    self.hideMessage(true);
                 }
                 else {
                     self.$mobileConnect.hide();
@@ -194,13 +197,13 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView) {
 
             var pauseChangeVisible = true;
             var showPauseNormal = function() {
-                self.$pauseButton.addClass('white-background');
-                self.$pauseButton.removeClass('image-inverted');
+                CssUtils.uninvert(self.$pauseButton);
+                CssUtils.addWhiteBackground(self.$pauseButton);
             };
 
             var showPauseInverted = function() {
-                self.$pauseButton.removeClass('white-background');
-                self.$pauseButton.addClass('image-inverted');
+                CssUtils.invert(self.$pauseButton);
+                CssUtils.removeWhiteBackground(self.$pauseButton);
             };
 
             this.$pauseButton.on('mousemove', function() {
