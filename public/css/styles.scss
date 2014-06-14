@@ -137,6 +137,17 @@ html, body {
 }
 
 
+/********** misc. **********/
+
+.image-inverted {
+  -webkit-filter: invert(100%);
+}
+
+.hidden {
+  display: none;
+}
+
+
 @import "_mainmenu";
 @import "_backbutton";
 @import "_scoreboard";

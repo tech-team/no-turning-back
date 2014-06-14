@@ -15,7 +15,7 @@
 		</div>
 
 		<footer class="page-footer">
-    		<div class="social-buttons">
+    		<div class="social-buttons hidden">
     			<div class="social-button"><a href="https://vk.com/" target="_blank">vk</a></div>
     			<div class="social-button"><a href="https://www.facebook.com" target="_blank">facebook</a></div>
     			<div class="social-button"><a href="http://twitter.com" target="_blank">twitter</a></div>
