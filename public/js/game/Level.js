@@ -733,8 +733,11 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         });
 
                         this.chests[i].storage = [];
+                        this.collisionObjects.remove(this.chests[i].dispObj);
                         this.removeFromStage(this.chests[i].dispObj);
-                        this.addToStage(this.chests[i]);
+                        var dispObj = this.addToStage(this.chests[i]);
+                        this.collisionObjects.push(dispObj);
+
                         break;
                     }
                 }
