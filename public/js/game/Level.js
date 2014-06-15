@@ -68,10 +68,13 @@ function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, Default
 
             this.reload(data);
 
-            this.keyCoder.addEventListener("keyup", KeyCoder.X, this.finish.bind(this));
 
             // Events
             this.levelFinished = new signals.Signal();
+
+            this.keyCoder.addEventListener("keyup", KeyCoder.X, this.finish.bind(this));
+
+
 		},
 
         __classvars__: {
@@ -946,7 +949,7 @@ function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, Default
                         self.stage.alpha = 1 - this.elapsed / finishTimeout;
                     },
                     function() {
-                        self.levelFinished.dispatch();
+                        self.levelFinished.dispatch({});
                         self.stage.alpha = 1;
                     });
             }

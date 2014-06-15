@@ -67,8 +67,8 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, Level, P
         },
 
         onLevelFinished: function(event) {
-
-            if (event.status === 'gameFinished') {
+            console.log('Level finished');
+            if (event && event.status === 'gameFinished') {
                 this.gameFinished.dispatch(event);
                 return;
             }
@@ -84,6 +84,7 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, Level, P
                 }
                 else {
                     self.level = new Level(self.stage, event.levelData, self.player, self.resourceManager, self.editorMode);
+                    self.level.levelFinished.add(self.onLevelFinished.bind(self));
                 }
             });
         },
