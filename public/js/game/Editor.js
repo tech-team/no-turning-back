@@ -113,37 +113,36 @@ define([
                 this.populateTypeSelect();
             },
 
-            reload: function(data) {
+            load: function(data) {
                 var self = this;
                 this.levelData = data;
 
                 //reset stage
-                this.stage.removeAllChildren();
-                this.stage.update();
+                //TODO
+                //this.stage.removeAllChildren();
+                //this.stage.update();
 
                 //create main container for camera feature
-                this.mainContainer = new createjs.Container();
-                this.stage.addChild(this.mainContainer);
+                //TODO: or create it here, and pass to sm as it was before
+                this.mainContainer = this.sm.mainContainer;
                 this.setMainContainer(this.mainContainer); //setter in JS, oh wow, lol
 
                 //add background
                 this.background = this.addToStage(data, true);
 
+                //TODO: strange thing with arguments here
                 _.each(data.walls, this.addToStage.bind(this));
                 _.each(data.doors, this.addToStage.bind(this));
                 _.each(data.chests, this.addToStage.bind(this));
                 _.each(data.buttons, this.addToStage.bind(this));
                 _.each(data.zombies, this.addToStage.bind(this));
 
-                //add waypoints
-                for (var i = 0; i < self.zombies.length; ++i) {
-                    _.each(self.zombies[i].waypoints, function(obj) {
-                        self.addToStage(obj).visible = false;
-                    });
-                }
-
                 //add player
                 this.addToStage(data.player);
+            },
+
+            update: function(event) {
+                this.keyFunc(event);
             },
 
             addToStage: function(objData, doNotCenter, id) {
@@ -301,7 +300,7 @@ define([
                 var level = DefaultObjects.level;
                 level.player = player;
 
-                this.reload(level);
+                this.load(level);
                 this.regenerateLevelPropertiesTable();
             },
 
@@ -411,7 +410,7 @@ define([
                                     data: {name: str},
                                     dataType: 'json',
                                     success: function(data) {
-                                        self.reload(data);
+                                        self.load(data);
                                         self.regenerateLevelPropertiesTable();
                                         self.regenerateObjectPropertiesTable();
                                     },
