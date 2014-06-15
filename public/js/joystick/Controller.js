@@ -2,7 +2,7 @@ define([
     'underscore',
     'classy',
     'easel',
-    'game/ImageTiler'
+    'game/misc/ImageTiler'
 ],
     function(_, Class, createjs, ImageTiler) {
         var Controller = Class.$extend({
