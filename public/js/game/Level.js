@@ -1,6 +1,7 @@
 define([
 	'classy',
     'underscore',
+    'signals',
     'easel',
     'sound',
     'collision',
@@ -17,7 +18,7 @@ define([
     'game/entities/Bullet'
 ],
 
-function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet) {
+function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet) {
     var Level = Class.$extend({
 		__init__: function(stage, data, player, resourceManager, editorMode, sound) {
             this.data = data;
@@ -68,6 +69,9 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
             this.reload(data);
 
             this.keyCoder.addEventListener("keyup", KeyCoder.X, this.finish.bind(this));
+
+            // Events
+            this.levelFinished = new signals.Signal();
 		},
 
         __classvars__: {
@@ -405,8 +409,8 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                     this.player.dead = true;
                     console.log("Game over.");
                     ResourceManager.playSound(ResourceManager.soundList.GameOver);
-                    $.event.trigger({
-                        type: "gameFinished",
+                    this.levelFinished.dispatch({
+                        status: 'gameFinished',
                         score: this.player.score,
                         message: "Game over"
                     });
@@ -942,9 +946,7 @@ function(Class, _, easeljs, soundjs, collider, ResourceManager, DefaultObjects, 
                         self.stage.alpha = 1 - this.elapsed / finishTimeout;
                     },
                     function() {
-                        $.event.trigger({
-                            type: "levelFinished"
-                        });
+                        self.levelFinished.dispatch();
                         self.stage.alpha = 1;
                     });
             }

@@ -2,6 +2,7 @@ define([
     'jquery',
 	'underscore',
 	'classy',
+    'signals',
 	'easel',
     'collision',
 	'game/misc/KeyCoder',
@@ -12,7 +13,7 @@ define([
     'console',
     'game/misc/Messenger'
 ],
-function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager, Console, Messenger) {
+function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager, Console, Messenger) {
 	var Game = Class.$extend({
 		__init__: function(canvas, editorMode, onLoadedCallback) {
             this.editorMode = editorMode;
@@ -31,6 +32,11 @@ function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Re
             this.resourceManager = null;
 			this.keyCoder = new KeyCoder(editorMode);
 			this.onLoadedCallback = onLoadedCallback;
+
+
+            // Events
+            this.gameFinished = new signals.Signal();
+            this.gameStateChanged = new signals.Signal();
 		},
 
         __classvars__: {
@@ -56,17 +62,22 @@ function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Re
         		self.level = new Level(self.stage, event.levelData, self.player, self.resourceManager, self.editorMode);
         		self.onLoadedCallback();
 
-                $(document).on("levelFinished", self.onLevelFinished.bind(self));
+                self.level.levelFinished.add(self.onLevelFinished.bind(self));
         	});
         },
 
-        onLevelFinished: function() {
+        onLevelFinished: function(event) {
+
+            if (event.status === 'gameFinished') {
+                this.gameFinished.dispatch(event);
+                return;
+            }
+
             var self = this;
             this.levelManager.loadNextLevel(function(event) {
                 if (event.levelData == null) {
                     ResourceManager.playSound(ResourceManager.soundList.Victory);
-                    $.event.trigger({
-                        type: "gameFinished",
+                    self.gameFinished.dispatch({
                         score: self.player.score,
                         message: "You win!"
                     });
@@ -90,8 +101,7 @@ function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, Re
         changeState: function(state, ignore_notify) {
             this.state = state;
             if (!ignore_notify) {
-                $.event.trigger({
-                    type: "gameStateChanged",
+                this.gameStateChanged.dispatch({
                     state: this.state
                 });
             }
