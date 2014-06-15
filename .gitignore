@@ -3,6 +3,7 @@ node_modules/
 .idea/
 
 public/css/**/*.css
+!public/css/bootstrap.min.css
 
 public/js/build
 public/js/joystick/build

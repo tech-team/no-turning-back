@@ -6,14 +6,14 @@ define([
     'collision',
 	'game/misc/KeyCoder',
 	'game/LevelManager',
-	'game/GameMechanics',
+	'game/GameLevel',
     'game/Editor',
 	'game/entities/Player',
 	'game/ResourceManager',
     'console',
     'game/misc/Messenger'
 ],
-function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, GameMechanics, Editor, Player, ResourceManager, Console, Messenger) {
+function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, GameLevel, Editor, Player, ResourceManager, Console, Messenger) {
 	var Game = Class.$extend({
 		__init__: function(canvas, editorMode, onLoadedCallback) {
             this.editorMode = editorMode;
@@ -55,7 +55,7 @@ function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, GameMechanics, Ed
             var self = this;
             this.levelManager.loadNextLevel(function(event) {
                 if (!self.editorMode) {
-                    self.level = new GameMechanics(self.stage, event.levelData, self.player, self.resourceManager);
+                    self.level = new GameLevel(self.stage, event.levelData, self.player, self.resourceManager);
                     $(document).on("levelFinished", self.onLevelFinished.bind(self));
                 }
                 else {
@@ -78,7 +78,7 @@ function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, GameMechanics, Ed
                     });
                 }
                 else {
-                    self.level = new GameMechanics(self.stage, event.levelData, self.player, self.resourceManager);
+                    self.level = new GameLevel(self.stage, event.levelData, self.player, self.resourceManager);
                 }
             });
         },
@@ -139,7 +139,7 @@ function($, _, Class, createjs, ndgmr, KeyCoder, LevelManager, GameMechanics, Ed
         },
 
         resize: function() {
-            //TODO: both Editor and GM should be derieved from one basic class with resize/update/keyFunc methods
+            //TODO: both Editor and GL should be derived from one basic class with resize/update/keyFunc methods
             if (this.level)
                 this.level.resize();
         }
