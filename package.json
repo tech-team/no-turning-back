@@ -1,18 +1,18 @@
 {
-  "name": "frontend-game",
-  "version": "0.1.0",
-  "description": "frontend-game",
-  "main": "index.js",
+  "name": "No Turning Back",
+  "version": "0.2.0",
+  "description": "No Turning Back. HTML5+JS game.",
+  "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tech-team/frontend-game.git"
+    "url": "https://github.com/tech-team/no-turning-back.git"
   },
   "author": "igorcoding, alekseyl1992, abashinos",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/tech-team/frontend-game/issues"
+    "url": "https://github.com/tech-team/no-turning-back/issues"
   },
-  "homepage": "https://github.com/tech-team/frontend-game",
+  "homepage": "https://github.com/tech-team/no-turning-back",
   "devDependencies": {
     "artist": "~0.1.5",
     "express": "~3.5.1",
