@@ -89,6 +89,34 @@ function(Class) {
                     callback(null);
                 }
             });
+        },
+
+        isLevelExists: function(levelName, callback) {
+            $.ajax({
+                type: 'GET',
+                url: 'levels/exists',
+                data: {name: levelName},
+                dataType: 'json',
+                success: callback,
+                error: callback.bind(null)
+            });
+        },
+
+        saveLevel: function(data, callback) {
+            $.ajax({
+                type: 'POST',
+                url: 'levels',
+                data: {
+                    name: data.name,
+                    data: JSON.stringify(data)
+                },
+                success: function(data) {
+                    callback(true);
+                },
+                error: function(data) {
+                    callback(null);
+                }
+            });
         }
 	});
 

@@ -358,42 +358,30 @@ define([
 
                 var self = this;
                 var actualSaveLevel = function() {
-                    $.ajax({
-                        type: 'POST',
-                        url: 'levels',
-                        data: {
-                            name: self.levelData.name,
-                            data: levelStr
-                        },
-                        success: function(data) {
+                    self.levelManager.saveLevel(self.levelData, function(result) {
+                        if (result)
                             alertify.success("Level successfully saved!");
-                        },
-                        error: function(data) {
+                        else
                             alertify.error("Unable to save level");
-                        }
                     });
                 };
 
-                $.ajax({
-                    type: 'GET',
-                    url: 'levels/exists',
-                    data: {name: this.levelData.name},
-                    dataType: 'json',
-                    success: function(data) {
-                        if (data == false)
+                this.levelManager.isLevelExists(this.levelData.name,
+                    function(result) {
+                        if (result === null) {
+                            alertify.error("Unable to save level");
+                            return;
+                        }
+
+                        if (result == false)
                             actualSaveLevel();
                         else {
                             alertify.confirm("Level \"" + self.levelData.name + "\" already exists.\nDo you want to rewrite it?",
                                 function (e) {
-                                    if (e)
-                                        actualSaveLevel();
+                                    e && actualSaveLevel();
                             });
                         }
-                    },
-                    error: function(data) {
-                        alertify.error("Unable to save level");
-                    }
-                });
+                    });
             },
 
             onLevelLoadClick: function() {
