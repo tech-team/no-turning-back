@@ -265,7 +265,7 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
                         this.weaponsHandle(event);
                         break;
                     case "move":
-                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (Level.SpeedModifier.Normal) : (Level.SpeedModifier.Sprint);
+                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (GameLevel.SpeedModifier.Normal) : (GameLevel.SpeedModifier.Sprint);
                         if (speedModifier) {
                             var movementData = {
                                 speedModifier: speedModifier,
@@ -594,7 +594,7 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
                     });
 
                     this.zombies.splice(i, 1);
-                    this.player.score += Level.SCORES.KILL;
+                    this.player.score += GameLevel.SCORES.KILL;
                 }
             }
         },
@@ -723,7 +723,7 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
                     this.removeFromStage(this.doors[i].dispObj);
                     this.addToStage(this.doors[i]);
 
-                    this.player.score += Level.SCORES.DOOR_OPEN;
+                    this.player.score += GameLevel.SCORES.DOOR_OPEN;
 
                     if (this.doors[i].role === "exit") {
                         this.finish();

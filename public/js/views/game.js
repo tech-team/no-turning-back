@@ -304,6 +304,8 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
         },
 
         runGame: function() {
+            var self = this;
+
             var ctx = this.canvas.getContext("2d");
             //ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             ctx.fillStyle = "#000000";
@@ -318,8 +320,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
                     self.game.run();
                 }
             );
-            
-            var self = this;
+
             this.game.gameFinished.add(function(event) {
                 self.game.stop(true);
                 GameFinishedView.show(event.score, event.message);

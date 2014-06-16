@@ -66,6 +66,8 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLeve
                 else {
                     self.level = new Editor(self.stage, self.resourceManager);
                 }
+
+                self.onLoadedCallback();
         	});
         },
 
