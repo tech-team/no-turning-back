@@ -47,6 +47,10 @@ function(Class) {
             });
         },
 
+        isLastLevel: function() {
+            return this.levels.length == this.currentLevelId + 1;
+        },
+
         loadNextLevel: function(callback) {
 			if (this.currentLevelId === null)
 				this.currentLevelId = 0;
@@ -59,29 +63,31 @@ function(Class) {
         loadLevel: function(levelId, callback) {
             var levelName = this.levels[levelId];
 
+            this.loadLevelByName(levelName, callback);
+        },
+
+        loadLevelByName: function(levelName, callback) {
             if (_.isUndefined(levelName)) {
-                callback({levelData: null});
-                return; //game finished
+                callback(null);
+                return;
             }
 
             var self = this;
             $.ajax({
-                    type: 'GET',
-                    url: 'levels',
-                    data: {
-                        name: levelName
-                    },
-                    dataType: 'json',
-                    beforeSend: function() {
-                    },
-                    success: function(data) {
-                        callback({
-                            levelData: data
-                        });
-                    },
-                    error: function(data) {
-                        alert("Unable to load level");
-                    }
+                type: 'GET',
+                url: 'levels',
+                data: {
+                    name: levelName
+                },
+                dataType: 'json',
+                beforeSend: function() {
+                },
+                success: function(data) {
+                    callback(data);
+                },
+                error: function(data) {
+                    callback(null);
+                }
             });
         }
 	});

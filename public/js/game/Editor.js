@@ -24,9 +24,10 @@ define([
                         "Shift + mouse to drag whole level</div>"
             },
 
-            __init__: function(stage, resourceManager) {
+            __init__: function(stage, resourceManager, levelManager) {
                 this.$super(stage, resourceManager);
 
+                this.levelManager = levelManager;
                 this.keyCoder = new KeyCoder();
 
                 this.showingWpsOwner = null;
@@ -398,29 +399,28 @@ define([
             onLevelLoadClick: function() {
                 var self = this;
 
-                alertify.prompt("Input level name, or leave it empty to load empty level",
-                    function (e, str) {
-                        if (e) {
-                            if (str == "")
-                                self.loadDefaultLevel();
-                            else {
-                                $.ajax({
-                                    type: 'GET',
-                                    url: 'levels',
-                                    data: {name: str},
-                                    dataType: 'json',
-                                    success: function(data) {
-                                        self.load(data);
-                                        self.regenerateLevelPropertiesTable();
-                                        self.regenerateObjectPropertiesTable();
-                                    },
-                                    error: function(data) {
-                                        alertify.error("Unable to load level");
-                                    }
-                                });
-                            }
+                var loader = function(ok, levelName) {
+                    if (!ok)
+                        return;
+
+                    if (levelName == "") {
+                        self.loadDefaultLevel();
+                        return;
+                    }
+
+                    self.levelManager.loadLevelByName(levelName, function(data) {
+                        if (data) {
+                            self.load(data);
+                            self.regenerateLevelPropertiesTable();
+                            self.regenerateObjectPropertiesTable();
                         }
-                }, "Level1");
+                        else
+                            alertify.error("Unable to load level");
+                    });
+                };
+
+                alertify.prompt("Input level name, or leave it empty to load empty level",
+                    loader, "Level1");
             },
 
             onLevelNewClick: function() {
@@ -605,7 +605,6 @@ define([
             },
 
             replaceObject: function(dispObj, newData) {
-                //TODO: is it ok to replace level object here?
                 var data = _.merge(dispObj.data, newData);
 
                 this.removeFromStage(dispObj);
@@ -622,7 +621,6 @@ define([
                 this.showingWpsOwner = null;
                 this.stage.removeChild(this.wpPath);
 
-                //TODO: remove direct reference to containers
                 var wpsContainer = this.containers['waypoint'];
                 wpsContainer && wpsContainer.removeAllChildren();
             },

@@ -38,7 +38,7 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             this.player = player;
             this.prevPlayerPos = {};
 
-            //TODO: all of them can be obtained via this.containers["name"].children btw
+            //TODO: all of these objects' dispObjects can be obtained via this.containers["name"].children btw
             this.walls = [];
             this.doors = [];
             this.chests = [];

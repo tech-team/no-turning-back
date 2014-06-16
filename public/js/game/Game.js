@@ -58,13 +58,13 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLeve
             createjs.Sound.stop();
 
             var self = this;
-            this.levelManager.loadNextLevel(function(event) {
+            this.levelManager.loadNextLevel(function(data) {
                 if (!self.editorMode) {
-                    self.level = new GameLevel(self.stage, event.levelData, self.player, self.resourceManager);
+                    self.level = new GameLevel(self.stage, data, self.player, self.resourceManager);
                     self.level.levelFinished.add(self.onLevelFinished.bind(self));
                 }
                 else {
-                    self.level = new Editor(self.stage, self.resourceManager);
+                    self.level = new Editor(self.stage, self.resourceManager, self.levelManager);
                 }
 
                 self.onLoadedCallback();
@@ -72,26 +72,33 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLeve
         },
 
         onLevelFinished: function(event) {
+            var self = this;
+
             console.log('Level finished');
             if (event && event.status === 'gameFinished') {
                 this.gameFinished.dispatch(event);
                 return;
             }
 
-            var self = this;
-            this.levelManager.loadNextLevel(function(event) {
-                if (event.levelData == null) {
-                    ResourceManager.playSound(ResourceManager.soundList.Victory);
-                    self.gameFinished.dispatch({
-                        score: self.player.score,
-                        message: "You win!"
-                    });
-                }
-                else {
-                    self.level = new GameLevel(self.stage, event.levelData, self.player, self.resourceManager);
+            if (this.levelManager.isLastLevel()) {
+                //game over, win!
+                ResourceManager.playSound(ResourceManager.soundList.Victory);
+                self.gameFinished.dispatch({
+                    score: self.player.score,
+                    message: "You win!"
+                });
+            }
+            else {
+                this.levelManager.loadNextLevel(function(data) {
+                    if (data == null) {
+                        alert("Unable to load level!"); //TODO: replace with alertify
+                        return
+                    }
+
+                    self.level = new GameLevel(self.stage, data, self.player, self.resourceManager);
                     self.level.levelFinished.add(self.onLevelFinished.bind(self));
-                }
-            });
+                });
+            }
         },
 
 		run: function() {
