@@ -11,7 +11,7 @@ define([
     'game/StageManager'
 ],
     function(Class, _, easeljs, $, alertify, KeyCoder, ResourceManager, LevelManager, DefaultObjects, StageManager) {
-        var Editor = Class.$extend({
+        var Editor = StageManager.$extend({
             __classvars__: {
                 duplicateDelta: 30,
                 helpMessage:
@@ -25,9 +25,9 @@ define([
             },
 
             __init__: function(stage, resourceManager) {
+                this.$super(stage, resourceManager);
+
                 this.keyCoder = new KeyCoder();
-                this.stage = stage;
-                this.sm = this.stageManager = new StageManager(stage, resourceManager);
 
                 this.showingWpsOwner = null;
                 this.selectedObject = null;
@@ -97,11 +97,11 @@ define([
                 });
 
                 this.keyCoder.addEventListener("keyup", KeyCoder.F, function(event) {
-                    self.sm.bringToFront(self.selectedObject);
+                    self.bringToFront(self.selectedObject);
                 });
 
                 this.keyCoder.addEventListener("keyup", KeyCoder.B, function(event) {
-                    self.sm.bringToBack(self.selectedObject);
+                    self.bringToBack(self.selectedObject);
                 });
 
                 alertify.alert(Editor.helpMessage);
@@ -114,18 +114,12 @@ define([
             },
 
             load: function(data) {
+                //reset stage
+                this.$super(data);
+                this.setMainContainer(this.mainContainer); //setter in JS, oh wow, lol
+
                 var self = this;
                 this.levelData = data;
-
-                //reset stage
-                //TODO
-                //this.stage.removeAllChildren();
-                //this.stage.update();
-
-                //create main container for camera feature
-                //TODO: or create it here, and pass to sm as it was before
-                this.mainContainer = this.sm.mainContainer;
-                this.setMainContainer(this.mainContainer); //setter in JS, oh wow, lol
 
                 //add background
                 this.background = this.addToStage(data, true);
@@ -150,7 +144,7 @@ define([
             },
 
             addToStage: function(objData, doNotCenter, id) {
-                var dispObj = this.sm.addToStage(objData, doNotCenter, id);
+                var dispObj = this.$super(objData, doNotCenter, id);
                 this.setObjectHandlers(dispObj);
             },   
             
@@ -612,7 +606,7 @@ define([
                 //TODO: is it ok to replace level object here?
                 var data = _.merge(dispObj.data, newData);
 
-                this.sm.removeFromStage(dispObj);
+                this.removeFromStage(dispObj);
 
                 var doNotCenter = data.type == "background";
                 var newObj = this.addToStage(data, doNotCenter);
@@ -627,7 +621,7 @@ define([
                 this.stage.removeChild(this.wpPath);
 
                 //TODO: remove direct reference to containers
-                var wpsContainer = this.sm.containers['waypoint'];
+                var wpsContainer = this.containers['waypoint'];
                 wpsContainer && wpsContainer.removeAllChildren();
             },
 
@@ -690,7 +684,7 @@ define([
                 var id = collection.indexOf(dispObj.data);
                 collection.splice(id, 1);
 
-                this.sm.removeFromStage(dispObj);
+                this.removeFromStage(dispObj);
 
                 this.selectObject(null);
             }

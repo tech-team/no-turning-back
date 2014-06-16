@@ -12,7 +12,9 @@ define([
             __init__: function(stage, resourceManager) {
                 this.stage = stage;
                 this.resourceManager = resourceManager;
+            },
 
+            load: function() {
                 this.containers = []; //wall, chest, waypoint and so on
                 this.mainContainer = null; //for camera
 

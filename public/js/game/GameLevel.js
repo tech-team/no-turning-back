@@ -19,11 +19,10 @@ define([
 ],
 
 function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet) {
-    var Level = Class.$extend({
+    var Level = StageManager.$extend({
 		__init__: function(stage, data, player, resourceManager, sound) {
+            this.$super(stage, resourceManager);
             this.data = data;
-            this.stage = stage;
-            this.sm = this.stageManager = new StageManager(stage, resourceManager);
 
             this.keyCoder = new KeyCoder();
             this.keyCoder.addEventListener("keyup", KeyCoder.M, ResourceManager.toggleSound);
@@ -78,65 +77,66 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
         },
 
         load: function(data) {
+            this.$super(data);
+
             var self = this;
             this.data = data;
 
             //TODO: or create it here, and pass to sm as it was before
-            this.mainContainer = this.sm.mainContainer;
 
             //add background
             //NB: unused variable, left for better code understandability
-            this.background = this.sm.addToStage(data, true);
+            this.background = this.addToStage(data, true);
 
             //add walls
             _.each(data.walls, function(obj) {
-                self.walls.push(self.sm.addToStage(obj));
+                self.walls.push(self.addToStage(obj));
             });
 
             //create empty containers for future stuff
-            this.sm.createContainer("corpse");
-            this.sm.createContainer("medkit");
-            this.sm.createContainer("weapon");
-            this.sm.createContainer("key");
-            this.sm.createContainer("bullet");
+            this.createContainer("corpse");
+            this.createContainer("medkit");
+            this.createContainer("weapon");
+            this.createContainer("key");
+            this.createContainer("bullet");
 
             //add doors
             _.each(data.doors, function(obj) {
                 var door = new Door(obj);
-                door.setDispObj(self.sm.addToStage(obj));
+                door.setDispObj(self.addToStage(obj));
                 self.doors.push(door);
             });
 
             //add chests
             _.each(data.chests, function(obj) {
                 var chest = new Chest(obj);
-                chest.setDispObj(self.sm.addToStage(obj));
+                chest.setDispObj(self.addToStage(obj));
                 self.chests.push(chest);
             });
 
             //add buttons
             _.each(data.buttons, function(obj) {
                 var button = new Button(obj);
-                button.setDispObj(self.sm.addToStage(obj));
+                button.setDispObj(self.addToStage(obj));
                 self.buttons.push(button);
             });
 
             //add enemies
             _.each(data.zombies, function(obj) {
                 var zombie = new Zombie(obj);
-                zombie.setDispObj(self.sm.addToStage(obj));
+                zombie.setDispObj(self.addToStage(obj));
                 self.zombies.push(zombie);
             });
 
             //add waypoints
             for (var i = 0; i < self.zombies.length; ++i) {
                 _.each(self.zombies[i].waypoints, function(obj) {
-                    self.sm.addToStage(obj).visible = false;
+                    self.addToStage(obj).visible = false;
                 });
             }
 
             //add player
-            var playerObj = this.sm.addToStage(data.player);
+            var playerObj = this.addToStage(data.player);
             this.player.setDispObj(playerObj);
             this.prevPlayerPos = {
                 x: this.player.dispObj.x,
@@ -146,21 +146,21 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
             this.player.currentWeapon = "knife";
 
             //add effects
-            this.sm.createContainer("effect", true);
+            this.createContainer("effect", true);
 
             var graphics = new easeljs.Graphics();
             this.effects.fogBox = new easeljs.Shape(graphics);
 
             //TODO: it's bad to use sm's field directly
-            var fogBox = this.sm.containers["effect"].addChild(this.effects.fogBox);
+            var fogBox = this.containers["effect"].addChild(this.effects.fogBox);
 
-            this.effects.fog = this.sm.addToStage({
+            this.effects.fog = this.addToStage({
                 type: "effect",
                 tex: "effects/fog",
                 x: this.player.dispObj.x,
                 y: this.player.dispObj.y});
 
-            this.effects.damage = this.sm.addToStage({
+            this.effects.damage = this.addToStage({
                 type: "effect",
                 tex: "effects/damage",
                 x: 0, y: 0,
@@ -311,7 +311,7 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
                     };
 
                     var bullet = new Bullet(
-                        this.sm.addToStage(bulletData),
+                        this.addToStage(bulletData),
                         bulletData);
 
                     this.bullets.push(bullet);
@@ -412,8 +412,8 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
 
                         if (this.player.dispObj.tex != "player") {
                             this.player.dispObj.tex = "player";
-                            this.sm.removeFromStage(this.player.dispObj);
-                            this.player.setDispObj(this.sm.addToStage(this.player.dispObj));
+                            this.removeFromStage(this.player.dispObj);
+                            this.player.setDispObj(this.addToStage(this.player.dispObj));
                         }
                         ResourceManager.playSound(ResourceManager.soundList.KnifeDraw, ResourceManager.weaponData.drawCooldown);
                         this.player.cooldown = ResourceManager.weaponData.drawCooldown;
@@ -425,8 +425,8 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
 
                         if (this.player.dispObj.tex != "player-pistol") {
                             this.player.dispObj.tex = "player-pistol";
-                            this.sm.removeFromStage(this.player.dispObj);
-                            this.player.setDispObj(this.sm.addToStage(this.player.dispObj));
+                            this.removeFromStage(this.player.dispObj);
+                            this.player.setDispObj(this.addToStage(this.player.dispObj));
                         }
 
                         ResourceManager.playSound(ResourceManager.soundList.PistolDraw, ResourceManager.weaponData.drawCooldown);
@@ -439,8 +439,8 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
 
                         if (this.player.dispObj.tex != "player-shotgun") {
                             this.player.dispObj.tex = "player-shotgun";
-                            this.sm.removeFromStage(this.player.dispObj);
-                            this.player.setDispObj(this.sm.addToStage(this.player.dispObj));
+                            this.removeFromStage(this.player.dispObj);
+                            this.player.setDispObj(this.addToStage(this.player.dispObj));
                         }
 
                         ResourceManager.playSound(ResourceManager.soundList.ShotgunDraw, ResourceManager.weaponData.drawCooldown);
@@ -484,7 +484,7 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
                         };
 
                         var bullet = new Bullet(
-                            this.sm.addToStage(bulletData),
+                            this.addToStage(bulletData),
                             bulletData);
 
                         this.bullets.push(bullet);
@@ -506,7 +506,7 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
                                 ttl: 8,
                                 type: "bullet"
                             };
-                            var bullet = new Bullet(this.sm.addToStage(bulletData), bulletData);
+                            var bullet = new Bullet(this.addToStage(bulletData), bulletData);
 
                             this.bullets.push(bullet);
                         }
@@ -525,14 +525,14 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
             for (var i = 0; i < this.bullets.length; ++i) {
                 if (this.bullets[i].ttl){
                     if (--this.bullets[i].ttl <= 0) {
-                        this.sm.removeFromStage(this.bullets[i].dispObj);
+                        this.removeFromStage(this.bullets[i].dispObj);
                         this.bullets.splice(i, 1);
                         break;
                     }
                 }
                 if (this.bullets[i].source != "player" && collider.checkPixelCollision(this.bullets[i].dispObj, this.player.dispObj)) {
                     this.player.damage(this.bullets[i].power);
-                    this.sm.removeFromStage(this.bullets[i].dispObj);
+                    this.removeFromStage(this.bullets[i].dispObj);
                     ResourceManager.playSound(ResourceManager.soundList.BulletHit);
                     ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
                     this.bullets.splice(i, 1);
@@ -541,7 +541,7 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
                 for(var j = 0; j < this.zombies.length; ++j) {
                     if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
                         this.zombies[j].health -= this.bullets[i].power;
-                        this.sm.removeFromStage(this.bullets[i].dispObj);
+                        this.removeFromStage(this.bullets[i].dispObj);
                         ResourceManager.playSound(ResourceManager.soundList.BulletHit);
                         this.bullets.splice(i, 1);
                         break out;
@@ -549,14 +549,14 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
                 }
                 for(var j = 0; j < this.collisionObjects.length; ++j) {
                     if (collider.checkPixelCollision(this.bullets[i].dispObj,this.collisionObjects[j])) {
-                        this.sm.removeFromStage(this.bullets[i].dispObj);
+                        this.removeFromStage(this.bullets[i].dispObj);
                         ResourceManager.playSound(ResourceManager.soundList.BulletRicochet);
                         this.bullets.splice(i, 1);
                         break out;
                     }
                 }
                 if (this.checkBounds(this.bullets[i].dispObj)) {
-                    this.sm.removeFromStage(this.bullets[i].dispObj);
+                    this.removeFromStage(this.bullets[i].dispObj);
                     this.bullets.splice(i, 1);
                     break;
                 }
@@ -574,8 +574,8 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
                             r: this.zombies[i].dispObj.rotation
                         });
 
-                    this.sm.addToStage(corpse);
-                    this.sm.removeFromStage(this.zombies[i].dispObj);
+                    this.addToStage(corpse);
+                    this.removeFromStage(this.zombies[i].dispObj);
 
                     for (var j = 0; j < this.collisionObjects.length; ++j) {
                         if (this.collisionObjects[j] == this.zombies[i].dispObj) {
@@ -588,7 +588,7 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
                         dropped.y = self.zombies[i].dispObj.y;
 
                         var drop = DefaultObjects.build(dropped.type, dropped);
-                        self.drops.push(self.sm.addToStage(drop))
+                        self.drops.push(self.addToStage(drop))
                     });
 
                     this.zombies.splice(i, 1);
@@ -650,8 +650,8 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
 
                         this.chests[i].storage = [];
                         this.collisionObjects.remove(this.chests[i].dispObj);
-                        this.sm.removeFromStage(this.chests[i].dispObj);
-                        var dispObj = this.sm.addToStage(this.chests[i]);
+                        this.removeFromStage(this.chests[i].dispObj);
+                        var dispObj = this.addToStage(this.chests[i]);
                         this.collisionObjects.push(dispObj);
 
                         break;
@@ -695,7 +695,7 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
                                 }
                         }
 
-                        this.sm.removeFromStage(this.drops[i]);
+                        this.removeFromStage(this.drops[i]);
                         this.drops.splice(i, 1);
                     }
                 }
@@ -718,8 +718,8 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
                             this.collisionObjects.splice(j, 1);
                         }
                     }
-                    this.sm.removeFromStage(this.doors[i].dispObj);
-                    this.sm.addToStage(this.doors[i]);
+                    this.removeFromStage(this.doors[i].dispObj);
+                    this.addToStage(this.doors[i]);
 
                     this.player.score += Level.SCORES.DOOR_OPEN;
 
@@ -736,13 +736,13 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
                 if (this.buttons[i].justPressed === true) {
                     ResourceManager.playSound(ResourceManager.soundList.Click);
                     this.buttons[i].justPressed = false;
-                    this.sm.removeFromStage(this.buttons[i].dispObj);
-                    this.buttons[i].setDispObj(this.sm.addToStage(this.buttons[i]));
+                    this.removeFromStage(this.buttons[i].dispObj);
+                    this.buttons[i].setDispObj(this.addToStage(this.buttons[i]));
                 }
                 else if (this.buttons[i].justDepressed === true) {
                     this.buttons[i].justDepressed = false;
-                    this.sm.removeFromStage(this.buttons[i].dispObj);
-                    this.buttons[i].setDispObj(this.sm.addToStage(this.buttons[i]));
+                    this.removeFromStage(this.buttons[i].dispObj);
+                    this.buttons[i].setDispObj(this.addToStage(this.buttons[i]));
                 }
                 if (this.buttons[i].message) {
                     Messenger.showMessage(this.buttons[i].message, Messenger.MessageColor.Default);
@@ -778,8 +778,8 @@ function(Class, _, easeljs, soundjs, collider, StageManager, ResourceManager, De
         updateEffects: function() {
             this.updateFog(true);
 
-            this.sm.removeFromStage(this.effects.damage);
-            this.effects.damage = this.sm.addToStage({
+            this.removeFromStage(this.effects.damage);
+            this.effects.damage = this.addToStage({
                 type: "effect",
                 tex: "effects/damage",
                 x: 0, y: 0,
