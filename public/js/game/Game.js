@@ -27,7 +27,7 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLeve
 			this.stage = new createjs.Stage(this.canvas);
             Messenger.setStage(this.stage);
 			this.ticker = createjs.Ticker;
-			this.levelManager = new LevelManager(this.onLevelLoaded, this);
+			this.levelManager = new LevelManager(this.onLevelLoaded.bind(this));
 			this.level = null;
 			this.player = new Player();
             this.resourceManager = null;
@@ -50,7 +50,7 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLeve
         },
 
         onLevelLoaded: function() {
-            this.resourceManager = ResourceManager.load(this.onResourcesLoaded, this);
+            this.resourceManager = ResourceManager.load(this.onResourcesLoaded.bind(this));
         },
 
         onResourcesLoaded: function() {

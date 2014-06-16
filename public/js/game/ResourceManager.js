@@ -59,13 +59,13 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
 
             instance: null,
 
-            load: function(onComplete, onCompleteContext) {
+            load: function(onComplete) {
                 if (this.instance && this.instance.loaded)
-                    onComplete.call(onCompleteContext);
+                    onComplete();
                 else if (!this.instance)
-                    this.instance = new ResourceManager(onComplete, onCompleteContext);
+                    this.instance = new ResourceManager(onComplete);
                 else
-                    this.instance.setOnComplete(onComplete, onCompleteContext);
+                    this.instance.setOnComplete(onComplete);
 
                 return this.instance;
             },
@@ -94,10 +94,9 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             }
         },
 
-		__init__: function(onComplete, onCompleteContext) {
+		__init__: function(onComplete) {
             this.loaded = false;
             this.onComplete = onComplete;
-            this.onCompleteContext = onCompleteContext;
 
             this.images = [];
             this.spriteSheets = [];
@@ -148,7 +147,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                     //TODO: should separate sounds and textures
                     self.images[tex.id] = queue.getResult(tex.id);
                 });
-                self.onComplete.call(self.onCompleteContext);
+                self.onComplete();
 
                 self.loaded = true;
 
@@ -166,9 +165,8 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             }
 		},
 
-        setOnComplete: function(onComplete, onCompleteContext) {
+        setOnComplete: function(onComplete) {
             this.onComplete = onComplete;
-            this.onCompleteContext = onCompleteContext;
         },
 
         getSpriteSheet: function(tex) {

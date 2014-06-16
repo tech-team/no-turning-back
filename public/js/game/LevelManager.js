@@ -3,7 +3,7 @@ define([
 ],
 function(Class) {
 	var LevelManager = Class.$extend({
-		__init__: function(loadedCallback, onLoadedContext) {
+		__init__: function(loadedCallback) {
 			this.currentLevelId = null;
             this.campaigns = [];
             this.activeCampaign = null;
@@ -18,7 +18,7 @@ function(Class) {
                 },
                 success: function(data) {
                     self.campaigns = data;
-                    self.campaignPicker(loadedCallback, onLoadedContext);
+                    self.campaignPicker(loadedCallback);
                 },
                 error: function(data) {
                     alert("Unable to load level. Error: " + data);
@@ -26,7 +26,7 @@ function(Class) {
             });
 		},
 
-        campaignPicker: function(loadedCallback, onLoadedContext) {
+        campaignPicker: function(loadedCallback) {
             var randId = Math.floor((Math.random() * this.campaigns.length));
             this.activeCampaign = this.campaigns[randId];
 
@@ -39,7 +39,7 @@ function(Class) {
                 },
                 success: function(data) {
                     self.levels = data;
-                    loadedCallback.call(onLoadedContext);
+                    loadedCallback();
                 },
                 error: function(data) {
                     alert("Unable to load level. Error: " + data);
