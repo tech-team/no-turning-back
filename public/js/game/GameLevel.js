@@ -38,13 +38,14 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             this.player = player;
             this.prevPlayerPos = {};
 
-            //TODO: all of them can be obtained via sm.containers["name"].children
+            //TODO: all of them can be obtained via this.containers["name"].children btw
             this.walls = [];
             this.doors = [];
             this.chests = [];
             this.buttons = [];
             this.zombies = [];
             this.bullets = [];
+
             this.collisionObjects = [];
             this.drops = [];
 
@@ -53,11 +54,6 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             this.lastShootTime = 0;
             this.shootDelta = 350;
             this.finished = false;
-
-            this.camera = {
-                x: 0,
-                y: 0
-            };
 
             this.load(data);
 
@@ -75,7 +71,9 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             SpeedModifier: {
                 Normal: 0.75,
                 Sprint: 1.5
-            }
+            },
+
+            CameraOffset: 200
         },
 
         load: function(data) {
@@ -83,8 +81,6 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
 
             var self = this;
             this.data = data;
-
-            //TODO: or create it here, and pass to sm as it was before
 
             //add background
             //NB: unused variable, left for better code understandability
@@ -153,7 +149,6 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             var graphics = new easeljs.Graphics();
             this.effects.fogBox = new easeljs.Shape(graphics);
 
-            //TODO: it's bad to use sm's field directly
             var fogBox = this.containers["effect"].addChild(this.effects.fogBox);
 
             this.effects.fog = this.addToStage({
@@ -277,7 +272,7 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
                     case "use":
                         var event = (new KeyCoder()).getKeys();
                         event.keys[KeyCoder.E] = true;
-                        this.chestsOpeningHandle(self, event);
+                        this.chestsOpeningHandle(event);
                         this.buttonsPressingHandle(event);
                         this.doorsOpeningHandle(event);
                         event.keys[KeyCoder.E] = false;
@@ -291,21 +286,23 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
 		update: function(event) {
             if (this.finished)
                 return;
+            
+            var self = this;
 
             this.keyFunc(event);
             this.setPrevPlayerPos();
 
             this.player.update(event, this.collisionObjects);
 
-            for (var i = 0; i < this.zombies.length; ++i) {
-                this.zombies[i].update(event, this.player, this.collisionObjects);
-                if (this.zombies[i].justFired === "pistol") {
-                    this.zombies[i].justFired = "";
+            _.each(this.zombies, function(zombie) {
+                zombie.update(event, self.player, self.collisionObjects);
+                if (zombie.justFired === "pistol") {
+                    zombie.justFired = "";
                     ResourceManager.playSound(ResourceManager.soundList.PistolFire);
                     var bulletData = {
-                        x: this.zombies[i].dispObj.x,
-                        y: this.zombies[i].dispObj.y,
-                        r: this.zombies[i].dispObj.rotation,
+                        x: zombie.dispObj.x,
+                        y: zombie.dispObj.y,
+                        r: zombie.dispObj.rotation,
                         power: ResourceManager.weaponData.pistol.power,
                         source: "zombie",
                         tex: "pistol-bullet",
@@ -313,15 +310,16 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
                     };
 
                     var bullet = new Bullet(
-                        this.addToStage(bulletData),
+                        self.addToStage(bulletData),
                         bulletData);
 
-                    this.bullets.push(bullet);
+                    self.bullets.push(bullet);
                 }
-            }
-            for (var i = 0; i < this.bullets.length; ++i) {
-                this.bullets[i].update(event);
-            }
+            });
+
+            _.each(this.bullets, function(bullet) {
+                bullet.update(event);
+            });
 
             if (this.player.health <= 0 && !this.player.dead) {
                 this.player.dead = true;
@@ -364,7 +362,7 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
                 width: this.stage.canvas.width,
                 height: this.stage.canvas.height
             };
-            var offset = 200;
+            var offset = GameLevel.CameraOffset;
 
             if (this.player.dispObj.x > stageSize.width - offset) {
                 this.mainContainer.x = -(this.player.dispObj.x - (stageSize.width - offset));
@@ -401,7 +399,7 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
 
             this.buttonsPressingHandle(event);
             if (event.keys[KeyCoder.E]) {
-                this.chestsOpeningHandle(self, event);
+                this.chestsOpeningHandle(event);
                 this.doorsOpeningHandle(event);
             }
         },
@@ -599,22 +597,22 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             }
         },
 
-        chestsOpeningHandle: function(self, event) {
-            for (var i = 0; i < this.chests.length; ++i) {
-                if (this.checkReach(this.chests[i])) {
-                    this.chests[i].update(event, this.player);
+        chestsOpeningHandle: function(event) {
+            var self = this;
 
-                    if (this.chests[i].justTried == true) {
-                        this.chests[i].justTried = false;
-                        Messenger.showMessage(this.chests[i].requiresMessage.toString(), Messenger.MessageColor.DoorClosed);
-                        break;
+            _.each(this.chests, function(chest) {
+                if (self.checkReach(chest)) {
+                    chest.update(event, self.player);
+
+                    if (chest.justTried == true) {
+                        chest.justTried = false;
+                        Messenger.showMessage(chest.requiresMessage.toString(), Messenger.MessageColor.DoorClosed);
+                        return false;
                     }
-                    else if (this.chests[i].justOpened == true) {
-
+                    else if (chest.justOpened == true) {
                         ResourceManager.playSound(ResourceManager.soundList.ChestOpen);
-                        this.chests[i].justOpened = false;
-                        this.chests[i].storage.forEach(function(drop) {
-
+                        chest.justOpened = false;
+                        _.each(chest.storage, function(drop) {
                             switch (drop['type']) {
                                 case "weapon":
                                     var name = drop['name'];
@@ -650,54 +648,57 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
                             }
                         });
 
-                        this.chests[i].storage = [];
-                        this.collisionObjects.remove(this.chests[i].dispObj);
-                        this.removeFromStage(this.chests[i].dispObj);
-                        var dispObj = this.addToStage(this.chests[i]);
-                        this.collisionObjects.push(dispObj);
+                        chest.storage = [];
+                        self.collisionObjects.remove(chest.dispObj);
+                        self.removeFromStage(chest.dispObj);
+                        var dispObj = self.addToStage(chest);
+                        self.collisionObjects.push(dispObj);
 
-                        break;
+                        return false; //break
                     }
                 }
-            }
+            });
         },
 
 
         dropsHandle: function() {
             for (var i = 0; i < this.drops.length; ++i) {
-                if (this.checkReach(this.drops[i])) {
-                    if (collider.checkPixelCollision(this.drops[i], this.player.dispObj)) {
-                        switch (this.drops[i].data['type']) {
+                //can't use _.each here because of splice in the end, but
+                var drop = this.drops[i]; //caching and readability!
+                
+                if (this.checkReach(drop)) {
+                    if (collider.checkPixelCollision(drop, this.player.dispObj)) {
+                        switch (drop.data['type']) {
                             case "key":
-                                if (!(this.drops[i].data['name'] in this.player.keys)) {
-                                    this.player.keys.push(this.drops[i].data['name']);
-                                    Messenger.showMessage("You picked up a " + this.drops[i].data['name'], Messenger.MessageColor.NewItem);
+                                if (!(drop.data['name'] in this.player.keys)) {
+                                    this.player.keys.push(drop.data['name']);
+                                    Messenger.showMessage("You picked up a " + drop.data['name'], Messenger.MessageColor.NewItem);
                                 }
                                 break;
                             case "weapon":
                                 ResourceManager.playSound(ResourceManager.soundList.Ammo);
-                                var name = this.drops[i].data['name'];
+                                var name = drop.data['name'];
                                 if (name in this.player.weapons) {
-                                    this.player.weapons[name] += this.drops[i].data['ammo'];
-                                    Messenger.showMessage("You picked up " + this.drops[i].data['ammo'] + " ammo for " + this.drops[i].data['name'], Messenger.MessageColor.Ammo);
+                                    this.player.weapons[name] += drop.data['ammo'];
+                                    Messenger.showMessage("You picked up " + drop.data['ammo'] + " ammo for " + drop.data['name'], Messenger.MessageColor.Ammo);
                                 }
                                 else {
-                                    this.player.weapons[name] = this.drops[i].data['ammo'];
-                                    Messenger.showMessage("You picked up a new weapon: " + this.drops[i].data['name'], Messenger.MessageColor.NewWeapon);
+                                    this.player.weapons[name] = drop.data['ammo'];
+                                    Messenger.showMessage("You picked up a new weapon: " + drop.data['name'], Messenger.MessageColor.NewWeapon);
                                 }
                                 break;
                             case "medkit":
-                                var howMuch = this.drops[i].data['size'];
+                                var howMuch = drop.data['size'];
                                 this.player.heal(howMuch);
                                 break;
                             default:
-                                if (this.drops[i].data['name']) {
-                                    this.player.inventory.push(this.drops[i].data['name']);
-                                    Messenger.showMessage(this.drops[i].data['name'] + " added to your inventory!");
+                                if (drop.data['name']) {
+                                    this.player.inventory.push(drop.data['name']);
+                                    Messenger.showMessage(drop.data['name'] + " added to your inventory!");
                                 }
                         }
 
-                        this.removeFromStage(this.drops[i]);
+                        this.removeFromStage(drop);
                         this.drops.splice(i, 1);
                     }
                 }
@@ -705,52 +706,56 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
         },
 
         doorsOpeningHandle: function(event) {
-            for (var i = 0; i < this.doors.length; ++i) {
-                this.doors[i].update(event, this.player, this.zombies.length);
-                if (this.doors[i].justTried == true) {
-                    this.doors[i].justTried = false;
-                    Messenger.showMessage(this.doors[i].requiresMessage.toString(), Messenger.MessageColor.DoorClosed);
+            var self = this;
+            
+            _.each(this.doors, function(door) {
+                door.update(event, self.player, self.zombies.length);
+                if (door.justTried == true) {
+                    door.justTried = false;
+                    Messenger.showMessage(door.requiresMessage.toString(), Messenger.MessageColor.DoorClosed);
                 }
-                else if (this.doors[i].justOpened == true) {
+                else if (door.justOpened == true) {
                     ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
 
-                    this.doors[i].justOpened = false;
-                    for (var j = 0; j < this.collisionObjects.length; ++j) {
-                        if (this.collisionObjects[j] == this.doors[i].dispObj) {
-                            this.collisionObjects.splice(j, 1);
+                    door.justOpened = false;
+                    for (var j = 0; j < self.collisionObjects.length; ++j) {
+                        if (self.collisionObjects[j] == door.dispObj) {
+                            self.collisionObjects.splice(j, 1);
                         }
                     }
-                    this.removeFromStage(this.doors[i].dispObj);
-                    this.addToStage(this.doors[i]);
+                    self.removeFromStage(door.dispObj);
+                    self.addToStage(door);
 
-                    this.player.score += GameLevel.SCORES.DOOR_OPEN;
+                    self.player.score += GameLevel.SCORES.DOOR_OPEN;
 
-                    if (this.doors[i].role === "exit") {
-                        this.finish();
+                    if (door.role === "exit") {
+                        self.finish();
                     }
                 }
-            }
+            });
         },
 
         buttonsPressingHandle: function(event) {
-            for (var i = 0; i < this.buttons.length; ++i) {
-                this.buttons[i].update(event, this.player, this.doors);
-                if (this.buttons[i].justPressed === true) {
+            var self = this;
+
+            _.each(this.buttons, function(button) {
+                button.update(event, self.player, self.doors);
+                if (button.justPressed === true) {
                     ResourceManager.playSound(ResourceManager.soundList.Click);
-                    this.buttons[i].justPressed = false;
-                    this.removeFromStage(this.buttons[i].dispObj);
-                    this.buttons[i].setDispObj(this.addToStage(this.buttons[i]));
+                    button.justPressed = false;
+                    self.removeFromStage(button.dispObj);
+                    button.setDispObj(self.addToStage(button));
                 }
-                else if (this.buttons[i].justDepressed === true) {
-                    this.buttons[i].justDepressed = false;
-                    this.removeFromStage(this.buttons[i].dispObj);
-                    this.buttons[i].setDispObj(this.addToStage(this.buttons[i]));
+                else if (button.justDepressed === true) {
+                    button.justDepressed = false;
+                    self.removeFromStage(button.dispObj);
+                    button.setDispObj(self.addToStage(button));
                 }
-                if (this.buttons[i].message) {
-                    Messenger.showMessage(this.buttons[i].message, Messenger.MessageColor.Default);
-                    this.buttons[i].message = "";
+                if (button.message) {
+                    Messenger.showMessage(button.message, Messenger.MessageColor.Default);
+                    button.message = "";
                 }
-            }
+            });
         },
 
         checkReach: function(obj) {
