@@ -130,12 +130,16 @@ define([
                 //add background
                 this.background = this.addToStage(data, true);
 
-                //TODO: strange thing with arguments here
-                _.each(data.walls, this.addToStage.bind(this));
-                _.each(data.doors, this.addToStage.bind(this));
-                _.each(data.chests, this.addToStage.bind(this));
-                _.each(data.buttons, this.addToStage.bind(this));
-                _.each(data.zombies, this.addToStage.bind(this));
+                var add = function(data) {
+                    //ensure calling with one argument
+                    self.addToStage(data);
+                };
+                
+                _.each(data.walls,   add);
+                _.each(data.doors,   add);
+                _.each(data.chests,  add);
+                _.each(data.buttons, add);
+                _.each(data.zombies, add);
 
                 //add player
                 this.addToStage(data.player);
