@@ -146,6 +146,8 @@ define([
             addToStage: function(objData, doNotCenter, id) {
                 var dispObj = this.$super(objData, doNotCenter, id);
                 this.setObjectHandlers(dispObj);
+
+                return dispObj;
             },   
             
             setMainContainer: function(container) {
