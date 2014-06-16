@@ -7,13 +7,14 @@ define([
     'collision',
 	'game/misc/KeyCoder',
 	'game/LevelManager',
-	'game/Level',
+	'game/GameLevel',
+    'game/Editor',
 	'game/entities/Player',
 	'game/ResourceManager',
     'console',
     'game/misc/Messenger'
 ],
-function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, Level, Player, ResourceManager, Console, Messenger) {
+function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLevel, Editor, Player, ResourceManager, Console, Messenger) {
 	var Game = Class.$extend({
 		__init__: function(canvas, editorMode, onLoadedCallback) {
             this.editorMode = editorMode;
@@ -32,7 +33,6 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, Level, P
             this.resourceManager = null;
 			this.keyCoder = new KeyCoder(editorMode);
 			this.onLoadedCallback = onLoadedCallback;
-
 
             // Events
             this.gameFinished = new signals.Signal();
@@ -59,10 +59,13 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, Level, P
 
             var self = this;
             this.levelManager.loadNextLevel(function(event) {
-        		self.level = new Level(self.stage, event.levelData, self.player, self.resourceManager, self.editorMode);
-        		self.onLoadedCallback();
-
-                self.level.levelFinished.add(self.onLevelFinished.bind(self));
+                if (!self.editorMode) {
+                    self.level = new GameLevel(self.stage, event.levelData, self.player, self.resourceManager);
+                    self.level.levelFinished.add(self.onLevelFinished.bind(self));
+                }
+                else {
+                    self.level = new Editor(self.stage, self.resourceManager);
+                }
         	});
         },
 
@@ -83,7 +86,7 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, Level, P
                     });
                 }
                 else {
-                    self.level = new Level(self.stage, event.levelData, self.player, self.resourceManager, self.editorMode);
+                    self.level = new GameLevel(self.stage, event.levelData, self.player, self.resourceManager);
                     self.level.levelFinished.add(self.onLevelFinished.bind(self));
                 }
             });
@@ -144,6 +147,7 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, Level, P
         },
 
         resize: function() {
+            //TODO: both Editor and GL should be derived from one basic class with resize/update/keyFunc methods
             if (this.level)
                 this.level.resize();
         }

@@ -5,6 +5,7 @@ define([
     'easel',
     'sound',
     'collision',
+    'game/StageManager',
     'game/ResourceManager',
     'game/DefaultObjects',
     'game/misc/KeyCoder',
@@ -17,23 +18,16 @@ define([
     'game/entities/Button',
     'game/entities/Bullet'
 ],
-
-function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet) {
-    var Level = Class.$extend({
-		__init__: function(stage, data, player, resourceManager, editorMode, sound) {
+function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet) {
+    var GameLevel = StageManager.$extend({
+		__init__: function(stage, data, player, resourceManager, sound) {
+            this.$super(stage, resourceManager);
             this.data = data;
 
             this.keyCoder = new KeyCoder();
             this.keyCoder.addEventListener("keyup", KeyCoder.M, ResourceManager.toggleSound);
 
-            this.editorMode = editorMode;
-
-            if (this.editorMode)
-                this.editor = new Editor(this, stage);
-
             this.showingMessagesCount = 0;
-
-            this.stage = stage;
 
             this.background = null;
             this.effects = {
@@ -43,9 +37,8 @@ function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, Default
 
             this.player = player;
             this.prevPlayerPos = {};
-            this.resourceManager = resourceManager;
 
-
+            //TODO: all of them can be obtained via sm.containers["name"].children
             this.walls = [];
             this.doors = [];
             this.chests = [];
@@ -66,15 +59,11 @@ function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, Default
                 y: 0
             };
 
-            this.reload(data);
-
+            this.load(data);
 
             // Events
             this.levelFinished = new signals.Signal();
-
             this.keyCoder.addEventListener("keyup", KeyCoder.X, this.finish.bind(this));
-
-
 		},
 
         __classvars__: {
@@ -89,24 +78,16 @@ function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, Default
             }
         },
 
-        reload: function(data) {
+        load: function(data) {
+            this.$super(data);
+
             var self = this;
             this.data = data;
 
-            //reset stage
-            this.stage.removeAllChildren();
-            this.stage.update();
-
-            this.containers = []; //wall, chest, waypoint and so on
-
-            //create main container for camera feature
-            this.mainContainer = new createjs.Container();
-            this.stage.addChild(this.mainContainer);
-
-            if (this.editorMode)
-                this.editor.setMainContainer(this.mainContainer); //setter in JS, oh wow, lol
+            //TODO: or create it here, and pass to sm as it was before
 
             //add background
+            //NB: unused variable, left for better code understandability
             this.background = this.addToStage(data, true);
 
             //add walls
@@ -166,51 +147,48 @@ function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, Default
             };
             this.player.currentWeapon = "knife";
 
-
             //add effects
-            if (!this.editorMode) {
-                this.createContainer("effect", true);
+            this.createContainer("effect", true);
 
-                var graphics = new easeljs.Graphics();
-                this.effects.fogBox = new easeljs.Shape(graphics);
-                var fogBox = this.containers["effect"].addChild(this.effects.fogBox);
+            var graphics = new easeljs.Graphics();
+            this.effects.fogBox = new easeljs.Shape(graphics);
 
-                this.effects.fog = this.addToStage({
-                    type: "effect",
-                    tex: "effects/fog",
-                    x: this.player.dispObj.x,
-                    y: this.player.dispObj.y});
+            //TODO: it's bad to use sm's field directly
+            var fogBox = this.containers["effect"].addChild(this.effects.fogBox);
 
-                this.effects.damage = this.addToStage({
-                    type: "effect",
-                    tex: "effects/damage",
-                    x: 0, y: 0,
-                    w: this.stage.canvas.width,
-                    h: this.stage.canvas.height}, true);
-                this.effects.damage.visible = false;
-            }
+            this.effects.fog = this.addToStage({
+                type: "effect",
+                tex: "effects/fog",
+                x: this.player.dispObj.x,
+                y: this.player.dispObj.y});
 
-            if (!this.editorMode) {
-                var healthText = new easeljs.Text("Health: 100", "20px Arial", "#00FF00");
-                healthText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
-                this.healthText = this.stage.addChild(healthText);
+            this.effects.damage = this.addToStage({
+                type: "effect",
+                tex: "effects/damage",
+                x: 0, y: 0,
+                w: this.stage.canvas.width,
+                h: this.stage.canvas.height}, true);
+            this.effects.damage.visible = false;
 
-                var weaponText = new easeljs.Text("Ammo: 0", "20px Arial", "#00FF00");
-                weaponText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
-                this.weaponText = this.stage.addChild(weaponText);
+            var healthText = new easeljs.Text("Health: 100", "20px Arial", "#00FF00");
+            healthText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
+            this.healthText = this.stage.addChild(healthText);
 
-                var scoreText = new easeljs.Text("Score: 0", "20px Arial", "#00FF00");
-                scoreText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
-                this.scoreText = this.stage.addChild(scoreText);
+            var weaponText = new easeljs.Text("Ammo: 0", "20px Arial", "#00FF00");
+            weaponText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
+            this.weaponText = this.stage.addChild(weaponText);
 
-                var fpsText = new easeljs.Text("FPS: 0", "20px Arial", "#00FF00");
-                fpsText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
-                this.fpsText = this.stage.addChild(fpsText);
+            var scoreText = new easeljs.Text("Score: 0", "20px Arial", "#00FF00");
+            scoreText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
+            this.scoreText = this.stage.addChild(scoreText);
 
-                this.resize(); //recalculate overlay positions
+            var fpsText = new easeljs.Text("FPS: 0", "20px Arial", "#00FF00");
+            fpsText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
+            this.fpsText = this.stage.addChild(fpsText);
 
-                Messenger.showMessage(this.data.name + " started...", Messenger.MessageColor.LevelLoaded, 6000);
-            }
+            this.resize(); //recalculate overlay positions
+
+            Messenger.showMessage(this.data.name + " started...", Messenger.MessageColor.LevelLoaded, 6000);
 
             this.updateFog(true);
             this.player.setEffects(this.effects);
@@ -237,16 +215,6 @@ function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, Default
             this.updateEffects();
         },
 
-        createContainer: function(name, toStage) {
-            var container = new createjs.Container();
-            this.containers[name] = container;
-
-            if (toStage)
-                this.stage.addChild(container);
-            else
-                this.mainContainer.addChild(container);
-        },
-
         createCollisionObjects: function() {
             for (var i = 0; i < this.walls.length; ++i) {
                 this.collisionObjects.push(this.walls[i]);
@@ -265,58 +233,6 @@ function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, Default
             for (var i = 0; i < this.chests.length; ++i) {
                 this.collisionObjects.push(this.chests[i].dispObj);
             }
-        },
-
-        //objData requires to have {type, tex, x, y}
-        addToStage: function(objData, doNotCenter, id) {
-            if (objData instanceof createjs.DisplayObject)
-                objData.type = objData.data.type;
-
-            if (!_.isUndefined(id))
-                alert("Do you really need id?");
-
-            //TODO: fix undefined type issue
-            if (_.isUndefined(objData.type)) {
-                console.log(objData);
-                alert("objData.type should be specified!");
-            }
-
-            var spriteSheet =
-                this.resourceManager.getTiledSpriteSheet(objData.tex, objData.w, objData.h);
-
-            var sprite = new easeljs.Sprite(spriteSheet);
-
-            if (_.isUndefined(this.containers[objData.type])) {
-                var container = new createjs.Container();
-                this.containers[objData.type] = container;
-                this.mainContainer.addChild(container);
-            }
-            var addTo = this.containers[objData.type];
-
-            var dispObj = null;
-            if (id)
-                dispObj = addTo.addChildAt(sprite, id);
-            else
-                dispObj = addTo.addChild(sprite);
-
-            dispObj.x = objData.x || objData.width/2 || 0;
-            dispObj.y = objData.y || objData.height/2 || 0;
-            dispObj.rotation = objData.r || objData.rotation || 0;
-            if (!doNotCenter) {
-                dispObj.regX = dispObj.getBounds().width / 2;
-                dispObj.regY = dispObj.getBounds().height / 2;
-            }
-            dispObj.data = objData;
-
-            if (this.editorMode)
-                this.editor.setObjectHandlers(dispObj);
-
-            return dispObj;
-        },
-
-        removeFromStage: function(dispObj) {
-            var container = this.containers[dispObj.data.type];
-            container.removeChild(dispObj);
         },
 
         onJoystickMessage: function(data, answer) {
@@ -373,79 +289,74 @@ function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, Default
         },
 
 		update: function(event) {
-            if (!this.editorMode) {
-                if (this.finished)
-                    return;
+            if (this.finished)
+                return;
 
-                this.keyFunc(event);
-                this.setPrevPlayerPos();
+            this.keyFunc(event);
+            this.setPrevPlayerPos();
 
-                this.player.update(event, this.collisionObjects);
+            this.player.update(event, this.collisionObjects);
 
-                for (var i = 0; i < this.zombies.length; ++i) {
-                    this.zombies[i].update(event, this.player, this.collisionObjects);
-                    if (this.zombies[i].justFired === "pistol") {
-                        this.zombies[i].justFired = "";
-                        ResourceManager.playSound(ResourceManager.soundList.PistolFire);
-                        var bulletData = {
-                            x: this.zombies[i].dispObj.x,
-                            y: this.zombies[i].dispObj.y,
-                            r: this.zombies[i].dispObj.rotation,
-                            power: ResourceManager.weaponData.pistol.power,
-                            source: "zombie",
-                            tex: "pistol-bullet",
-                            type: "bullet"
-                        };
+            for (var i = 0; i < this.zombies.length; ++i) {
+                this.zombies[i].update(event, this.player, this.collisionObjects);
+                if (this.zombies[i].justFired === "pistol") {
+                    this.zombies[i].justFired = "";
+                    ResourceManager.playSound(ResourceManager.soundList.PistolFire);
+                    var bulletData = {
+                        x: this.zombies[i].dispObj.x,
+                        y: this.zombies[i].dispObj.y,
+                        r: this.zombies[i].dispObj.rotation,
+                        power: ResourceManager.weaponData.pistol.power,
+                        source: "zombie",
+                        tex: "pistol-bullet",
+                        type: "bullet"
+                    };
 
-                        var bullet = new Bullet(
-                            this.addToStage(bulletData),
-                            bulletData);
+                    var bullet = new Bullet(
+                        this.addToStage(bulletData),
+                        bulletData);
 
-                        this.bullets.push(bullet);
-                    }
+                    this.bullets.push(bullet);
                 }
-                for (var i = 0; i < this.bullets.length; ++i) {
-                    this.bullets[i].update(event);
-                }
-
-                if (this.player.health <= 0 && !this.player.dead) {
-                    this.player.dead = true;
-                    console.log("Game over.");
-                    ResourceManager.playSound(ResourceManager.soundList.GameOver);
-                    this.levelFinished.dispatch({
-                        status: 'gameFinished',
-                        score: this.player.score,
-                        message: "Game over"
-                    });
-                }
-
-                this.healthText.text = "Health: " + this.player.health;
-
-                var currentWeapon = this.player.currentWeapon;
-                var ammo = this.player.weapons[currentWeapon];
-
-                var weaponText = currentWeapon;
-                if (weaponText != "knife")
-                    weaponText += ": " + ammo;
-                this.weaponText.text = weaponText;
-
-                this.fpsText.text = "FPS: " + Math.round(easeljs.Ticker.getMeasuredFPS());
-
-                this.scoreText.text = "Score: " + this.player.score;
-
-                this.updateFog();
-
-                for (var sound in ResourceManager.playingSounds) {
-                    if (ResourceManager.playingSounds[sound] > 0) {
-                        --ResourceManager.playingSounds[sound];
-                    }
-                }
-
-                this.updateCamera();
             }
-            else {
-                this.editor.keyFunc(event);
+            for (var i = 0; i < this.bullets.length; ++i) {
+                this.bullets[i].update(event);
             }
+
+            if (this.player.health <= 0 && !this.player.dead) {
+                this.player.dead = true;
+                console.log("Game over.");
+                ResourceManager.playSound(ResourceManager.soundList.GameOver);
+                this.levelFinished.dispatch({
+                    status: 'gameFinished',
+                    score: this.player.score,
+                    message: "Game over"
+                });
+            }
+
+            this.healthText.text = "Health: " + this.player.health;
+
+            var currentWeapon = this.player.currentWeapon;
+            var ammo = this.player.weapons[currentWeapon];
+
+            var weaponText = currentWeapon;
+            if (weaponText != "knife")
+                weaponText += ": " + ammo;
+            this.weaponText.text = weaponText;
+
+            this.fpsText.text = "FPS: " + Math.round(easeljs.Ticker.getMeasuredFPS());
+
+            this.scoreText.text = "Score: " + this.player.score;
+
+            this.updateFog();
+
+            for (var sound in ResourceManager.playingSounds) {
+                if (ResourceManager.playingSounds[sound] > 0) {
+                    --ResourceManager.playingSounds[sound];
+                }
+            }
+
+            this.updateCamera();
 		},
 
         updateCamera: function() {
@@ -956,5 +867,5 @@ function(Class, _, signals, easeljs, soundjs, collider, ResourceManager, Default
         }
 	});
 
-	return Level;
+	return GameLevel;
 });

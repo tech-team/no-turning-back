@@ -7,10 +7,11 @@ define([
     'game/misc/KeyCoder',
     'game/ResourceManager',
     'game/LevelManager',
-    'game/DefaultObjects'
+    'game/DefaultObjects',
+    'game/StageManager'
 ],
-    function(Class, _, easeljs, $, alertify, KeyCoder, ResourceManager, LevelManager, DefaultObjects) {
-        var Editor = Class.$extend({
+    function(Class, _, easeljs, $, alertify, KeyCoder, ResourceManager, LevelManager, DefaultObjects, StageManager) {
+        var Editor = StageManager.$extend({
             __classvars__: {
                 duplicateDelta: 30,
                 helpMessage:
@@ -23,11 +24,11 @@ define([
                         "Shift + mouse to drag whole level</div>"
             },
 
-            __init__: function(level, stage) {
-                this.level = level;
+            __init__: function(stage, resourceManager) {
+                this.$super(stage, resourceManager);
 
                 this.keyCoder = new KeyCoder();
-                this.stage = stage;
+
                 this.showingWpsOwner = null;
                 this.selectedObject = null;
                 this.selectionFilter = new easeljs.ColorFilter(1, 1, 1, 1, 10, 60, 10, 100);
@@ -103,13 +104,50 @@ define([
                     self.bringToBack(self.selectedObject);
                 });
 
+                alertify.alert(Editor.helpMessage);
+
+                this.onLevelLoadClick(); //ask level to load
+
                 this.regenerateLevelPropertiesTable();
                 this.populateTexSelect();
                 this.populateTypeSelect();
-
-                alertify.alert(Editor.helpMessage);
             },
 
+            load: function(data) {
+                //reset stage
+                this.$super(data);
+                this.setMainContainer(this.mainContainer); //setter in JS, oh wow, lol
+
+                var self = this;
+                this.levelData = data;
+
+                //add background
+                this.background = this.addToStage(data, true);
+
+                var add = function(obj) {
+                    //ensure calling with one argument
+                    self.addToStage(obj);
+                };
+                
+                _.each(data.walls,   add);
+                _.each(data.doors,   add);
+                _.each(data.chests,  add);
+                _.each(data.buttons, add);
+                _.each(data.zombies, add);
+
+                //add player
+                this.addToStage(data.player);
+            },
+
+            update: function(event) {
+                this.keyFunc(event);
+            },
+
+            addToStage: function(objData, doNotCenter, id) {
+                var dispObj = this.$super(objData, doNotCenter, id);
+                this.setObjectHandlers(dispObj);
+            },   
+            
             setMainContainer: function(container) {
                 this.mainContainer = container;
 
@@ -171,7 +209,7 @@ define([
                     }
                 });
 
-                this.updateObjectData(this.level.background, data);
+                this.updateObjectData(this.background, data);
                 this.regenerateLevelPropertiesTable();
             },
 
@@ -260,7 +298,7 @@ define([
                 var level = DefaultObjects.level;
                 level.player = player;
 
-                this.level.reload(level);
+                this.load(level);
                 this.regenerateLevelPropertiesTable();
             },
 
@@ -313,7 +351,7 @@ define([
                 //ensure everything is saved
                 this.applyToLevel();
 
-                var levelStr = JSON.stringify(this.level.data);
+                var levelStr = JSON.stringify(this.levelData);
 
                 var self = this;
                 var actualSaveLevel = function() {
@@ -321,7 +359,7 @@ define([
                         type: 'POST',
                         url: 'levels',
                         data: {
-                            name: self.level.data.name,
+                            name: self.levelData.name,
                             data: levelStr
                         },
                         success: function(data) {
@@ -336,13 +374,13 @@ define([
                 $.ajax({
                     type: 'GET',
                     url: 'levels/exists',
-                    data: {name: this.level.data.name},
+                    data: {name: this.levelData.name},
                     dataType: 'json',
                     success: function(data) {
                         if (data == false)
                             actualSaveLevel();
                         else {
-                            alertify.confirm("Level \"" + self.level.data.name + "\" already exists.\nDo you want to rewrite it?",
+                            alertify.confirm("Level \"" + self.levelData.name + "\" already exists.\nDo you want to rewrite it?",
                                 function (e) {
                                     if (e)
                                         actualSaveLevel();
@@ -370,7 +408,7 @@ define([
                                     data: {name: str},
                                     dataType: 'json',
                                     success: function(data) {
-                                        self.level.reload(data);
+                                        self.load(data);
                                         self.regenerateLevelPropertiesTable();
                                         self.regenerateObjectPropertiesTable();
                                     },
@@ -425,9 +463,9 @@ define([
             },
 
             addObjectByData: function(data, id) {
-                this.level.data[data.type + 's'].push(data);
+                this.levelData[data.type + 's'].push(data);
 
-                var dispObj = this.level.addToStage(data, false, id);
+                var dispObj = this.addToStage(data, false, id);
                 this.selectObject(dispObj);
 
                 return dispObj;
@@ -440,7 +478,7 @@ define([
                 var index = wps.indexOf(after) + 1;
                 wps.splice(index, 0, data);
 
-                var dispObj = this.level.addToStage(data);
+                var dispObj = this.addToStage(data);
                 this.selectObject(dispObj);
             },
 
@@ -522,7 +560,7 @@ define([
 
             regenerateLevelPropertiesTable: function() {
                 //exclude arrays
-                var obj = this.level.data;
+                var obj = this.levelData;
 
                 var excludedKeys = _.filter(_.keys(obj), function(el) { return _.isArray(obj[el]); });
                 excludedKeys.push('player');
@@ -532,7 +570,7 @@ define([
                 excludedKeys.push('y');
 
                 this.regeneratePropertiesTable('#level-object', 'level',
-                    _.omit(this.level.data, excludedKeys));
+                    _.omit(this.levelData, excludedKeys));
                 $(window).resize(); //update sidebar's components heights
             },
 
@@ -568,10 +606,10 @@ define([
                 //TODO: is it ok to replace level object here?
                 var data = _.merge(dispObj.data, newData);
 
-                this.level.removeFromStage(dispObj);
+                this.removeFromStage(dispObj);
 
                 var doNotCenter = data.type == "background";
-                var newObj = this.level.addToStage(data, doNotCenter);
+                var newObj = this.addToStage(data, doNotCenter);
 
                 if (newObj.data.draggable !== false)
                     this.selectObject(newObj);
@@ -582,7 +620,8 @@ define([
                 this.showingWpsOwner = null;
                 this.stage.removeChild(this.wpPath);
 
-                var wpsContainer = this.level.containers['waypoint'];
+                //TODO: remove direct reference to containers
+                var wpsContainer = this.containers['waypoint'];
                 wpsContainer && wpsContainer.removeAllChildren();
             },
 
@@ -599,7 +638,7 @@ define([
                 if (wps.length) {
                     this.updateWpPath(wps);
                     _.each(this.showingWpsOwner.data.waypoints, function(wp) {
-                        self.level.addToStage(wp);
+                        self.addToStage(wp);
                     });
                 }
             },
@@ -636,7 +675,7 @@ define([
                 var collection = null;
                 if (dispObj.data.type != 'waypoint') {
                     var collectionName = dispObj.data.type + 's';
-                    collection = this.level.data[collectionName];
+                    collection = this.levelData[collectionName];
                 }
                 else {
                     collection = this.showingWpsOwner.data.waypoints;
@@ -645,43 +684,9 @@ define([
                 var id = collection.indexOf(dispObj.data);
                 collection.splice(id, 1);
 
-                this.level.removeFromStage(dispObj);
+                this.removeFromStage(dispObj);
 
                 this.selectObject(null);
-            },
-
-            bringToFront: function(dispObj) {
-                this.bringTo(dispObj, "front");
-            },
-
-            bringToBack: function(dispObj) {
-                this.bringTo(dispObj, "back");
-            },
-
-            bringTo: function(dispObj, to) {
-                //omit single objects
-                if (!dispObj || dispObj.data.type == 'player')
-                    return;
-
-                var collectionName = dispObj.data.type + 's';
-                var collection = this.level.data[collectionName];
-
-                if (_.isUndefined(collection) || collection.length <= 1)
-                    return;
-
-                var id = 0;
-                if (to === "front")
-                    id = collection.indexOf(dispObj.data);
-                collection.move(id, collection.length - 1);
-
-                var container = this.level.containers[dispObj.data.type];
-
-                if (to === "front") {
-                    var childrenCount = container.getNumChildren();
-                    container.setChildIndex(dispObj, childrenCount - 1);
-                }
-                else
-                    container.setChildIndex(dispObj, 0);
             }
         });
 
