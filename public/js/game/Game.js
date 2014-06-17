@@ -49,6 +49,15 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLeve
             console: Console
         },
 
+        createGameLevel: function(levelData) {
+            this.level = new GameLevel(this.stage, levelData, this.player, this.resourceManager);
+            this.level.levelFinished.add(this.onLevelFinished.bind(this));
+        },
+
+        createEditor: function() {
+            this.level = new Editor(this.stage, this.resourceManager, this.levelManager);
+        },
+
         onLevelLoaded: function() {
             this.resourceManager = ResourceManager.load(this.onResourcesLoaded.bind(this));
         },
@@ -60,11 +69,10 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLeve
             var self = this;
             this.levelManager.loadNextLevel(function(data) {
                 if (!self.editorMode) {
-                    self.level = new GameLevel(self.stage, data, self.player, self.resourceManager);
-                    self.level.levelFinished.add(self.onLevelFinished.bind(self));
+                    self.createGameLevel(data);
                 }
                 else {
-                    self.level = new Editor(self.stage, self.resourceManager, self.levelManager);
+                    self.createEditor();
                 }
 
                 self.onLoadedCallback();
@@ -95,8 +103,7 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLeve
                         return
                     }
 
-                    self.level = new GameLevel(self.stage, data, self.player, self.resourceManager);
-                    self.level.levelFinished.add(self.onLevelFinished.bind(self));
+                    self.createGameLevel(data);
                 });
             }
         },

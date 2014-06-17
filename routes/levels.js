@@ -45,6 +45,7 @@ function saveLevel(db, levelInfo, callbacks) {
 function retrieveCampaigns(db, callbacks) {
     callbacks = utils.default_callbacks(callbacks);
 
+    //db.levels.aggregate({$sort: {name: 1}}, {$group: {_id: "$campaign", levels: {$push: "$name"}}}, {$project: {_id: 0, campaign: "$_id", levels: 1}})
     //db.levels.aggregate({$group: {_id: "$campaign", levelsCount: {$sum: 1}}}, {$project: {_id: 0, campaign: "$_id", levelsCount: "$levelsCount"}})
     db.levels.aggregate([
         { $group: {_id: "$campaign", levelsCount: {$sum: 1}} },
