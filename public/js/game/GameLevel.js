@@ -224,14 +224,15 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
                 }
             }
 
-            //Порядок добавления важен
+            //Порядок добавления важен. Или не очень.
             for (var i = 0; i < this.chests.length; ++i) {
                 this.collisionObjects.push(this.chests[i].dispObj);
             }
         },
 
         onJoystickMessage: function(data, answer) {
-            var self = this;
+            if (this.finished)
+                return;
 
             if (data.type === "game") {
                 switch (data.action) {
@@ -289,33 +290,32 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             
             var self = this;
 
-            this.keyFunc(event);
+            if (this.checkBounds(this.player.dispObj)) {
+                this.player.dispObj.x = this.prevPlayerPos.x;
+                this.player.dispObj.y = this.prevPlayerPos.y;
+                this.player.dispObj.rotation = this.prevPlayerPos.rotation;
+            }
             this.setPrevPlayerPos();
+
+            this.weaponsHandle(event);
+            if (event.keys[KeyCoder.SPACE]) {
+                this.shootingHandle();
+            }
+
+            this.bulletsCollisionsHandle();
+            this.zombiesDeathHandle();
+            this.dropsHandle();
+
+            this.buttonsPressingHandle(event);
+            if (event.keys[KeyCoder.E]) {
+                this.chestsOpeningHandle(event);
+                this.doorsOpeningHandle(event);
+            }
 
             this.player.update(event, this.collisionObjects);
 
-            _.each(this.zombies, function(zombie) {
-                zombie.update(event, self.player, self.collisionObjects);
-                if (zombie.justFired === "pistol") {
-                    zombie.justFired = "";
-                    ResourceManager.playSound(ResourceManager.soundList.PistolFire);
-                    var bulletData = {
-                        x: zombie.dispObj.x,
-                        y: zombie.dispObj.y,
-                        r: zombie.dispObj.rotation,
-                        power: ResourceManager.weaponData.pistol.power,
-                        source: "zombie",
-                        tex: "pistol-bullet",
-                        type: "bullet"
-                    };
+            this.zombiesUpdate(event);
 
-                    var bullet = new Bullet(
-                        self.addToStage(bulletData),
-                        bulletData);
-
-                    self.bullets.push(bullet);
-                }
-            });
 
             _.each(this.bullets, function(bullet) {
                 bullet.update(event);
@@ -332,19 +332,7 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
                 });
             }
 
-            this.healthText.text = "Health: " + this.player.health;
-
-            var currentWeapon = this.player.currentWeapon;
-            var ammo = this.player.weapons[currentWeapon];
-
-            var weaponText = currentWeapon;
-            if (weaponText != "knife")
-                weaponText += ": " + ammo;
-            this.weaponText.text = weaponText;
-
-            this.fpsText.text = "FPS: " + Math.round(easeljs.Ticker.getMeasuredFPS());
-
-            this.scoreText.text = "Score: " + this.player.score;
+            this.hudSetup();
 
             this.updateFog();
 
@@ -379,69 +367,79 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             }
         },
 
-        keyFunc: function(event) {
+        hudSetup: function() {
+            this.healthText.text = "Health: " + Math.ceil(this.player.health);
+
+            var currentWeapon = this.player.currentWeapon;
+            var ammo = this.player.weapons[currentWeapon];
+
+            var weaponText = currentWeapon;
+            if (weaponText != "knife")
+                weaponText += ": " + ammo;
+            this.weaponText.text = weaponText;
+
+            this.fpsText.text = "FPS: " + Math.round(easeljs.Ticker.getMeasuredFPS());
+
+            this.scoreText.text = "Score: " + this.player.score;
+        },
+
+        zombiesUpdate: function(event) {
             var self = this;
 
-            if (this.checkBounds(this.player.dispObj)) {
-                this.player.dispObj.x = this.prevPlayerPos.x;
-                this.player.dispObj.y = this.prevPlayerPos.y;
-                this.player.dispObj.rotation = this.prevPlayerPos.rotation;
-            }
+            _.each(this.zombies, function(zombie) {
+                zombie.update(event, self.player, self.collisionObjects);
+                if (zombie.justFired === "pistol") {
+                    zombie.justFired = "";
+                    ResourceManager.playSound(ResourceManager.soundList.PistolFire);
+                    var bulletData = {
+                        x: zombie.dispObj.x,
+                        y: zombie.dispObj.y,
+                        r: zombie.dispObj.rotation,
+                        power: ResourceManager.weaponData.pistol.power,
+                        source: "zombie",
+                        tex: "pistol-bullet",
+                        type: "bullet"
+                    };
 
-            this.weaponsHandle(event);
-            if (event.keys[KeyCoder.SPACE]) {
-                this.shootingHandle();
-            }
+                    var bullet = new Bullet(
+                        self.addToStage(bulletData),
+                        bulletData);
 
-            this.bulletsCollisionsHandle();
-            this.zombiesDeathHandle(self);
-            this.dropsHandle();
-
-            this.buttonsPressingHandle(event);
-            if (event.keys[KeyCoder.E]) {
-                this.chestsOpeningHandle(event);
-                this.doorsOpeningHandle(event);
-            }
+                    self.bullets.push(bullet);
+                }
+            });
         },
 
         weaponsHandle: function(event) {
             if(this.player.cooldown == 0) {
                 if(event.keys[KeyCoder.ONE]) {
-                    if ("knife" in this.player.weapons) {
+                    if ("knife" in this.player.weapons && this.player.currentWeapon != "knife") {
                         this.player.currentWeapon = "knife";
+                        this.player.dispObj.tex = "player";
+                        this.removeFromStage(this.player.dispObj);
+                        this.player.setDispObj(this.addToStage(this.player.dispObj));
 
-                        if (this.player.dispObj.tex != "player") {
-                            this.player.dispObj.tex = "player";
-                            this.removeFromStage(this.player.dispObj);
-                            this.player.setDispObj(this.addToStage(this.player.dispObj));
-                        }
                         ResourceManager.playSound(ResourceManager.soundList.KnifeDraw, ResourceManager.weaponData.drawCooldown);
                         this.player.cooldown = ResourceManager.weaponData.drawCooldown;
                     }
                 }
                 if(event.keys[KeyCoder.TWO]) {
-                    if ("pistol" in this.player.weapons) {
+                    if ("pistol" in this.player.weapons && this.player.currentWeapon != "pistol") {
                         this.player.currentWeapon = "pistol";
-
-                        if (this.player.dispObj.tex != "player-pistol") {
-                            this.player.dispObj.tex = "player-pistol";
-                            this.removeFromStage(this.player.dispObj);
-                            this.player.setDispObj(this.addToStage(this.player.dispObj));
-                        }
+                        this.player.dispObj.tex = "player-pistol";
+                        this.removeFromStage(this.player.dispObj);
+                        this.player.setDispObj(this.addToStage(this.player.dispObj));
 
                         ResourceManager.playSound(ResourceManager.soundList.PistolDraw, ResourceManager.weaponData.drawCooldown);
                         this.player.cooldown = ResourceManager.weaponData.drawCooldown;
                     }
                 }
                 if(event.keys[KeyCoder.THREE]) {
-                    if ("shotgun" in this.player.weapons) {
+                    if ("shotgun" in this.player.weapons && this.player.currentWeapon != "shotgun") {
                         this.player.currentWeapon = "shotgun";
-
-                        if (this.player.dispObj.tex != "player-shotgun") {
-                            this.player.dispObj.tex = "player-shotgun";
-                            this.removeFromStage(this.player.dispObj);
-                            this.player.setDispObj(this.addToStage(this.player.dispObj));
-                        }
+                        this.player.dispObj.tex = "player-shotgun";
+                        this.removeFromStage(this.player.dispObj);
+                        this.player.setDispObj(this.addToStage(this.player.dispObj));
 
                         ResourceManager.playSound(ResourceManager.soundList.ShotgunDraw, ResourceManager.weaponData.drawCooldown);
                         this.player.cooldown = ResourceManager.weaponData.drawCooldown;
@@ -471,52 +469,53 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
 
                         this.player.cooldown = ResourceManager.weaponData.knife.coolDown;
                     }
-                    else if (currentWeapon === "pistol") {
-                        ResourceManager.playSound(ResourceManager.soundList.PistolFire);
+                    else {
+                        // Weapons that shoot bullets
                         var bulletData = {
                             x: this.player.dispObj.x,
                             y: this.player.dispObj.y,
                             r: this.player.dispObj.rotation,
-                            power: ResourceManager.weaponData.pistol.power,
                             source: "player",
-                            tex: "pistol-bullet",
                             type: "bullet"
                         };
 
-                        var bullet = new Bullet(
-                            this.addToStage(bulletData),
-                            bulletData);
+                        if (currentWeapon === "pistol") {
+                            ResourceManager.playSound(ResourceManager.soundList.PistolFire);
+                            bulletData.power = ResourceManager.weaponData.pistol.power;
+                            bulletData.tex = "pistol-bullet";
 
-                        this.bullets.push(bullet);
-
-                        this.player.cooldown = ResourceManager.weaponData.pistol.coolDown;
-                        --this.player.weapons['pistol'];
-                    }
-                    else if (currentWeapon === "shotgun") {
-                        ResourceManager.playSound(ResourceManager.soundList.ShotgunFire);
-                        for (var i = 0; i < ResourceManager.weaponData.shotgun.bulletNum; ++i) {
-
-                            var bulletData = {
-                                x: this.player.dispObj.x,
-                                y: this.player.dispObj.y,
-                                r: this.player.dispObj.rotation - (Math.floor(ResourceManager.weaponData.shotgun.bulletNum/2) - i) * ResourceManager.weaponData.shotgun.dispersion,
-                                power: ResourceManager.weaponData.shotgun.power,
-                                source: "player",
-                                tex: "shotgun-bullet",
-                                ttl: 8,
-                                type: "bullet"
-                            };
-                            var bullet = new Bullet(this.addToStage(bulletData), bulletData);
+                            var bullet = new Bullet(
+                                this.addToStage(bulletData),
+                                bulletData);
 
                             this.bullets.push(bullet);
-                        }
 
-                        this.player.cooldown = ResourceManager.weaponData.shotgun.coolDown;
-                        --this.player.weapons['shotgun'];
+                            this.player.cooldown = ResourceManager.weaponData.pistol.coolDown;
+                            --this.player.weapons['pistol'];
+                        }
+                        else if (currentWeapon === "shotgun") {
+                            ResourceManager.playSound(ResourceManager.soundList.ShotgunFire);
+                            for (var i = 0; i < ResourceManager.weaponData.shotgun.bulletNum; ++i) {
+
+                                bulletData.r = this.player.dispObj.rotation -
+                                               (Math.floor(ResourceManager.weaponData.shotgun.bulletNum/2) - i) * ResourceManager.weaponData.shotgun.dispersion;
+                                bulletData.power = ResourceManager.weaponData.shotgun.power;
+                                bulletData.tex = "shotgun-bullet";
+                                bulletData.ttl = 8;
+
+                                var bullet = new Bullet(this.addToStage(bulletData), bulletData);
+
+                                this.bullets.push(bullet);
+                            }
+
+                            this.player.cooldown = ResourceManager.weaponData.shotgun.coolDown;
+                            --this.player.weapons['shotgun'];
+                        }
                     }
                 }
-                else {
+                else if (this.player.messageCooldown <= 0) {
                     Messenger.showMessage("You are out of ammo!", Messenger.MessageColor.NoAmmo);
+                    this.player.messageCooldown = 100;
                 }
             }
         },
@@ -563,7 +562,9 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             }
         },
 
-        zombiesDeathHandle: function(self) {
+        zombiesDeathHandle: function() {
+            var self = this;
+
             for (var i = 0; i < this.zombies.length; ++i) {
                 if (this.zombies[i].health <= 0) {
                     var corpse = DefaultObjects.build("corpse",
