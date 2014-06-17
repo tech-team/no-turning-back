@@ -18,7 +18,8 @@ if ('development' == app.get('env')) {
 	app.use(express.logger('dev'));
 }
 
-app.use(express.bodyParser());
+app.use(express.urlencoded());
+app.use(express.json());
 app.use(express.methodOverride());
 app.use(express.cookieParser("R+mP2QeS-\"WzN&<mFs]~_V6WMz X[} =<obw<G-"));
 app.use(express.session({

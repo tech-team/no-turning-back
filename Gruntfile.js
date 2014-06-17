@@ -176,7 +176,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-cssmin');
 	
 	
-	grunt.registerTask('default', ['express', 'watch']);
+	grunt.registerTask('default', ['watch', 'express']);
 
 	grunt.registerTask(
 	    'build_main',
