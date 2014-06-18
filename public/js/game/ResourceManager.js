@@ -75,7 +75,7 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 return this.instance;
             },
 
-            soundDisabled: localStorage["soundDisabled"],
+            soundDisabled: (localStorage["soundDisabled"] === "true"), //string to bool conversion
 
             toggleSound: function() {
                 localStorage["soundDisabled"] = !this.soundDisabled;
