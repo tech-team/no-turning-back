@@ -208,6 +208,11 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             this.fpsText.y = 80;
 
             this.updateEffects();
+
+            //reset camera position
+            this.mainContainer.x = 0;
+            this.mainContainer.y = 0;
+            this.updateCamera();
         },
 
         createCollisionObjects: function() {
