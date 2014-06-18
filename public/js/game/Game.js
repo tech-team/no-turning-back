@@ -163,7 +163,6 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLeve
         },
 
         resize: function() {
-            //TODO: both Editor and GL should be derived from one basic class with resize/update/keyFunc methods
             if (this.level)
                 this.level.resize();
         }

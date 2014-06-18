@@ -205,7 +205,7 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             this.scoreText.y = toolbarHeight;
 
             this.fpsText.x = this.stage.canvas.width - 90;
-            this.fpsText.y = 100;
+            this.fpsText.y = 80;
 
             this.updateEffects();
         },

@@ -27,6 +27,11 @@ define([
                 this.stage.addChild(this.mainContainer);
             },
 
+            //kinda interface, maybe they should be null instead of functions, it doesn't really mater though
+            update: function(event) {},
+            keyFunc: function(event) {},
+            resize: function() {},
+
             createContainer: function(name, toStage) {
                 var container = new createjs.Container();
                 this.containers[name] = container;
