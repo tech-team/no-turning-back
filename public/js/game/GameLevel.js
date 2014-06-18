@@ -4,6 +4,7 @@ define([
     'signals',
     'easel',
     'sound',
+    'alertify',
     'collision',
     'game/StageManager',
     'game/ResourceManager',
@@ -18,7 +19,7 @@ define([
     'game/entities/Button',
     'game/entities/Bullet'
 ],
-function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet) {
+function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet) {
     var GameLevel = StageManager.$extend({
 		__init__: function(stage, data, player, resourceManager, sound) {
             this.$super(stage, resourceManager);

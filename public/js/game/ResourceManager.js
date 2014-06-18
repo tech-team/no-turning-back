@@ -4,9 +4,10 @@ define([
     'easel',
     'preload',
     'sound',
+    'alertify',
     'game/misc/ImageTiler'
 ],
-function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
+function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
 	var ResourceManager = Class.$extend({
         __classvars__: {
             //all textures should have .png format
@@ -78,8 +79,10 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             soundDisabled: (localStorage["soundDisabled"] === "true"), //string to bool conversion
 
             toggleSound: function() {
-                localStorage["soundDisabled"] = !this.soundDisabled;
                 this.soundDisabled = !this.soundDisabled;
+                localStorage["soundDisabled"] = this.soundDisabled;
+
+                alertify.success(this.soundDisabled ? "Sound disabled" : "Sound enabled");
             },
 
             playSound: function(snd, cooldown) {
