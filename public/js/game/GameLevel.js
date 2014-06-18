@@ -25,7 +25,7 @@ function(Class, _, signals, easeljs, soundjs, collider, StageManager, ResourceMa
             this.data = data;
 
             this.keyCoder = new KeyCoder();
-            this.keyCoder.addEventListener("keyup", KeyCoder.M, ResourceManager.toggleSound);
+            this.keyCoder.addEventListener("keyup", KeyCoder.M, ResourceManager.toggleSound.bind(ResourceManager));
 
             this.showingMessagesCount = 0;
 
