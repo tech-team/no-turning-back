@@ -215,12 +215,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
 
             //please note, that amount of health to be healed is unpredictable
             //because player can be hurt in process
-            var messages = [
-                "Oh, sweet lemonade!",
-                "That feels good!",
-                "Much health, very medkit, wow!"
-            ];
-            Messenger.showMessage(messages[_.random(messages.length - 1)], Messenger.MessageColor.Medkit);
+            Messenger.showMessage(Messenger.healPackPicked, howMuch);
 
             var self = this;
             var tid = setInterval(function() {

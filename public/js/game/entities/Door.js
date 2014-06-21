@@ -1,9 +1,10 @@
 define([
     'classy',
     'underscore',
-    'game/entities/GameObject'
+    'game/entities/GameObject',
+    'game/misc/Messenger'
 ],
-    function(Class, _, GameObject) {
+    function(Class, _, GameObject, Messenger) {
         var Door = GameObject.$extend({
             __init__: function(obj) {
                 this.type = "door";
@@ -14,7 +15,7 @@ define([
                 this.tex = obj.tex;
                 this.activationRadius = 90;
                 this.requires = obj.requires;
-                this.requiresMessage = "";
+                this.requiresMessage = undefined;
                 this.role = obj.role || null;
                 this.puzzle = obj.puzzle || null;
                 this.inputCode = "";
@@ -39,37 +40,38 @@ define([
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
                     if (this.state === "closed") {
-                        this.requiresMessage = "";
+                        this.requiresMessage = undefined;
 
                         if(_.isArray(this.requires)) {
                             _.each(this.requires, function(requirement) {
-                                if (self.requiresMessage === "") {
+                                if (!self.requiresMessage) {
                                     if (requirement === "kill_all") {
                                         if (zombiesLeft !== 0) {
-                                            self.requiresMessage = "Kill all zombies first.";
+                                            self.requiresMessage = Messenger.doorLockedKillAll;
                                         }
                                     }
                                     else if(requirement === "puzzle") {
-                                        self.requiresMessage = "This door should be opened from somewhere else.";
+                                        self.requiresMessage = Messenger.doorLockedPuzzle;
                                     }
                                     else if(!(_.contains(player.keys, requirement))) {
-                                        self.requiresMessage = requirement + " required.";
+                                        self.requiresMessage = Messenger.prepareMessage(Messenger.doorLocked, requirement)
                                     }
                                 }
                             });
                         }
                         else {
-                            if (this.requiresMessage === "") {
+                            if (!this.requiresMessage) {
+                                //TODO: copy paste :(
                                 if (this.requires === "kill_all") {
                                     if (zombiesLeft !== 0) {
-                                        this.requiresMessage = "Kill all zombies first.";
+                                        self.requiresMessage = Messenger.doorLockedKillAll;
                                     }
                                 }
                                 else if(this.requires === "puzzle") {
-                                    this.requiresMessage = "This door should be opened from somewhere else.";
+                                    self.requiresMessage = Messenger.doorLockedPuzzle;
                                 }
                                 else if(!_.contains(player.keys, this.requires)) {
-                                    this.requiresMessage = this.requires + " required.";
+                                    self.requiresMessage = Messenger.prepareMessage(Messenger.doorLocked, this.requires);
                                 }
                             }
                         }

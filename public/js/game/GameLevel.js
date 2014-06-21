@@ -184,7 +184,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             this.resize(); //recalculate overlay positions
 
-            Messenger.showMessage(this.data.name + " started...", Messenger.MessageColor.LevelLoaded, 6000);
+            Messenger.showMessage(Messenger.levelLoaded, this.data.name);
+            Messenger.showMessage(Messenger.levelStarted);
 
             this.updateFog(true);
             this.player.setEffects(this.effects);
@@ -520,7 +521,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     }
                 }
                 else if (this.player.messageCooldown <= 0) {
-                    Messenger.showMessage("You are out of ammo!", Messenger.MessageColor.NoAmmo);
+                    Messenger.showMessage(Messenger.outOfAmmo);
                     this.player.messageCooldown = 100;
                 }
             }
@@ -613,7 +614,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
                     if (chest.justTried == true) {
                         chest.justTried = false;
-                        Messenger.showMessage(chest.requiresMessage.toString(), Messenger.MessageColor.DoorClosed);
+                        Messenger.showMessage(Messenger.chestLocked, chest.requiresMessage);
                         return false;
                     }
                     else if (chest.justOpened == true) {
@@ -626,11 +627,11 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                                     var ammo = drop['ammo'] || 5;
                                     if (name in self.player.weapons) {
                                         self.player.weapons[name] += ammo;
-                                        Messenger.showMessage("You picked up " + ammo + " ammo for " + name, Messenger.MessageColor.Ammo);
+                                        Messenger.showMessage(Messenger.ammoPicked, ammo, name);
                                     }
                                     else {
                                         self.player.weapons[name] = ammo;
-                                        Messenger.showMessage("You picked up a new weapon: " + name, Messenger.MessageColor.NewWeapon);
+                                        Messenger.showMessage(Messenger.newWeaponPicked, name);
                                     }
                                     break;
                                 case "medkit":
@@ -639,18 +640,19 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                                 case "ammo":
                                     if (drop['name'] in self.player.weapons) {
                                         self.player.weapons[drop['name']] += drop['size'];
-                                        Messenger.showMessage("You picked up " + drop['size'] + " ammo for " + drop['name'], Messenger.MessageColor.Ammo);
+                                        Messenger.showMessage(Messenger.ammoPicked, drop['size'], drop['name']);
                                     }
                                     break;
                                 case "key":
                                     if (!(drop['name'] in self.player.keys)) {
                                         self.player.keys.push(drop['name']);
-                                        Messenger.showMessage("You got a " + drop['name'], Messenger.MessageColor.NewItem);
+                                        Messenger.showMessage(Messenger.keyPicked, drop['name']);
                                     }
                                     break;
                                 default:
                                     if (drop['name']) {
                                         self.player.inventory.push(drop['name']);
+                                        Messenger.showMessage(Messenger.newItemPicked, drop['name']);
                                     }
                             }
                         });
@@ -672,14 +674,17 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             for (var i = 0; i < this.drops.length; ++i) {
                 //can't use _.each here because of splice in the end, but
                 var drop = this.drops[i]; //caching and readability!
-                
+
+                //TODO: looks like a copy of chest handling -_-
+                //TODO: refactoring required?
+
                 if (this.checkReach(drop)) {
                     if (collider.checkPixelCollision(drop, this.player.dispObj)) {
                         switch (drop.data['type']) {
                             case "key":
                                 if (!(drop.data['name'] in this.player.keys)) {
                                     this.player.keys.push(drop.data['name']);
-                                    Messenger.showMessage("You picked up a " + drop.data['name'], Messenger.MessageColor.NewItem);
+                                    Messenger.showMessage(Messenger.keyPicked, drop.data['name']);
                                 }
                                 break;
                             case "weapon":
@@ -687,11 +692,11 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                                 var name = drop.data['name'];
                                 if (name in this.player.weapons) {
                                     this.player.weapons[name] += drop.data['ammo'];
-                                    Messenger.showMessage("You picked up " + drop.data['ammo'] + " ammo for " + drop.data['name'], Messenger.MessageColor.Ammo);
+                                    Messenger.showMessage(Messenger.ammoPicked, drop.data['ammo'], drop.data['name']);
                                 }
                                 else {
                                     this.player.weapons[name] = drop.data['ammo'];
-                                    Messenger.showMessage("You picked up a new weapon: " + drop.data['name'], Messenger.MessageColor.NewWeapon);
+                                    Messenger.showMessage(Messenger.newWeaponPicked, drop.data['name']);
                                 }
                                 break;
                             case "medkit":
@@ -701,7 +706,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                             default:
                                 if (drop.data['name']) {
                                     this.player.inventory.push(drop.data['name']);
-                                    Messenger.showMessage(drop.data['name'] + " added to your inventory!");
+                                    Messenger.showMessage(Messenger.newItemPicked, drop.data['name']);
                                 }
                         }
 
@@ -719,7 +724,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 door.update(event, self.player, self.zombies.length);
                 if (door.justTried == true) {
                     door.justTried = false;
-                    Messenger.showMessage(door.requiresMessage.toString(), Messenger.MessageColor.DoorClosed);
+                    Messenger.showMessage(door.requiresMessage);
                 }
                 else if (door.justOpened == true) {
                     ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
@@ -747,6 +752,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             _.each(this.buttons, function(button) {
                 button.update(event, self.player, self.doors);
+
+                //TODO: maybe all the code below could be moved to button.update?
                 if (button.justPressed === true) {
                     ResourceManager.playSound(ResourceManager.soundList.Click);
                     button.justPressed = false;
@@ -759,8 +766,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     button.setDispObj(self.addToStage(button));
                 }
                 if (button.message) {
-                    Messenger.showMessage(button.message, Messenger.MessageColor.Default);
-                    button.message = "";
+                    Messenger.showMessage(button.message);
+                    button.message = undefined;
                 }
             });
         },
@@ -865,7 +872,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 var finishTimeout = 7000;
 
                 ResourceManager.playSound(ResourceManager.soundList.LevelFinished);
-                Messenger.showMessage("Level finished!", Messenger.MessageColor.LevelFinished, finishTimeout);
+                Messenger.showMessage(Messenger.levelFinished);
 
                 var self = this;
                 new UntilTimer(finishTimeout, function() {
