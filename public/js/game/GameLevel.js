@@ -143,6 +143,9 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 rotation: this.player.dispObj.rotation
             };
             this.player.currentWeapon = "knife";
+            this.player.addWeapon(this.player.currentWeapon);
+            this.player.addWeapon("pistol", 20);
+            this.player.addWeapon("shotgun", 20);
 
             //add effects
             this.createContainer("effect", true);
@@ -378,7 +381,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             this.healthText.text = "Health: " + Math.ceil(this.player.health);
 
             var currentWeapon = this.player.currentWeapon;
-            var ammo = this.player.weapons[currentWeapon];
+            var ammo = this.player.weapons[currentWeapon].ammo;
 
             var weaponText = currentWeapon;
             if (weaponText != "knife")
@@ -397,7 +400,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 zombie.update(event, self.player, self.collisionObjects);
                 if (zombie.justFired === "pistol") {
                     zombie.justFired = "";
-                    ResourceManager.playSound(ResourceManager.soundList.PistolFire);
+                    ResourceManager.playSound(ResourceManager.soundList.pistol.Fire);
                     var bulletData = {
                         x: zombie.dispObj.x,
                         y: zombie.dispObj.y,
@@ -426,7 +429,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         this.removeFromStage(this.player.dispObj);
                         this.player.setDispObj(this.addToStage(this.player.dispObj));
 
-                        ResourceManager.playSound(ResourceManager.soundList.KnifeDraw, ResourceManager.weaponData.drawCooldown);
+                        ResourceManager.playSound(ResourceManager.soundList.knife.Draw, ResourceManager.weaponData.drawCooldown);
                         this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
                     }
                 }
@@ -437,7 +440,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         this.removeFromStage(this.player.dispObj);
                         this.player.setDispObj(this.addToStage(this.player.dispObj));
 
-                        ResourceManager.playSound(ResourceManager.soundList.PistolDraw, ResourceManager.weaponData.drawCooldown);
+                        ResourceManager.playSound(ResourceManager.soundList.pistol.Draw, ResourceManager.weaponData.drawCooldown);
                         this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
                     }
                 }
@@ -448,7 +451,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         this.removeFromStage(this.player.dispObj);
                         this.player.setDispObj(this.addToStage(this.player.dispObj));
 
-                        ResourceManager.playSound(ResourceManager.soundList.ShotgunDraw, ResourceManager.weaponData.drawCooldown);
+                        ResourceManager.playSound(ResourceManager.soundList.shotgun.Draw, ResourceManager.weaponData.drawCooldown);
                         this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
                     }
                 }
@@ -459,66 +462,39 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         shootingHandle: function() {
             if(this.player.shootCooldown == 0) {
                 var currentWeapon = this.player.currentWeapon;
-                if (this.player.weapons[currentWeapon] > 0) {
-                    if (currentWeapon === "knife") {
-                        var hit = false;
-                        for (var i = 0; i < this.zombies.length; ++i) {
-                            var xToZombie = this.player.dispObj.x - this.zombies[i].dispObj.x;
-                            var yToZombie = this.player.dispObj.y - this.zombies[i].dispObj.y;
-                            var distanceToZombie = Math.sqrt(xToZombie * xToZombie + yToZombie * yToZombie);
 
-                            if (distanceToZombie <= this.player.reach) {
-                                this.zombies[i].health -= ResourceManager.weaponData.knife.power;
-                                hit = true;
-                            }
-                        }
-                        ResourceManager.playSound((hit) ? (ResourceManager.soundList.KnifeHit) : (ResourceManager.soundList.KnifeMissShort));
+                if (this.player.hasCurrentAmmo()) {
+                    var currentWeaponSounds = ResourceManager.soundList[currentWeapon];
 
-                        this.player.shootCooldown = ResourceManager.weaponData.knife.coolDown;
+                    if (this.player.isCurrentWeaponImmediate()) { // like knife
+                        var hit = this.player.shoot(this);
+                        ResourceManager.playSound((hit) ? (currentWeaponSounds.Hit) : (currentWeaponSounds.MissShort));
                     }
-                    else {
-                        // Weapons that shoot bullets
-                        var bulletData = {
-                            x: this.player.dispObj.x,
-                            y: this.player.dispObj.y,
-                            r: this.player.dispObj.rotation,
-                            source: "player",
-                            type: "bullet"
-                        };
-
-                        if (currentWeapon === "pistol") {
-                            ResourceManager.playSound(ResourceManager.soundList.PistolFire);
-                            bulletData.power = ResourceManager.weaponData.pistol.power;
-                            bulletData.tex = "pistol-bullet";
-
-                            var bullet = new Bullet(
-                                this.addToStage(bulletData),
-                                bulletData);
-
-                            this.bullets.push(bullet);
-
-                            this.player.shootCooldown = ResourceManager.weaponData.pistol.coolDown;
-                            --this.player.weapons['pistol'];
-                        }
-                        else if (currentWeapon === "shotgun") {
-                            ResourceManager.playSound(ResourceManager.soundList.ShotgunFire);
-                            for (var i = 0; i < ResourceManager.weaponData.shotgun.bulletNum; ++i) {
-
-                                bulletData.r = this.player.dispObj.rotation -
-                                               (Math.floor(ResourceManager.weaponData.shotgun.bulletNum/2) - i) * ResourceManager.weaponData.shotgun.dispersion;
-                                bulletData.power = ResourceManager.weaponData.shotgun.power;
-                                bulletData.tex = "shotgun-bullet";
-                                bulletData.ttl = 8;
-
-                                var bullet = new Bullet(this.addToStage(bulletData), bulletData);
-
-                                this.bullets.push(bullet);
-                            }
-
-                            this.player.shootCooldown = ResourceManager.weaponData.shotgun.coolDown;
-                            --this.player.weapons['shotgun'];
-                        }
+                    else { // like pistol and shotgun
+                        ResourceManager.playSound(currentWeaponSounds.Fire);
+                        this.player.shoot(this);
                     }
+
+
+
+
+
+//                    if (currentWeapon === "knife") {
+//                        var hit = this.player.shoot(this);
+//                        ResourceManager.playSound((hit) ? (ResourceManager.soundList.KnifeHit) : (ResourceManager.soundList.KnifeMissShort));
+//                    }
+//                    else {
+//                        // Weapons that shoot bullets
+//
+//                        if (currentWeapon === "pistol") {
+//                            ResourceManager.playSound(ResourceManager.soundList.PistolFire);
+//                            this.player.shoot(this);
+//                        }
+//                        else if (currentWeapon === "shotgun") {
+//                            ResourceManager.playSound(ResourceManager.soundList.ShotgunFire);
+//                            this.player.shoot(this);
+//                        }
+//                    }
                 }
                 else if (this.player.messageCooldown <= 0) {
                     Messenger.showMessage(Messenger.outOfAmmo);
@@ -625,12 +601,12 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                                 case "weapon":
                                     var name = drop['name'];
                                     var ammo = drop['ammo'] || 5;
-                                    if (name in self.player.weapons) {
-                                        self.player.weapons[name] += ammo;
+                                    if (self.player.hasWeapon(name)) {
+                                        self.player.addAmmo(name, ammo);
                                         Messenger.showMessage(Messenger.ammoPicked, ammo, name);
                                     }
                                     else {
-                                        self.player.weapons[name] = ammo;
+                                        self.player.addWeapon(name, ammo);
                                         Messenger.showMessage(Messenger.newWeaponPicked, name);
                                     }
                                     break;
@@ -638,8 +614,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                                     self.player.heal(drop['size']);
                                     break;
                                 case "ammo":
-                                    if (drop['name'] in self.player.weapons) {
-                                        self.player.weapons[drop['name']] += drop['size'];
+                                    if (self.player.hasWeapon(drop['name'])) {
+                                        self.player.addAmmo(drop['name'], drop['size']);
                                         Messenger.showMessage(Messenger.ammoPicked, drop['size'], drop['name']);
                                     }
                                     break;
@@ -690,13 +666,14 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                             case "weapon":
                                 ResourceManager.playSound(ResourceManager.soundList.Ammo);
                                 var name = drop.data['name'];
-                                if (name in this.player.weapons) {
-                                    this.player.weapons[name] += drop.data['ammo'];
-                                    Messenger.showMessage(Messenger.ammoPicked, drop.data['ammo'], drop.data['name']);
+                                var ammo = drop.data['ammo'];
+                                if (this.player.hasWeapon(name)) {
+                                    this.player.addAmmo(name, ammo);
+                                    Messenger.showMessage(Messenger.ammoPicked, ammo, name);
                                 }
                                 else {
-                                    this.player.weapons[name] = drop.data['ammo'];
-                                    Messenger.showMessage(Messenger.newWeaponPicked, drop.data['name']);
+                                    this.player.addWeapon(name, ammo);
+                                    Messenger.showMessage(Messenger.newWeaponPicked, name);
                                 }
                                 break;
                             case "medkit":

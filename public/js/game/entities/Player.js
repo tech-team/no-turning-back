@@ -5,9 +5,10 @@ define([
     'game/misc/UntilTimer',
     'game/misc/Messenger',
     'game/misc/KeyCoder',
-    'collision'
+    'collision',
+    'game/weapons/Weapons'
 ],
-function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, collider) {
+function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, collider, Weapons) {
 	var Player = AliveObject.$extend({
 		__init__: function() {
             this.type = "player"; //type should be specified in each class it its' objects will be passed to addToStage
@@ -19,8 +20,8 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             this.messageCooldown = 0;
             this.saturationTime = 0;
             this.effects = null;
-            this.weapons = {"knife": 1};
-            this.currentWeapon = "knife";
+            this.currentWeapon = null;
+            this.weapons = { };
             this.inventory = [];
             this.keys = [];
 
@@ -32,6 +33,34 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
 
         setEffects: function(effects) {
             this.effects = effects;
+        },
+
+        hasWeapon: function(name) {
+            return name in this.weapons;
+        },
+
+        addWeapon: function(name, ammo) {
+            this.weapons[name] = new Weapons[name](ammo, ResourceManager.weaponData[name]);
+        },
+
+        hasAmmo: function(name) {
+            return this.weapons[name].ammo > 0;
+        },
+
+        hasCurrentAmmo: function() {
+            return this.hasAmmo(this.currentWeapon);
+        },
+
+        addAmmo: function(name, ammo) {
+            this.weapons[name].addAmmo(ammo);
+        },
+
+        isCurrentWeaponImmediate: function() {
+            return this.weapons[this.currentWeapon].immediate;
+        },
+
+        shoot: function(level) {
+            return this.weapons[this.currentWeapon].shoot(level);
         },
 
 		update: function(event, collisionObjects) {

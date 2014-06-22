@@ -19,14 +19,6 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                 Ammo: "ammo.mp3",
                 Medkit: "apple.mp3",
                 Click: "click.mp3",
-                KnifeDraw: "knife.mp3",
-                KnifeMiss: "knife_miss.mp3",
-                KnifeMissShort: "knife_miss_short.mp3",
-                KnifeHit: "knife_stab.mp3",
-                PistolDraw: "pistol_draw.mp3",
-                PistolFire: "pistol_shoot.mp3",
-                ShotgunDraw: "shotgun_draw.mp3",
-                ShotgunFire: "shotgun_shoot.mp3",
                 BulletHit: "bullet_hit.mp3",
                 ZombieHurt: "ambiance.mp3",
                 PlayerHurt: ["hurt1.mp3", "hurt2.mp3", "hurt3.mp3"],
@@ -36,7 +28,21 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                 GameOver: "game_over.mp3",
                 Victory: "fortunate_son.mp3",
                 CheaterVictory: "cheater_victory.mp3",
-                LevelFinished: "" //TODO: add some kind of short ta-da sound
+                LevelFinished: "", //TODO: add some kind of short ta-da sound
+                knife: {
+                    Draw: "knife.mp3",
+                    Miss: "knife_miss.mp3",
+                    MissShort: "knife_miss_short.mp3",
+                    Hit: "knife_stab.mp3"
+                },
+                pistol: {
+                    Draw: "pistol_draw.mp3",
+                    Fire: "pistol_shoot.mp3"
+                },
+                shotgun: {
+                    Draw: "shotgun_draw.mp3",
+                    Fire: "shotgun_shoot.mp3"
+                }
             },
             weaponData: {
                 knife: {
@@ -129,7 +135,7 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                 });
             });
 
-            _.each(ResourceManager.soundList, function(sound) {
+            _.each(flattenObject(ResourceManager.soundList), function(sound) {
                 if (sound && sound != "") {
 
                     if (_.isArray(sound)) {
