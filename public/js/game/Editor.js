@@ -107,6 +107,17 @@ define([
                     self.bringToBack(self.selectedObject);
                 });
 
+                this.keyCoder.addEventListener("keyup", KeyCoder.V, function(event) {
+                    if (event.ctrlKey) {
+                        var selection = _.clone(self.multiselection);
+                        self.selectObject(null);
+
+                        _.each(selection, function(obj) {
+                            self.duplicateObject(obj);
+                        });
+                    }
+                });
+
                 alertify.alert(Editor.helpMessage);
 
                 this.onLevelLoadClick(); //ask level to load
@@ -493,7 +504,7 @@ define([
 
             selectOneMoreObject: function(dispObj) {
                 if (_.isEmpty(this.multiselection))
-                    this.selectedObject(dispObj);
+                    this.selectObject(dispObj);
                 else {
                     if (_.contains(this.multiselection, dispObj))
                         return;
@@ -511,7 +522,7 @@ define([
                 this.levelData[data.type + 's'].push(data);
 
                 var dispObj = this.addToStage(data, false, id);
-                this.selectObject(dispObj);
+                this.selectOneMoreObject(dispObj);
 
                 return dispObj;
             },
