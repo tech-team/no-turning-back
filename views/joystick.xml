@@ -16,18 +16,11 @@
                 <input type="submit" id="connect" class="one-field-input__send-button" value="Submit" />
             </form>
             <div id="message"></div>
-            <div id="test"></div>
         </div>
         <div class="canvasHolder" style="display:none;">
             <canvas id="canvas">You have a very old browser, dude.</canvas>
         </div>
-        <div class="message-dimmer"></div>
-        <div class="message">
-
-            <div class="message__textbox">
-                <div class="message__textbox__text">Some text</div>
-            </div>
-        </div>
+        <fest:include context="json" src="../templates/_message.xml" />
         <br />
 
         <fest:if test="json.development">

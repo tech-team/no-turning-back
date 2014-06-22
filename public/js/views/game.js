@@ -1,13 +1,14 @@
 define([
     'backbone',
-    'modernizr',
+    'utils/BrowserCheck',
     'tmpl/game',
     'game/Game',
     'views/gamefinished',
     'utils/CssUtils',
-    'game/misc/KeyCoder'
+    'game/misc/KeyCoder',
+    'utils/Message'
 ], 
-function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) {
+function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Message) {
     var GameView = Backbone.View.extend({
 
         template: tmpl,
@@ -20,9 +21,6 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
         scene: null,
         game: null,
         guid: null,
-        $message: null,
-        $messageText: null,
-        $messageDimmer: null,
 
         $pauseButton: null,
         $pauseIconPause: null,
@@ -36,56 +34,16 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
         $loadingIndicator: null,
         mobileOpened: false,
 
+        messenger: null,
+
 
         initialize: function () {
             this.render();
         },
 
-
-        onMessageEvents: function(callback) {
-            var self = this;
-            this.$messageDimmer.on('click', function () {
-                self.hideMessage();
-                if (callback)
-                    callback();
-            });
-
-            this.$message.on('click', function () {
-                self.hideMessage();
-                if (callback)
-                    callback();
-            });
-        },
-
-        offMessageEvents: function() {
-            this.$messageDimmer.off('click');
-            this.$message.off('click');
-        },
-
-
-        showMessage: function(messageText, disallowHide, callback) {
-            if (disallowHide)
-                this.offMessageEvents();
-            else
-                this.onMessageEvents(callback);
-            this.$messageText.text(messageText);
-            this.$messageDimmer.show();
-            this.$message.show();
-        },
-
-        hideMessage: function(keepDimmer) {
-            this.$message.hide();
-            if (!keepDimmer)
-                this.$messageDimmer.hide();
-        },
-
-        checkBrowserSupport: function() {
-            if (Modernizr) {
-                if (!Modernizr.canvas || !Modernizr.canvastext || !Modernizr.localstorage
-                    || !Modernizr.audio || !Modernizr.multiplebgs
-                    || !Modernizr.csstransforms || !Modernizr.fontface) {
-                    this.showMessage("Your browser is not supported. Sorry", true);
-                }
+        browserSupport: function() {
+            if (!checker.browserSupport()) {
+                this.messenger.showMessage("Your browser is not supported. Sorry", true);
             }
         },
 
@@ -108,7 +66,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
                 CssUtils.showBlackOnWhite(this.$mobileIcon);
                 this.mobileOpened = true;
                 this.hidePauseButton();
-                this.hideMessage(true);
+                this.messenger.hideMessage(true);
             }
             else {
                 this.triggerGamePause();
@@ -163,10 +121,6 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
             this.scene = this.$el.find('#scene');
             this.guid = this.$el.find('#token');
 
-            this.$message = this.$el.find('.message');
-            this.$messageText = this.$message.find('.message__textbox__text');
-            this.$messageDimmer = this.$el.find('.message-dimmer');
-
             this.$pauseButton = this.$el.find('.pause-icon');
             this.$pauseIconPause = this.$pauseButton.find('.game-icon__pause');
             this.$pauseIconPlay = this.$pauseButton.find('.game-icon__play');
@@ -177,8 +131,9 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
 
             this.$closeButton = this.$el.find('.reconnect-button');
             this.$loadingIndicator = this.$el.find('.loading-indicator');
-            this.createEvents();
 
+            this.createEvents();
+            this.messenger = new Message(this.$el);
             this.calcDimensions();
 
             return this;
@@ -231,7 +186,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
                 type: "showPageEvent",
                 pageId: this.pageId
             });
-            this.checkBrowserSupport();
+            this.browserSupport();
             this.runGame();
         },
 
@@ -248,12 +203,12 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
                 case "orientation":
                     if (data.orientation === "portrait") {
                         console.log("change orientation!");
-                        this.showMessage("Change device orientation to landsape", true);
+                        this.messenger.showMessage("Change device orientation to landsape", true);
                         this.game.pause(true);
                     }
                     else {
                         console.log("thanks for changing orientation");
-                        this.hideMessage();
+                        this.messenger.hideMessage();
                         this.game.continueGame(true);
                     }
                     break;
@@ -295,7 +250,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
                 },
                 onDisconnect: function() {
                     console.log("joystick disconnected");
-                    self.showMessage("You were disconnected", false, function() {
+                    self.messenger.showMessage("You were disconnected", false, function() {
                         self.game.continueGame();
                     });
                     self.game.pause(true);
@@ -333,8 +288,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
 
             this.game.gameStateChanged.add(function(event) {
                 if (event.state === Game.GameState.Pause) {
-                    self.$messageDimmer.show();
-                    self.showMessage("Game paused", true);
+                    self.messenger.showMessage("Game paused", true);
                     if (window.server) {
                         window.server.send({
                             type: "info",
@@ -343,8 +297,7 @@ function(Backbone, modernizr, tmpl, Game, GameFinishedView, CssUtils, KeyCoder) 
                         });
                     }
                 } else if (event.state === Game.GameState.Game) {
-                    self.hideMessage();
-                    self.$messageDimmer.hide();
+                    self.messenger.hideMessage();
                     if (window.server) {
                         window.server.send({
                             type: "info",

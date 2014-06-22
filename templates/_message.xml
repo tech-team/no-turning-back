@@ -1,0 +1,9 @@
+<fest:template xmlns:fest="http://fest.mail.ru"
+               context_name="json">
+    <div class="message-dimmer"></div>
+    <div class="message">
+        <div class="message__textbox">
+            <div class="message__textbox__text"></div>
+        </div>
+    </div>
+</fest:template>

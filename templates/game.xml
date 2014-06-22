@@ -6,12 +6,8 @@
             <span class="back-button__caption">Menu</span>
         </a>
         <fest:include context="json" src="./_progress.xml" />
-        <div class="message-dimmer"></div>
-        <div class="message">
-            <div class="message__textbox">
-                <div class="message__textbox__text">Some text</div>
-            </div>
-        </div>
+        <fest:include context="json" src="./_message.xml" />
+
         <canvas id="game-field">You have a very old browser, dude.</canvas>
         <div class="mobile-connect">
             <div class="mobile-connect__header">Enter this token on your mobile device:</div>
@@ -27,8 +23,5 @@
         <div class="game-icon mobile-icon image-inverted">
             <img src="/res/img/mobile.png"></img>
         </div>
-
-        <!--<input id="token" value="guid" disabled="disabled" style="position:absolute; top:0; right:0;" />-->
-        <!--<button id="connect" type="submit">connect</button>-->
     </div>
 </fest:template>
