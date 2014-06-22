@@ -59,6 +59,7 @@ function(Class, $, _) {
 			UP_ARROW: 38,
 			RIGHT_ARROW: 39,
 			DOWN_ARROW: 40,
+            DEL: 46,
             ONE: 49,
             TWO: 50,
             THREE: 51,

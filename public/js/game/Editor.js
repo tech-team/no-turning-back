@@ -66,9 +66,14 @@ define([
                     return false;
                 });
 
+                var onDeleteObjects = function() {
+                    _.each(self.multiselection, function(obj) {
+                        self.deleteObject(obj);
+                    });
+                };
+
                 $('#deleteObject').click(function() {
-                    if (self.selectedObject)
-                        self.deleteObject(self.selectedObject);
+                    onDeleteObjects();
                     return false;
                 });
 
@@ -108,14 +113,12 @@ define([
                 });
 
                 this.keyCoder.addEventListener("keyup", KeyCoder.V, function(event) {
-                    if (event.ctrlKey) {
-                        var selection = _.clone(self.multiselection);
-                        self.selectObject(null);
+                    if (event.ctrlKey)
+                        self.duplicateObjects();
+                });
 
-                        _.each(selection, function(obj) {
-                            self.duplicateObject(obj);
-                        });
-                    }
+                this.keyCoder.addEventListener("keyup", KeyCoder.DEL, function(event) {
+                    onDeleteObjects();
                 });
 
                 alertify.alert(Editor.helpMessage);
@@ -560,6 +563,17 @@ define([
                 }
 
                 var dispObj = this.addObjectByData(data);
+            },
+
+            duplicateObjects: function() {
+                var self = this;
+
+                var selection = _.clone(self.multiselection);
+                self.selectObject(null);
+
+                _.each(selection, function(obj) {
+                    self.duplicateObject(obj);
+                });
             },
 
             duplicateObject: function(dispObj) {
