@@ -262,8 +262,6 @@ define([
                     return;
                 }
 
-                var oldReg = {x: 0, y: 0};
-
                 dispObj.on("mousedown", function(evt) {
                     var dispObj = evt.currentTarget;
 
@@ -276,8 +274,10 @@ define([
                         self.selectObject(dispObj);
 
                     var point = dispObj.globalToLocal(evt.stageX + self.mainContainer.x, evt.stageY + self.mainContainer.y);
-                    oldReg.x = dispObj.regX;
-                    oldReg.y = dispObj.regY;
+                    dispObj.oldReg = {
+                        x: dispObj.regX,
+                        y: dispObj.regY
+                    };
 
                     dispObj.regX = point.x;
                     dispObj.regY = point.y;
@@ -305,11 +305,11 @@ define([
                 dispObj.on("click", function(evt) {
                     var dispObj = evt.currentTarget;
 
-                    var dx = dispObj.regX - oldReg.x;
-                    var dy = dispObj.regY - oldReg.y;
+                    var dx = dispObj.regX - dispObj.oldReg.x;
+                    var dy = dispObj.regY - dispObj.oldReg.y;
 
-                    dispObj.regX = oldReg.x;
-                    dispObj.regY = oldReg.y;
+                    dispObj.regX = dispObj.oldReg.x;
+                    dispObj.regY = dispObj.oldReg.y;
 
                     var a = dispObj.rotation * Math.PI / 180;
 
