@@ -14,8 +14,6 @@
   },
   "homepage": "https://github.com/tech-team/no-turning-back",
   "devDependencies": {
-    "artist": "~0.1.5",
-    "express": "~3.5.1",
     "grunt": "~0.4.4",
     "grunt-contrib-concat": "~0.4.0",
     "grunt-contrib-cssmin": "^0.9.0",
@@ -24,10 +22,13 @@
     "grunt-contrib-uglify": "~0.4.0",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-express-server": "~0.4.13",
-    "grunt-fest": "~0.1.5",
+    "grunt-fest": "~0.1.5"
+  },
+  "dependencies": {
+  	"artist": "~0.1.5",
+    "express": "~3.5.1",
     "guid": "0.0.10",
     "mongojs": "^0.13.0",
     "socket.io": "^0.9.16"
-  },
-  "dependencies": {}
+  }
 }

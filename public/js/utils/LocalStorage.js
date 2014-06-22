@@ -1,12 +1,7 @@
 define([
-	'classy'
 ],
-function(Class) {
-	var LocalStorage = Class.$extend({
-		__init__: function() {
-			
-		},
-
+function() {
+	var LocalStorage = {
         add: function(key, value) {
             window.localStorage.setItem(key, value);
         },
@@ -51,7 +46,7 @@ function(Class) {
 			arr.pop();
 			this.addJSON(keyOfArray, arr);
 		}
-	});
+	};
 
-	return new LocalStorage();
+	return LocalStorage;
 });

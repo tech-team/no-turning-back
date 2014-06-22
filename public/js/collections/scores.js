@@ -1,7 +1,7 @@
 define([
     'backbone',
     'models/player',
-    'collections/LocalStorage'
+    'utils/LocalStorage'
 ], 
 function(Backbone, Player, LocalStorage) {
     var ScoreBoard = Backbone.Collection.extend({
