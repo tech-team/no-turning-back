@@ -418,7 +418,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         },
 
         weaponsHandle: function(event) {
-            if(this.player.cooldown == 0) {
+//            if(this.player.shootCooldown == 0) {
                 if(event.keys[KeyCoder.ONE]) {
                     if ("knife" in this.player.weapons && this.player.currentWeapon != "knife") {
                         this.player.currentWeapon = "knife";
@@ -427,7 +427,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         this.player.setDispObj(this.addToStage(this.player.dispObj));
 
                         ResourceManager.playSound(ResourceManager.soundList.KnifeDraw, ResourceManager.weaponData.drawCooldown);
-                        this.player.cooldown = ResourceManager.weaponData.drawCooldown;
+                        this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
                     }
                 }
                 if(event.keys[KeyCoder.TWO]) {
@@ -438,7 +438,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         this.player.setDispObj(this.addToStage(this.player.dispObj));
 
                         ResourceManager.playSound(ResourceManager.soundList.PistolDraw, ResourceManager.weaponData.drawCooldown);
-                        this.player.cooldown = ResourceManager.weaponData.drawCooldown;
+                        this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
                     }
                 }
                 if(event.keys[KeyCoder.THREE]) {
@@ -449,15 +449,15 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         this.player.setDispObj(this.addToStage(this.player.dispObj));
 
                         ResourceManager.playSound(ResourceManager.soundList.ShotgunDraw, ResourceManager.weaponData.drawCooldown);
-                        this.player.cooldown = ResourceManager.weaponData.drawCooldown;
+                        this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
                     }
                 }
 
-            }
+//            }
         },
 
         shootingHandle: function() {
-            if(this.player.cooldown == 0) {
+            if(this.player.shootCooldown == 0) {
                 var currentWeapon = this.player.currentWeapon;
                 if (this.player.weapons[currentWeapon] > 0) {
                     if (currentWeapon === "knife") {
@@ -474,7 +474,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         }
                         ResourceManager.playSound((hit) ? (ResourceManager.soundList.KnifeHit) : (ResourceManager.soundList.KnifeMissShort));
 
-                        this.player.cooldown = ResourceManager.weaponData.knife.coolDown;
+                        this.player.shootCooldown = ResourceManager.weaponData.knife.coolDown;
                     }
                     else {
                         // Weapons that shoot bullets
@@ -497,7 +497,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
                             this.bullets.push(bullet);
 
-                            this.player.cooldown = ResourceManager.weaponData.pistol.coolDown;
+                            this.player.shootCooldown = ResourceManager.weaponData.pistol.coolDown;
                             --this.player.weapons['pistol'];
                         }
                         else if (currentWeapon === "shotgun") {
@@ -515,7 +515,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                                 this.bullets.push(bullet);
                             }
 
-                            this.player.cooldown = ResourceManager.weaponData.shotgun.coolDown;
+                            this.player.shootCooldown = ResourceManager.weaponData.shotgun.coolDown;
                             --this.player.weapons['shotgun'];
                         }
                     }

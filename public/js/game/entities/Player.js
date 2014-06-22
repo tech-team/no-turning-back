@@ -15,7 +15,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             this.maxHealth = 100;
             this.dead = false;
 			this.score = 0;
-            this.cooldown = 0;
+            this.shootCooldown = 0;
             this.messageCooldown = 0;
             this.saturationTime = 0;
             this.effects = null;
@@ -35,8 +35,8 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
         },
 
 		update: function(event, collisionObjects) {
-            if (this.cooldown > 0) {
-                --this.cooldown;
+            if (this.shootCooldown > 0) {
+                --this.shootCooldown;
             }
             if (this.messageCooldown > 0) {
                 --this.messageCooldown;

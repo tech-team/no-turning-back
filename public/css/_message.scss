@@ -55,8 +55,9 @@ $borderRadius: 20px;
   };
 
   &__controls {
-    @include message-inner-thing($messageWidth, $controlsHeight, -50%, 180%);
-//    display: none;
+    @include message-inner-thing($messageWidth, $controlsHeight, -50%, 140%);
+    display: none;
+    padding-bottom: 10px;
     border-radius: 0 0 $borderRadius $borderRadius;
     text-align: center;
 

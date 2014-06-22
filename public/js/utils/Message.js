@@ -88,13 +88,14 @@ function(Class) {
 
             callbackOnClose || (callbackOnClose = function() {});
 
+            this._hideControls();
+            this._removeControls();
+
             if (controls) {
                 this._createControls(controls);
                 this._showControls();
-            } else {
-                this._hideControls();
-                this._removeControls();
             }
+
 
             if (disallowHide)
                 this._offMessageEvents();
