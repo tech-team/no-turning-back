@@ -57,7 +57,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             this.weapons[name].addAmmo(ammo);
         },
 
-        isCurrentWeaponImmediate: function() {
+        isCurrentWeaponMelee: function() {
             return this.weapons[this.currentWeapon].immediate;
         },
 

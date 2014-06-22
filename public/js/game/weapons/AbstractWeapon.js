@@ -2,11 +2,11 @@ define([
     'classy'
 ], function(Class) {
     var Weapon = Class.$extend({
-        __init__: function(ammo, data, immediate) {
+        __init__: function(ammo, data, melee) {
             this.ammo = ammo || 1;
             this.data = data;
             this.reach = 50;
-            this.immediate = immediate;
+            this.immediate = melee;
         },
 
         addAmmo: function(ammo) {

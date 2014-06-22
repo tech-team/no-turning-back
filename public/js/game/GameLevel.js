@@ -448,11 +448,11 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 if (this.player.hasCurrentAmmo()) {
                     var currentWeaponSounds = ResourceManager.soundList[currentWeapon];
 
-                    if (this.player.isCurrentWeaponImmediate()) { // like knife
+                    if (this.player.isCurrentWeaponMelee()) {
                         var hit = this.player.shoot(this);
                         ResourceManager.playSound((hit) ? (currentWeaponSounds.Hit) : (currentWeaponSounds.MissShort));
                     }
-                    else { // like pistol and shotgun
+                    else {
                         ResourceManager.playSound(currentWeaponSounds.Fire);
                         this.player.shoot(this);
                     }
@@ -463,6 +463,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 }
             }
         },
+
         bulletsCollisionsHandle: function() {
             out:
             for (var i = 0; i < this.bullets.length; ++i) {
@@ -542,6 +543,45 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             }
         },
 
+        itemInteraction: function(item, playSounds) {
+            switch (item['type']) {
+                case "weapon":
+                    var name = item['name'];
+                    var ammo = item['ammo'] || 5;
+                    if (this.player.hasWeapon(name)) {
+                        this.player.addAmmo(name, ammo);
+                        Messenger.showMessage(Messenger.ammoPicked, ammo, name);
+                    }
+                    else {
+                        this.player.addWeapon(name, ammo);
+                        Messenger.showMessage(Messenger.newWeaponPicked, name);
+                    }
+                    if (playSounds)
+                        ResourceManager.playSound(ResourceManager.soundList.Ammo);
+                    break;
+                case "medkit":
+                    this.player.heal(item['size']);
+                    break;
+                case "ammo":
+                    if (this.player.hasWeapon(item['name'])) {
+                        this.player.addAmmo(item['name'], item['size']);
+                        Messenger.showMessage(Messenger.ammoPicked, item['size'], item['name']);
+                    }
+                    break;
+                case "key":
+                    if (!(item['name'] in self.player.keys)) {
+                        this.player.keys.push(item['name']);
+                        Messenger.showMessage(Messenger.keyPicked, item['name']);
+                    }
+                    break;
+                default:
+                    if (item['name']) {
+                        this.player.inventory.push(drop['name']);
+                        Messenger.showMessage(Messenger.newItemPicked, drop['name']);
+                    }
+            }
+        },
+
         chestsOpeningHandle: function(event) {
             var self = this;
 
@@ -557,42 +597,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     else if (chest.justOpened == true) {
                         ResourceManager.playSound(ResourceManager.soundList.ChestOpen);
                         chest.justOpened = false;
-                        _.each(chest.storage, function(drop) {
-                            switch (drop['type']) {
-                                case "weapon":
-                                    var name = drop['name'];
-                                    var ammo = drop['ammo'] || 5;
-                                    if (self.player.hasWeapon(name)) {
-                                        self.player.addAmmo(name, ammo);
-                                        Messenger.showMessage(Messenger.ammoPicked, ammo, name);
-                                    }
-                                    else {
-                                        self.player.addWeapon(name, ammo);
-                                        Messenger.showMessage(Messenger.newWeaponPicked, name);
-                                    }
-                                    break;
-                                case "medkit":
-                                    self.player.heal(drop['size']);
-                                    break;
-                                case "ammo":
-                                    if (self.player.hasWeapon(drop['name'])) {
-                                        self.player.addAmmo(drop['name'], drop['size']);
-                                        Messenger.showMessage(Messenger.ammoPicked, drop['size'], drop['name']);
-                                    }
-                                    break;
-                                case "key":
-                                    if (!(drop['name'] in self.player.keys)) {
-                                        self.player.keys.push(drop['name']);
-                                        Messenger.showMessage(Messenger.keyPicked, drop['name']);
-                                    }
-                                    break;
-                                default:
-                                    if (drop['name']) {
-                                        self.player.inventory.push(drop['name']);
-                                        Messenger.showMessage(Messenger.newItemPicked, drop['name']);
-                                    }
-                            }
-                        });
+
+                        _.each(chest.storage, self.itemInteraction.bind(self));
 
                         chest.storage = [];
                         self.collisionObjects.remove(chest.dispObj);
@@ -617,36 +623,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
                 if (this.checkReach(drop)) {
                     if (collider.checkPixelCollision(drop, this.player.dispObj)) {
-                        switch (drop.data['type']) {
-                            case "key":
-                                if (!(drop.data['name'] in this.player.keys)) {
-                                    this.player.keys.push(drop.data['name']);
-                                    Messenger.showMessage(Messenger.keyPicked, drop.data['name']);
-                                }
-                                break;
-                            case "weapon":
-                                ResourceManager.playSound(ResourceManager.soundList.Ammo);
-                                var name = drop.data['name'];
-                                var ammo = drop.data['ammo'];
-                                if (this.player.hasWeapon(name)) {
-                                    this.player.addAmmo(name, ammo);
-                                    Messenger.showMessage(Messenger.ammoPicked, ammo, name);
-                                }
-                                else {
-                                    this.player.addWeapon(name, ammo);
-                                    Messenger.showMessage(Messenger.newWeaponPicked, name);
-                                }
-                                break;
-                            case "medkit":
-                                var howMuch = drop.data['size'];
-                                this.player.heal(howMuch);
-                                break;
-                            default:
-                                if (drop.data['name']) {
-                                    this.player.inventory.push(drop.data['name']);
-                                    Messenger.showMessage(Messenger.newItemPicked, drop.data['name']);
-                                }
-                        }
+                        this.itemInteraction(drop.data, true);
 
                         this.removeFromStage(drop);
                         this.drops.splice(i, 1);
