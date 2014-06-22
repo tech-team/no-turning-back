@@ -474,27 +474,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         ResourceManager.playSound(currentWeaponSounds.Fire);
                         this.player.shoot(this);
                     }
-
-
-
-
-
-//                    if (currentWeapon === "knife") {
-//                        var hit = this.player.shoot(this);
-//                        ResourceManager.playSound((hit) ? (ResourceManager.soundList.KnifeHit) : (ResourceManager.soundList.KnifeMissShort));
-//                    }
-//                    else {
-//                        // Weapons that shoot bullets
-//
-//                        if (currentWeapon === "pistol") {
-//                            ResourceManager.playSound(ResourceManager.soundList.PistolFire);
-//                            this.player.shoot(this);
-//                        }
-//                        else if (currentWeapon === "shotgun") {
-//                            ResourceManager.playSound(ResourceManager.soundList.ShotgunFire);
-//                            this.player.shoot(this);
-//                        }
-//                    }
                 }
                 else if (this.player.messageCooldown <= 0) {
                     Messenger.showMessage(Messenger.outOfAmmo);
