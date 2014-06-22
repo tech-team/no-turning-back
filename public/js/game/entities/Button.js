@@ -2,9 +2,10 @@ define([
     'classy',
     'underscore',
     'game/entities/GameObject',
-    'game/misc/KeyCoder'
+    'game/misc/KeyCoder',
+    'game/misc/Messenger'
 ],
-    function(Class, _, GameObject, KeyCoder) {
+    function(Class, _, GameObject, KeyCoder, Messenger) {
         var Button = GameObject.$extend({
             __init__: function(obj) {
                 this.type = "button";
@@ -20,7 +21,7 @@ define([
                 this.justPressed = false;
                 this.justDepressed = false;
 
-                this.message = "";
+                this.message = undefined;
                 this.pressCooldown = 0;
             },
 
@@ -47,10 +48,10 @@ define([
                                         doors[i].justOpened = true;
                                         doors[i].state = "open";
                                         doors[i].tex = "door-open";
-                                        this.message = "Puzzle solved!";
+                                        this.message = Messenger.puzzleSolved;
                                     }
                                     else {
-                                        this.message = "Solution is incorrect";
+                                        this.message = Messenger.puzzleFailed;
                                     }
                                     doors[i].inputCode = "";
                                 }

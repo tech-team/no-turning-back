@@ -43,12 +43,12 @@ define([
                             if(_.isArray(this.requires)) {
                                 _.each(this.requires, function(requirement) {
                                     if (self.requiresMessage === "" && !(_.contains(player.keys, requirement))) {
-                                        self.requiresMessage = requirement + " required.";
+                                        self.requiresMessage = requirement;
                                     }
                                 });
                             }
                             else if(!_.contains(player.keys, this.requires)) {
-                                this.requiresMessage = this.requires + " required.";
+                                this.requiresMessage = this.requires;
                             }
                         }
 

@@ -4,9 +4,10 @@ define([
     'easel',
     'preload',
     'sound',
+    'alertify',
     'game/misc/ImageTiler'
 ],
-function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
+function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
 	var ResourceManager = Class.$extend({
         __classvars__: {
             //all textures should have .png format
@@ -57,6 +58,11 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             },
             playingSounds: {},
 
+            ResourceType: {
+                sound: 0,
+                tex: 1
+            },
+
             instance: null,
 
             load: function(onComplete) {
@@ -70,11 +76,13 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                 return this.instance;
             },
 
-            soundDisabled: localStorage["soundDisabled"],
+            soundDisabled: (localStorage["soundDisabled"] === "true"), //string to bool conversion
 
             toggleSound: function() {
-                localStorage["soundDisabled"] = !this.soundDisabled;
                 this.soundDisabled = !this.soundDisabled;
+                localStorage["soundDisabled"] = this.soundDisabled;
+
+                alertify.success(this.soundDisabled ? "Sound disabled" : "Sound enabled");
             },
 
             playSound: function(snd, cooldown) {
@@ -116,7 +124,8 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             _.each(ResourceManager.texList, function(tex) {
                 manifest.push({
                     id: tex,
-                    src: "gfx/" + tex + ".png"
+                    src: "gfx/" + tex + ".png",
+                    resType: ResourceManager.ResourceType.tex
                 });
             });
 
@@ -127,14 +136,16 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
                         _.each(sound, function(snd) {
                             manifest.push({
                                 id: snd,
-                                src: "sound/" + snd
+                                src: "sound/" + snd,
+                                resType: ResourceManager.ResourceType.sound
                             });
                         });
                     }
                     else {
                         manifest.push({
                             id: sound,
-                            src: "sound/" + sound
+                            src: "sound/" + sound,
+                            resType: ResourceManager.ResourceType.sound
                         });
                     }
                 }
@@ -143,9 +154,9 @@ function(Class, _, createjs, preloadjs, soundjs, ImageTiler) {
             queue.loadManifest(manifest, true, "res/");
 
             function handleComplete() {
-                _.each(manifest, function(tex) {
-                    //TODO: should separate sounds and textures
-                    self.images[tex.id] = queue.getResult(tex.id);
+                _.each(manifest, function(res) {
+                    if (res.resType === ResourceManager.ResourceType.tex)
+                        self.images[res.id] = queue.getResult(res.id);
                 });
                 self.onComplete();
 

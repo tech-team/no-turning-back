@@ -1,7 +1,8 @@
 define([
-	'classy'
+	'classy',
+    'alertify'
 ],
-function(Class) {
+function(Class, alertify) {
 	var LevelManager = Class.$extend({
 		__init__: function(loadedCallback) {
 			this.currentLevelId = null;
@@ -21,7 +22,7 @@ function(Class) {
                     self.campaignPicker(loadedCallback);
                 },
                 error: function(data) {
-                    alert("Unable to load level. Error: " + data);
+                    alertify.alert("Unable to campaigns list. Error: " + JSON.stringify(data));
                 }
             });
 		},
@@ -42,7 +43,7 @@ function(Class) {
                     loadedCallback();
                 },
                 error: function(data) {
-                    alert("Unable to load level. Error: " + data);
+                    alertify.alert("Unable to campaign's levels list. Error: " + JSON.stringify(data));
                 }
             });
         },

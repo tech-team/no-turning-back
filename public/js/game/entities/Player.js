@@ -17,6 +17,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
 			this.score = 0;
             this.cooldown = 0;
             this.messageCooldown = 0;
+            this.saturationTime = 0;
             this.effects = null;
             this.weapons = {"knife": 1};
             this.currentWeapon = "knife";
@@ -25,6 +26,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
 
             this.power = 5;
             this.reach = 50;
+            this.healthDecrease = 0.1;
 		},
 
 
@@ -38,6 +40,13 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             }
             if (this.messageCooldown > 0) {
                 --this.messageCooldown;
+            }
+            if (this.saturationTime > 0) {
+                --this.saturationTime;
+            }
+            if (this.health > this.maxHealth && this.saturationTime === 0) {
+                var healthLeft = this.health - this.healthDecrease;
+                this.health = (healthLeft < this.maxHealth) ? (this.maxHealth) : (healthLeft);
             }
 
             var speedModifier = 2;
@@ -157,6 +166,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
         },
 
         movementHandle: function(movementData, collisionObjects) {
+            //TODO: Movement code refactoring will be carried out only after implementing two-joystick handling
             var reboundModifier = 1;
 
             while (Math.abs(this.dispObj.rotation) > 180) {
@@ -173,14 +183,10 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             this.dispObj.y += offsetY;
 
             for (var i = 0; i < collisionObjects.length; ++i) {
-                var xToObject = this.dispObj.x - collisionObjects[i].x;
-                var yToObject = this.dispObj.y - collisionObjects[i].y;
-                if (Math.sqrt(xToObject*xToObject + yToObject*yToObject) <= 50) {
-                    if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
-                        this.dispObj.x -= reboundModifier * offsetX;
-                        this.dispObj.y -= reboundModifier * offsetY;
-                        this.dispObj.rotation = currentRotation;
-                    }
+                if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                    this.dispObj.x -= reboundModifier * offsetX;
+                    this.dispObj.y -= reboundModifier * offsetY;
+                    this.dispObj.rotation = currentRotation;
                 }
             }
         },
@@ -209,22 +215,17 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
 
             //please note, that amount of health to be healed is unpredictable
             //because player can be hurt in process
-            var messages = [
-                "Oh, sweet lemonade!",
-                "That feels good!",
-                "Much health, very medkit, wow!"
-            ];
-            Messenger.showMessage(messages[_.random(messages.length - 1)], Messenger.MessageColor.Medkit);
+            Messenger.showMessage(Messenger.healPackPicked, howMuch);
 
             var self = this;
             var tid = setInterval(function() {
                 if (howMuch > 0) {
                     howMuch--;
 
-                    if (self.health < self.maxHealth)
-                        self.health++;
+                    self.health++;
                 }
                 else {
+                    self.saturationTime = 100;
                     //healing finished
                     clearInterval(tid);
                 }

@@ -89,6 +89,9 @@ function(Backbone, tmpl, Game) {
                     - level.height()
                     - palette.height()
                     - 18); //todo: everybody like magic
+
+                if (this.game)
+                    this.game.resize();
             });
             $(window).resize();
         }

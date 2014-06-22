@@ -4,6 +4,7 @@ define([
 	'classy',
     'signals',
 	'easel',
+    'alertify',
     'collision',
 	'game/misc/KeyCoder',
 	'game/LevelManager',
@@ -14,7 +15,7 @@ define([
     'console',
     'game/misc/Messenger'
 ],
-function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLevel, Editor, Player, ResourceManager, Console, Messenger) {
+function($, _, Class, signals, createjs, alertify, ndgmr, KeyCoder, LevelManager, GameLevel, Editor, Player, ResourceManager, Console, Messenger) {
 	var Game = Class.$extend({
 		__init__: function(canvas, editorMode, onLoadedCallback) {
             this.editorMode = editorMode;
@@ -99,8 +100,8 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLeve
             else {
                 this.levelManager.loadNextLevel(function(data) {
                     if (data == null) {
-                        alert("Unable to load level!"); //TODO: replace with alertify
-                        return
+                        alertify.alert("Unable to load level!");
+                        return;
                     }
 
                     self.createGameLevel(data);
@@ -163,7 +164,6 @@ function($, _, Class, signals, createjs, ndgmr, KeyCoder, LevelManager, GameLeve
         },
 
         resize: function() {
-            //TODO: both Editor and GL should be derived from one basic class with resize/update/keyFunc methods
             if (this.level)
                 this.level.resize();
         }
