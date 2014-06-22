@@ -58,8 +58,8 @@ require.config({
 define([
     'backbone',
     'router',
-    'utils/ArrayUtils'
-], function(Backbone, router, ArrayUtils) {
+    'utils/BuiltinTypesUtils'
+], function(Backbone, router, BuiltinTypesUtils) {
     Backbone.history.start();
-    ArrayUtils();
+    BuiltinTypesUtils();
 });
