@@ -142,10 +142,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 y: this.player.dispObj.y,
                 rotation: this.player.dispObj.rotation
             };
-            this.player.currentWeapon = "knife";
-            this.player.addWeapon(this.player.currentWeapon);
-            this.player.addWeapon("pistol", 20);
-            this.player.addWeapon("shotgun", 20);
 
             //add effects
             this.createContainer("effect", true);

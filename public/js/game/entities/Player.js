@@ -20,14 +20,16 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             this.messageCooldown = 0;
             this.saturationTime = 0;
             this.effects = null;
-            this.currentWeapon = null;
-            this.weapons = { };
             this.inventory = [];
             this.keys = [];
 
             this.power = 5;
             this.reach = 50;
             this.healthDecrease = 0.1;
+
+            this.currentWeapon = "knife";
+            this.weapons = { };
+            this.addWeapon(this.currentWeapon);
 		},
 
 

@@ -30,7 +30,7 @@ function($, _, Class, signals, createjs, alertify, ndgmr, KeyCoder, LevelManager
 			this.ticker = createjs.Ticker;
 			this.levelManager = new LevelManager(this.onLevelLoaded.bind(this));
 			this.level = null;
-			this.player = new Player();
+			this.player = null;
             this.resourceManager = null;
 			this.keyCoder = new KeyCoder(editorMode);
 			this.onLoadedCallback = onLoadedCallback;
@@ -70,6 +70,7 @@ function($, _, Class, signals, createjs, alertify, ndgmr, KeyCoder, LevelManager
             var self = this;
             this.levelManager.loadNextLevel(function(data) {
                 if (!self.editorMode) {
+                    self.player = new Player()
                     self.createGameLevel(data);
                 }
                 else {
