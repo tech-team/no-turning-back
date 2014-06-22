@@ -2,9 +2,9 @@ define([
     'backbone',
     'tmpl/editor',
     'game/Game',
-    'views/viewmanager'
+    'utils/Message'
 ], 
-function(Backbone, tmpl, Game) {
+function(Backbone, tmpl, Game, Message) {
     var EditorView = Backbone.View.extend({
 
         template: tmpl,
@@ -12,11 +12,15 @@ function(Backbone, tmpl, Game) {
         className: 'page',
         pageId: '#editorPage',
         hidden: true,
+
+        $backButton: null,
         
         canvas: null,
         scene: null,
         sidebar: null,
         game: null,
+
+        messenger: null,
 
         initialize: function () {
             this.render();
@@ -26,12 +30,41 @@ function(Backbone, tmpl, Game) {
             this.$el.html(this.template());
             this.$el.attr('id', this.pageId.slice(1));
 
+            this.$backButton = this.$el.find('.back-button');
+
             this.canvas = this.$el.find('#editor-field')[0];
             this.scene = this.$el.find('#editor-scene');
             this.sidebar = this.$el.find('#editor-sidebar');
+
+            this.messenger = new Message(this.$el);
+
+            this.createEvents();
             this.calcDimensions();
 
             return this;
+        },
+
+        createEvents: function() {
+            var self = this;
+
+            this.$backButton.on('click', function(event) {
+                var controls = [
+                    {
+                        name: "Yes",
+                        action: function(event) {
+                            window.location = self.$backButton.attr('href');
+                        }
+                    },
+                    {
+                        name: "No",
+                        action: function(event) {
+                            self.messenger.hideMessage();
+                        }
+                    }
+                ];
+                self.messenger.showMessage("Do you really want to close this page?", true, null, controls);
+                return false;
+            });
         },
 
         show: function () {
@@ -46,6 +79,7 @@ function(Backbone, tmpl, Game) {
 
         hide: function () {
             if (!this.hidden) {
+                this.messenger.hideMessage();
                 this.$el.hide();
                 this.hidden = true;
             }

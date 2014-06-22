@@ -6,6 +6,7 @@
             <span class="back-button__caption">Back</span>
         </a>
         <fest:include context="json" src="./_progress.xml" />
+
         <canvas id="editor-field" tabindex="1">You have a very old browser, dude.</canvas>
     </div>
     <div id="editor-sidebar" class="editor-sidebar">
@@ -45,4 +46,5 @@
             </form>
         </div>
     </div>
+    <fest:include context="json" src="./_message.xml" />
 </fest:template>
