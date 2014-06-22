@@ -22,12 +22,12 @@ function(Backbone, tmpl) {
         },
         
         show: function () {
-            this.$el.show();
-            this.hidden = false;
             $.event.trigger({
                 type: "showPageEvent",
                 pageId: this.pageId
             });
+            this.$el.show();
+            this.hidden = false;
         },
 
         hide: function () {

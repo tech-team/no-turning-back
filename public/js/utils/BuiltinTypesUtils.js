@@ -1,6 +1,7 @@
 define([],
     function() {
-        return function() {
+
+        var ArrayExtensions = function() {
             Array.prototype.move = function (old_index, new_index) {
                 while (old_index < 0) {
                     old_index += this.length;
@@ -28,6 +29,25 @@ define([],
             Array.prototype.removeAt = function (id) {
                 this.splice(id, 1);
             };
+        };
+
+        var StringExtensions = function() {
+            if (!String.prototype.format) {
+                String.prototype.format = function() {
+                    var args = arguments;
+                    return this.replace(/{(\d+)}/g, function(match, number) {
+                        return typeof args[number] != 'undefined'
+                            ? args[number]
+                            : match
+                            ;
+                    });
+                };
+            }
+        };
+
+        return function() {
+            ArrayExtensions();
+            StringExtensions();
         };
     }
 );

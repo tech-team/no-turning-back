@@ -9,20 +9,33 @@
   opacity: $dimmer-opacity;
 }
 
+$messageWidth: 350px;
+$messageHeight: 200px;
+
+$controlsHeight: 40px;
+
+
+@mixin message-inner-thing($width, $height, $xOffset, $yOffset) {
+  width: $width;
+  height: $height;
+  background-color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate($xOffset, $yOffset);
+  -ms-transform: translate($xOffset, $yOffset);
+  transform: translate($xOffset, $yOffset);
+}
+
+$borderRadius: 20px;
+
 .message {
   display: none;
+  width: $messageWidth;
   &__textbox {
-    width: 350px;
-    height: 200px;
-    background-color: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+    @include message-inner-thing($messageWidth, $messageHeight, -50%, -50%);
 
-    border-radius: 20px;
+    border-radius: $borderRadius;
 
     &__text {
       color: black;
@@ -39,5 +52,41 @@
       transform: translateY(-50%);
 
     }
+  };
+
+  &__controls {
+    @include message-inner-thing($messageWidth, $controlsHeight, -50%, 180%);
+//    display: none;
+    border-radius: 0 0 $borderRadius $borderRadius;
+    text-align: center;
+
+    &__button {
+      display: inline-block;
+      margin: 0 auto;
+      margin-right: 20px;
+      width: 70px;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 100px;
+
+      font-weight: bold;
+      font-size: 22px;
+      font-family: $font;
+      color: black;
+      background-color: white;
+
+      cursor: pointer;
+      border: solid 1px black;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &:hover {
+        color: white;
+        background-color: black;
+      }
+    }
+
   }
 }

@@ -22,6 +22,8 @@ function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
         game: null,
         guid: null,
 
+        $backButton: null,
+
         $pauseButton: null,
         $pauseIconPause: null,
         $pauseIconPlay: null,
@@ -121,6 +123,8 @@ function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             this.scene = this.$el.find('#scene');
             this.guid = this.$el.find('#token');
 
+            this.$backButton = this.$el.find('.back-button');
+
             this.$pauseButton = this.$el.find('.pause-icon');
             this.$pauseIconPause = this.$pauseButton.find('.game-icon__pause');
             this.$pauseIconPlay = this.$pauseButton.find('.game-icon__play');
@@ -141,6 +145,31 @@ function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
         createEvents: function() {
             var self = this;
+
+            this.$backButton.on('click', function(event) {
+                if (!self.gamePaused)
+                    self._pauseGame();
+
+                var controls = [
+                    {
+                        name: "Yes",
+                        action: function(event) {
+                            window.location = self.$backButton.attr('href');
+                        }
+                    },
+                    {
+                        name: "No",
+                        action: function(event) {
+                            if (self.gamePaused)
+                                self._resumeGame();
+
+                            self.messenger.hideMessage();
+                        }
+                    }
+                ];
+                self.messenger.showMessage("Do you really want to close this page?", true, null, controls);
+                return false;
+            });
 
 
             this.$mobileIcon.on('mousemove', function() {
@@ -182,6 +211,7 @@ function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
         show: function () {
             this.$el.show();
             this.hidden = false;
+            this.backPermitted = false;
             $.event.trigger({
                 type: "showPageEvent",
                 pageId: this.pageId
@@ -192,6 +222,7 @@ function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
         hide: function () {
             if (!this.hidden) {
+                this.messenger.hideMessage();
                 this.$el.hide();
                 this.game.stop();
                 this.hidden = true;
@@ -203,7 +234,7 @@ function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                 case "orientation":
                     if (data.orientation === "portrait") {
                         console.log("change orientation!");
-                        this.messenger.showMessage("Change device orientation to landsape", true);
+                        this.messenger.showMessage("Change device orientation to landscape", true);
                         this.game.pause(true);
                     }
                     else {
