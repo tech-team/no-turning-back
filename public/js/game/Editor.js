@@ -317,8 +317,6 @@ define([
                     dispObj.y -= dy*Math.cos(a) + dx*Math.sin(a);
 
                     //save data
-                    //dispObj.data.x = dispObj.x;
-                    //dispObj.data.y = dispObj.y;
                     _.each(self.multiselection, function(obj) {
                         console.log(obj);
                         obj.data.x = obj.x;
