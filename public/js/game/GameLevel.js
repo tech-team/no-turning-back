@@ -743,6 +743,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     if (door.role === "exit") {
                         self.finish();
                     }
+
+                    return false; //do not open all the doors at once
                 }
             });
         },
@@ -750,10 +752,12 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         buttonsPressingHandle: function(event) {
             var self = this;
 
+            //TODO: надо развязать проверку нажатия и проверку отпускания кнопки
+            //TODO: так как нажиматься должна только 1 кнопка за раз, а обновление вообще должно происходить для всех
+            //TODO: можно попробовать повесить отпукание в UntilTimer или setTimeout
             _.each(this.buttons, function(button) {
                 button.update(event, self.player, self.doors);
 
-                //TODO: maybe all the code below could be moved to button.update?
                 if (button.justPressed === true) {
                     ResourceManager.playSound(ResourceManager.soundList.Click);
                     button.justPressed = false;

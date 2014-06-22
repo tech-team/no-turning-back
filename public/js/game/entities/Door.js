@@ -42,39 +42,24 @@ define([
                     if (this.state === "closed") {
                         this.requiresMessage = undefined;
 
-                        if(_.isArray(this.requires)) {
-                            _.each(this.requires, function(requirement) {
-                                if (!self.requiresMessage) {
-                                    if (requirement === "kill_all") {
-                                        if (zombiesLeft !== 0) {
-                                            self.requiresMessage = Messenger.doorLockedKillAll;
-                                        }
-                                    }
-                                    else if(requirement === "puzzle") {
-                                        self.requiresMessage = Messenger.doorLockedPuzzle;
-                                    }
-                                    else if(!(_.contains(player.keys, requirement))) {
-                                        self.requiresMessage = Messenger.prepareMessage(Messenger.doorLocked, requirement)
-                                    }
+                        var testRequirement = function(requirement) {
+                            if (!self.requiresMessage) {
+                                if (requirement === "kill_all" && zombiesLeft !== 0) {
+                                    self.requiresMessage = Messenger.doorLockedKillAll;
                                 }
-                            });
-                        }
-                        else {
-                            if (!this.requiresMessage) {
-                                //TODO: copy paste :(
-                                if (this.requires === "kill_all") {
-                                    if (zombiesLeft !== 0) {
-                                        self.requiresMessage = Messenger.doorLockedKillAll;
-                                    }
-                                }
-                                else if(this.requires === "puzzle") {
+                                else if(requirement === "puzzle") {
                                     self.requiresMessage = Messenger.doorLockedPuzzle;
                                 }
-                                else if(!_.contains(player.keys, this.requires)) {
-                                    self.requiresMessage = Messenger.prepareMessage(Messenger.doorLocked, this.requires);
+                                else if(!(_.contains(player.keys, requirement))) {
+                                    self.requiresMessage = Messenger.prepareMessage(Messenger.doorLocked, requirement)
                                 }
                             }
-                        }
+                        };
+
+                        if(_.isArray(this.requires))
+                            _.each(this.requires, testRequirement);
+                        else
+                            testRequirement(this.requires);
 
                         if (!this.requiresMessage) {
                             self.justOpened = true;
