@@ -44,8 +44,9 @@ define([
 
                         var testRequirement = function(requirement) {
                             if (!self.requiresMessage) {
-                                if (requirement === "kill_all" && zombiesLeft !== 0) {
-                                    self.requiresMessage = Messenger.doorLockedKillAll;
+                                if (requirement === "kill_all") {
+                                    if (zombiesLeft !== 0)
+                                        self.requiresMessage = Messenger.doorLockedKillAll;
                                 }
                                 else if(requirement === "puzzle") {
                                     self.requiresMessage = Messenger.doorLockedPuzzle;
