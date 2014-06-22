@@ -11,7 +11,7 @@ define([
                 this.x = obj.x;
                 this.y = obj.y;
                 this.r = obj.r;
-                this.state = ( obj.state === "open" ) ? "open" : "closed" ;
+                this.state = ( obj.state === "open" ) ? Door.State.Open : Door.State.Closed ;
                 this.tex = obj.tex;
                 this.activationRadius = 90;
                 this.requires = obj.requires;
@@ -19,8 +19,6 @@ define([
                 this.role = obj.role || null;
                 this.puzzle = obj.puzzle || null;
                 this.inputCode = "";
-                this.justOpened = false;
-                this.justTried = false;
             },
 
             __classvars__: {
@@ -39,8 +37,8 @@ define([
                 };
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
-                    if (this.state === "closed") {
-                        this.requiresMessage = undefined;
+                    if (this.state === Door.State.Closed) {
+                        this.requiresMessage = null;
 
                         var testRequirement = function(requirement) {
                             if (!self.requiresMessage) {
@@ -63,17 +61,17 @@ define([
                             testRequirement(this.requires);
 
                         if (!this.requiresMessage) {
-                            self.justOpened = true;
-                            self.state = "open";
+                            self.state = Door.State.Open;
                             self.tex = "door-open";
                         }
 
                         else if (player.messageCooldown <= 0) {
-                            this.justTried = true;
                             player.messageCooldown = 100;
                         }
                     }
+                    return true;
                 }
+                return false;
             }
         });
 

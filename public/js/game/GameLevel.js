@@ -149,7 +149,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             var graphics = new easeljs.Graphics();
             this.effects.fogBox = new easeljs.Shape(graphics);
 
-            var fogBox = this.containers["effect"].addChild(this.effects.fogBox);
+            var fogBox = this.containers["effect"].addChild(this.effects.fogBox); // TODO: unused variable
 
             this.effects.fog = this.addToStage({
                 type: "effect",
@@ -191,6 +191,16 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             this.createCollisionObjects();
             soundjs.Sound.stop();
+
+            this.createEvents();
+        },
+
+        createEvents: function() {
+            var self = this;
+            this.keyCoder.addEventListener("keyup", KeyCoder.E, function(event) {
+                self.chestsOpeningHandle(event);
+                self.doorsOpeningHandle(event);
+            });
         },
 
         resize: function() {
@@ -217,23 +227,25 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         },
 
         createCollisionObjects: function() {
-            for (var i = 0; i < this.walls.length; ++i) {
-                this.collisionObjects.push(this.walls[i]);
-            }
+            var self = this;
 
-            for (var i = 0; i < this.zombies.length; ++i) {
-                this.collisionObjects.push(this.zombies[i].dispObj);
-            }
-            for (var i = 0; i < this.doors.length; ++i) {
-                if (this.doors[i].state === "closed") {
-                    this.collisionObjects.push(this.doors[i].dispObj);
+            _.each(this.walls, function(wall) {
+                self.collisionObjects.push(wall);
+            });
+
+            _.each(this.zombies, function(zombie) {
+                self.collisionObjects.push(zombie.dispObj);
+            });
+
+            _.each(this.doors, function(door) {
+                if (door.state === Door.State.Closed) {
+                    self.collisionObjects.push(door.dispObj);
                 }
-            }
+            });
 
-            //Порядок добавления важен. Или не очень.
-            for (var i = 0; i < this.chests.length; ++i) {
-                this.collisionObjects.push(this.chests[i].dispObj);
-            }
+            _.each(this.chests, function(chest) {
+                self.collisionObjects.push(chest.dispObj);
+            });
         },
 
         onJoystickMessage: function(data, answer) {
@@ -241,6 +253,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 return;
 
             if (data.type === "game") {
+                var event = null;
                 switch (data.action) {
                     case "shoot":
                         if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
@@ -252,7 +265,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     case "weaponchange":
                         var weapon = data.weapon;
                         console.log(weapon);
-                        var event = (new KeyCoder()).getKeys();
+                        event = (new KeyCoder()).getKeys();
                         switch (weapon) {
                             case "knife":
                                 event.keys[KeyCoder.ONE] = true;
@@ -277,7 +290,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         }
                         break;
                     case "use":
-                        var event = (new KeyCoder()).getKeys();
+                        event = (new KeyCoder()).getKeys();
                         event.keys[KeyCoder.E] = true;
                         this.chestsOpeningHandle(event);
                         this.buttonsPressingHandle(event);
@@ -293,8 +306,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 		update: function(event) {
             if (this.finished)
                 return;
-            
-            var self = this;
 
             if (this.checkBounds(this.player.dispObj)) {
                 this.player.dispObj.x = this.prevPlayerPos.x;
@@ -313,10 +324,10 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             this.dropsHandle();
 
             this.buttonsPressingHandle(event);
-            if (event.keys[KeyCoder.E]) {
-                this.chestsOpeningHandle(event);
-                this.doorsOpeningHandle(event);
-            }
+//            if (event.keys[KeyCoder.E]) {
+//                this.chestsOpeningHandle(event);
+//                this.doorsOpeningHandle(event);
+//            }
 
             this.player.update(event, this.collisionObjects);
 
@@ -482,7 +493,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     this.bullets.splice(i, 1);
                     break;
                 }
-                for(var j = 0; j < this.zombies.length; ++j) {
+                var j = 0;
+                for(j = 0; j < this.zombies.length; ++j) {
                     if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
                         this.zombies[j].health -= this.bullets[i].power;
                         this.removeFromStage(this.bullets[i].dispObj);
@@ -491,7 +503,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         break out;
                     }
                 }
-                for(var j = 0; j < this.collisionObjects.length; ++j) {
+                for(j = 0; j < this.collisionObjects.length; ++j) {
                     if (collider.checkPixelCollision(this.bullets[i].dispObj,this.collisionObjects[j])) {
                         this.removeFromStage(this.bullets[i].dispObj);
                         ResourceManager.playSound(ResourceManager.soundList.BulletRicochet);
@@ -569,15 +581,15 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     }
                     break;
                 case "key":
-                    if (!(item['name'] in self.player.keys)) {
+                    if (!(item['name'] in this.player.keys)) {
                         this.player.keys.push(item['name']);
                         Messenger.showMessage(Messenger.keyPicked, item['name']);
                     }
                     break;
                 default:
                     if (item['name']) {
-                        this.player.inventory.push(drop['name']);
-                        Messenger.showMessage(Messenger.newItemPicked, drop['name']);
+                        this.player.inventory.push(item['name']);
+                        Messenger.showMessage(Messenger.newItemPicked, item['name']);
                     }
             }
         },
@@ -589,12 +601,11 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 if (self.checkReach(chest)) {
                     chest.update(event, self.player);
 
-                    if (chest.justTried == true) {
-                        chest.justTried = false;
+                    if (chest.state === Chest.State.Closed) {
                         Messenger.showMessage(Messenger.chestLocked, chest.requiresMessage);
                         return false;
                     }
-                    else if (chest.justOpened == true) {
+                    else {
                         ResourceManager.playSound(ResourceManager.soundList.ChestOpen);
                         chest.justOpened = false;
 
@@ -618,9 +629,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 //can't use _.each here because of splice in the end, but
                 var drop = this.drops[i]; //caching and readability!
 
-                //TODO: looks like a copy of chest handling -_-
-                //TODO: refactoring required?
-
                 if (this.checkReach(drop)) {
                     if (collider.checkPixelCollision(drop, this.player.dispObj)) {
                         this.itemInteraction(drop.data, true);
@@ -636,15 +644,16 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             var self = this;
             
             _.each(this.doors, function(door) {
-                door.update(event, self.player, self.zombies.length);
-                if (door.justTried == true) {
-                    door.justTried = false;
+                var isNear = door.update(event, self.player, self.zombies.length);
+
+                if (!isNear) return;
+
+                if (door.state === Door.State.Closed) {
                     Messenger.showMessage(door.requiresMessage);
                 }
-                else if (door.justOpened == true) {
+                else {
                     ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
 
-                    door.justOpened = false;
                     for (var j = 0; j < self.collisionObjects.length; ++j) {
                         if (self.collisionObjects[j] == door.dispObj) {
                             self.collisionObjects.splice(j, 1);

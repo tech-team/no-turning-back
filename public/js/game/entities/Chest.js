@@ -11,13 +11,11 @@ define([
                 this.y = obj.y;
                 this.r = obj.r;
                 this.storage = obj.storage;
-                this.state = ( obj.state === "open" ) ? "open" : "closed" ;
+                this.state = ( obj.state === "open" ) ? Chest.State.Open : Chest.State.Closed ;
                 this.requires = obj.requires;
                 this.requiresMessage = "";
                 this.activationRadius = 50;
-                this.tex = ( this.state === "open") ? "chest-open" : "chest";
-                this.justTried = false;
-                this.justOpened = false;
+                this.tex = ( this.state === Chest.State.Open) ? "chest-open" : "chest";
             },
 
             __classvars__: {
@@ -30,13 +28,13 @@ define([
             update: function(event, player) {
 
                 var vectorToPlayer = {
-                x: player.dispObj.x - this.dispObj.x,
-                y: player.dispObj.y - this.dispObj.y,
-                distance: function() { return Math.sqrt(this.x*this.x + this.y*this.y); }
+                    x: player.dispObj.x - this.dispObj.x,
+                    y: player.dispObj.y - this.dispObj.y,
+                    distance: function() { return Math.sqrt(this.x*this.x + this.y*this.y); }
                 };
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
-                    if (this.state === "closed") {
+                    if (this.state === Chest.State.Closed) {
                         this.requiresMessage = "";
 
                         if (this.requires) {
@@ -53,12 +51,10 @@ define([
                         }
 
                         if (!this.requiresMessage) {
-                            this.justOpened = true;
-                            this.state = "open";
+                            this.state = Chest.State.Open ;
                             this.tex = "chest-open";
                         }
                         else if (player.messageCooldown <= 0) {
-                            this.justTried = true;
                             player.messageCooldown = 100;
                         }
                     }
