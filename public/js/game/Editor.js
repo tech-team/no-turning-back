@@ -16,11 +16,14 @@ define([
                 duplicateDelta: 30,
                 helpMessage:
                         "<h2>Quick help</h2>" +
-                        "<div align='left'>Use mouse to select and move objects<br>" +
+                        "<div align='left'>" +
+                        "Use mouse to select and move objects<br>" +
+                        "Ctrl+click to select multiple objects<br>" +
                         "WASD to move<br>" +
                         "QE to rotate<br>" +
                         "FB to bring to front or back<br>" +
-                        "Double click to clone object<br>" +
+                        "Double click or Ctrl+V to clone<br>" +
+                        "DEL to delete selected objects<br>" +
                         "Shift + mouse to drag whole level</div>"
             },
 
