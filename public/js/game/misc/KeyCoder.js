@@ -22,7 +22,7 @@ function(Class, $, _) {
 
                 _.each(self.listeners, function(el) {
                     if (el.event === "keydown" && el.key === event.keyCode)
-                        el.handler(el);
+                        el.handler(event);
                 });
 			});
 
@@ -31,7 +31,7 @@ function(Class, $, _) {
 
                 _.each(self.listeners, function(el) {
                     if (el.event === "keyup" && el.keyCode === event.keyCode) {
-                        el.handler(el);
+                        el.handler(event);
                     }
                 });
             });
@@ -59,6 +59,7 @@ function(Class, $, _) {
 			UP_ARROW: 38,
 			RIGHT_ARROW: 39,
 			DOWN_ARROW: 40,
+            DEL: 46,
             ONE: 49,
             TWO: 50,
             THREE: 51,
@@ -76,6 +77,7 @@ function(Class, $, _) {
             P: 80,
             Q: 81,
             S: 83,
+            V: 86,
             W: 87,
             X: 88,
             Z: 90

@@ -16,11 +16,14 @@ define([
                 duplicateDelta: 30,
                 helpMessage:
                         "<h2>Quick help</h2>" +
-                        "<div align='left'>Use mouse to select and move objects<br>" +
+                        "<div align='left'>" +
+                        "Use mouse to select and move objects<br>" +
+                        "Ctrl+click to select multiple objects<br>" +
                         "WASD to move<br>" +
                         "QE to rotate<br>" +
                         "FB to bring to front or back<br>" +
-                        "Double click to clone object<br>" +
+                        "Double click or Ctrl+V to clone<br>" +
+                        "DEL to delete selected objects<br>" +
                         "Shift + mouse to drag whole level</div>"
             },
 
@@ -32,6 +35,8 @@ define([
 
                 this.showingWpsOwner = null;
                 this.selectedObject = null;
+                this.multiselection = []; //used for multiple selection using Ctrl and Ctr+C/V
+
                 this.selectionFilter = new easeljs.ColorFilter(1, 1, 1, 1, 10, 60, 10, 100);
                 this.wpPath = null;
 
@@ -64,9 +69,14 @@ define([
                     return false;
                 });
 
+                var onDeleteObjects = function() {
+                    _.each(self.multiselection, function(obj) {
+                        self.deleteObject(obj);
+                    });
+                };
+
                 $('#deleteObject').click(function() {
-                    if (self.selectedObject)
-                        self.deleteObject(self.selectedObject);
+                    onDeleteObjects();
                     return false;
                 });
 
@@ -103,6 +113,15 @@ define([
 
                 this.keyCoder.addEventListener("keyup", KeyCoder.B, function(event) {
                     self.bringToBack(self.selectedObject);
+                });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.V, function(event) {
+                    if (event.ctrlKey)
+                        self.duplicateObjects();
+                });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.DEL, function(event) {
+                    onDeleteObjects();
                 });
 
                 alertify.alert(Editor.helpMessage);
@@ -246,15 +265,22 @@ define([
                     return;
                 }
 
-                var oldReg = {x: 0, y: 0};
-
                 dispObj.on("mousedown", function(evt) {
                     var dispObj = evt.currentTarget;
 
-                    self.selectObject(dispObj);
+                    if (evt.nativeEvent.ctrlKey) {
+                        self.selectOneMoreObject(dispObj);
+                        return;
+                    }
+
+                    if (!_.contains(self.multiselection, dispObj))
+                        self.selectObject(dispObj);
+
                     var point = dispObj.globalToLocal(evt.stageX + self.mainContainer.x, evt.stageY + self.mainContainer.y);
-                    oldReg.x = dispObj.regX;
-                    oldReg.y = dispObj.regY;
+                    dispObj.oldReg = {
+                        x: dispObj.regX,
+                        y: dispObj.regY
+                    };
 
                     dispObj.regX = point.x;
                     dispObj.regY = point.y;
@@ -264,8 +290,15 @@ define([
                 });
 
                 dispObj.on("pressmove", function(evt) {
-                    evt.currentTarget.x = evt.stageX;
-                    evt.currentTarget.y = evt.stageY;
+                    var origin = {
+                        x: evt.currentTarget.x,
+                        y: evt.currentTarget.y
+                    };
+
+                    _.each(self.multiselection, function(obj) {
+                        obj.x = evt.stageX + (obj.x - origin.x);
+                        obj.y = evt.stageY + (obj.y - origin.y);
+                    });
 
                     self.updateWpPath();
                     self.regenerateObjectPropertiesTable();
@@ -275,11 +308,11 @@ define([
                 dispObj.on("click", function(evt) {
                     var dispObj = evt.currentTarget;
 
-                    var dx = dispObj.regX - oldReg.x;
-                    var dy = dispObj.regY - oldReg.y;
+                    var dx = dispObj.regX - dispObj.oldReg.x;
+                    var dy = dispObj.regY - dispObj.oldReg.y;
 
-                    dispObj.regX = oldReg.x;
-                    dispObj.regY = oldReg.y;
+                    dispObj.regX = dispObj.oldReg.x;
+                    dispObj.regY = dispObj.oldReg.y;
 
                     var a = dispObj.rotation * Math.PI / 180;
 
@@ -287,8 +320,11 @@ define([
                     dispObj.y -= dy*Math.cos(a) + dx*Math.sin(a);
 
                     //save data
-                    evt.currentTarget.data.x = dispObj.x;
-                    evt.currentTarget.data.y = dispObj.y;
+                    _.each(self.multiselection, function(obj) {
+                        console.log(obj);
+                        obj.data.x = obj.x;
+                        obj.data.y = obj.y;
+                    });
                 });
 
                 dispObj.on("dblclick", function(evt) {
@@ -306,37 +342,49 @@ define([
             },
 
             keyFunc: function(event) {
-                if (this.selectedObject == null)
+                if (_.isEmpty(this.multiselection))
                     return;
 
                 if (event.keys[KeyCoder.A]) {
-                    this.selectedObject.x--;
-                    this.selectedObject.data.x--;
+                    _.each(this.multiselection, function(obj) {
+                        obj.x--;
+                        obj.data.x--;
+                    });
                 }
 
                 if (event.keys[KeyCoder.D]) {
-                    this.selectedObject.x++;
-                    this.selectedObject.data.x++;
+                    _.each(this.multiselection, function(obj) {
+                        obj.x++;
+                        obj.data.x++;
+                    });
                 }
 
                 if (event.keys[KeyCoder.W]) {
-                    this.selectedObject.y--;
-                    this.selectedObject.data.y--;
+                    _.each(this.multiselection, function(obj) {
+                        obj.y--;
+                        obj.data.y--;
+                    });
                 }
 
                 if (event.keys[KeyCoder.S]) {
-                    this.selectedObject.y++;
-                    this.selectedObject.data.y++;
+                    _.each(this.multiselection, function(obj) {
+                        obj.y++;
+                        obj.data.y++;
+                    });
                 }
 
                 if (event.keys[KeyCoder.Q]) {
-                    this.selectedObject.rotation--;
-                    this.selectedObject.data.r--;
+                    _.each(this.multiselection, function(obj) {
+                        obj.rotation--;
+                        obj.data.r--;
+                    });
                 }
 
                 if (event.keys[KeyCoder.E]) {
-                    this.selectedObject.rotation++;
-                    this.selectedObject.data.r++;
+                    _.each(this.multiselection, function(obj) {
+                        obj.rotation++;
+                        obj.data.r++;
+                    });
                 }
 
                 //TODO: move it to KeyCoder maybe?
@@ -431,14 +479,20 @@ define([
             },
 
             selectObject: function(dispObj) {
+                var self = this;
+
                 //reset filters
-                if (this.selectedObject) {
-                    this.applyFilters(this.selectedObject, null);
-                }
+                _.each(this.multiselection, function(sel) {
+                    self.applyFilters(sel, null);
+                });
+                this.multiselection = [];
+                this.selectedObject = null;
 
                 //select object
                 this.selectedObject = dispObj;
                 if (this.selectedObject) {
+                    this.multiselection.push(this.selectedObject);
+
                     this.applyFilters(this.selectedObject, [this.selectionFilter]);
 
                     if (this.selectedObject.data.type == 'zombie') {
@@ -452,11 +506,27 @@ define([
                 this.regenerateObjectPropertiesTable();
             },
 
+            selectOneMoreObject: function(dispObj) {
+                if (_.isEmpty(this.multiselection))
+                    this.selectObject(dispObj);
+                else {
+                    if (_.contains(this.multiselection, dispObj))
+                        return;
+
+                    this.selectedObject = null;
+
+                    this.applyFilters(dispObj, [this.selectionFilter]);
+                    this.multiselection.push(dispObj);
+
+                    this.regenerateObjectPropertiesTable();
+                }
+            },
+
             addObjectByData: function(data, id) {
                 this.levelData[data.type + 's'].push(data);
 
                 var dispObj = this.addToStage(data, false, id);
-                this.selectObject(dispObj);
+                this.selectOneMoreObject(dispObj);
 
                 return dispObj;
             },
@@ -494,6 +564,17 @@ define([
                 }
 
                 var dispObj = this.addObjectByData(data);
+            },
+
+            duplicateObjects: function() {
+                var self = this;
+
+                var selection = _.clone(self.multiselection);
+                self.selectObject(null);
+
+                _.each(selection, function(obj) {
+                    self.duplicateObject(obj);
+                });
             },
 
             duplicateObject: function(dispObj) {
