@@ -417,42 +417,28 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         },
 
         weaponsHandle: function(event) {
-//            if(this.player.shootCooldown == 0) {
-                if(event.keys[KeyCoder.ONE]) {
-                    if ("knife" in this.player.weapons && this.player.currentWeapon != "knife") {
-                        this.player.currentWeapon = "knife";
-                        this.player.dispObj.tex = "player";
-                        this.removeFromStage(this.player.dispObj);
-                        this.player.setDispObj(this.addToStage(this.player.dispObj));
+            var weapon = null;
+            if(event.keys[KeyCoder.ONE]) {
+                weapon = "knife";
+            }
+            if(event.keys[KeyCoder.TWO]) {
+                weapon = "pistol";
+            }
+            if(event.keys[KeyCoder.THREE]) {
+                weapon = "shotgun";
+            }
 
-                        ResourceManager.playSound(ResourceManager.soundList.knife.Draw, ResourceManager.weaponData.drawCooldown);
-                        this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
-                    }
+            if (weapon != null) {
+                if (this.player.hasWeapon(weapon) && this.player.currentWeapon != weapon) {
+                    this.player.currentWeapon = weapon;
+                    this.player.dispObj.tex = "player-{0}".format(this.player.currentWeapon);
+                    this.removeFromStage(this.player.dispObj);
+                    this.player.setDispObj(this.addToStage(this.player.dispObj));
+
+                    ResourceManager.playSound(ResourceManager.soundList[this.player.currentWeapon].Draw, ResourceManager.weaponData.drawCooldown);
+                    this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
                 }
-                if(event.keys[KeyCoder.TWO]) {
-                    if ("pistol" in this.player.weapons && this.player.currentWeapon != "pistol") {
-                        this.player.currentWeapon = "pistol";
-                        this.player.dispObj.tex = "player-pistol";
-                        this.removeFromStage(this.player.dispObj);
-                        this.player.setDispObj(this.addToStage(this.player.dispObj));
-
-                        ResourceManager.playSound(ResourceManager.soundList.pistol.Draw, ResourceManager.weaponData.drawCooldown);
-                        this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
-                    }
-                }
-                if(event.keys[KeyCoder.THREE]) {
-                    if ("shotgun" in this.player.weapons && this.player.currentWeapon != "shotgun") {
-                        this.player.currentWeapon = "shotgun";
-                        this.player.dispObj.tex = "player-shotgun";
-                        this.removeFromStage(this.player.dispObj);
-                        this.player.setDispObj(this.addToStage(this.player.dispObj));
-
-                        ResourceManager.playSound(ResourceManager.soundList.shotgun.Draw, ResourceManager.weaponData.drawCooldown);
-                        this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
-                    }
-                }
-
-//            }
+            }
         },
 
         shootingHandle: function() {

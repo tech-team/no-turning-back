@@ -70,7 +70,7 @@ function($, _, Class, signals, createjs, alertify, ndgmr, KeyCoder, LevelManager
             var self = this;
             this.levelManager.loadNextLevel(function(data) {
                 if (!self.editorMode) {
-                    self.player = new Player()
+                    self.player = new Player();
                     self.createGameLevel(data);
                 }
                 else {
