@@ -1,6 +1,7 @@
 define([
-    'game/weapons/AbstractWeapon'
-], function(Weapon) {
+    'game/weapons/AbstractWeapon',
+    'game/misc/Vector'
+], function(Weapon, Vector) {
     var Knife = Weapon.$extend({
         __init__: function(ammo, data) {
             this.$super(ammo, data, true);
@@ -12,11 +13,12 @@ define([
 
             var hit = false;
             for (var i = 0; i < targets.length; ++i) {
-                var xToZombie = player.dispObj.x - targets[i].dispObj.x;
-                var yToZombie = player.dispObj.y - targets[i].dispObj.y;
-                var distanceToZombie = Math.sqrt(xToZombie * xToZombie + yToZombie * yToZombie);
+                var toZombie = new Vector({
+                    x: player.dispObj.x - targets[i].dispObj.x,
+                    y: player.dispObj.y - targets[i].dispObj.y
+                });
 
-                if (distanceToZombie <= this.reach) {
+                if (toZombie.distance() <= this.reach) {
                     targets[i].health -= this.data.power;
                     hit = true;
                 }

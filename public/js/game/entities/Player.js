@@ -30,7 +30,6 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             this.currentWeapon = "knife";
             this.weapons = { };
             this.addWeapon(this.currentWeapon);
-            this.addWeapon("shotgun", 200);
 		},
 
         __classvars__: {

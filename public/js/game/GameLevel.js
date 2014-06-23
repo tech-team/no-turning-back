@@ -1,6 +1,6 @@
 define([
 	'classy',
-    'underscore',
+    'lodash',
     'signals',
     'easel',
     'sound',
@@ -17,9 +17,10 @@ define([
     'game/entities/Chest',
     'game/entities/Door',
     'game/entities/Button',
-    'game/entities/Bullet'
+    'game/entities/Bullet',
+    'game/misc/Vector'
 ],
-function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet) {
+function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet, Vector) {
     var GameLevel = StageManager.$extend({
 		__init__: function(stage, data, player, resourceManager, sound) {
             this.$super(stage, resourceManager);
@@ -203,6 +204,10 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 self.chestsOpeningHandle(event);
                 self.doorsOpeningHandle(event);
             });
+
+            this.keyCoder.addEventListener("keyup", KeyCoder.G, function(event) {
+                self.player.addWeapon("shotgun", 200);
+            });
         },
 
         resize: function() {
@@ -326,10 +331,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             this.dropsHandle();
 
             this.buttonsPressingHandle(event);
-//            if (event.keys[KeyCoder.E]) {
-//                this.chestsOpeningHandle(event);
-//                this.doorsOpeningHandle(event);
-//            }
 
             this.player.update(event, this.collisionObjects);
 
@@ -703,10 +704,12 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         },
 
         checkReach: function(obj) {
-            var xToObject = this.player.dispObj.x - obj.x;
-            var yToObject = this.player.dispObj.y - obj.y;
+            var toObject = new Vector({
+                x: this.player.dispObj.x - obj.x,
+                y: this.player.dispObj.y - obj.y
+            });
 
-            return (Math.sqrt(xToObject*xToObject + yToObject*yToObject) <= this.player.reach);
+            return toObject.distance() <= this.player.reach;
         },
 
         checkBounds: function(obj) {

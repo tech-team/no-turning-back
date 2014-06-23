@@ -1,9 +1,10 @@
 define([
     'classy',
-    'underscore',
-    'game/entities/GameObject'
+    'lodash',
+    'game/entities/GameObject',
+    'game/misc/Vector'
 ],
-    function(Class, _, GameObject) {
+    function(Class, _, GameObject, Vector) {
         var Chest = GameObject.$extend({
             __init__: function(obj) {
                 this.type = "chest";
@@ -27,11 +28,10 @@ define([
 
             update: function(event, player) {
 
-                var vectorToPlayer = {
+                var vectorToPlayer = new Vector({
                     x: player.dispObj.x - this.dispObj.x,
-                    y: player.dispObj.y - this.dispObj.y,
-                    distance: function() { return Math.sqrt(this.x*this.x + this.y*this.y); }
-                };
+                    y: player.dispObj.y - this.dispObj.y
+                });
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
                     if (this.state === Chest.State.Closed) {

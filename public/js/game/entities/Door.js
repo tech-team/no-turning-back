@@ -1,10 +1,11 @@
 define([
     'classy',
-    'underscore',
+    'lodash',
     'game/entities/GameObject',
-    'game/misc/Messenger'
+    'game/misc/Messenger',
+    'game/misc/Vector'
 ],
-    function(Class, _, GameObject, Messenger) {
+    function(Class, _, GameObject, Messenger, Vector) {
         var Door = GameObject.$extend({
             __init__: function(obj) {
                 this.type = "door";
@@ -30,11 +31,10 @@ define([
 
             update: function(event, player, zombiesLeft) {
                 var self = this;
-                var vectorToPlayer = {
+                var vectorToPlayer = new Vector({
                     x: player.dispObj.x - this.dispObj.x,
-                    y: player.dispObj.y - this.dispObj.y,
-                    distance: function() { return Math.sqrt(this.x*this.x + this.y*this.y); }
-                };
+                    y: player.dispObj.y - this.dispObj.y
+                });
 
                 if (vectorToPlayer.distance() <= this.activationRadius) {
                     if (this.state === Door.State.Closed) {

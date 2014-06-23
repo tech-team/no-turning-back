@@ -1,11 +1,12 @@
 define([
     'classy',
-    'underscore',
+    'lodash',
     'game/entities/GameObject',
     'game/misc/KeyCoder',
-    'game/misc/Messenger'
+    'game/misc/Messenger',
+    'game/misc/Vector'
 ],
-    function(Class, _, GameObject, KeyCoder, Messenger) {
+    function(Class, _, GameObject, KeyCoder, Messenger, Vector) {
         var Button = GameObject.$extend({
             __init__: function(obj) {
                 this.type = "button";
@@ -26,11 +27,10 @@ define([
             },
 
             update: function(event, player, doors) {
-                var vectorToPlayer = {
+                var vectorToPlayer = new Vector({
                     x: player.dispObj.x - this.dispObj.x,
-                    y: player.dispObj.y - this.dispObj.y,
-                    distance: function() { return Math.sqrt(this.x*this.x + this.y*this.y); }
-                };
+                    y: player.dispObj.y - this.dispObj.y
+                });
 
                 if (event.keys[KeyCoder.E]) {
                     if (vectorToPlayer.distance() <= this.activationRadius && this.state === "depressed") {

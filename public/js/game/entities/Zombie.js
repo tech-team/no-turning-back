@@ -3,9 +3,10 @@ define([
     'game/entities/AliveObject',
     'game/ResourceManager',
     'sound',
-    'collision'
+    'collision',
+    'game/misc/Vector'
 ],
-    function(Class, AliveObject, ResourceManager, soundjs, collider) {
+    function(Class, AliveObject, ResourceManager, soundjs, collider, Vector) {
         var Zombie = AliveObject.$extend({
             __init__: function(obj) {
                 this.waypoints = obj.waypoints;
@@ -32,27 +33,26 @@ define([
                     this.target = this.dispObj;
                 }
 
-                var vectorsToWaypoint = {
+                var vectorsToWaypoint = new Vector({
                     x: this.target.x - this.dispObj.x,
                     y: this.target.y - this.dispObj.y
-                };
+                });
 
-                var vectorToPlayer = {
+                var vectorToPlayer = new Vector({
                     x: player.dispObj.x - this.dispObj.x,
-                    y: player.dispObj.y - this.dispObj.y,
-                    distance: function() { return Math.sqrt(this.x*this.x + this.y*this.y); }
-                };
+                    y: player.dispObj.y - this.dispObj.y
+                });
 
-                var angle = Math.atan2(vectorsToWaypoint.y,
-                                       vectorsToWaypoint.x);
+                var vectorToPlayerDistance = vectorToPlayer.distance();
+                var angle = vectorsToWaypoint.angle();
 
                 this.dispObj.rotation = (180 / Math.PI) * angle;
 
-                if (vectorToPlayer.distance() < this.followDistance) {
+                if (vectorToPlayerDistance < this.followDistance) {
                     this.target = player.dispObj;
                     if (this.canAttack) {
                         var self = this;
-                        if (!this.weapon && vectorToPlayer.distance() <= this.attackDistance) {
+                        if (!this.weapon && vectorToPlayerDistance <= this.attackDistance) {
                             player.damage(this.damage);
                             ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
                             this.canAttack = false;
@@ -79,7 +79,7 @@ define([
                     this.target = this.dispObj;
                 }
 
-                if (vectorToPlayer.distance() > this.attackDistance) {
+                if (vectorToPlayerDistance > this.attackDistance) {
                     if (vectorsToWaypoint.x != 0) {
                         offsetX = this.speed * Math.cos(angle);
                         this.dispObj.x += offsetX;
