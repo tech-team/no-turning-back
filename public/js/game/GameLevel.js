@@ -430,6 +430,16 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             });
         },
 
+        changeWeapon: function(name) {
+            this.player.currentWeapon = name;
+            this.player.dispObj.tex = "player-{0}".format(this.player.currentWeapon);
+            this.removeFromStage(this.player.dispObj);
+            this.player.setDispObj(this.addToStage(this.player.dispObj));
+
+            ResourceManager.playSound(ResourceManager.soundList[this.player.currentWeapon].Draw, ResourceManager.weaponData.drawCooldown);
+            this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
+        },
+
         weaponsHandle: function(event) {
             var weapon = null;
             if(event.keys[KeyCoder.ONE]) {
@@ -444,13 +454,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             if (weapon != null) {
                 if (this.player.hasWeapon(weapon) && this.player.currentWeapon != weapon) {
-                    this.player.currentWeapon = weapon;
-                    this.player.dispObj.tex = "player-{0}".format(this.player.currentWeapon);
-                    this.removeFromStage(this.player.dispObj);
-                    this.player.setDispObj(this.addToStage(this.player.dispObj));
-
-                    ResourceManager.playSound(ResourceManager.soundList[this.player.currentWeapon].Draw, ResourceManager.weaponData.drawCooldown);
-                    this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
+                    this.changeWeapon(weapon);
                 }
             }
         },
@@ -569,6 +573,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     }
                     else {
                         this.player.addWeapon(name, ammo);
+                        this.changeWeapon(name);
                         Messenger.showMessage(Messenger.newWeaponPicked, name);
                     }
                     if (playSounds)
