@@ -47,8 +47,8 @@ define([
                 },
                 levelStarted: {
                     text: ["Let's kill them all!", "Let's get started!", "Come get me, zombies!"],
-                    color: "#775588",
-                    period: 5
+                    color: "#9977AA",
+                    period: 7
                 },
                 levelFinished: {
                     text: ["Well done!", "Level finished"],
@@ -98,7 +98,7 @@ define([
                     var str = msg.text[0];
 
                     //text[0] is more likely to appear
-                    //consider it as main message
+                    //consider it as a main message
                     if (_.random(0, 3) == 0) {
                         var messageId = _.random(0, msg.text.length-1);
                         str = msg.text[messageId];
@@ -117,17 +117,16 @@ define([
                     if (!msg.prepared)
                         msg = this.prepareMessage.apply(this, arguments);
 
-
                     this._showMessage(msg.preparedText, msg.color, msg.period * 1000);
                 },
 
                 _showMessage: function(str, color, period) {
                     this.showingMessagesCount++;
 
-                    var text = new easeljs.Text(str, "20px Arial", color || Level.MessageColor.Default);
+                    var text = new easeljs.Text(str, "28px MacondoRegular", color || Level.MessageColor.Default);
                     text.x = this.stage.canvas.width / 2 - text.getMeasuredWidth() / 2;
                     text.y = text.getMeasuredHeight() * this.showingMessagesCount;
-                    text.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
+                    text.shadow = new easeljs.Shadow("#22AA22", -1, -1, 0);
 
                     var dispObjText = this.stage.addChild(text);
 
