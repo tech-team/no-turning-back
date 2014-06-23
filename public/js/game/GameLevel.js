@@ -135,7 +135,9 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             }
 
             //add player
+            data.player.tex = this.player.$class.weaponSpecificTex(this.player.currentWeapon);
             var playerObj = this.addToStage(data.player);
+
             this.player.setDispObj(playerObj);
             this.prevPlayerPos = {
                 x: this.player.dispObj.x,

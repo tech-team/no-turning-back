@@ -30,7 +30,14 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             this.currentWeapon = "knife";
             this.weapons = { };
             this.addWeapon(this.currentWeapon);
+            this.addWeapon("shotgun", 200);
 		},
+
+        __classvars__: {
+            weaponSpecificTex: function(weapon) {
+                return 'player-{0}'.format(weapon);
+            }
+        },
 
 
         setEffects: function(effects) {
@@ -58,7 +65,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
         },
 
         isCurrentWeaponMelee: function() {
-            return this.weapons[this.currentWeapon].immediate;
+            return this.weapons[this.currentWeapon].melee;
         },
 
         shoot: function(level) {

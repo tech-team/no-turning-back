@@ -6,7 +6,7 @@ define([
             this.ammo = ammo || 1;
             this.data = data;
             this.reach = 50;
-            this.immediate = melee;
+            this.melee = melee;
         },
 
         addAmmo: function(ammo) {
