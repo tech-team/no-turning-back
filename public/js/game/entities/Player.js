@@ -13,7 +13,6 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
 		__init__: function() {
             this.type = "player"; //type should be specified in each class it its' objects will be passed to addToStage
             this.health = 100;
-            this.maxHealth = 100;
             this.dead = false;
 			this.score = 0;
             this.shootCooldown = 0;
@@ -23,10 +22,6 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             this.inventory = [];
             this.keys = [];
 
-            this.power = 5;
-            this.reach = 50;
-            this.healthDecrease = 0.1;
-
             this.currentWeapon = "knife";
             this.weapons = { };
             this.addWeapon(this.currentWeapon);
@@ -35,7 +30,11 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
         __classvars__: {
             weaponSpecificTex: function(weapon) {
                 return 'player-{0}'.format(weapon);
-            }
+            },
+
+            Reach: 50,
+            MaxHealth: 100,
+            OverSaturationHealthDecrease: 0.1
         },
 
 
@@ -81,9 +80,9 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             if (this.saturationTime > 0) {
                 --this.saturationTime;
             }
-            if (this.health > this.maxHealth && this.saturationTime === 0) {
-                var healthLeft = this.health - this.healthDecrease;
-                this.health = (healthLeft < this.maxHealth) ? (this.maxHealth) : (healthLeft);
+            if (this.health > Player.MaxHealth && this.saturationTime === 0) {
+                var healthLeft = this.health - Player.OverSaturationHealthDecrease;
+                this.health = (healthLeft < Player.MaxHealth) ? (Player.MaxHealth) : (healthLeft);
             }
 
             var speedModifier = 2;

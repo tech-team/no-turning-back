@@ -5,7 +5,6 @@ define([
         __init__: function(ammo, data, melee) {
             this.ammo = ammo || 1;
             this.data = data;
-            this.reach = 50;
             this.melee = melee;
         },
 

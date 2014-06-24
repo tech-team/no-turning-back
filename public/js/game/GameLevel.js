@@ -602,33 +602,44 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             }
         },
 
-        chestsOpeningHandle: function(event) {
+        pickNearestToPlayer: function(targets, reachablePredicate) {
             var self = this;
 
-            _.each(this.chests, function(chest) {
-                if (self.checkReach(chest)) {
-                    chest.update(event, self.player);
+            var nearest = null;
+            _.each(targets, function(target) {
+                var d = self.getDistance(target);
 
-                    if (chest.state === Chest.State.Closed) {
-                        Messenger.showMessage(Messenger.chestLocked, chest.requiresMessage);
-                        return false;
-                    }
-                    else {
-                        ResourceManager.playSound(ResourceManager.soundList.ChestOpen);
-                        chest.justOpened = false;
-
-                        _.each(chest.storage, self.itemInteraction.bind(self));
-
-                        chest.storage = [];
-                        self.collisionObjects.remove(chest.dispObj);
-                        self.removeFromStage(chest.dispObj);
-                        var dispObj = self.addToStage(chest);
-                        self.collisionObjects.push(dispObj);
-
-                        return false; //break
-                    }
+                if (reachablePredicate(d) && (!nearest || d < nearest)) {
+                    nearest = target;
                 }
             });
+
+            return nearest;
+        },
+
+        chestsOpeningHandle: function(event) {
+            var nearestChest = this.pickNearestToPlayer(this.chests, function(d) {
+                return d <= this.player.$class.Reach;
+            }.bind(this));
+
+            if (nearestChest) {
+                nearestChest.update(event, this.player);
+
+                if (nearestChest.state === Chest.State.Closed) {
+                    Messenger.showMessage(Messenger.chestLocked, nearestChest.requiresMessage);
+                }
+                else {
+                    ResourceManager.playSound(ResourceManager.soundList.ChestOpen);
+
+                    _.each(nearestChest.storage, this.itemInteraction.bind(this));
+
+                    nearestChest.storage = [];
+                    this.collisionObjects.remove(nearestChest.dispObj);
+                    this.removeFromStage(nearestChest.dispObj);
+                    var dispObj = this.addToStage(nearestChest); // it has a new texture
+                    this.collisionObjects.push(dispObj);
+                }
+            }
         },
 
 
@@ -650,11 +661,13 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
         doorsOpeningHandle: function(event) {
             var self = this;
-            
-            _.each(this.doors, function(door) {
-                var isNear = door.update(event, self.player, self.zombies.length);
 
-                if (!isNear) return;
+            var door = this.pickNearestToPlayer(this.doors, function(d) {
+                return d <= Door.ActivationRadius;
+            });
+
+            if (door) {
+                door.update(event, this.player, this.zombies.length);
 
                 if (door.state === Door.State.Closed) {
                     Messenger.showMessage(door.requiresMessage);
@@ -662,23 +675,21 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 else {
                     ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
 
-                    for (var j = 0; j < self.collisionObjects.length; ++j) {
-                        if (self.collisionObjects[j] == door.dispObj) {
-                            self.collisionObjects.splice(j, 1);
+                    for (var j = 0; j < this.collisionObjects.length; ++j) {
+                        if (this.collisionObjects[j] == door.dispObj) {
+                            this.collisionObjects.splice(j, 1);
                         }
                     }
-                    self.removeFromStage(door.dispObj);
-                    self.addToStage(door);
+                    this.removeFromStage(door.dispObj);
+                    this.addToStage(door);
 
-                    self.player.score += GameLevel.SCORES.DOOR_OPEN;
+                    this.player.score += GameLevel.SCORES.DOOR_OPEN;
 
-                    if (door.role === "exit") {
-                        self.finish();
+                    if (this.role === "exit") {
+                        this.finish();
                     }
-
-                    return false; //do not open all the doors at once
                 }
-            });
+            }
         },
 
         buttonsPressingHandle: function(event) {
@@ -708,13 +719,17 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             });
         },
 
-        checkReach: function(obj) {
+        getDistance: function(obj) {
             var toObject = new Vector({
                 x: this.player.dispObj.x - obj.x,
                 y: this.player.dispObj.y - obj.y
             });
 
-            return toObject.distance() <= this.player.reach;
+            return toObject.distance();
+        },
+
+        checkReach: function(obj) {
+            return this.getDistance(obj) <= this.player.$class.Reach;
         },
 
         checkBounds: function(obj) {

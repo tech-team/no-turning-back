@@ -18,7 +18,7 @@ define([
                     y: player.dispObj.y - targets[i].dispObj.y
                 });
 
-                if (toZombie.distance() <= this.reach) {
+                if (toZombie.distance() <= level.player.$class.Reach) {
                     targets[i].health -= this.data.power;
                     hit = true;
                 }
