@@ -14,8 +14,8 @@ define([
             var hit = false;
             for (var i = 0; i < targets.length; ++i) {
                 var toZombie = new Vector({
-                    x: player.dispObj.x - targets[i].dispObj.x,
-                    y: player.dispObj.y - targets[i].dispObj.y
+                    x: player.x() - targets[i].x(),
+                    y: player.y() - targets[i].y()
                 });
 
                 if (toZombie.distance() <= level.player.$class.Reach) {

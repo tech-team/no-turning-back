@@ -27,12 +27,6 @@ define([
                 ActivationRadius: 90
             },
 
-            data: function() {
-                this._data.x = this.dispObj.x;
-                this._data.y = this.dispObj.y;
-                this._data.rotation = this.dispObj.rotation;
-            },
-
             _state: function() {
                 return this._data.state;
             },

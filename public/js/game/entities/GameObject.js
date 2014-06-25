@@ -8,6 +8,13 @@ function(Class) {
 			this.dispObj = dispObj;
 		},
 
+        data: function() {
+            this._data.x = this.dispObj.x;
+            this._data.y = this.dispObj.y;
+            this._data.rotation = this.dispObj.rotation;
+            return this._data;
+        },
+
         setObjectData: function(objectData) {
             this._data = objectData;
         },

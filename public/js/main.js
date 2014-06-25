@@ -62,4 +62,5 @@ define([
 ], function(Backbone, router, BuiltinTypesUtils) {
     Backbone.history.start();
     BuiltinTypesUtils();
+    window.DEBUG = true;
 });

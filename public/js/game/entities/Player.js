@@ -192,23 +192,6 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
                     }
                 }
             }
-
-
-            if(event.keys[KeyCoder.K]) {
-                this.keys.forEach(function(key) {
-                    console.log(key + " ");
-                });
-            }
-            if(event.keys[KeyCoder.I]) {
-                this.inventory.forEach(function(item) {
-                    console.log(item + " ");
-                });
-            }
-            if(event.keys[KeyCoder.O]) {
-                for (var weapon in this.weapons) {
-                    console.log(weapon + " : " + this.weapons[weapon]);
-                }
-            }
         },
 
         movementHandle: function(movementData, collisionObjects) {

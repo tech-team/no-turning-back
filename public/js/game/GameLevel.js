@@ -36,7 +36,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             this.player = player;
 
-            //TODO: all of these objects' dispObjects can be obtained via this.containers["name"].children btw
             this.walls = [];
             this.doors = [];
             this.chests = [];
@@ -212,25 +211,40 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
         createEvents: function() {
             var self = this;
-            this.keyCoder.addEventListener("keyup", GameLevel.Keys.Use, function(event) {
-                var openedChest = self.chestsOpeningHandle(event);
-
+            this.keyCoder.addEventListener("keyup", GameLevel.Keys.Use, function() {
+                var openedChest = self.chestsOpeningHandle();
                 if (!openedChest)
-                    self.doorsOpeningHandle(event);
+                    self.doorsOpeningHandle();
             });
 
             _.each(this.player.$class.getAvailableWeapons(), function(weapon) {
-                self.keyCoder.addEventListener("keyup", GameLevel.Keys.Weapon[weapon], function(event) {
+                self.keyCoder.addEventListener("keyup", GameLevel.Keys.Weapon[weapon], function() {
                     self.changeWeapon(weapon);
                 });
             });
 
             this.keyCoder.addEventListener("keyup", GameLevel.Keys.ToggleSound, ResourceManager.toggleSound.bind(ResourceManager));
-            this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.Finish, this.finish.bind(this));
 
-            this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.GearUp, function(event) {
-                self.player.addWeapon("shotgun", 200);
-            });
+
+            if (DEBUG) {
+                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.Finish, this.finish.bind(this));
+
+                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.GearUp, function () {
+                    self.player.addWeapon("shotgun", 200);
+                });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.K, function () {
+                    console.log(self.player.keys);
+                });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.I, function () {
+                    console.log(self.player.inventory);
+                });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.O, function () {
+                    console.log(self.player.weapons);
+                });
+            }
         },
 
         resize: function() {
@@ -413,7 +427,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             var ammo = this.player.weapons[currentWeapon].ammo;
 
             var weaponText = currentWeapon;
-            if (ammo)
+            if (ammo !== null)
                 weaponText += ": " + ammo;
             this.weaponText.text = weaponText;
 
@@ -575,7 +589,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     }
                     else {
                         this.player.addWeapon(name, ammo);
-                        this.changeWeapon(name);
+                        if (this.player.weapons[name].power >= this.player.weapons[this.player.currentWeapon].power)
+                            this.changeWeapon(name);
                         Messenger.showMessage(Messenger.newWeaponPicked, name);
                     }
                     if (playSounds)
@@ -638,7 +653,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     nearestChest.clearStorage();
                     this.collisionObjects.remove(nearestChest.dispObj);
                     this.removeFromStage(nearestChest.dispObj);
-                    var dispObj = this.addToStage(nearestChest._data); // it has a new texture
+                    var dispObj = this.addToStage(nearestChest.data()); // it has a new texture
                     this.collisionObjects.push(dispObj);
                 }
                 return true;
@@ -689,7 +704,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         }
                     }
                     this.removeFromStage(door.dispObj);
-                    this.addToStage(door._data);
+                    this.addToStage(door.data());
 
                     this.player.score += GameLevel.SCORES.DOOR_OPEN;
 
