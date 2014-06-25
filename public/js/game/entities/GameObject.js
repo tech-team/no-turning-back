@@ -3,20 +3,15 @@ define([
 ],
 function(Class) {
 	var GameObject = Class.$extend({
-		__init__: function(objectData, dispObj) {
-            this._data = objectData;
+		__init__: function(dispObj) {
 			this.dispObj = dispObj;
 		},
 
         data: function() {
-            this._data.x = this.dispObj.x;
-            this._data.y = this.dispObj.y;
-            this._data.rotation = this.dispObj.rotation;
-            return this._data;
-        },
-
-        setObjectData: function(objectData) {
-            this._data = objectData;
+            this.dispObj.data.x = this.dispObj.x;
+            this.dispObj.data.y = this.dispObj.y;
+            this.dispObj.data.r = this.dispObj.rotation;
+            return this.dispObj.data;
         },
 
         setDispObj: function(dispObj) {

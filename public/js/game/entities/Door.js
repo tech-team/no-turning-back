@@ -6,8 +6,8 @@ define([
 ],
     function(Class, _, GameObject, Messenger) {
         var Door = GameObject.$extend({
-            __init__: function(objectData, dispObj) {
-                this.$super(objectData, dispObj);
+            __init__: function(dispObj) {
+                this.$super(dispObj);
 
                 this.requiresMessage = null;
                 this.inputCode = ""; // TODO: need to do smth with this...
@@ -28,7 +28,7 @@ define([
             },
 
             _state: function() {
-                return this._data.state;
+                return this.dispObj.data.state;
             },
 
             isClosed: function() {
@@ -36,30 +36,38 @@ define([
             },
 
             setState: function(newState) {
-                this._data.state = newState;
+                this.dispObj.data.state = newState;
             },
 
             requires: function() {
-                return this._data.requires;
+                return this.dispObj.data.requires;
             },
 
             tex: function() {
-                return this._data.tex;
+                return this.dispObj.data.tex;
             },
 
             setTex: function(newTex) {
-                this._data.tex = newTex;
+                this.dispObj.data.tex = newTex;
             },
 
             role: function() {
-                return this._data.role;
+                return this.dispObj.data.role;
             },
 
             puzzle: function() {
-                return this._data.puzzle;
+                return this.dispObj.data.puzzle;
+            },
+
+            puzzleSolved: function() {
+                return this.inputCode == this.puzzle().code;
             },
 
 
+            openDoor: function() {
+                this.setState(Door.State.Open);
+                this.setTex(Door.Tex.Open);
+            },
 
             update: function(event, player, zombiesLeft) {
                 if (!this.isClosed()) return;
@@ -74,9 +82,11 @@ define([
 //                                    self.requiresMessage = Messenger.doorLockedKillAll;
                         }
                         else if(requirement === "puzzle") {
-                            self.requiresMessage = Messenger.doorLockedPuzzle;
+                            if (!self.puzzleSolved()) {
+                                self.requiresMessage = Messenger.doorLockedPuzzle;
+                            }
                         }
-                        else if(!(_.contains(player.keys, requirement))) {
+                        else if(!(_.contains(player.keys(), requirement))) {
                             self.requiresMessage = Messenger.prepareMessage(Messenger.doorLocked, requirement)
                         }
                     }
@@ -88,8 +98,7 @@ define([
                     testRequirement(this.requires());
 
                 if (!this.requiresMessage) {
-                    self.setState(Door.State.Open);
-                    self.setTex(Door.Tex.Open);
+                    this.openDoor();
                 }
 
                 else if (player.messageCooldown <= 0) {

@@ -41,8 +41,7 @@ define([
                 player: {
                     health: 100,
                     inventory: [],
-                    keys: [],
-                    weapons: {"knife": -1}
+                    keys: []
                 },
 
                 zombie: {
@@ -72,7 +71,8 @@ define([
 
                 button: {
                     puzzle: "",
-                    value: ""
+                    value: "",
+                    state: "depressed"
                 },
 
                 waypoint: {

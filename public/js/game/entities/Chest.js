@@ -5,8 +5,8 @@ define([
 ],
     function(Class, _, GameObject) {
         var Chest = GameObject.$extend({
-            __init__: function(objectData, dispObj) {
-                this.$super(objectData, dispObj);
+            __init__: function(dispObj) {
+                this.$super(dispObj);
 
                 this.requiresMessage = null;
             },
@@ -24,15 +24,15 @@ define([
             },
 
             storage: function() {
-                return this._data.storage;
+                return this.dispObj.data.storage;
             },
 
             clearStorage: function() {
-                this._data.storage = [];
+                this.dispObj.data.storage = [];
             },
 
             _state: function() {
-                return this._data.state;
+                return this.dispObj.data.state;
             },
 
             isClosed: function() {
@@ -40,19 +40,19 @@ define([
             },
 
             setState: function(newState) {
-                this._data.state = newState;
+                this.dispObj.data.state = newState;
             },
 
             requires: function() {
-                return this._data.requires;
+                return this.dispObj.data.requires;
             },
 
             tex: function() {
-                return this._data.tex;
+                return this.dispObj.data.tex;
             },
 
             setTex: function(newTex) {
-                this._data.tex = newTex;
+                this.dispObj.data.tex = newTex;
             },
 
 
@@ -70,7 +70,7 @@ define([
                             }
                         });
                     }
-                    else if(!_.contains(player.keys, this.requires())) {
+                    else if(!_.contains(player.keys(), this.requires())) {
                         this.requiresMessage = this.requires();
                     }
                 }

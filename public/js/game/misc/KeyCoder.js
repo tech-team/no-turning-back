@@ -11,13 +11,13 @@ function(Class, $, _) {
 
             this.listeners = [];
 
-            var listener = null;
+            this.listener = null;
             if (editorMode)
-                listener = $('#editor-field');
+                this.listener = $('#editor-field');
             else
-                listener = $(document);
+                this.listener = $(document);
 
-            listener.keydown(function(event) {
+            this.listener.keydown(function(event) {
 				self.keys[event.keyCode] = true;
 
                 _.each(self.listeners, function(el) {
@@ -26,7 +26,7 @@ function(Class, $, _) {
                 });
 			});
 
-            listener.keyup(function(event) {
+            this.listener.keyup(function(event) {
                 self.keys[event.keyCode] = false;
 
                 _.each(self.listeners, function(el) {
@@ -49,6 +49,13 @@ function(Class, $, _) {
                 keyCode: keyCode,
                 handler: handler
             });
+        },
+
+        removeAllListeners: function() {
+            this.listeners = [];
+            this.keys = [];
+            this.listener.off('keyup');
+            this.listener.off('keydown');
         },
 
 		__classvars__: {

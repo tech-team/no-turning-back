@@ -120,13 +120,13 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             //add doors
             _.each(data.doors, function(obj) {
-                var door = new Door(obj, self.addToStage(obj));
+                var door = new Door(self.addToStage(obj));
                 self.doors.push(door);
             });
 
             //add chests
             _.each(data.chests, function(obj) {
-                var chest = new Chest(obj, self.addToStage(obj));
+                var chest = new Chest(self.addToStage(obj));
                 self.chests.push(chest);
             });
 
@@ -212,9 +212,9 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         createEvents: function() {
             var self = this;
             this.keyCoder.addEventListener("keyup", GameLevel.Keys.Use, function() {
-                var openedChest = self.chestsOpeningHandle();
-                if (!openedChest)
-                    self.doorsOpeningHandle();
+                if (self.chestsOpeningHandle()) return;
+                if (self.doorsOpeningHandle()) return;
+                self.buttonsPressingHandle()
             });
 
             _.each(this.player.$class.getAvailableWeapons(), function(weapon) {
@@ -234,11 +234,11 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 });
 
                 this.keyCoder.addEventListener("keyup", KeyCoder.K, function () {
-                    console.log(self.player.keys);
+                    console.log(self.player.keys());
                 });
 
                 this.keyCoder.addEventListener("keyup", KeyCoder.I, function () {
-                    console.log(self.player.inventory);
+                    console.log(self.player.inventory());
                 });
 
                 this.keyCoder.addEventListener("keyup", KeyCoder.O, function () {
@@ -364,7 +364,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             this.zombiesDeathHandle();
             this.dropsHandle();
 
-            this.buttonsPressingHandle(event);
+//            this.buttonsPressingHandle(event);
 
             this.player.update(event, this.collisionObjects);
 
@@ -374,10 +374,11 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 bullet.update(event);
             });
 
-            if (this.player.health <= 0 && !this.player.dead) {
+            if (this.player.health() <= 0 && !this.player.dead) {
                 this.player.dead = true;
                 console.log("Game over.");
                 ResourceManager.playSound(ResourceManager.soundList.GameOver);
+                this.keyCoder.removeAllListeners();
                 this.levelFinished.dispatch({
                     status: 'gameFinished',
                     score: this.player.score,
@@ -421,7 +422,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         },
 
         hudSetup: function() {
-            this.healthText.text = "Health: " + Math.ceil(this.player.health);
+            this.healthText.text = "Health: " + Math.ceil(this.player.health());
 
             var currentWeapon = this.player.currentWeapon;
             var ammo = this.player.weapons[currentWeapon].ammo;
@@ -454,9 +455,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         type: "bullet"
                     };
 
-                    var bullet = new Bullet(
-                        self.addToStage(bulletData),
-                        bulletData);
+                    var bullet = new Bullet(self.addToStage(bulletData));
 
                     self.bullets.push(bullet);
                 }
@@ -467,8 +466,9 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             if (this.player.hasWeapon(name) && this.player.currentWeapon != name) {
                 this.player.currentWeapon = name;
                 this.player.changeTexture(this.player.currentWeapon);
+
                 this.removeFromStage(this.player.dispObj);
-                this.player.setDispObj(this.addToStage(this.player.dispObj));
+                this.player.setDispObj(this.addToStage(this.player.data()));
 
                 ResourceManager.playSound(ResourceManager.soundList[this.player.currentWeapon].Draw, ResourceManager.weaponData.drawCooldown);
                 this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
@@ -606,14 +606,14 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     }
                     break;
                 case "key":
-                    if (!(item['name'] in this.player.keys)) {
-                        this.player.keys.push(item['name']);
+                    if (!(item['name'] in this.player.keys())) {
+                        this.player.addToKeys(item['name']);
                         Messenger.showMessage(Messenger.keyPicked, item['name']);
                     }
                     break;
                 default:
                     if (item['name']) {
-                        this.player.inventory.push(item['name']);
+                        this.player.addToInventory(item['name']);
                         Messenger.showMessage(Messenger.newItemPicked, item['name']);
                     }
             }
@@ -626,7 +626,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             _.each(targets, function(target) {
                 var d = self.getDistance(target);
 
-                if (reachablePredicate(d) && (!nearest || d < nearest)) {
+                if (reachablePredicate(d, target) && (!nearest || d < nearest)) {
                     nearest = target;
                 }
             });
@@ -700,7 +700,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     for (var j = 0; j < this.collisionObjects.length; ++j) {
                         if (this.collisionObjects[j] == door.dispObj) {
                             this.collisionObjects.splice(j, 1);
-                            --j; // TODO: rethink it
+//                            --j; // TODO: rethink it
                         }
                     }
                     this.removeFromStage(door.dispObj);
@@ -720,28 +720,45 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         buttonsPressingHandle: function(event) {
             var self = this;
 
-            //TODO: надо развязать проверку нажатия и проверку отпускания кнопки
-            //TODO: так как нажиматься должна только 1 кнопка за раз, а обновление вообще должно происходить для всех
-            //TODO: можно попробовать повесить отпукание в UntilTimer или setTimeout
-            _.each(this.buttons, function(button) {
-                button.update(event, self.player, self.doors);
+            var button = this.pickNearestToPlayer(this.buttons, function(d, button) {
+                return d <= Button.ActivationRadius && button.isDepressed();
+            });
 
-                if (button.justPressed === true) {
-                    ResourceManager.playSound(ResourceManager.soundList.Click);
-                    button.justPressed = false;
-                    self.removeFromStage(button.dispObj);
-                    button.setDispObj(self.addToStage(button));
-                }
-                else if (button.justDepressed === true) {
-                    button.justDepressed = false;
-                    self.removeFromStage(button.dispObj);
-                    button.setDispObj(self.addToStage(button));
-                }
+            if (button) {
+                button.update(event, this.player, this.doors);
+                ResourceManager.playSound(ResourceManager.soundList.Click);
+
+                this.removeFromStage(button.dispObj);
+                this.addToStage(button.data());
+
                 if (button.message) {
                     Messenger.showMessage(button.message);
-                    button.message = undefined;
+                    button.message = null;
                 }
-            });
+            }
+
+//            //TODO: надо развязать проверку нажатия и проверку отпускания кнопки
+//            //TODO: так как нажиматься должна только 1 кнопка за раз, а обновление вообще должно происходить для всех
+//            //TODO: можно попробовать повесить отпукание в UntilTimer или setTimeout
+//            _.each(this.buttons, function(button) {
+//                button.update(event, self.player, self.doors);
+//
+//                if (button.justPressed === true) {
+//                    ResourceManager.playSound(ResourceManager.soundList.Click);
+//                    button.justPressed = false;
+//                    self.removeFromStage(button.dispObj);
+//                    button.setDispObj(self.addToStage(button));
+//                }
+//                else if (button.justDepressed === true) {
+//                    button.justDepressed = false;
+//                    self.removeFromStage(button.dispObj);
+//                    button.setDispObj(self.addToStage(button));
+//                }
+//                if (button.message) {
+//                    Messenger.showMessage(button.message);
+//                    button.message = undefined;
+//                }
+//            });
         },
 
         getDistance: function(obj) {
@@ -766,10 +783,12 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         },
 
         checkBounds: function(obj) {
+            // TODO:  впрочем это не учитывает.. ничего не учитывает
+            // TODO:  (поворот, форму)
             return obj.x + obj.getBounds().width/2 >= this.data['w'] ||
                     obj.x - obj.getBounds().width/2 <= 0 ||
-                    obj.y + obj.getBounds().width/2 >= this.data['h'] ||
-                    obj.y - obj.getBounds().width/2 <= 0;
+                    obj.y + obj.getBounds().height/2 >= this.data['h'] ||
+                    obj.y - obj.getBounds().height/2 <= 0;
         },
 
         updateEffects: function() {
@@ -845,6 +864,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         finish: function() {
             if (!this.finished) {
                 this.finished = true;
+                this.keyCoder.removeAllListeners();
+
                 var finishTimeout = 7000;
 
                 ResourceManager.playSound(ResourceManager.soundList.LevelFinished);

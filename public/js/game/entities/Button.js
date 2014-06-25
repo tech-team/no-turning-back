@@ -8,14 +8,14 @@ define([
 ],
     function(Class, _, GameObject, KeyCoder, Messenger, Vector) {
         var Button = GameObject.$extend({
-            __init__: function(obj) {
-                this.type = "button";
-                this.role = obj.role;
-                this.puzzle = obj.puzzle;
-                this.value = obj.value;
-                this.state = "depressed";
-                this.tex = obj.tex;
-                this.activationRadius = 30;
+            __init__: function(objectData, dispObj) {
+                this.$super(objectData, dispObj);
+
+
+//                this.puzzle = obj.puzzle;
+//                this.value = obj.value;
+//                this.state = "depressed";
+//                this.tex = obj.tex;
                 this.justPressed = false;
                 this.justDepressed = false;
 
@@ -24,49 +24,77 @@ define([
             },
 
             __classvars__: {
-
+                State: {
+                    Pressed: "pressed",
+                    Depressed: "depressed"
+                },
+                Tex: {
+                    Pressed: "button_pressed",
+                    Depressed: "button"
+                },
+                ActivationRadius: 30
             },
 
+            state: function() {
+                return this._data.state;
+            },
+
+            isPressed: function() {
+                return this.state() == Button.State.Pressed;
+            },
+
+            isDepressed: function() {
+                return this.state() == Button.State.Depressed;
+            },
+
+            setState: function(newState) {
+                this._data.state = newState;
+            },
+
+            tex: function() {
+                return this._data.tex;
+            },
+
+            setTex: function(newTex) {
+                this._data.tex = newTex;
+            },
+
+            value: function() {
+                return this._data.value;
+            },
+
+            puzzle: function() {
+                return this._data.puzzle;
+            },
+
+
             update: function(event, player, doors) {
-                var vectorToPlayer = new Vector({
-                    x: player.x() - this.x(),
-                    y: player.y() - this.y()
+                this.setState(Button.State.Pressed);
+                this.setTex(Button.Tex.Pressed);
+                this.pressCooldown = 50;
+
+                var self = this;
+                var targetDoors = [];
+                _.each(doors, function(door) {
+                    if (door.puzzle() && door.puzzle().name == self.puzzle && door.isClosed()) {
+                        targetDoors.push(door);
+                    }
                 });
 
-                if (event.keys[KeyCoder.E]) {
-                    if (vectorToPlayer.distance() <= this.activationRadius && this.state === "depressed") {
-                        this.justPressed = true;
-                        this.state = "pressed";
-                        this.tex = "button_pressed";
-                        this.pressCooldown = 50;
-
-
-                        for (var i = 0; i < doors.length; ++i) {
-                            if (doors[i].puzzle && doors[i].puzzle["name"] === this.puzzle && doors[i].state === "closed") {
-                                doors[i].inputCode += this.value;
-                                if (doors[i].inputCode.length >= doors[i].puzzle["code"].length) {
-                                    if (doors[i].inputCode === doors[i].puzzle["code"]) {
-                                        doors[i].justOpened = true;
-                                        doors[i].state = "open";
-                                        doors[i].tex = "door-open";
-                                        this.message = Messenger.puzzleSolved;
-                                    }
-                                    else {
-                                        this.message = Messenger.puzzleFailed;
-                                    }
-                                    doors[i].inputCode = "";
-                                }
-                            }
-                        }
+                _.each(targetDoors, function(door) {
+                    door.inputCode += self.value();
+                    if (door.inputCode.length >= door.puzzle().code.length) {
+                        self.message = door.puzzleSolved() ? Messenger.puzzleSolved : Messenger.puzzleFailed;
+                        door.inputCode = "";
                     }
+
+                });
+
+                if (this.isPressed() && this.pressCooldown === 0) {
+                    this.setState(Button.State.Depressed);
+                    this.setTex(Button.Tex.Depressed);
                 }
 
-                if (this.state === "pressed" && this.pressCooldown === 0) {
-                    this.justDepressed = true;
-                    this.state = "depressed";
-                    this.tex = "button";
-
-                }
                 if (this.pressCooldown > 0) {
                     --this.pressCooldown;
                 }

@@ -10,19 +10,19 @@ define([
 ],
 function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, collider, Weapons) {
 	var Player = AliveObject.$extend({
-		__init__: function(objectData, dispObj) {
-            this.$super(objectData, dispObj);
+		__init__: function(dispObj) {
+            this.$super(dispObj);
 
-            this.type = "player"; //type should be specified in each class it its' objects will be passed to addToStage
-            this.health = 100;
+//            this.type = "player"; //type should be specified in each class it its' objects will be passed to addToStage
+//            this.health = 100;
             this.dead = false;
 			this.score = 0;
             this.shootCooldown = 0;
             this.messageCooldown = 0;
             this.saturationTime = 0;
             this.effects = null;
-            this.inventory = [];
-            this.keys = [];
+//            this.inventory = [];
+//            this.keys = [];
 
             this.currentWeapon = "knife";
             this.weapons = { };
@@ -43,14 +43,51 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             OverSaturationHealthDecrease: 0.1
         },
 
+        health: function() {
+            return this.dispObj.data.health;
+        },
+        _setHealth: function(newHealth) {
+            this.dispObj.data.health = newHealth;
+        },
+
+        inventory: function() {
+            return this.dispObj.data.inventory;
+        },
+        addToInventory: function(item) {
+            this.dispObj.data.inventory.push(item);
+        },
+        clearInventory: function() {
+            this.dispObj.data.inventory = [];
+        },
+
+        keys: function() {
+            return this.dispObj.data.keys;
+        },
+        addToKeys: function(key) {
+            this.dispObj.data.keys.push(key);
+        },
+        clearKeys: function() {
+            this.dispObj.data.keys = [];
+        },
+
+        tex: function() {
+            return this.dispObj.data.tex;
+        },
+        changeTexture: function(weapon) {
+            this.dispObj.data.tex = this.$class.weaponSpecificTex(weapon);
+            return this.tex();
+        },
+
+
+
+
+
+
         setEffects: function(effects) {
             this.effects = effects;
         },
 
-        changeTexture: function(weapon) {
-            this.dispObj.tex = this.$class.weaponSpecificTex(this.currentWeapon);
-            return this.dispObj.tex;
-        },
+
 
         hasWeapon: function(name) {
             return name in this.weapons;
@@ -90,9 +127,9 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             if (this.saturationTime > 0) {
                 --this.saturationTime;
             }
-            if (this.health > Player.MaxHealth && this.saturationTime === 0) {
-                var healthLeft = this.health - Player.OverSaturationHealthDecrease;
-                this.health = (healthLeft < Player.MaxHealth) ? (Player.MaxHealth) : (healthLeft);
+            if (this.health() > Player.MaxHealth && this.saturationTime === 0) {
+                var healthLeft = this.health() - Player.OverSaturationHealthDecrease;
+                this._setHealth(healthLeft < Player.MaxHealth ? Player.MaxHealth : healthLeft);
             }
 
             var speedModifier = 2;
@@ -221,7 +258,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
         },
 
         damage: function(howMuch) {
-            this.health -= howMuch;
+            this._setHealth(this.health() - howMuch);
             //TODO: should be replaced with UntilTimer
             //well that and heal() function cannot be replaced by UntilTimer
             //because UntilTimer tick speed is uncontrollable
@@ -251,7 +288,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
                 if (howMuch > 0) {
                     howMuch--;
 
-                    self.health++;
+                    self._setHealth(self.health() + 1);
                 }
                 else {
                     self.saturationTime = 100;
@@ -262,7 +299,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
         },
 
         isDead: function() {
-            return this.health <= 0;
+            return this.health() <= 0;
         }
 	});
 

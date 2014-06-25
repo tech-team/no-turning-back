@@ -4,8 +4,8 @@ define([
 ],
 function(Class, GameObject) {
 	var AliveObject = GameObject.$extend({
-		__init__: function(objectData, dispObj) {
-            this.$super(objectData, dispObj);
+		__init__: function(dispObj) {
+            this.$super(dispObj);
 
             this.prevPos = {
                 x: null,
