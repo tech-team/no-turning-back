@@ -1,23 +1,16 @@
 define([
     'classy',
-    'underscore'
+    'lodash'
 ],
     function(Class, _) {
         var DefaultObjects = Class.$extend({
             __classvars__: {
                 build: function(type, params) {
-                    var data = _.clone(DefaultObjects.object);
+                    var objectData = _.cloneDeep(DefaultObjects.object);
+                    var typeData = _.cloneDeep(DefaultObjects[type]);
+                    var paramsData = _.cloneDeep(params);
 
-                    //TODO: lodash, merge?
-
-                    var typeData = DefaultObjects[type];
-                    for (var field in typeData) {
-                        data[field] = _.clone(typeData[field]);
-                    }
-
-                    for (var field in params) {
-                        data[field] = _.clone(params[field]);
-                    }
+                    var data = _.extend(_.extend(objectData, typeData), paramsData);
 
                     data.type = type;
 

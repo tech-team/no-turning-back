@@ -321,7 +321,6 @@ define([
 
                     //save data
                     _.each(self.multiselection, function(obj) {
-                        console.log(obj);
                         obj.data.x = obj.x;
                         obj.data.y = obj.y;
                     });
