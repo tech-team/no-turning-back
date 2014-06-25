@@ -10,7 +10,9 @@ define([
 ],
 function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, collider, Weapons) {
 	var Player = AliveObject.$extend({
-		__init__: function() {
+		__init__: function(objectData, dispObj) {
+            this.$super(objectData, dispObj);
+
             this.type = "player"; //type should be specified in each class it its' objects will be passed to addToStage
             this.health = 100;
             this.dead = false;
@@ -32,14 +34,22 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
                 return 'player-{0}'.format(weapon);
             },
 
+            getAvailableWeapons: function() {
+                return _.keys(Weapons);
+            },
+
             Reach: 50,
             MaxHealth: 100,
             OverSaturationHealthDecrease: 0.1
         },
 
-
         setEffects: function(effects) {
             this.effects = effects;
+        },
+
+        changeTexture: function(weapon) {
+            this.dispObj.tex = this.$class.weaponSpecificTex(this.currentWeapon);
+            return this.dispObj.tex;
         },
 
         hasWeapon: function(name) {
@@ -51,7 +61,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
         },
 
         hasAmmo: function(name) {
-            return this.weapons[name].ammo > 0;
+            return this.weapons[name].hasAmmo();
         },
 
         hasCurrentAmmo: function() {

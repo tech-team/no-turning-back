@@ -19,7 +19,7 @@ define([
                 power: this.data.power,
                 tex: 'pistol-bullet'
             };
-            var bullet = new Bullet(level.addToStage(bulletData), bulletData);
+            var bullet = new Bullet(bulletData, level.addToStage(bulletData));
             level.bullets.push(bullet);
 
             player.shootCooldown = this.data.coolDown;

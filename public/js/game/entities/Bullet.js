@@ -4,12 +4,13 @@ define([
 ],
     function(Class, GameObject) {
         var Bullet = GameObject.$extend({
-            __init__: function(dispObj, data) {
-                this.setDispObj(dispObj); //or kinda super(dispObj)
-                this.power = data['power'];
+            __init__: function(objectData, dispObj) {
+                this.$super(objectData, dispObj);
+
+                this.power = objectData.power;
                 this.speed = 10;
-                this.source = data['source'];
-                this.ttl = data['ttl'] || null;
+                this.source = objectData.source;
+                this.ttl = objectData.ttl || null;
             },
 
             update: function(event) {

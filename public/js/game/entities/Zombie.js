@@ -9,6 +9,8 @@ define([
     function(Class, AliveObject, ResourceManager, soundjs, collider, Vector) {
         var Zombie = AliveObject.$extend({
             __init__: function(obj) {
+                this.$super();
+
                 this.waypoints = obj.waypoints;
                 this.target = (this.waypoints.length != 0) ? (this.waypoints[0]) : (null);
                 this.speed = obj.speed;

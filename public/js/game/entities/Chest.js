@@ -1,63 +1,85 @@
 define([
     'classy',
     'lodash',
-    'game/entities/GameObject',
-    'game/misc/Vector'
+    'game/entities/GameObject'
 ],
-    function(Class, _, GameObject, Vector) {
+    function(Class, _, GameObject) {
         var Chest = GameObject.$extend({
-            __init__: function(obj) {
-                this.type = "chest";
-                this.x = obj.x;
-                this.y = obj.y;
-                this.r = obj.r;
-                this.storage = obj.storage;
-                this.state = ( obj.state === "open" ) ? Chest.State.Open : Chest.State.Closed ;
-                this.requires = obj.requires;
-                this.requiresMessage = "";
-                this.activationRadius = 50;
-                this.tex = ( this.state === Chest.State.Open) ? "chest-open" : "chest";
+            __init__: function(objectData, dispObj) {
+                this.$super(objectData, dispObj);
+
+                this.requiresMessage = null;
             },
 
             __classvars__: {
                 State: {
-                    Closed: 0,
-                    Open: 1
-                }
+                    Closed: "closed",
+                    Open: "open"
+                },
+                Tex: {
+                    Closed: "chest",
+                    Open: "chest-open"
+                },
+                ActivationRadius: 50
             },
 
+            storage: function() {
+                return this._data.storage;
+            },
+
+            clearStorage: function() {
+                this._data.storage = [];
+            },
+
+            _state: function() {
+                return this._data.state;
+            },
+
+            isClosed: function() {
+                return this._state() == Chest.State.Closed;
+            },
+
+            setState: function(newState) {
+                this._data.state = newState;
+            },
+
+            requires: function() {
+                return this._data.requires;
+            },
+
+            tex: function() {
+                return this._data.tex;
+            },
+
+            setTex: function(newTex) {
+                this._data.tex = newTex;
+            },
+
+
+
             update: function(event, player) {
+                if (!this.isClosed()) return;
 
-                var vectorToPlayer = new Vector({
-                    x: player.dispObj.x - this.dispObj.x,
-                    y: player.dispObj.y - this.dispObj.y
-                });
-
-                if (vectorToPlayer.distance() <= this.activationRadius) {
-                    if (this.state === Chest.State.Closed) {
-                        this.requiresMessage = "";
-
-                        if (this.requires) {
-                            if(_.isArray(this.requires)) {
-                                _.each(this.requires, function(requirement) {
-                                    if (self.requiresMessage === "" && !(_.contains(player.keys, requirement))) {
-                                        self.requiresMessage = requirement;
-                                    }
-                                });
+                var self = this;
+                this.requiresMessage = "";
+                if (this.requires()) {
+                    if(_.isArray(this.requires())) {
+                        _.each(this.requires(), function(requirement) {
+                            if (self.requiresMessage === "" && !(_.contains(player.keys, requirement))) {
+                                self.requiresMessage = requirement;
                             }
-                            else if(!_.contains(player.keys, this.requires)) {
-                                this.requiresMessage = this.requires;
-                            }
-                        }
-
-                        if (!this.requiresMessage) {
-                            this.state = Chest.State.Open ;
-                            this.tex = "chest-open";
-                        }
-                        else if (player.messageCooldown <= 0) {
-                            player.messageCooldown = 100;
-                        }
+                        });
                     }
+                    else if(!_.contains(player.keys, this.requires())) {
+                        this.requiresMessage = this.requires();
+                    }
+                }
+
+                if (!this.requiresMessage) {
+                    this.setState(Chest.State.Open);
+                    this.setTex(Chest.Tex.Open);
+                } else if (player.messageCooldown <= 0) {
+                    player.messageCooldown = 100;
                 }
             }
         });

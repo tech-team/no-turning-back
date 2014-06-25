@@ -65,6 +65,7 @@ define([
                 },
 
                 chest: {
+                    state: "closed",
                     requires: [],
                     storage: []
                 },

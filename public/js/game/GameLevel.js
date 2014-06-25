@@ -22,14 +22,11 @@ define([
 ],
 function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet, Vector) {
     var GameLevel = StageManager.$extend({
-		__init__: function(stage, data, player, resourceManager, sound) {
+		__init__: function(stage, levelData, player, resourceManager) {
             this.$super(stage, resourceManager);
-            this.data = data;
+            this.data = levelData;
 
             this.keyCoder = new KeyCoder();
-            this.keyCoder.addEventListener("keyup", KeyCoder.M, ResourceManager.toggleSound.bind(ResourceManager));
-
-            this.showingMessagesCount = 0;
 
             this.background = null;
             this.effects = {
@@ -38,7 +35,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             };
 
             this.player = player;
-            this.prevPlayerPos = {};
 
             //TODO: all of these objects' dispObjects can be obtained via this.containers["name"].children btw
             this.walls = [];
@@ -51,20 +47,43 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             this.collisionObjects = [];
             this.drops = [];
 
-            this.isJoystick = false;
-            this.joystickServer = null;
-            this.lastShootTime = 0;
-            this.shootDelta = 350;
+//            /*** <Joystick stuff> ***/
+//            this.isJoystick = false;
+//            this.joystickServer = null;
+//            this.lastShootTime = 0;
+//            this.shootDelta = 350;
+//            /*** </Joystick stuff> ***/
+
             this.finished = false;
 
-            this.load(data);
+            this.load(levelData);
 
             // Events
             this.levelFinished = new signals.Signal();
-            this.keyCoder.addEventListener("keyup", KeyCoder.X, this.finish.bind(this));
 		},
 
         __classvars__: {
+            Keys: {
+                ToggleSound: KeyCoder.M,
+                Use: KeyCoder.E,
+                Shoot: KeyCoder.SPACE,
+                Forward: KeyCoder.W,
+                Back: KeyCoder.S,
+                Left: KeyCoder.A,
+                Right: KeyCoder.D,
+
+                Weapon: {
+                    knife: KeyCoder.ONE,
+                    pistol: KeyCoder.TWO,
+                    shotgun: KeyCoder.THREE
+                },
+
+                Hack: {
+                    Finish: KeyCoder.X,
+                    GearUp: KeyCoder.G
+                }
+            },
+
             SCORES: {
                 KILL: 10,
                 DOOR_OPEN: 5
@@ -102,15 +121,13 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             //add doors
             _.each(data.doors, function(obj) {
-                var door = new Door(obj);
-                door.setDispObj(self.addToStage(obj));
+                var door = new Door(obj, self.addToStage(obj));
                 self.doors.push(door);
             });
 
             //add chests
             _.each(data.chests, function(obj) {
-                var chest = new Chest(obj);
-                chest.setDispObj(self.addToStage(obj));
+                var chest = new Chest(obj, self.addToStage(obj));
                 self.chests.push(chest);
             });
 
@@ -140,11 +157,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             var playerObj = this.addToStage(data.player);
 
             this.player.setDispObj(playerObj);
-            this.prevPlayerPos = {
-                x: this.player.dispObj.x,
-                y: this.player.dispObj.y,
-                rotation: this.player.dispObj.rotation
-            };
 
             //add effects
             this.createContainer("effect", true);
@@ -157,8 +169,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             this.effects.fog = this.addToStage({
                 type: "effect",
                 tex: "effects/fog",
-                x: this.player.dispObj.x,
-                y: this.player.dispObj.y});
+                x: this.player.x(),
+                y: this.player.y()});
 
             this.effects.damage = this.addToStage({
                 type: "effect",
@@ -186,6 +198,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             this.resize(); //recalculate overlay positions
 
+            this.createEvents();
+
             Messenger.showMessage(Messenger.levelLoaded, this.data.name);
             Messenger.showMessage(Messenger.levelStarted);
 
@@ -194,18 +208,27 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             this.createCollisionObjects();
             soundjs.Sound.stop();
-
-            this.createEvents();
         },
 
         createEvents: function() {
             var self = this;
-            this.keyCoder.addEventListener("keyup", KeyCoder.E, function(event) {
-                self.chestsOpeningHandle(event);
-                self.doorsOpeningHandle(event);
+            this.keyCoder.addEventListener("keyup", GameLevel.Keys.Use, function(event) {
+                var openedChest = self.chestsOpeningHandle(event);
+
+                if (!openedChest)
+                    self.doorsOpeningHandle(event);
             });
 
-            this.keyCoder.addEventListener("keyup", KeyCoder.G, function(event) {
+            _.each(this.player.$class.getAvailableWeapons(), function(weapon) {
+                self.keyCoder.addEventListener("keyup", GameLevel.Keys.Weapon[weapon], function(event) {
+                    self.changeWeapon(weapon);
+                });
+            });
+
+            this.keyCoder.addEventListener("keyup", GameLevel.Keys.ToggleSound, ResourceManager.toggleSound.bind(ResourceManager));
+            this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.Finish, this.finish.bind(this));
+
+            this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.GearUp, function(event) {
                 self.player.addWeapon("shotgun", 200);
             });
         },
@@ -245,7 +268,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             });
 
             _.each(this.doors, function(door) {
-                if (door.state === Door.State.Closed) {
+                if (door.isClosed()) {
                     self.collisionObjects.push(door.dispObj);
                 }
             });
@@ -255,74 +278,71 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             });
         },
 
-        onJoystickMessage: function(data, answer) {
-            if (this.finished)
-                return;
-
-            if (data.type === "game") {
-                var event = null;
-                switch (data.action) {
-                    case "shoot":
-                        if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
-                            this.lastShootTime = data.timestamp;
-
-                            this.shootingHandle();
-                        }
-                        break;
-                    case "weaponchange":
-                        var weapon = data.weapon;
-                        console.log(weapon);
-                        event = (new KeyCoder()).getKeys();
-                        switch (weapon) {
-                            case "knife":
-                                event.keys[KeyCoder.ONE] = true;
-                                break;
-                            case "pistol":
-                                event.keys[KeyCoder.TWO] = true;
-                                break;
-                            case "shotgun":
-                                event.keys[KeyCoder.THREE] = true;
-                                break;
-                        }
-                        this.weaponsHandle(event);
-                        break;
-                    case "move":
-                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (GameLevel.SpeedModifier.Normal) : (GameLevel.SpeedModifier.Sprint);
-                        if (speedModifier) {
-                            var movementData = {
-                                speedModifier: speedModifier,
-                                angle: data.phi
-                            };
-                            this.player.movementHandle(movementData, this.collisionObjects);
-                        }
-                        break;
-                    case "use":
-                        event = (new KeyCoder()).getKeys();
-                        event.keys[KeyCoder.E] = true;
-                        this.chestsOpeningHandle(event);
-                        this.buttonsPressingHandle(event);
-                        this.doorsOpeningHandle(event);
-                        event.keys[KeyCoder.E] = false;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        },
+//        onJoystickMessage: function(data, answer) {
+//            if (this.finished)
+//                return;
+//
+//            if (data.type === "game") {
+//                var event = null;
+//                switch (data.action) {
+//                    case "shoot":
+//                        if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
+//                            this.lastShootTime = data.timestamp;
+//
+//                            this.shootingHandle();
+//                        }
+//                        break;
+//                    case "weaponchange":
+//                        var weapon = data.weapon;
+//                        console.log(weapon);
+//                        event = (new KeyCoder()).getKeys();
+//                        switch (weapon) {
+//                            case "knife":
+//                                event.keys[KeyCoder.ONE] = true;
+//                                break;
+//                            case "pistol":
+//                                event.keys[KeyCoder.TWO] = true;
+//                                break;
+//                            case "shotgun":
+//                                event.keys[KeyCoder.THREE] = true;
+//                                break;
+//                        }
+////                        this.weaponsHandle(event); // TODO: because it has been deprecated
+//                        break;
+//                    case "move":
+//                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (GameLevel.SpeedModifier.Normal) : (GameLevel.SpeedModifier.Sprint);
+//                        if (speedModifier) {
+//                            var movementData = {
+//                                speedModifier: speedModifier,
+//                                angle: data.phi
+//                            };
+//                            this.player.movementHandle(movementData, this.collisionObjects);
+//                        }
+//                        break;
+//                    case "use":
+//                        event = (new KeyCoder()).getKeys();
+//                        event.keys[KeyCoder.E] = true;
+//                        this.chestsOpeningHandle(event);
+//                        this.buttonsPressingHandle(event);
+//                        this.doorsOpeningHandle(event);
+//                        event.keys[KeyCoder.E] = false;
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
+//        },
 
 		update: function(event) {
             if (this.finished)
                 return;
 
             if (this.checkBounds(this.player.dispObj)) {
-                this.player.dispObj.x = this.prevPlayerPos.x;
-                this.player.dispObj.y = this.prevPlayerPos.y;
-                this.player.dispObj.rotation = this.prevPlayerPos.rotation;
+                this.player.restorePrevPos();
             }
-            this.setPrevPlayerPos();
+            this.player.savePrevPos();
 
-            this.weaponsHandle(event);
-            if (event.keys[KeyCoder.SPACE]) {
+            if (event.keys[GameLevel.Keys.Shoot]) {
                 this.shootingHandle();
             }
 
@@ -335,7 +355,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             this.player.update(event, this.collisionObjects);
 
             this.zombiesUpdate(event);
-
 
             _.each(this.bullets, function(bullet) {
                 bullet.update(event);
@@ -372,18 +391,18 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             };
             var offset = GameLevel.CameraOffset;
 
-            if (this.player.dispObj.x > stageSize.width - offset) {
-                this.mainContainer.x = -(this.player.dispObj.x - (stageSize.width - offset));
+            if (this.player.x() > stageSize.width - offset) {
+                this.mainContainer.x = -(this.player.x() - (stageSize.width - offset));
             }
-            else if (this.player.dispObj.x < offset) {
-                this.mainContainer.x = -this.player.dispObj.x + offset;
+            else if (this.player.x() < offset) {
+                this.mainContainer.x = -this.player.x() + offset;
             }
 
-            if (this.player.dispObj.y > stageSize.height - offset) {
-                this.mainContainer.y = -(this.player.dispObj.y - (stageSize.height - offset));
+            if (this.player.y() > stageSize.height - offset) {
+                this.mainContainer.y = -(this.player.y() - (stageSize.height - offset));
             }
-            else if (this.player.dispObj.y < offset) {
-                this.mainContainer.y = -this.player.dispObj.y + offset;
+            else if (this.player.y() < offset) {
+                this.mainContainer.y = -this.player.y() + offset;
             }
         },
 
@@ -394,7 +413,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             var ammo = this.player.weapons[currentWeapon].ammo;
 
             var weaponText = currentWeapon;
-            if (weaponText != "knife")
+            if (ammo)
                 weaponText += ": " + ammo;
             this.weaponText.text = weaponText;
 
@@ -412,9 +431,9 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     zombie.justFired = "";
                     ResourceManager.playSound(ResourceManager.soundList.pistol.Fire);
                     var bulletData = {
-                        x: zombie.dispObj.x,
-                        y: zombie.dispObj.y,
-                        r: zombie.dispObj.rotation,
+                        x: zombie.x(),
+                        y: zombie.y(),
+                        r: zombie.rotation(),
                         power: ResourceManager.weaponData.pistol.power,
                         source: "zombie",
                         tex: "pistol-bullet",
@@ -431,31 +450,14 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         },
 
         changeWeapon: function(name) {
-            this.player.currentWeapon = name;
-            this.player.dispObj.tex = "player-{0}".format(this.player.currentWeapon);
-            this.removeFromStage(this.player.dispObj);
-            this.player.setDispObj(this.addToStage(this.player.dispObj));
+            if (this.player.hasWeapon(name) && this.player.currentWeapon != name) {
+                this.player.currentWeapon = name;
+                this.player.changeTexture(this.player.currentWeapon);
+                this.removeFromStage(this.player.dispObj);
+                this.player.setDispObj(this.addToStage(this.player.dispObj));
 
-            ResourceManager.playSound(ResourceManager.soundList[this.player.currentWeapon].Draw, ResourceManager.weaponData.drawCooldown);
-            this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
-        },
-
-        weaponsHandle: function(event) {
-            var weapon = null;
-            if(event.keys[KeyCoder.ONE]) {
-                weapon = "knife";
-            }
-            if(event.keys[KeyCoder.TWO]) {
-                weapon = "pistol";
-            }
-            if(event.keys[KeyCoder.THREE]) {
-                weapon = "shotgun";
-            }
-
-            if (weapon != null) {
-                if (this.player.hasWeapon(weapon) && this.player.currentWeapon != weapon) {
-                    this.changeWeapon(weapon);
-                }
+                ResourceManager.playSound(ResourceManager.soundList[this.player.currentWeapon].Draw, ResourceManager.weaponData.drawCooldown);
+                this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
             }
         },
 
@@ -534,9 +536,9 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     var corpse = DefaultObjects.build("corpse",
                         {
                             tex: "zombie_corpse",
-                            x: this.zombies[i].dispObj.x,
-                            y: this.zombies[i].dispObj.y,
-                            r: this.zombies[i].dispObj.rotation
+                            x: this.zombies[i].x(),
+                            y: this.zombies[i].y(),
+                            r: this.zombies[i].rotation()
                         });
 
                     this.addToStage(corpse);
@@ -549,8 +551,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     }
 
                     this.zombies[i].drops.forEach(function(dropped) {
-                        dropped.x = self.zombies[i].dispObj.x;
-                        dropped.y = self.zombies[i].dispObj.y;
+                        dropped.x = self.zombies[i].x();
+                        dropped.y = self.zombies[i].y();
 
                         var drop = DefaultObjects.build(dropped.type, dropped);
                         self.drops.push(self.addToStage(drop))
@@ -619,44 +621,49 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
         chestsOpeningHandle: function(event) {
             var nearestChest = this.pickNearestToPlayer(this.chests, function(d) {
-                return d <= this.player.$class.Reach;
+                return d <= this.player.$class.Reach && d <= Chest.ActivationRadius;
             }.bind(this));
 
             if (nearestChest) {
                 nearestChest.update(event, this.player);
 
-                if (nearestChest.state === Chest.State.Closed) {
+                if (nearestChest.isClosed()) {
                     Messenger.showMessage(Messenger.chestLocked, nearestChest.requiresMessage);
                 }
                 else {
                     ResourceManager.playSound(ResourceManager.soundList.ChestOpen);
 
-                    _.each(nearestChest.storage, this.itemInteraction.bind(this));
+                    _.each(nearestChest.storage(), this.itemInteraction.bind(this));
 
-                    nearestChest.storage = [];
+                    nearestChest.clearStorage();
                     this.collisionObjects.remove(nearestChest.dispObj);
                     this.removeFromStage(nearestChest.dispObj);
-                    var dispObj = this.addToStage(nearestChest); // it has a new texture
+                    var dispObj = this.addToStage(nearestChest._data); // it has a new texture
                     this.collisionObjects.push(dispObj);
                 }
+                return true;
             }
+            return false;
         },
 
 
         dropsHandle: function() {
-            for (var i = 0; i < this.drops.length; ++i) {
-                //can't use _.each here because of splice in the end, but
-                var drop = this.drops[i]; //caching and readability!
+            var self = this;
 
-                if (this.checkReach(drop)) {
-                    if (collider.checkPixelCollision(drop, this.player.dispObj)) {
-                        this.itemInteraction(drop.data, true);
+            var newDrops = _.clone(this.drops);
 
-                        this.removeFromStage(drop);
-                        this.drops.splice(i, 1);
+            _.each(this.drops, function(drop, i) {
+                if (self.checkReach(drop)) {
+                    if (collider.checkPixelCollision(drop, self.player.dispObj)) {
+                        self.itemInteraction(drop.data, true);
+
+                        self.removeFromStage(drop);
+                        newDrops.splice(i, 1);
                     }
                 }
-            }
+            });
+
+            this.drops = newDrops;
         },
 
         doorsOpeningHandle: function(event) {
@@ -669,7 +676,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             if (door) {
                 door.update(event, this.player, this.zombies.length);
 
-                if (door.state === Door.State.Closed) {
+                if (door.isClosed()) {
                     Messenger.showMessage(door.requiresMessage);
                 }
                 else {
@@ -678,18 +685,21 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     for (var j = 0; j < this.collisionObjects.length; ++j) {
                         if (this.collisionObjects[j] == door.dispObj) {
                             this.collisionObjects.splice(j, 1);
+                            --j; // TODO: rethink it
                         }
                     }
                     this.removeFromStage(door.dispObj);
-                    this.addToStage(door);
+                    this.addToStage(door._data);
 
                     this.player.score += GameLevel.SCORES.DOOR_OPEN;
 
-                    if (this.role === "exit") {
+                    if (door.role() == "exit") {
                         this.finish();
                     }
                 }
+                return true;
             }
+            return false;
         },
 
         buttonsPressingHandle: function(event) {
@@ -720,10 +730,18 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         },
 
         getDistance: function(obj) {
-            var toObject = new Vector({
-                x: this.player.dispObj.x - obj.x,
-                y: this.player.dispObj.y - obj.y
-            });
+            var toObject = null;
+            if (_.isFunction(obj.x) && _.isFunction(obj.y)) {
+                toObject = new Vector({
+                    x: this.player.x() - obj.x(),
+                    y: this.player.y() - obj.y()
+                });
+            } else {
+                toObject = new Vector({
+                    x: this.player.x() - obj.x,
+                    y: this.player.y() - obj.y
+                });
+            }
 
             return toObject.distance();
         },
@@ -733,20 +751,10 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         },
 
         checkBounds: function(obj) {
-            return (
-            obj.x + obj.getBounds().width/2 >= this.data['w'] ||
-            obj.x - obj.getBounds().width/2 <= 0 ||
-            obj.y + obj.getBounds().width/2 >= this.data['h'] ||
-            obj.y - obj.getBounds().width/2 <= 0
-            );
-        },
-
-        setPrevPlayerPos: function() {
-            this.prevPlayerPos = {
-                x: this.player.dispObj.x,
-                y: this.player.dispObj.y,
-                rotation: this.player.dispObj.rotation
-            };
+            return obj.x + obj.getBounds().width/2 >= this.data['w'] ||
+                    obj.x - obj.getBounds().width/2 <= 0 ||
+                    obj.y + obj.getBounds().width/2 >= this.data['h'] ||
+                    obj.y - obj.getBounds().width/2 <= 0;
         },
 
         updateEffects: function() {
@@ -765,8 +773,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         updateFog: function(forceUpdate) {
             if (this.effects.fog) {
                 var playerPos = {
-                    x: Math.floor(this.player.dispObj.x + this.mainContainer.x),
-                    y: Math.floor(this.player.dispObj.y + this.mainContainer.y)
+                    x: Math.floor(this.player.x() + this.mainContainer.x),
+                    y: Math.floor(this.player.y() + this.mainContainer.y)
                 };
 
                 //if player moved

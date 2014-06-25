@@ -10,9 +10,6 @@ define([
         var Button = GameObject.$extend({
             __init__: function(obj) {
                 this.type = "button";
-                this.x = obj.x;
-                this.y = obj.y;
-                this.r = obj.r;
                 this.role = obj.role;
                 this.puzzle = obj.puzzle;
                 this.value = obj.value;
@@ -26,10 +23,14 @@ define([
                 this.pressCooldown = 0;
             },
 
+            __classvars__: {
+
+            },
+
             update: function(event, player, doors) {
                 var vectorToPlayer = new Vector({
-                    x: player.dispObj.x - this.dispObj.x,
-                    y: player.dispObj.y - this.dispObj.y
+                    x: player.x() - this.x(),
+                    y: player.y() - this.y()
                 });
 
                 if (event.keys[KeyCoder.E]) {

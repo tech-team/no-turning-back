@@ -26,7 +26,7 @@ define([
                 bulletData.tex = "shotgun-bullet";
                 bulletData.ttl = 8;
 
-                var bullet = new Bullet(level.addToStage(bulletData), bulletData);
+                var bullet = new Bullet(bulletData, level.addToStage(bulletData));
 
                 level.bullets.push(bullet);
             }

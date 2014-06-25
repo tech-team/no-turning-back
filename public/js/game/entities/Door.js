@@ -2,67 +2,104 @@ define([
     'classy',
     'lodash',
     'game/entities/GameObject',
-    'game/misc/Messenger',
-    'game/misc/Vector'
+    'game/misc/Messenger'
 ],
-    function(Class, _, GameObject, Messenger, Vector) {
+    function(Class, _, GameObject, Messenger) {
         var Door = GameObject.$extend({
-            __init__: function(obj) {
-                this.type = "door";
-                this.x = obj.x;
-                this.y = obj.y;
-                this.r = obj.r;
-                this.state = ( obj.state === "open" ) ? Door.State.Open : Door.State.Closed;
-                this.tex = obj.tex;
-                this.activationRadius = 90; // TODO: Deprecated
-                this.requires = obj.requires;
-                this.requiresMessage = undefined;
-                this.role = obj.role || null;
-                this.puzzle = obj.puzzle || null;
-                this.inputCode = "";
+            __init__: function(objectData, dispObj) {
+                this.$super(objectData, dispObj);
+
+                this.requiresMessage = null;
+                this.inputCode = ""; // TODO: need to do smth with this...
             },
 
             __classvars__: {
                 State: {
-                    Closed: 0,
-                    Open: 1
+                    Closed: "closed",
+                    Open: "open"
                 },
+
+                Tex: {
+                    Closed: "door-closed",
+                    Open: "door-open"
+                },
+
                 ActivationRadius: 90
             },
 
+            data: function() {
+                this._data.x = this.dispObj.x;
+                this._data.y = this.dispObj.y;
+                this._data.rotation = this.dispObj.rotation;
+            },
+
+            _state: function() {
+                return this._data.state;
+            },
+
+            isClosed: function() {
+                return this._state() == Door.State.Closed;
+            },
+
+            setState: function(newState) {
+                this._data.state = newState;
+            },
+
+            requires: function() {
+                return this._data.requires;
+            },
+
+            tex: function() {
+                return this._data.tex;
+            },
+
+            setTex: function(newTex) {
+                this._data.tex = newTex;
+            },
+
+            role: function() {
+                return this._data.role;
+            },
+
+            puzzle: function() {
+                return this._data.puzzle;
+            },
+
+
+
             update: function(event, player, zombiesLeft) {
+                if (!this.isClosed()) return;
+
                 var self = this;
-                if (this.state === Door.State.Closed) {
-                    this.requiresMessage = null;
+                this.requiresMessage = "";
 
-                    var testRequirement = function(requirement) {
-                        if (!self.requiresMessage) {
-                            if (requirement === "kill_all") {
-                                if (zombiesLeft !== 0)
-                                    self.requiresMessage = Messenger.doorLockedKillAll;
-                            }
-                            else if(requirement === "puzzle") {
-                                self.requiresMessage = Messenger.doorLockedPuzzle;
-                            }
-                            else if(!(_.contains(player.keys, requirement))) {
-                                self.requiresMessage = Messenger.prepareMessage(Messenger.doorLocked, requirement)
-                            }
+                var testRequirement = function(requirement) {
+                    if (!self.requiresMessage) {
+                        if (requirement === "kill_all") {
+//                                if (zombiesLeft !== 0)
+//                                    self.requiresMessage = Messenger.doorLockedKillAll;
                         }
-                    };
-
-                    if(_.isArray(this.requires))
-                        _.each(this.requires, testRequirement);
-                    else
-                        testRequirement(this.requires);
-
-                    if (!this.requiresMessage) {
-                        self.state = Door.State.Open;
-                        self.tex = "door-open";
+                        else if(requirement === "puzzle") {
+                            self.requiresMessage = Messenger.doorLockedPuzzle;
+                        }
+                        else if(!(_.contains(player.keys, requirement))) {
+                            self.requiresMessage = Messenger.prepareMessage(Messenger.doorLocked, requirement)
+                        }
                     }
+                };
 
-                    else if (player.messageCooldown <= 0) {
-                        player.messageCooldown = 100;
-                    }
+                if(_.isArray(this.requires()))
+                    _.each(this.requires(), testRequirement);
+                else
+                    testRequirement(this.requires());
+
+                if (!this.requiresMessage) {
+                    self.setState(Door.State.Open);
+                    self.setTex(Door.Tex.Open);
+                }
+
+                else if (player.messageCooldown <= 0) {
+                    player.messageCooldown = 100;
                 }
             }
         });
