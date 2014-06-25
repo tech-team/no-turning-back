@@ -132,8 +132,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             //add buttons
             _.each(data.buttons, function(obj) {
-                var button = new Button(obj);
-                button.setDispObj(self.addToStage(obj));
+                var button = new Button(self.addToStage(obj));
                 self.buttons.push(button);
             });
 
@@ -225,6 +224,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             this.keyCoder.addEventListener("keyup", GameLevel.Keys.ToggleSound, ResourceManager.toggleSound.bind(ResourceManager));
 
+            this.keyCoder.addEventListener("keypress", GameLevel.Keys.Shoot, this.shootingHandle.bind(this));
 
             if (DEBUG) {
                 this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.Finish, this.finish.bind(this));
@@ -356,9 +356,9 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             }
             this.player.savePrevPos();
 
-            if (event.keys[GameLevel.Keys.Shoot]) {
-                this.shootingHandle();
-            }
+//            if (event.keys[GameLevel.Keys.Shoot]) {
+//                this.shootingHandle();
+//            }
 
             this.bulletsCollisionsHandle();
             this.zombiesDeathHandle();
@@ -368,7 +368,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             this.player.update(event, this.collisionObjects);
 
-            this.zombiesUpdate(event);
+//            this.zombiesUpdate(event);
 
             _.each(this.bullets, function(bullet) {
                 bullet.update(event);

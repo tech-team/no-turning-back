@@ -85,6 +85,8 @@ function($, _, Class, signals, createjs, alertify, ndgmr, KeyCoder, LevelManager
             var self = this;
 
             console.log('Level finished');
+            this.keyCoder.removeAllListeners();
+
             if (event && event.status === 'gameFinished') {
                 this.gameFinished.dispatch(event);
                 return;

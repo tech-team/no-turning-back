@@ -8,8 +8,8 @@ define([
 ],
     function(Class, _, GameObject, KeyCoder, Messenger, Vector) {
         var Button = GameObject.$extend({
-            __init__: function(objectData, dispObj) {
-                this.$super(objectData, dispObj);
+            __init__: function(dispObj) {
+                this.$super(dispObj);
 
 
 //                this.puzzle = obj.puzzle;
@@ -36,7 +36,7 @@ define([
             },
 
             state: function() {
-                return this._data.state;
+                return this.dispObj.data.state;
             },
 
             isPressed: function() {
@@ -48,23 +48,23 @@ define([
             },
 
             setState: function(newState) {
-                this._data.state = newState;
+                this.dispObj.data.state = newState;
             },
 
             tex: function() {
-                return this._data.tex;
+                return this.dispObj.data.tex;
             },
 
             setTex: function(newTex) {
-                this._data.tex = newTex;
+                this.dispObj.data.tex = newTex;
             },
 
             value: function() {
-                return this._data.value;
+                return this.dispObj.data.value;
             },
 
             puzzle: function() {
-                return this._data.puzzle;
+                return this.dispObj.data.puzzle;
             },
 
 

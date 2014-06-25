@@ -1,7 +1,7 @@
 define([
 	'classy',
     'jquery',
-    'underscore'
+    'lodash'
 ],
 function(Class, $, _) {
 	var KeyCoder = Class.$extend({
@@ -10,31 +10,47 @@ function(Class, $, _) {
 			var self = this;
 
             this.listeners = [];
-
             this.listener = null;
             if (editorMode)
                 this.listener = $('#editor-field');
             else
                 this.listener = $(document);
 
-            this.listener.keydown(function(event) {
-				self.keys[event.keyCode] = true;
 
-                _.each(self.listeners, function(el) {
-                    if (el.event === "keydown" && el.key === event.keyCode)
-                        el.handler(event);
-                });
-			});
+            this.keyEventsCallbacks = {
+                keydown: function(event) {
+                    self.keys[event.keyCode] = true;
 
-            this.listener.keyup(function(event) {
-                self.keys[event.keyCode] = false;
+                    _.each(self.listeners, function(el) {
+                        if (el.event === "keydown" && el.key === event.keyCode)
+                            el.handler(event);
+                    });
+                },
+                keyup: function(event) {
+                    self.keys[event.keyCode] = false;
 
-                _.each(self.listeners, function(el) {
-                    if (el.event === "keyup" && el.keyCode === event.keyCode) {
-                        el.handler(event);
-                    }
-                });
+                    _.each(self.listeners, function(el) {
+                        if (el.event === "keyup" && el.keyCode === event.keyCode) {
+                            el.handler(event);
+                        }
+                    });
+                },
+                keypress: function(event) {
+                    _.each(self.listeners, function(el) {
+                        if (el.event === "keypress" && el.keyCode === event.keyCode) {
+                            el.handler(event);
+                        }
+                    });
+                }
+            };
+
+            _.each(_.keys(this.keyEventsCallbacks), function(keyEvent) {
+                self.listener.bind(keyEvent, self.keyEventsCallbacks[keyEvent]);
             });
+
+//            this.listener.keydown();
+//            this.listener.keyup();
+//            this.listener.keypress();
 		},
 
 		getKeys: function() {
@@ -52,10 +68,10 @@ function(Class, $, _) {
         },
 
         removeAllListeners: function() {
+            var self = this;
+
             this.listeners = [];
             this.keys = [];
-            this.listener.off('keyup');
-            this.listener.off('keydown');
         },
 
 		__classvars__: {
