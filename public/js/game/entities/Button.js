@@ -8,31 +8,33 @@ define([
 ],
     function(Class, _, GameObject, KeyCoder, Messenger, Vector) {
         var Button = GameObject.$extend({
-            __init__: function(dispObj) {
+            __init__: function(dispObj, doors) {
                 this.$super(dispObj);
 
+                this.targetDoors = [];
+                _.each(doors, function(door) {
+                    if (door.puzzle() && door.puzzle().name == this.puzzle() && door.isClosed()) {
+                        this.targetDoors.push(door);
+                    }
+                }.bind(this));
 
-//                this.puzzle = obj.puzzle;
-//                this.value = obj.value;
-//                this.state = "depressed";
-//                this.tex = obj.tex;
-                this.justPressed = false;
-                this.justDepressed = false;
-
-                this.message = undefined;
-                this.pressCooldown = 0;
+                this.puzzleSolvedStatus = null;
             },
 
             __classvars__: {
                 State: {
                     Pressed: "pressed",
-                    Depressed: "depressed"
+                    Released: "depressed"
                 },
                 Tex: {
                     Pressed: "button_pressed",
-                    Depressed: "button"
+                    Released: "button"
                 },
                 ActivationRadius: 30
+            },
+
+            targets: function() {
+                return this.targetDoors;
             },
 
             state: function() {
@@ -43,8 +45,8 @@ define([
                 return this.state() == Button.State.Pressed;
             },
 
-            isDepressed: function() {
-                return this.state() == Button.State.Depressed;
+            isReleased: function() {
+                return this.state() == Button.State.Released;
             },
 
             setState: function(newState) {
@@ -67,37 +69,48 @@ define([
                 return this.dispObj.data.puzzle;
             },
 
-
-            update: function(event, player, doors) {
+            pressButton: function() {
                 this.setState(Button.State.Pressed);
                 this.setTex(Button.Tex.Pressed);
-                this.pressCooldown = 50;
+            },
+            releaseButton: function() {
+                this.setState(Button.State.Released);
+                this.setTex(Button.Tex.Released);
+            },
 
-                var self = this;
-                var targetDoors = [];
-                _.each(doors, function(door) {
-                    if (door.puzzle() && door.puzzle().name == self.puzzle && door.isClosed()) {
-                        targetDoors.push(door);
-                    }
-                });
 
-                _.each(targetDoors, function(door) {
-                    door.inputCode += self.value();
-                    if (door.inputCode.length >= door.puzzle().code.length) {
-                        self.message = door.puzzleSolved() ? Messenger.puzzleSolved : Messenger.puzzleFailed;
-                        door.inputCode = "";
-                    }
+            update: function(event, player, doors) {
+                if (this.isReleased()) {
+                    this.pressButton();
 
-                });
+                    if (this.puzzleSolvedStatus === true)
+                        return null;
 
-                if (this.isPressed() && this.pressCooldown === 0) {
-                    this.setState(Button.State.Depressed);
-                    this.setTex(Button.Tex.Depressed);
+                    var self = this;
+                    _.each(this.targetDoors, function(door) {
+                        door.inputCode += self.value();
+                        if (door.inputCode.length >= door.puzzle().code.length) {
+                            if (door.puzzleSolved()) {
+                                self.puzzleSolvedStatus = true;
+                            } else {
+                                self.puzzleSolvedStatus = false;
+                                door.inputCode = "";
+                            }
+
+                        }
+                    });
+                    return self.puzzleSolvedStatus;
                 }
+                return null;
 
-                if (this.pressCooldown > 0) {
-                    --this.pressCooldown;
-                }
+//                if (this.isPressed() && this.pressCooldown === 0) {
+//                    this.setState(Button.State.Released);
+//                    this.setTex(Button.Tex.Released);
+//                }
+//
+//                if (this.pressCooldown > 0) {
+//                    --this.pressCooldown;
+//                }
 
 
             }

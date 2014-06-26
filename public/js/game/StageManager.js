@@ -1,6 +1,6 @@
 define([
     'classy',
-    'underscore',
+    'lodash',
     'easel'
 ],
     function(Class, _, easeljs) {

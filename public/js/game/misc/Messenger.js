@@ -1,7 +1,7 @@
 define([
     'classy',
     'easel',
-    'underscore',
+    'lodash',
     'game/misc/UntilTimer'
 ],
     function(Class, easeljs, _, UntilTimer) {

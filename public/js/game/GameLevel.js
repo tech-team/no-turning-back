@@ -132,7 +132,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             //add buttons
             _.each(data.buttons, function(obj) {
-                var button = new Button(self.addToStage(obj));
+                var button = new Button(self.addToStage(obj), self.doors);
                 self.buttons.push(button);
             });
 
@@ -356,10 +356,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             }
             this.player.savePrevPos();
 
-//            if (event.keys[GameLevel.Keys.Shoot]) {
-//                this.shootingHandle();
-//            }
-
             this.bulletsCollisionsHandle();
             this.zombiesDeathHandle();
             this.dropsHandle();
@@ -368,7 +364,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             this.player.update(event, this.collisionObjects);
 
-//            this.zombiesUpdate(event);
+            this.zombiesUpdate(event);
 
             _.each(this.bullets, function(bullet) {
                 bullet.update(event);
@@ -466,9 +462,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             if (this.player.hasWeapon(name) && this.player.currentWeapon != name) {
                 this.player.currentWeapon = name;
                 this.player.changeTexture(this.player.currentWeapon);
-
-                this.removeFromStage(this.player.dispObj);
-                this.player.setDispObj(this.addToStage(this.player.data()));
+                this.redrawGameObject(this.player);
 
                 ResourceManager.playSound(ResourceManager.soundList[this.player.currentWeapon].Draw, ResourceManager.weaponData.drawCooldown);
                 this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
@@ -652,9 +646,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
                     nearestChest.clearStorage();
                     this.collisionObjects.remove(nearestChest.dispObj);
-                    this.removeFromStage(nearestChest.dispObj);
-                    var dispObj = this.addToStage(nearestChest.data()); // it has a new texture
-                    this.collisionObjects.push(dispObj);
+                    this.redrawGameObject(nearestChest);
+                    this.collisionObjects.push(nearestChest.dispObj);
                 }
                 return true;
             }
@@ -681,59 +674,75 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             this.drops = newDrops;
         },
 
-        doorsOpeningHandle: function(event) {
+        doorsOpeningHandle: function(event, targetDoors) {
             var self = this;
 
-            var door = this.pickNearestToPlayer(this.doors, function(d) {
-                return d <= Door.ActivationRadius;
-            });
+            var doorUpdater = function(door) {
+                if (door && door.isClosed()) {
+                    door.update(event, self.player, self.zombies.length);
 
-            if (door) {
-                door.update(event, this.player, this.zombies.length);
+                    if (door.isClosed()) {
+                        Messenger.showMessage(door.requiresMessage);
+                    }
+                    else {
+                        ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
 
-                if (door.isClosed()) {
-                    Messenger.showMessage(door.requiresMessage);
-                }
-                else {
-                    ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
+                        for (var j = 0; j < self.collisionObjects.length; ++j) {
+                            if (self.collisionObjects[j] == door.dispObj) {
+                                self.collisionObjects.splice(j, 1);
+                                --j; // TODO: rethink it
+                            }
+                        }
+                        self.redrawGameObject(door);
 
-                    for (var j = 0; j < this.collisionObjects.length; ++j) {
-                        if (this.collisionObjects[j] == door.dispObj) {
-                            this.collisionObjects.splice(j, 1);
-//                            --j; // TODO: rethink it
+                        self.player.score += GameLevel.SCORES.DOOR_OPEN;
+
+                        if (door.role() == "exit") {
+                            self.finish();
                         }
                     }
-                    this.removeFromStage(door.dispObj);
-                    this.addToStage(door.data());
-
-                    this.player.score += GameLevel.SCORES.DOOR_OPEN;
-
-                    if (door.role() == "exit") {
-                        this.finish();
-                    }
                 }
-                return true;
+            };
+
+            if (targetDoors) {
+                _.each(targetDoors, doorUpdater.bind(this));
+            } else {
+                var door = this.pickNearestToPlayer(this.doors, function (d) {
+                    return d <= Door.ActivationRadius;
+                });
+                doorUpdater(door);
             }
-            return false;
         },
 
         buttonsPressingHandle: function(event) {
             var self = this;
 
             var button = this.pickNearestToPlayer(this.buttons, function(d, button) {
-                return d <= Button.ActivationRadius && button.isDepressed();
+                return d <= Button.ActivationRadius && button.isReleased();
             });
 
             if (button) {
-                button.update(event, this.player, this.doors);
+                var solved = button.update(event, this.player, this.doors);
+                self.redrawGameObject(button);
                 ResourceManager.playSound(ResourceManager.soundList.Click);
 
-                this.removeFromStage(button.dispObj);
-                this.addToStage(button.data());
+                if (solved !== null) {
 
-                if (button.message) {
-                    Messenger.showMessage(button.message);
-                    button.message = null;
+                    if (solved) {
+                        Messenger.showMessage(Messenger.puzzleSolved);
+                        this.doorsOpeningHandle(event, button.targets());
+                    } else {
+                        Messenger.showMessage(Messenger.puzzleFailed);
+                    }
+
+                }
+
+                if (button.isPressed()) {
+                    setTimeout(function () {
+                        button.releaseButton();
+                        ResourceManager.playSound(ResourceManager.soundList.Click);
+                        self.redrawGameObject(button);
+                    }, 1500);
                 }
             }
 
@@ -759,6 +768,11 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 //                    button.message = undefined;
 //                }
 //            });
+        },
+
+        redrawGameObject: function(gameObject) {
+            this.removeFromStage(gameObject.dispObj);
+            gameObject.setDispObj(this.addToStage(gameObject.data()));
         },
 
         getDistance: function(obj) {
