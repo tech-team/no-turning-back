@@ -1,5 +1,4 @@
 define([
-	'classy',
 	'game/entities/AliveObject',
     'game/ResourceManager',
     'game/misc/UntilTimer',
@@ -7,7 +6,7 @@ define([
     'collision',
     'game/weapons/Weapons'
 ],
-function(Class, AliveObject, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) {
+function(AliveObject, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) {
 	var Player = AliveObject.$extend({
 		__init__: function(dispObj) {
             this.$super(dispObj);

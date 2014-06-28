@@ -1,12 +1,8 @@
 define([
-    'classy',
     'lodash',
-    'game/entities/GameObject',
-    'game/misc/KeyCoder',
-    'game/misc/Messenger',
-    'game/misc/Vector'
+    'game/entities/GameObject'
 ],
-    function(Class, _, GameObject, KeyCoder, Messenger, Vector) {
+    function(_, GameObject) {
         var Button = GameObject.$extend({
             __init__: function(dispObj, doors) {
                 this.$super(dispObj);
@@ -79,7 +75,7 @@ define([
             },
 
 
-            update: function(event, player, doors) {
+            update: function(event) {
                 if (this.isReleased()) {
                     this.pressButton();
 

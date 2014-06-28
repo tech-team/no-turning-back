@@ -1,9 +1,8 @@
 define([
-    'classy',
     'lodash',
     'game/entities/GameObject'
 ],
-    function(Class, _, GameObject) {
+    function(_, GameObject) {
         var Chest = GameObject.$extend({
             __init__: function(dispObj) {
                 this.$super(dispObj);

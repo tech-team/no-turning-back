@@ -1,8 +1,7 @@
 define([
-    'classy',
     'game/entities/GameObject'
 ],
-    function(Class, GameObject) {
+    function(GameObject) {
         var Bullet = GameObject.$extend({
             __init__: function(dispObj) {
                 this.$super(dispObj);

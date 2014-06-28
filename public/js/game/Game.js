@@ -5,7 +5,6 @@ define([
     'signals',
 	'easel',
     'alertify',
-    'collision',
 	'game/misc/KeyCoder',
 	'game/LevelManager',
 	'game/GameLevel',
@@ -15,7 +14,7 @@ define([
     'console',
     'game/misc/Messenger'
 ],
-function($, _, Class, signals, createjs, alertify, ndgmr, KeyCoder, LevelManager, GameLevel, Editor, Player, ResourceManager, Console, Messenger) {
+function($, _, Class, signals, createjs, alertify, KeyCoder, LevelManager, GameLevel, Editor, Player, ResourceManager, Console, Messenger) {
 	var Game = Class.$extend({
 		__init__: function(canvas, editorMode, onLoadedCallback) {
             this.editorMode = editorMode;

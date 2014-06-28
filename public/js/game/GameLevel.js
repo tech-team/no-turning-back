@@ -728,7 +728,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             });
 
             if (button) {
-                var solved = button.update(event, this.player, this.doors);
+                var solved = button.update(event);
                 self.redrawGameObject(button);
                 ResourceManager.playSound(ResourceManager.soundList.Click);
 

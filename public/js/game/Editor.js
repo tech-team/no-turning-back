@@ -1,8 +1,7 @@
 define([
-    'classy',
+    'jquery',
     'lodash',
     'easel',
-    'jquery',
     'alertify',
     'game/misc/KeyCoder',
     'game/ResourceManager',
@@ -10,7 +9,7 @@ define([
     'game/DefaultObjects',
     'game/StageManager'
 ],
-    function(Class, _, easeljs, $, alertify, KeyCoder, ResourceManager, LevelManager, DefaultObjects, StageManager) {
+    function($, _, easeljs, alertify, KeyCoder, ResourceManager, LevelManager, DefaultObjects, StageManager) {
         var Editor = StageManager.$extend({
             __classvars__: {
                 duplicateDelta: 30,

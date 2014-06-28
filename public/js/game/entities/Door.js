@@ -1,10 +1,9 @@
 define([
-    'classy',
     'lodash',
     'game/entities/GameObject',
     'game/misc/Messenger'
 ],
-    function(Class, _, GameObject, Messenger) {
+    function(_, GameObject, Messenger) {
         var Door = GameObject.$extend({
             __init__: function(dispObj) {
                 this.$super(dispObj);
@@ -78,8 +77,8 @@ define([
                 var testRequirement = function(requirement) {
                     if (!self.requiresMessage) {
                         if (requirement === "kill_all") {
-//                                if (zombiesLeft !== 0)
-//                                    self.requiresMessage = Messenger.doorLockedKillAll;
+                            if (zombiesLeft !== 0)
+                                self.requiresMessage = Messenger.doorLockedKillAll;
                         }
                         else if(requirement === "puzzle") {
                             if (!self.puzzleSolved()) {

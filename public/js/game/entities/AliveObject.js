@@ -1,8 +1,7 @@
 define([
-	'classy',
 	'game/entities/GameObject'
 ],
-function(Class, GameObject) {
+function(GameObject) {
 	var AliveObject = GameObject.$extend({
 		__init__: function(dispObj) {
             this.$super(dispObj);
@@ -32,7 +31,7 @@ function(Class, GameObject) {
         },
 
         heal: function(howMuch) {
-
+            throw "Heal function is not implemented";
         },
 
         damage: function(howMuch) {
@@ -40,7 +39,7 @@ function(Class, GameObject) {
         },
 
 		update: function(event) {
-			
+            throw "Update function is not implemented";
 		}
 	});
 

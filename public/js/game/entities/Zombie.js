@@ -1,13 +1,11 @@
 define([
-    'classy',
     'game/entities/AliveObject',
     'game/ResourceManager',
-    'sound',
     'collision',
     'game/misc/Vector',
     'game/weapons/Weapons'
 ],
-    function(Class, AliveObject, ResourceManager, soundjs, collider, Vector, Weapons) {
+    function(AliveObject, ResourceManager, collider, Vector, Weapons) {
         var Zombie = AliveObject.$extend({
             __init__: function(dispObj) {
                 this.$super(dispObj);
@@ -138,23 +136,6 @@ define([
                         } else {
                             delay = Zombie.FireDelayModifier[this.currentWeapon];
                         }
-
-
-
-//                        if (!this.weapons) {
-//                            if (vectorToPlayerDistance <= Zombie.Reach) {
-//                                player.damage(this.damageAmount());
-//                                ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
-//                                this.canAttack = false;
-//                                delay = 1;
-//                            }
-//                        }
-//                        else {
-//                            this.justFired = true;
-//                            this.canAttack = false;
-//
-//                            delay = Zombie.FireDelayModifier[this.currentWeapon];
-//                        }
 
                         if (delay) {
                             setTimeout(function () {
