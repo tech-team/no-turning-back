@@ -19,6 +19,9 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
             this.saturationTime = 0;
             this.effects = null;
             this.events = null;
+//            this.inventory = [];
+//            this.keys = [];
+
             this.currentWeapon = "knife";
             this.weapons = { };
             this.addWeapon(this.currentWeapon);

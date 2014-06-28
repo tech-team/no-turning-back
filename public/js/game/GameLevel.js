@@ -119,7 +119,6 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             });
 
             this.keyCoder.addEventListener("keyup", GameLevel.Keys.ToggleSound, ResourceManager.toggleSound.bind(ResourceManager));
-
             this.keyCoder.addEventListener("keypress", GameLevel.Keys.Shoot, this.playerShootingHandle.bind(this));
 
             if (DEBUG) {
@@ -235,7 +234,6 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             this.player.setEffects(this.effects);
 
             this.createCollisionObjects();
-
             ResourceManager.stopSounds();
         },
 
