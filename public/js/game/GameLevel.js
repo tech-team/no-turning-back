@@ -3,24 +3,20 @@ define([
     'lodash',
     'signals',
     'easel',
-    'sound',
-    'alertify',
     'collision',
     'game/StageManager',
     'game/ResourceManager',
     'game/DefaultObjects',
     'game/misc/KeyCoder',
-    'game/Editor',
     'game/misc/UntilTimer',
     'game/misc/Messenger',
     'game/entities/Zombie',
     'game/entities/Chest',
     'game/entities/Door',
     'game/entities/Button',
-    'game/entities/Bullet',
     'game/misc/Vector'
 ],
-function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, Editor, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet, Vector) {
+function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, UntilTimer, Messenger, Zombie, Chest, Door, Button, Vector) {
     var GameLevel = StageManager.$extend({
 		__init__: function(stage, levelData, player, resourceManager) {
             this.$super(stage, resourceManager);
@@ -103,7 +99,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             this.data = data;
 
             //add background
-            //NB: unused variable, left for better code understandability
             this.background = this.addToStage(data, true);
 
             //add walls
@@ -161,7 +156,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             var graphics = new easeljs.Graphics();
             this.effects.fogBox = new easeljs.Shape(graphics);
 
-            var fogBox = this.containers["effect"].addChild(this.effects.fogBox); // TODO: unused variable
+//            var fogBox = this.containers["effect"].addChild(this.effects.fogBox); // TODO: unused variable
+            this.containers["effect"].addChild(this.effects.fogBox);
 
             this.effects.fog = this.addToStage({
                 type: "effect",
@@ -204,7 +200,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             this.player.setEffects(this.effects);
 
             this.createCollisionObjects();
-            soundjs.Sound.stop();
+
+            ResourceManager.stopSounds();
         },
 
         createEvents: function() {
@@ -350,7 +347,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             if (this.finished)
                 return;
 
-            if (this.checkBounds(this.player.dispObj)) {
+            if (this.checkBounds(this.player)) {
                 this.player.restorePrevPos();
             }
             this.player.savePrevPos();
@@ -382,16 +379,16 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             }
 
             this.hudSetup();
-
             this.updateFog();
+            this.updateCamera();
 
             for (var sound in ResourceManager.playingSounds) {
-                if (ResourceManager.playingSounds[sound] > 0) {
-                    --ResourceManager.playingSounds[sound];
+                if(ResourceManager.playingSounds.hasOwnProperty(sound)) {
+                    if (ResourceManager.playingSounds[sound] > 0) {
+                        --ResourceManager.playingSounds[sound];
+                    }
                 }
             }
-
-            this.updateCamera();
 		},
 
         updateCamera: function() {
@@ -524,7 +521,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         break out;
                     }
                 }
-                if (this.checkBounds(this.bullets[i].dispObj)) {
+                if (this.checkBounds(this.bullets[i])) {
                     this.removeFromStage(this.bullets[i].dispObj);
                     this.bullets.splice(i, 1);
                     break;
@@ -569,10 +566,10 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         },
 
         itemInteraction: function(item, playSounds) {
-            switch (item['type']) {
+            switch (item.type) {
                 case "weapon":
-                    var name = item['name'];
-                    var ammo = item['ammo'] || 5;
+                    var name = item.name;
+                    var ammo = item.ammo || 5;
                     if (this.player.hasWeapon(name)) {
                         this.player.addAmmo(name, ammo);
                         Messenger.showMessage(Messenger.ammoPicked, ammo, name);
@@ -587,24 +584,28 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         ResourceManager.playSound(ResourceManager.soundList.Ammo);
                     break;
                 case "medkit":
-                    this.player.heal(item['size']);
+                    this.player.heal(item.size);
+
+                    //please note, that amount of health to be healed is unpredictable
+                    //because player can be hurt in process
+                    Messenger.showMessage(Messenger.healPackPicked, item.size);
                     break;
                 case "ammo":
-                    if (this.player.hasWeapon(item['name'])) {
-                        this.player.addAmmo(item['name'], item['size']);
-                        Messenger.showMessage(Messenger.ammoPicked, item['size'], item['name']);
+                    if (this.player.hasWeapon(item.name)) {
+                        this.player.addAmmo(item.name, item.size);
+                        Messenger.showMessage(Messenger.ammoPicked, item.size, item.name);
                     }
                     break;
                 case "key":
-                    if (!(item['name'] in this.player.keys())) {
-                        this.player.addToKeys(item['name']);
-                        Messenger.showMessage(Messenger.keyPicked, item['name']);
+                    if (!(item.name in this.player.keys())) {
+                        this.player.addToKeys(item.name);
+                        Messenger.showMessage(Messenger.keyPicked, item.name);
                     }
                     break;
                 default:
-                    if (item['name']) {
-                        this.player.addToInventory(item['name']);
-                        Messenger.showMessage(Messenger.newItemPicked, item['name']);
+                    if (item.name) {
+                        this.player.addToInventory(item.name);
+                        Messenger.showMessage(Messenger.newItemPicked, item.name);
                     }
             }
         },
@@ -641,9 +642,9 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     _.each(nearestChest.storage(), this.itemInteraction.bind(this));
 
                     nearestChest.clearStorage();
-                    this.collisionObjects.remove(nearestChest.dispObj);
                     this.redrawGameObject(nearestChest);
-                    this.collisionObjects.push(nearestChest.dispObj);
+
+                    this.chests.remove(nearestChest);
                 }
                 return true;
             }
@@ -673,6 +674,8 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         doorsOpeningHandle: function(event, targetDoors) {
             var self = this;
 
+            var removeDoors = false;
+
             var doorUpdater = function(door) {
                 if (door && door.isClosed()) {
                     door.update(event, self.player, self.zombies.length);
@@ -685,6 +688,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
                         self.collisionObjects.remove(door.dispObj);
                         self.redrawGameObject(door);
+                        removeDoors = true;
 
                         self.player.score += GameLevel.SCORES.DOOR_OPEN;
 
@@ -697,11 +701,21 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             if (targetDoors) {
                 _.each(targetDoors, doorUpdater.bind(this));
+
+                if (removeDoors) {
+                    _.each(targetDoors, function (door) {
+                        self.doors.remove(door);
+                    });
+                }
             } else {
                 var door = this.pickNearestToPlayer(this.doors, function (d) {
                     return d <= Door.ActivationRadius;
                 });
                 doorUpdater(door);
+
+                if (removeDoors) {
+                    this.doors.remove(door);
+                }
             }
         },
 
@@ -768,10 +782,10 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
         checkBounds: function(obj) {
             // TODO:  впрочем это не учитывает.. ничего не учитывает
             // TODO:  (поворот, форму)
-            return obj.x + obj.getBounds().width/2 >= this.data['w'] ||
-                    obj.x - obj.getBounds().width/2 <= 0 ||
-                    obj.y + obj.getBounds().height/2 >= this.data['h'] ||
-                    obj.y - obj.getBounds().height/2 <= 0;
+            return obj.x() + obj.dispObj.getBounds().width/2 >= this.data.w ||
+                   obj.x() - obj.dispObj.getBounds().width/2 <= 0 ||
+                   obj.y() + obj.dispObj.getBounds().height/2 >= this.data.h ||
+                   obj.y() - obj.dispObj.getBounds().height/2 <= 0;
         },
 
         updateEffects: function() {

@@ -3,12 +3,11 @@ define([
 	'game/entities/AliveObject',
     'game/ResourceManager',
     'game/misc/UntilTimer',
-    'game/misc/Messenger',
     'game/misc/KeyCoder',
     'collision',
     'game/weapons/Weapons'
 ],
-function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, collider, Weapons) {
+function(Class, AliveObject, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) {
 	var Player = AliveObject.$extend({
 		__init__: function(dispObj) {
             this.$super(dispObj);
@@ -138,6 +137,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             var offsetRotation = 4;
             var offsetX, offsetY;
 
+            var i = 0;
 
 
             if (event.keys[KeyCoder.W]) {
@@ -146,7 +146,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
                 offsetY = speedModifier * Math.sin( (Math.PI / 180) * this.dispObj.rotation);
                 this.dispObj.x += offsetX;
                 this.dispObj.y += offsetY;
-                for (var i = 0; i < collisionObjects.length; ++i) {
+                for (i = 0; i < collisionObjects.length; ++i) {
                     if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
                         this.dispObj.x -= reboundModifier * offsetX;
                         this.dispObj.y -= reboundModifier * offsetY;
@@ -158,7 +158,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
                 }
                 if (event.keys[KeyCoder.D]) {
                     this.dispObj.rotation += offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
+                    for (i = 0; i < collisionObjects.length; ++i) {
                         if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
                             this.dispObj.rotation -= reboundModifier * offsetRotation;
 
@@ -167,7 +167,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
                 }
                 if (event.keys[KeyCoder.A]) {
                     this.dispObj.rotation -= offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
+                    for (i = 0; i < collisionObjects.length; ++i) {
                         if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
                             this.dispObj.rotation += reboundModifier * offsetRotation;
                         }
@@ -179,7 +179,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
                 offsetY = speedModifier * Math.sin( (Math.PI / 180) * this.dispObj.rotation);
                 this.dispObj.x -= offsetX;
                 this.dispObj.y -= offsetY;
-                for (var i = 0; i < collisionObjects.length; ++i) {
+                for (i = 0; i < collisionObjects.length; ++i) {
                     if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
                         this.dispObj.x += reboundModifier * offsetX;
                         this.dispObj.y += reboundModifier * offsetY;
@@ -191,7 +191,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
                 }
                 if (event.keys[KeyCoder.D]) {
                     this.dispObj.rotation -= offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
+                    for (i = 0; i < collisionObjects.length; ++i) {
                         if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
                             this.dispObj.rotation += reboundModifier * offsetRotation;
 
@@ -200,7 +200,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
                 }
                 if (event.keys[KeyCoder.A]) {
                     this.dispObj.rotation += offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
+                    for (i = 0; i < collisionObjects.length; ++i) {
                         if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
                             this.dispObj.rotation -= reboundModifier * offsetRotation;
                         }
@@ -212,7 +212,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
                 if (event.keys[KeyCoder.D]) {
                     offsetRotation *= 2;
                     this.dispObj.rotation += offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
+                    for (i = 0; i < collisionObjects.length; ++i) {
                         if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
                             this.dispObj.rotation -= offsetRotation;
 
@@ -222,7 +222,7 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
                 if (event.keys[KeyCoder.A]) {
                     offsetRotation *= 2;
                     this.dispObj.rotation -= offsetRotation;
-                    for (var i = 0; i < collisionObjects.length; ++i) {
+                    for (i = 0; i < collisionObjects.length; ++i) {
                         if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
                             this.dispObj.rotation += offsetRotation;
 
@@ -279,10 +279,6 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
 
         heal: function(howMuch) {
             ResourceManager.playSound(ResourceManager.soundList.Medkit);
-
-            //please note, that amount of health to be healed is unpredictable
-            //because player can be hurt in process
-            Messenger.showMessage(Messenger.healPackPicked, howMuch);
 
             var self = this;
             var tid = setInterval(function() {

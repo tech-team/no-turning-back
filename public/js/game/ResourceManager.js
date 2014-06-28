@@ -108,6 +108,10 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                     soundjs.Sound.play(sound);
                     ResourceManager.playingSounds[sound] = cooldown || 0;
                 }
+            },
+
+            stopSounds: function() {
+                soundjs.Sound.stop();
             }
         },
 
