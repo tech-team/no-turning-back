@@ -31,6 +31,14 @@ function(Class, GameObject) {
             this.dispObj.rotation = this.prevPos.rotation;
         },
 
+        heal: function(howMuch) {
+
+        },
+
+        damage: function(howMuch) {
+            throw "Damage function is not implemented";
+        },
+
 		update: function(event) {
 			
 		}

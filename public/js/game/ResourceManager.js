@@ -45,6 +45,9 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                 }
             },
             weaponData: {
+                fist: {
+                    power: 3
+                },
                 knife: {
                     power: 5,
                     coolDown: 40

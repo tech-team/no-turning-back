@@ -1,37 +1,32 @@
 define([
-    'game/weapons/AbstractWeapon',
+    'game/weapons/RangeWeapon',
     'game/entities/Bullet'
-], function(Weapon, Bullet) {
-    var Shotgun = Weapon.$extend({
+], function(RangeWeapon, Bullet) {
+    var Shotgun = RangeWeapon.$extend({
         __init__: function(ammo, data) {
-            this.$super(ammo, data, false);
+            this.$super(ammo, data);
         },
 
-        shoot: function(level) {
-            var player = level.player;
-
+        shoot: function(sourceName, source, level) {
             var bulletData = {
-                x: player.dispObj.x,
-                y: player.dispObj.y,
-                r: player.dispObj.rotation,
-                source: "player",
-                type: "bullet"
+                x: source.x(),
+                y: source.y(),
+                r: source.rotation(),
+                source: sourceName,
+                type: "bullet",
+                power: this.data.power,
+                tex: "shotgun-bullet",
+                ttl: 8
             };
 
             for (var i = 0; i < this.data.bulletNum; ++i) {
-
-                bulletData.r = player.dispObj.rotation -
+                bulletData.r = source.rotation() -
                     (Math.floor(this.data.bulletNum/2) - i) * this.data.dispersion;
-                bulletData.power = this.data.power;
-                bulletData.tex = "shotgun-bullet";
-                bulletData.ttl = 8;
 
                 var bullet = new Bullet(level.addToStage(bulletData));
 
                 level.bullets.push(bullet);
             }
-
-            player.shootCooldown = this.data.coolDown;
             --this.ammo;
 
             return true;

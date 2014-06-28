@@ -72,7 +72,7 @@ define([
                 button: {
                     puzzle: "",
                     value: "",
-                    state: "depressed"
+                    state: "released"
                 },
 
                 waypoint: {

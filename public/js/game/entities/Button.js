@@ -24,7 +24,7 @@ define([
             __classvars__: {
                 State: {
                     Pressed: "pressed",
-                    Released: "depressed"
+                    Released: "released"
                 },
                 Tex: {
                     Pressed: "button_pressed",
@@ -102,17 +102,6 @@ define([
                     return self.puzzleSolvedStatus;
                 }
                 return null;
-
-//                if (this.isPressed() && this.pressCooldown === 0) {
-//                    this.setState(Button.State.Released);
-//                    this.setTex(Button.Tex.Released);
-//                }
-//
-//                if (this.pressCooldown > 0) {
-//                    --this.pressCooldown;
-//                }
-
-
             }
         });
 

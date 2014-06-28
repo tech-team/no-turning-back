@@ -4,45 +4,119 @@ define([
     'game/ResourceManager',
     'sound',
     'collision',
-    'game/misc/Vector'
+    'game/misc/Vector',
+    'game/weapons/Weapons'
 ],
-    function(Class, AliveObject, ResourceManager, soundjs, collider, Vector) {
+    function(Class, AliveObject, ResourceManager, soundjs, collider, Vector, Weapons) {
         var Zombie = AliveObject.$extend({
-            __init__: function(obj) {
-                this.$super();
+            __init__: function(dispObj) {
+                this.$super(dispObj);
 
-                this.waypoints = obj.waypoints;
-                this.target = (this.waypoints.length != 0) ? (this.waypoints[0]) : (null);
-                this.speed = obj.speed;
-                this.drops = obj.drops;
+                this.health = this._health();
+                this.target = (this.waypoints().length != 0) ? (this.waypoints()[0]) : (null);
+
+                this.currentWeapon = this._weapon();
+                this.weapons = {};
+                this.addWeapon(this.currentWeapon);
+
                 this.currentWaypoint = 0;
                 this.canAttack = true;
-                this.attackInterval = 1000;
-                this.weapon = obj.weapon || "";
-                this.health = 20;
-                this.damage = 5;
-                this.followDistance = obj.followDistance || 150;
-                this.attackDistance = 30;
-                this.justFired = "";
+
+                this.justFired = false;
             },
+
+            __classvars__: {
+                EntityName: "zombie",
+
+                DefaultHealth: 20,
+                DefaultFollowDistance: 150,
+                DefaultSpeed: 2,
+                DefaultDamage: 5,
+                Reach: 30,
+                DefaultAttackInterval: 1000,
+
+                FireDelayModifier: {
+                    pistol: 1.5,
+                    shotgun: 1.5
+                },
+
+                DefaultWeapon: "fist"
+            },
+
+            _health: function() {
+                return this.dispObj.data.health || Zombie.DefaultHealth;
+            },
+
+            damageAmount: function() {
+                return this.dispObj.data.damage || Zombie.DefaultDamage;
+            },
+
+            followDistance: function() {
+                return this.dispObj.data.followDistance || Zombie.DefaultFollowDistance;
+            },
+
+            attackInterval: function() {
+                return this.dispObj.data.attackInterval || Zombie.DefaultAttackInterval;
+            },
+
+            waypoints: function() {
+                return this.dispObj.data.waypoints || [];
+            },
+
+            speed: function() {
+                return this.dispObj.data.speed || Zombie.DefaultSpeed;
+            },
+
+            drops: function() {
+                return this.dispObj.data.drops || [];
+            },
+
+            _weapon: function() {
+                return this.dispObj.data.weapon || Zombie.DefaultWeapon;
+            },
+
+            addWeapon: function(name) {
+                var data = _.extend(ResourceManager.weaponData[name], {
+                    power: this.damageAmount()
+                });
+                this.weapons[this.currentWeapon] = new Weapons[name](Infinity, data);
+            },
+
+            isCurrentWeaponMelee: function() {
+                return this.weapons[this.currentWeapon].melee;
+            },
+
+            shoot: function(level, targets) {
+                this.justFired = false;
+                if (targets)
+                    return this.weapons[this.currentWeapon].shoot(this, targets);
+                else
+                    return this.weapons[this.currentWeapon].shoot(Zombie.EntityName, this, level);
+            },
+
+
+            damage: function(howMuch) {
+                this.health -= howMuch;
+            },
+
+
 
             update: function(event, player, collisionObjects) {
 
                 var epsilon = 5, offsetX = 0, offsetY = 0;
-                var pistolFireDelayModifier= 1.5;
 
                 if (this.target == null) {
                     this.target = this.dispObj;
                 }
 
                 var vectorsToWaypoint = new Vector({
-                    x: this.target.x - this.dispObj.x,
-                    y: this.target.y - this.dispObj.y
+                    x: this.target.x - this.x(),
+                    y: this.target.y - this.y()
                 });
 
                 var vectorToPlayer = new Vector({
-                    x: player.dispObj.x - this.dispObj.x,
-                    y: player.dispObj.y - this.dispObj.y
+                    x: player.x() - this.x(),
+                    y: player.y() - this.y()
                 });
 
                 var vectorToPlayerDistance = vectorToPlayer.distance();
@@ -50,44 +124,59 @@ define([
 
                 this.dispObj.rotation = (180 / Math.PI) * angle;
 
-                if (vectorToPlayerDistance < this.followDistance) {
+                if (vectorToPlayerDistance < this.followDistance()) {
                     this.target = player.dispObj;
                     if (this.canAttack) {
                         var self = this;
-                        if (!this.weapon && vectorToPlayerDistance <= this.attackDistance) {
-                            player.damage(this.damage);
-                            ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
-                            this.canAttack = false;
+                        var delay = null;
 
-                            setTimeout(function() {
-                                self.canAttack = true;
-                            }, this.attackInterval);
+                        this.justFired = true;
+                        this.canAttack = false;
+
+                        if (this.weapons[this.currentWeapon].melee) {
+                            delay = 1;
+                        } else {
+                            delay = Zombie.FireDelayModifier[this.currentWeapon];
                         }
-                        else if (this.weapon === "pistol") {
-                            this.justFired = "pistol";
 
-                            this.canAttack = false;
 
-                            setTimeout(function() {
+
+//                        if (!this.weapons) {
+//                            if (vectorToPlayerDistance <= Zombie.Reach) {
+//                                player.damage(this.damageAmount());
+//                                ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
+//                                this.canAttack = false;
+//                                delay = 1;
+//                            }
+//                        }
+//                        else {
+//                            this.justFired = true;
+//                            this.canAttack = false;
+//
+//                            delay = Zombie.FireDelayModifier[this.currentWeapon];
+//                        }
+
+                        if (delay) {
+                            setTimeout(function () {
                                 self.canAttack = true;
-                            }, pistolFireDelayModifier * this.attackInterval);
+                            }, delay * this.attackInterval());
                         }
                     }
                 }
-                else if (this.waypoints.length > 0) {
-                    this.target = this.waypoints[this.currentWaypoint];
+                else if (this.waypoints().length > 0) {
+                    this.target = this.waypoints()[this.currentWaypoint];
                 }
                 else {
                     this.target = this.dispObj;
                 }
 
-                if (vectorToPlayerDistance > this.attackDistance) {
+                if (vectorToPlayerDistance > Zombie.Reach) {
                     if (vectorsToWaypoint.x != 0) {
-                        offsetX = this.speed * Math.cos(angle);
+                        offsetX = this.speed() * Math.cos(angle);
                         this.dispObj.x += offsetX;
                     }
                     if (vectorsToWaypoint.y != 0) {
-                        offsetY = this.speed * Math.sin(angle);
+                        offsetY = this.speed() * Math.sin(angle);
                         this.dispObj.y += offsetY;
                     }
                     for (var i = 0; i < collisionObjects.length; ++i) {
@@ -103,12 +192,12 @@ define([
                     Math.abs(vectorsToWaypoint.y) < epsilon &&
                     this.target != player.dispObj)
                 {
-                    if (++this.currentWaypoint < this.waypoints.length) {
-                        this.target = this.waypoints[this.currentWaypoint];
+                    if (++this.currentWaypoint < this.waypoints().length) {
+                        this.target = this.waypoints()[this.currentWaypoint];
                     }
                     else {
                         this.currentWaypoint = 0;
-                        this.target = this.waypoints[this.currentWaypoint];
+                        this.target = this.waypoints()[this.currentWaypoint];
                     }
                 }
 

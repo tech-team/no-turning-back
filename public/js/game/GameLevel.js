@@ -138,14 +138,13 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             //add enemies
             _.each(data.zombies, function(obj) {
-                var zombie = new Zombie(obj);
-                zombie.setDispObj(self.addToStage(obj));
+                var zombie = new Zombie(self.addToStage(obj));
                 self.zombies.push(zombie);
             });
 
             //add waypoints
             for (var i = 0; i < self.zombies.length; ++i) {
-                _.each(self.zombies[i].waypoints, function(obj) {
+                _.each(self.zombies[i].waypoints(), function(obj) {
                     self.addToStage(obj).visible = false;
                 });
             }
@@ -224,7 +223,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             this.keyCoder.addEventListener("keyup", GameLevel.Keys.ToggleSound, ResourceManager.toggleSound.bind(ResourceManager));
 
-            this.keyCoder.addEventListener("keypress", GameLevel.Keys.Shoot, this.shootingHandle.bind(this));
+            this.keyCoder.addEventListener("keypress", GameLevel.Keys.Shoot, this.playerShootingHandle.bind(this));
 
             if (DEBUG) {
                 this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.Finish, this.finish.bind(this));
@@ -303,7 +302,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 //                        if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
 //                            this.lastShootTime = data.timestamp;
 //
-//                            this.shootingHandle();
+//                            this.playerShootingHandle();
 //                        }
 //                        break;
 //                    case "weaponchange":
@@ -438,22 +437,17 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
 
             _.each(this.zombies, function(zombie) {
                 zombie.update(event, self.player, self.collisionObjects);
-                if (zombie.justFired === "pistol") {
-                    zombie.justFired = "";
-                    ResourceManager.playSound(ResourceManager.soundList.pistol.Fire);
-                    var bulletData = {
-                        x: zombie.x(),
-                        y: zombie.y(),
-                        r: zombie.rotation(),
-                        power: ResourceManager.weaponData.pistol.power,
-                        source: "zombie",
-                        tex: "pistol-bullet",
-                        type: "bullet"
-                    };
-
-                    var bullet = new Bullet(self.addToStage(bulletData));
-
-                    self.bullets.push(bullet);
+                if (zombie.justFired) {
+                    if (zombie.isCurrentWeaponMelee()) {
+                        var hit = zombie.shoot(self, self.player);
+                        if (hit) {
+                            ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
+                        }
+                    }
+                    else {
+                        zombie.shoot(self);
+                        ResourceManager.playSound(ResourceManager.soundList[zombie.currentWeapon].Fire);
+                    }
                 }
             });
         },
@@ -469,7 +463,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             }
         },
 
-        shootingHandle: function() {
+        playerShootingHandle: function() {
             if(this.player.shootCooldown == 0) {
                 var currentWeapon = this.player.currentWeapon;
 
@@ -477,13 +471,15 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     var currentWeaponSounds = ResourceManager.soundList[currentWeapon];
 
                     if (this.player.isCurrentWeaponMelee()) {
-                        var hit = this.player.shoot(this);
+                        var hit = this.player.shoot(this, this.zombies);
                         ResourceManager.playSound((hit) ? (currentWeaponSounds.Hit) : (currentWeaponSounds.MissShort));
                     }
                     else {
-                        ResourceManager.playSound(currentWeaponSounds.Fire);
                         this.player.shoot(this);
+                        ResourceManager.playSound(currentWeaponSounds.Fire);
                     }
+
+                    this.player.shootCooldown = this.player.weapons[this.player.currentWeapon].data.coolDown;
                 }
                 else if (this.player.messageCooldown <= 0) {
                     Messenger.showMessage(Messenger.outOfAmmo);
@@ -512,7 +508,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                 }
                 var j = 0;
                 for(j = 0; j < this.zombies.length; ++j) {
-                    if (collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
+                    if (this.bullets[i].source == "player" && collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
                         this.zombies[j].health -= this.bullets[i].power;
                         this.removeFromStage(this.bullets[i].dispObj);
                         ResourceManager.playSound(ResourceManager.soundList.BulletHit);
@@ -558,7 +554,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         }
                     }
 
-                    this.zombies[i].drops.forEach(function(dropped) {
+                    this.zombies[i].drops().forEach(function(dropped) {
                         dropped.x = self.zombies[i].x();
                         dropped.y = self.zombies[i].y();
 
@@ -666,7 +662,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                         self.itemInteraction(drop.data, true);
 
                         self.removeFromStage(drop);
-                        newDrops.splice(i, 1);
+                        newDrops.removeAt(i);
                     }
                 }
             });
@@ -687,12 +683,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     else {
                         ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
 
-                        for (var j = 0; j < self.collisionObjects.length; ++j) {
-                            if (self.collisionObjects[j] == door.dispObj) {
-                                self.collisionObjects.splice(j, 1);
-                                --j; // TODO: rethink it
-                            }
-                        }
+                        self.collisionObjects.remove(door.dispObj);
                         self.redrawGameObject(door);
 
                         self.player.score += GameLevel.SCORES.DOOR_OPEN;
@@ -714,6 +705,7 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
             }
         },
 
+        // TODO: make puzzle a separate object in level
         buttonsPressingHandle: function(event) {
             var self = this;
 
@@ -745,29 +737,6 @@ function(Class, _, signals, easeljs, soundjs, alertify, collider, StageManager, 
                     }, 1500);
                 }
             }
-
-//            //TODO: надо развязать проверку нажатия и проверку отпускания кнопки
-//            //TODO: так как нажиматься должна только 1 кнопка за раз, а обновление вообще должно происходить для всех
-//            //TODO: можно попробовать повесить отпукание в UntilTimer или setTimeout
-//            _.each(this.buttons, function(button) {
-//                button.update(event, self.player, self.doors);
-//
-//                if (button.justPressed === true) {
-//                    ResourceManager.playSound(ResourceManager.soundList.Click);
-//                    button.justPressed = false;
-//                    self.removeFromStage(button.dispObj);
-//                    button.setDispObj(self.addToStage(button));
-//                }
-//                else if (button.justDepressed === true) {
-//                    button.justDepressed = false;
-//                    self.removeFromStage(button.dispObj);
-//                    button.setDispObj(self.addToStage(button));
-//                }
-//                if (button.message) {
-//                    Messenger.showMessage(button.message);
-//                    button.message = undefined;
-//                }
-//            });
         },
 
         redrawGameObject: function(gameObject) {

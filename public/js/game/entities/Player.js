@@ -13,16 +13,12 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
 		__init__: function(dispObj) {
             this.$super(dispObj);
 
-//            this.type = "player"; //type should be specified in each class it its' objects will be passed to addToStage
-//            this.health = 100;
             this.dead = false;
 			this.score = 0;
             this.shootCooldown = 0;
             this.messageCooldown = 0;
             this.saturationTime = 0;
             this.effects = null;
-//            this.inventory = [];
-//            this.keys = [];
 
             this.currentWeapon = "knife";
             this.weapons = { };
@@ -30,6 +26,8 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
 		},
 
         __classvars__: {
+            EntityName: "player",
+
             weaponSpecificTex: function(weapon) {
                 return 'player-{0}'.format(weapon);
             },
@@ -113,8 +111,11 @@ function(Class, AliveObject, ResourceManager, UntilTimer, Messenger, KeyCoder, c
             return this.weapons[this.currentWeapon].melee;
         },
 
-        shoot: function(level) {
-            return this.weapons[this.currentWeapon].shoot(level);
+        shoot: function(level, targets) {
+            if (targets)
+                return this.weapons[this.currentWeapon].shoot(this, targets);
+            else
+                return this.weapons[this.currentWeapon].shoot(Player.EntityName, this, level);
         },
 
 		update: function(event, collisionObjects) {
