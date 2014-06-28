@@ -562,7 +562,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
                     }
                     else {
                         this.player.addWeapon(name, ammo);
-                        if (this.player.weapons[name].power >= this.player.weapons[this.player.currentWeapon].power)
+                        if (this.player.weapons[name].data.power >= this.player.weapons[this.player.currentWeapon].data.power)
                             this.changeWeapon(name);
                         Messenger.showMessage(Messenger.newWeaponPicked, name);
                     }

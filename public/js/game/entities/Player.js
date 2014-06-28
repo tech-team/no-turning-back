@@ -19,8 +19,6 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
             this.saturationTime = 0;
             this.effects = null;
             this.events = null;
-//            this.inventory = [];
-//            this.keys = [];
 
             this.currentWeapon = "knife";
             this.weapons = { };
@@ -129,6 +127,8 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
         },
 
         addWeapon: function(name, ammo) {
+            if (!ammo)
+                ammo = Infinity;
             this.weapons[name] = new Weapons[name](ammo, ResourceManager.weaponData[name]);
             this.events && this.events.weaponAdded.dispatch(name); //JS needs safe navigation operator (?.)
         },
