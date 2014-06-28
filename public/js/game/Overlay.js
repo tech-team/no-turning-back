@@ -17,7 +17,7 @@ define([
                 this.scoreText = this._createText("Score: 0");
 
                 if (DEBUG)
-                    this.fpsText = this._createText("Health: 100");
+                    this.fpsText = this._createText("FPS: 0");
             },
 
             _createText: function(str) {
