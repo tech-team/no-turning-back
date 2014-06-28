@@ -13,6 +13,13 @@ define([
                 this.ammo += ammo;
         },
 
+        getAmmo: function() {
+            return {
+                current: this.ammo,
+                total: 0//this.totalAmmo //actually the rest of ammo
+            };
+        },
+
         hasAmmo: function() {
             return this.ammo === null || this.ammo > 0;
         },

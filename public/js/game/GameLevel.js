@@ -14,9 +14,11 @@ define([
     'game/entities/Chest',
     'game/entities/Door',
     'game/entities/Button',
-    'game/misc/Vector'
+    'game/entities/Bullet',
+    'game/misc/Vector',
+    'game/Overlay'
 ],
-function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, UntilTimer, Messenger, Zombie, Chest, Door, Button, Vector) {
+function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet, Vector, Overlay) {
     var GameLevel = StageManager.$extend({
 		__init__: function(stage, levelData, player, resourceManager) {
             this.$super(stage, resourceManager);
@@ -53,8 +55,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
 
             this.load(levelData);
 
-            // Events
-            this.levelFinished = new signals.Signal();
+            this.createEvents();
 		},
 
         __classvars__: {
@@ -90,6 +91,56 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             },
 
             CameraOffset: 200
+        },
+
+        createEvents: function() {
+            this.levelFinished = new signals.Signal();
+
+            var playerEvents = this.player.createEvents();
+            playerEvents.healthChanged.add(this.overlay.setHealth.bind(this.overlay));
+            playerEvents.armorChanged.add(this.overlay.setArmor.bind(this.overlay));
+            playerEvents.ammoChanged.add(this.overlay.setAmmo.bind(this.overlay));
+            playerEvents.weaponAdded.add(this.overlay.addWeapon.bind(this.overlay));
+            playerEvents.itemAdded.add(this.overlay.addItem.bind(this.overlay));
+            playerEvents.keyAdded.add(this.overlay.addKey.bind(this.overlay));
+            playerEvents.scoreChanged.add(this.overlay.setScore.bind(this.overlay));
+
+            var self = this;
+            this.keyCoder.addEventListener("keyup", GameLevel.Keys.Use, function() {
+                if (self.chestsOpeningHandle()) return;
+                if (self.doorsOpeningHandle()) return;
+                self.buttonsPressingHandle()
+            });
+
+            _.each(this.player.$class.getAvailableWeapons(), function(weapon) {
+                self.keyCoder.addEventListener("keyup", GameLevel.Keys.Weapon[weapon], function() {
+                    self.changeWeapon(weapon);
+                });
+            });
+
+            this.keyCoder.addEventListener("keyup", GameLevel.Keys.ToggleSound, ResourceManager.toggleSound.bind(ResourceManager));
+
+            this.keyCoder.addEventListener("keypress", GameLevel.Keys.Shoot, this.playerShootingHandle.bind(this));
+
+            if (DEBUG) {
+                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.Finish, this.finish.bind(this));
+
+                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.GearUp, function () {
+                    self.player.addWeapon("shotgun", 200);
+                });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.K, function () {
+                    console.log(self.player.keys());
+                });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.I, function () {
+                    console.log(self.player.inventory());
+                });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.O, function () {
+                    console.log(self.player.weapons);
+                });
+            }
         },
 
         load: function(data) {
@@ -173,25 +224,9 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
                 h: this.stage.canvas.height}, true);
             this.effects.damage.visible = false;
 
-            var healthText = new easeljs.Text("Health: 100", "20px Arial", "#00FF00");
-            healthText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
-            this.healthText = this.stage.addChild(healthText);
-
-            var weaponText = new easeljs.Text("Ammo: 0", "20px Arial", "#00FF00");
-            weaponText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
-            this.weaponText = this.stage.addChild(weaponText);
-
-            var scoreText = new easeljs.Text("Score: 0", "20px Arial", "#00FF00");
-            scoreText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
-            this.scoreText = this.stage.addChild(scoreText);
-
-            var fpsText = new easeljs.Text("FPS: 0", "20px Arial", "#00FF00");
-            fpsText.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
-            this.fpsText = this.stage.addChild(fpsText);
+            this.initOverlay();
 
             this.resize(); //recalculate overlay positions
-
-            this.createEvents();
 
             Messenger.showMessage(Messenger.levelLoaded, this.data.name);
             Messenger.showMessage(Messenger.levelStarted);
@@ -204,59 +239,19 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             ResourceManager.stopSounds();
         },
 
-        createEvents: function() {
-            var self = this;
-            this.keyCoder.addEventListener("keyup", GameLevel.Keys.Use, function() {
-                if (self.chestsOpeningHandle()) return;
-                if (self.doorsOpeningHandle()) return;
-                self.buttonsPressingHandle()
-            });
-
-            _.each(this.player.$class.getAvailableWeapons(), function(weapon) {
-                self.keyCoder.addEventListener("keyup", GameLevel.Keys.Weapon[weapon], function() {
-                    self.changeWeapon(weapon);
-                });
-            });
-
-            this.keyCoder.addEventListener("keyup", GameLevel.Keys.ToggleSound, ResourceManager.toggleSound.bind(ResourceManager));
-
-            this.keyCoder.addEventListener("keypress", GameLevel.Keys.Shoot, this.playerShootingHandle.bind(this));
-
-            if (DEBUG) {
-                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.Finish, this.finish.bind(this));
-
-                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.GearUp, function () {
-                    self.player.addWeapon("shotgun", 200);
-                });
-
-                this.keyCoder.addEventListener("keyup", KeyCoder.K, function () {
-                    console.log(self.player.keys());
-                });
-
-                this.keyCoder.addEventListener("keyup", KeyCoder.I, function () {
-                    console.log(self.player.inventory());
-                });
-
-                this.keyCoder.addEventListener("keyup", KeyCoder.O, function () {
-                    console.log(self.player.weapons);
-                });
-            }
+        initOverlay: function() {
+            this.overlay = new Overlay(this.stage);
+            //send old information from player to overlay
+            _.each(_.keys(this.player.weapons), this.overlay.addWeapon.bind(this));
+            this.overlay.setHealth(this.player.health());
+            this.overlay.setArmor(this.player.armor());
+            this.overlay.setWeapon(this.player.currentWeapon);
+            this.overlay.setAmmo(this.player.ammo());
+            this.overlay.setScore(this.player.score);
         },
 
         resize: function() {
-            var toolbarHeight = this.stage.canvas.height - 32;
-
-            this.healthText.x = 20;
-            this.healthText.y = toolbarHeight;
-
-            this.weaponText.x = this.stage.canvas.width / 2;
-            this.weaponText.y = toolbarHeight;
-
-            this.scoreText.x = this.stage.canvas.width - 100;
-            this.scoreText.y = toolbarHeight;
-
-            this.fpsText.x = this.stage.canvas.width - 90;
-            this.fpsText.y = 80;
+            this.overlay.resize();
 
             this.updateEffects();
 
@@ -373,12 +368,13 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
                 this.keyCoder.removeAllListeners();
                 this.levelFinished.dispatch({
                     status: 'gameFinished',
-                    score: this.player.score,
+                    score: this.player.score(),
                     message: "Game over"
                 });
             }
 
-            this.hudSetup();
+            this.updateOverlay();
+
             this.updateFog();
             this.updateCamera();
 
@@ -413,20 +409,9 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             }
         },
 
-        hudSetup: function() {
-            this.healthText.text = "Health: " + Math.ceil(this.player.health());
-
-            var currentWeapon = this.player.currentWeapon;
-            var ammo = this.player.weapons[currentWeapon].ammo;
-
-            var weaponText = currentWeapon;
-            if (ammo !== null)
-                weaponText += ": " + ammo;
-            this.weaponText.text = weaponText;
-
-            this.fpsText.text = "FPS: " + Math.round(easeljs.Ticker.getMeasuredFPS());
-
-            this.scoreText.text = "Score: " + this.player.score;
+        updateOverlay: function() {
+            if (DEBUG)
+                this.overlay.setFPS(easeljs.Ticker.getMeasuredFPS());
         },
 
         zombiesUpdate: function(event) {
@@ -452,6 +437,9 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
         changeWeapon: function(name) {
             if (this.player.hasWeapon(name) && this.player.currentWeapon != name) {
                 this.player.currentWeapon = name;
+                this.overlay.setWeapon(name);
+                this.overlay.setAmmo(this.player.ammo());
+
                 this.player.changeTexture(this.player.currentWeapon);
                 this.redrawGameObject(this.player);
 
@@ -560,7 +548,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
                     });
 
                     this.zombies.splice(i, 1);
-                    this.player.score += GameLevel.SCORES.KILL;
+                    this.player.addScore(GameLevel.SCORES.KILL);
                 }
             }
         },
@@ -690,7 +678,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
                         self.redrawGameObject(door);
                         removeDoors = true;
 
-                        self.player.score += GameLevel.SCORES.DOOR_OPEN;
+                        self.player.addScore(GameLevel.SCORES.DOOR_OPEN);
 
                         if (door.role() == "exit") {
                             self.finish();

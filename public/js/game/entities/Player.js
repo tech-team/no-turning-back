@@ -1,12 +1,13 @@
 define([
-	'game/entities/AliveObject',
+    'game/entities/AliveObject',
+    'signals',
     'game/ResourceManager',
     'game/misc/UntilTimer',
     'game/misc/KeyCoder',
     'collision',
     'game/weapons/Weapons'
 ],
-function(AliveObject, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) {
+function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) {
 	var Player = AliveObject.$extend({
 		__init__: function(dispObj) {
             this.$super(dispObj);
@@ -17,7 +18,7 @@ function(AliveObject, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) 
             this.messageCooldown = 0;
             this.saturationTime = 0;
             this.effects = null;
-
+            this.events = null;
             this.currentWeapon = "knife";
             this.weapons = { };
             this.addWeapon(this.currentWeapon);
@@ -39,19 +40,56 @@ function(AliveObject, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) 
             OverSaturationHealthDecrease: 0.1
         },
 
+        createEvents: function() {
+            this.events = {
+                healthChanged: new signals.Signal(),
+                armorChanged: new signals.Signal(),
+                ammoChanged: new signals.Signal(),
+                weaponAdded: new signals.Signal(),
+                itemAdded: new signals.Signal(),
+                keyAdded: new signals.Signal(),
+                scoreChanged: new signals.Signal()
+            };
+
+            return this.events;
+        },
+
         health: function() {
             return this.dispObj.data.health;
         },
-        _setHealth: function(newHealth) {
-            this.dispObj.data.health = newHealth;
+
+        _setHealth: function(value) {
+            this.dispObj.data.health = value;
+            this.events.healthChanged.dispatch(value);
+        },
+
+        armor: function() {
+            return this.dispObj.data.armor;
+        },
+
+        _setArmor: function(value) {
+            this.dispObj.data.armor = value;
+            this.events.armorChanged.dispatch(value);
+        },
+
+        ammo: function() {
+            return this.weapons[this.currentWeapon].getAmmo();
+        },
+
+        addScore: function(value) {
+            this.score += value;
+            this.events.scoreChanged.dispatch(this.score);
         },
 
         inventory: function() {
             return this.dispObj.data.inventory;
         },
+
         addToInventory: function(item) {
             this.dispObj.data.inventory.push(item);
+            this.events.itemAdded.dispatch(item);
         },
+
         clearInventory: function() {
             this.dispObj.data.inventory = [];
         },
@@ -59,9 +97,13 @@ function(AliveObject, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) 
         keys: function() {
             return this.dispObj.data.keys;
         },
+
         addToKeys: function(key) {
             this.dispObj.data.keys.push(key);
+            this.events.keyAdded.dispatch(key);
         },
+
+        //TODO: rename to onLevelFinished/prepareToNextLevel
         clearKeys: function() {
             this.dispObj.data.keys = [];
         },
@@ -69,21 +111,15 @@ function(AliveObject, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) 
         tex: function() {
             return this.dispObj.data.tex;
         },
+
         changeTexture: function(weapon) {
             this.dispObj.data.tex = this.$class.weaponSpecificTex(weapon);
             return this.tex();
         },
 
-
-
-
-
-
         setEffects: function(effects) {
             this.effects = effects;
         },
-
-
 
         hasWeapon: function(name) {
             return name in this.weapons;
@@ -91,6 +127,7 @@ function(AliveObject, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) 
 
         addWeapon: function(name, ammo) {
             this.weapons[name] = new Weapons[name](ammo, ResourceManager.weaponData[name]);
+            this.events && this.events.weaponAdded.dispatch(name); //JS needs safe navigation operator (?.)
         },
 
         hasAmmo: function(name) {
@@ -103,6 +140,11 @@ function(AliveObject, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) 
 
         addAmmo: function(name, ammo) {
             this.weapons[name].addAmmo(ammo);
+
+            if (name == this.currentWeapon) {
+                var ammoData = this.weapons[this.currentWeapon].getAmmo();
+                this.events.ammoChanged.dispatch(ammoData);
+            }
         },
 
         isCurrentWeaponMelee: function() {
@@ -110,10 +152,19 @@ function(AliveObject, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) 
         },
 
         shoot: function(level, targets) {
+            var shot = null;
+
             if (targets)
-                return this.weapons[this.currentWeapon].shoot(this, targets);
+                shot = this.weapons[this.currentWeapon].shoot(this, targets);
             else
-                return this.weapons[this.currentWeapon].shoot(Player.EntityName, this, level);
+                shot = this.weapons[this.currentWeapon].shoot(Player.EntityName, this, level);
+
+            if (shot) {
+                var ammoData = this.weapons[this.currentWeapon].getAmmo();
+                this.events.ammoChanged.dispatch(ammoData);
+            }
+
+            return shot;
         },
 
 		update: function(event, collisionObjects) {
