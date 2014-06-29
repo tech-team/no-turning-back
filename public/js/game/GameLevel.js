@@ -292,6 +292,21 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             });
         },
 
+        addToCollisionObjects: function(dispObj) {
+            this.collisionObjects.push(dispObj);
+            this.ricochetObjects.push(dispObj);
+        },
+
+        removeFromCollisionObjects: function(dispObj) {
+            this.collisionObjects.remove(dispObj);
+            this.ricochetObjects.remove(dispObj);
+        },
+
+        recreateCollisionObject: function(dispObj) {
+            this.removeFromCollisionObjects(dispObj);
+            this.addToCollisionObjects(dispObj);
+        },
+
         onJoystickMessage: function(data, answer) {
             if (this.finished)
                 return;
@@ -598,6 +613,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
                     nearestChest.clearStorage();
                     this.redrawGameObject(nearestChest);
+                    this.recreateCollisionObject(nearestChest.dispObj);
 
                     this.chests.remove(nearestChest);
                 }
@@ -642,7 +658,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                     else {
                         ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
 
-                        self.collisionObjects.remove(door.dispObj);
+                        self.removeFromCollisionObjects(door.dispObj);
                         self.redrawGameObject(door);
                         removeDoors = true;
 
