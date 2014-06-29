@@ -29,7 +29,7 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                 LevelFinished: "levelFinished.mp3",
 
                 Items: {
-                    weapon: "",
+                    weapon: "ammo.mp3",
                     ammo: "ammo.mp3",
                     medkit: "apple.mp3",
                     key: ["keyPicked1.wav", "keyPicked2.wav"],
