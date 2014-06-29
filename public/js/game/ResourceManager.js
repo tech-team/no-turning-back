@@ -33,7 +33,7 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                     ammo: "ammo.mp3",
                     medkit: "apple.mp3",
                     key: ["keyPicked1.wav", "keyPicked2.wav"],
-                    default: ["itemPicked1.wav", "itemPicked2.wav", "itemPicked3.wav", "itemPicked4.wav"]
+                    inventoryItem: ["itemPicked1.wav", "itemPicked2.wav", "itemPicked3.wav", "itemPicked4.wav"]
                 },
 
                 Weapons: {

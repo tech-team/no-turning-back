@@ -547,8 +547,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
         },
 
         itemInteraction: function(item, disableSounds) {
-            var itemObject = item.type in Items ? new Items[item.type](item)
-                                                : new Items.default(item);
+            var itemObject = new Items[item.type](item);
 
             itemObject.apply(this.player);
 

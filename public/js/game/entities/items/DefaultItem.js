@@ -7,16 +7,8 @@ define([
             this.$super(dispObj);
         },
 
-        __classvars__: {
-            DefaultType: "default"
-        },
-
         name: function() {
             return this._rawData().name;
-        },
-
-        type: function() {
-            return this._rawData().type || this.$class.DefaultType;
         },
 
         apply: function(player, noMessaging) {
