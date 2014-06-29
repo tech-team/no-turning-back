@@ -546,13 +546,12 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             }
         },
 
-        itemInteraction: function(item, playSounds) {
-            var itemObject = item.type in Items ? new Items[item.type](item)
-                                                : new Items.default(item);
+        itemInteraction: function(item, disableSounds) {
+            var itemObject = new Items[item.type](item);
 
             itemObject.apply(this.player);
 
-            if (playSounds)
+            if (!disableSounds)
                 ResourceManager.playSound(ResourceManager.soundList.Items[itemObject.type()]);
         },
 
@@ -606,7 +605,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             _.each(this.drops, function(drop, i) {
                 if (self.checkReach(drop)) {
                     if (collider.checkPixelCollision(drop, self.player.dispObj)) {
-                        self.itemInteraction(drop.data, true);
+                        self.itemInteraction(drop.data);
 
                         self.removeFromStage(drop);
                         newDrops.removeAt(i);
