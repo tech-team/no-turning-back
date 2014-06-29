@@ -1,7 +1,8 @@
 define([
-	'classy'
+	'classy',
+    'collision'
 ],
-function(Class) {
+function(Class, collider) {
 	var GameObject = Class.$extend({
 		__init__: function(dispObj) {
 			this.dispObj = dispObj;
@@ -32,6 +33,11 @@ function(Class) {
 
         rotation: function() {
             return this.dispObj.rotation;
+        },
+
+        collidesWith: function(otherObj) {
+            var obj = otherObj.dispObj || otherObj;
+            return collider.checkPixelCollision(this.dispObj, obj);
         },
 
 		update: function(event) {

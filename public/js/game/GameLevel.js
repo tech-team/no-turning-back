@@ -43,6 +43,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             this.bullets = [];
 
             this.collisionObjects = [];
+            this.ricochetObjects = [];
             this.drops = [];
 
 //            /*** <Joystick stuff> ***/
@@ -111,9 +112,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
 
             var self = this;
             this.keyCoder.addEventListener("keyup", GameLevel.Keys.Use, function() {
-                if (self.chestsOpeningHandle()) return;
-                if (self.doorsOpeningHandle()) return;
-                self.buttonsPressingHandle()
+                self.useHandle();
             });
 
             _.each(this.player.$class.getAvailableWeapons(), function(weapon) {
@@ -238,6 +237,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             this.player.setEffects(this.effects);
 
             this.createCollisionObjects();
+            this.createRicochetObjects();
             //ResourceManager.stopSounds();
         },
 
@@ -285,60 +285,58 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             });
         },
 
-//        onJoystickMessage: function(data, answer) {
-//            if (this.finished)
-//                return;
-//
-//            if (data.type === "game") {
-//                var event = null;
-//                switch (data.action) {
-//                    case "shoot":
-//                        if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
-//                            this.lastShootTime = data.timestamp;
-//
-//                            this.playerShootingHandle();
-//                        }
-//                        break;
-//                    case "weaponchange":
-//                        var weapon = data.weapon;
-//                        console.log(weapon);
-//                        event = (new KeyCoder()).getKeys();
-//                        switch (weapon) {
-//                            case "knife":
-//                                event.keys[KeyCoder.ONE] = true;
-//                                break;
-//                            case "pistol":
-//                                event.keys[KeyCoder.TWO] = true;
-//                                break;
-//                            case "shotgun":
-//                                event.keys[KeyCoder.THREE] = true;
-//                                break;
-//                        }
-////                        this.weaponsHandle(event); // TODO: because it has been deprecated
-//                        break;
-//                    case "move":
-//                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (GameLevel.SpeedModifier.Normal) : (GameLevel.SpeedModifier.Sprint);
-//                        if (speedModifier) {
-//                            var movementData = {
-//                                speedModifier: speedModifier,
-//                                angle: data.phi
-//                            };
-//                            this.player.movementHandle(movementData, this.collisionObjects);
-//                        }
-//                        break;
-//                    case "use":
-//                        event = (new KeyCoder()).getKeys();
-//                        event.keys[KeyCoder.E] = true;
-//                        this.chestsOpeningHandle(event);
-//                        this.buttonsPressingHandle(event);
-//                        this.doorsOpeningHandle(event);
-//                        event.keys[KeyCoder.E] = false;
-//                        break;
-//                    default:
-//                        break;
-//                }
-//            }
-//        },
+        createRicochetObjects: function() {
+            var self = this;
+
+            _.each(this.walls, function(wall) {
+                self.ricochetObjects.push(wall);
+            });
+
+            _.each(this.doors, function(door) {
+                if (door.isClosed()) {
+                    self.ricochetObjects.push(door.dispObj);
+                }
+            });
+
+            _.each(this.chests, function(chest) {
+                self.ricochetObjects.push(chest.dispObj);
+            });
+        },
+
+        onJoystickMessage: function(data, answer) {
+            if (this.finished)
+                return;
+
+            if (data.type === "game") {
+                var event = null;
+                switch (data.action) {
+                    case "shoot":
+                        if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
+                            this.lastShootTime = data.timestamp;
+                            this.playerShootingHandle();
+                        }
+                        break;
+                    case "weaponchange":
+                        this.player.changeWeapon(data.weapon);
+                        break;
+                    case "move":
+                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (GameLevel.SpeedModifier.Normal) : (GameLevel.SpeedModifier.Sprint);
+                        if (speedModifier) {
+                            var movementData = {
+                                speedModifier: speedModifier,
+                                angle: data.phi
+                            };
+                            this.player.movementHandle(movementData, this.collisionObjects);
+                        }
+                        break;
+                    case "use":
+                        this.useHandle();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        },
 
 		update: function(event) {
             if (this.finished)
@@ -349,19 +347,14 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             }
             this.player.savePrevPos();
 
-            this.bulletsCollisionsHandle();
-            this.zombiesDeathHandle();
-            this.dropsHandle();
-
-//            this.buttonsPressingHandle(event);
-
-            this.player.update(event, this.collisionObjects);
-
-            this.zombiesUpdate(event);
-
             _.each(this.bullets, function(bullet) {
                 bullet.update(event);
             });
+            this.bulletsCollisionsHandle();
+            this.zombiesUpdate(event);
+            this.zombiesDeathHandle();
+            this.dropsHandle();
+            this.player.update(event, this.collisionObjects);
 
             if (this.player.health() <= 0 && !this.player.dead) {
                 this.player.dead = true;
@@ -376,17 +369,9 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             }
 
             this.updateOverlay();
-
             this.updateFog();
             this.updateCamera();
-
-            for (var sound in ResourceManager.playingSounds) {
-                if(ResourceManager.playingSounds.hasOwnProperty(sound)) {
-                    if (ResourceManager.playingSounds[sound] > 0) {
-                        --ResourceManager.playingSounds[sound];
-                    }
-                }
-            }
+            ResourceManager.updatePlayingSounds();
 		},
 
         updateCamera: function() {
@@ -414,6 +399,13 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
         updateOverlay: function() {
             if (DEBUG)
                 this.overlay.setFPS(easeljs.Ticker.getMeasuredFPS());
+        },
+
+
+        useHandle: function() {
+            this.chestsOpeningHandle() ||
+            this.buttonsPressingHandle() ||
+            this.doorsOpeningHandle()
         },
 
         zombiesUpdate: function(event) {
@@ -467,45 +459,74 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
         },
 
         bulletsCollisionsHandle: function() {
-            out:
-            for (var i = 0; i < this.bullets.length; ++i) {
-                if (this.bullets[i].ttl){
-                    if (--this.bullets[i].ttl <= 0) {
+            var self = this;
+
+            var i = 0;
+            for (i = 0; i < this.bullets.length; ++i) {
+
+                if (this.bullets[i].ttl) {
+                    if (this.bullets[i].ttl <= 0) {
                         this.removeFromStage(this.bullets[i].dispObj);
-                        this.bullets.splice(i, 1);
-                        break;
+                        this.bullets.removeAt(i);
+                        if (this.bullets.length > 0 && i > 0) --i;
+                        else break;
+                    } else {
+                        --this.bullets[i].ttl;
                     }
                 }
-                if (this.bullets[i].source != "player" && collider.checkPixelCollision(this.bullets[i].dispObj, this.player.dispObj)) {
-                    this.player.damage(this.bullets[i].power);
-                    this.removeFromStage(this.bullets[i].dispObj);
-                    ResourceManager.playSound(ResourceManager.soundList.BulletHit);
-                    ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
-                    this.bullets.splice(i, 1);
-                    break;
-                }
-                var j = 0;
-                for(j = 0; j < this.zombies.length; ++j) {
-                    if (this.bullets[i].source == "player" && collider.checkPixelCollision(this.bullets[i].dispObj,this.zombies[j].dispObj)) {
-                        this.zombies[j].health -= this.bullets[i].power;
+            }
+
+
+
+            for (i = 0; i < this.bullets.length; ++i) {
+
+                if (this.bullets[i].source == "player") {
+                    _.each(this.zombies, function (zombie) {
+
+                        if (self.bullets[i].collidesWith(zombie)) {
+                            zombie.damage(self.bullets[i].power);
+                            self.removeFromStage(self.bullets[i].dispObj);
+                            self.bullets.removeAt(i);
+                            if (self.bullets.length > 0 && i > 0) --i;
+
+                            ResourceManager.playSound(ResourceManager.soundList.BulletHit);
+                            return false; // bullet can damage only one zombie
+                        }
+
+                    });
+
+
+                } else {
+                    if (this.bullets[i].collidesWith(this.player)) {
+                        this.player.damage(this.bullets[i].power);
                         this.removeFromStage(this.bullets[i].dispObj);
+                        this.bullets.removeAt(i);
+                        if (this.bullets.length > 0 && i > 0) --i;
+
                         ResourceManager.playSound(ResourceManager.soundList.BulletHit);
-                        this.bullets.splice(i, 1);
-                        break out;
+                        ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
                     }
+
                 }
-                for(j = 0; j < this.collisionObjects.length; ++j) {
-                    if (collider.checkPixelCollision(this.bullets[i].dispObj,this.collisionObjects[j])) {
-                        this.removeFromStage(this.bullets[i].dispObj);
+            }
+
+            for (i = 0; i < this.bullets.length; ++i) {
+                _.each(this.ricochetObjects, function (obj) {
+                    if (self.bullets[i].collidesWith(obj)) {
+                        self.removeFromStage(self.bullets[i].dispObj);
                         ResourceManager.playSound(ResourceManager.soundList.BulletRicochet);
-                        this.bullets.splice(i, 1);
-                        break out;
+                        self.bullets.removeAt(i);
+                        if (self.bullets.length > 0 && i > 0) --i;
+                        return false;
                     }
-                }
+                });
+            }
+
+            for (i = 0; i < this.bullets.length; ++i) {
                 if (this.checkBounds(this.bullets[i])) {
                     this.removeFromStage(this.bullets[i].dispObj);
-                    this.bullets.splice(i, 1);
-                    break;
+                    this.bullets.removeAt(i);
+                    if (this.bullets.length > 0 && i > 0) --i;
                 }
             }
         },

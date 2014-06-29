@@ -121,6 +121,16 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
 
             stopSounds: function() {
                 soundjs.Sound.stop();
+            },
+
+            updatePlayingSounds: function() {
+                for (var sound in ResourceManager.playingSounds) {
+                    if(ResourceManager.playingSounds.hasOwnProperty(sound)) {
+                        if (ResourceManager.playingSounds[sound] > 0) {
+                            --ResourceManager.playingSounds[sound];
+                        }
+                    }
+                }
             }
         },
 
