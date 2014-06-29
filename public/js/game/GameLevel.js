@@ -142,6 +142,11 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
                 this.keyCoder.addEventListener("keyup", KeyCoder.O, function () {
                     console.log(self.player.weapons);
                 });
+
+                this.keyCoder.addEventListener("keyup", KeyCoder.F, function () {
+                    self.effects.fogBox.visible = !self.effects.fogBox.visible;
+                    self.effects.fog.visible = !self.effects.fog.visible;
+                });
             }
         },
 
@@ -209,14 +214,15 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             var graphics = new easeljs.Graphics();
             this.effects.fogBox = new easeljs.Shape(graphics);
 
-//            var fogBox = this.containers["effect"].addChild(this.effects.fogBox); // TODO: unused variable
-            this.containers["effect"].addChild(this.effects.fogBox);
+            var fogBox = this.containers["effect"].addChild(this.effects.fogBox); // TODO: unused variable
 
             this.effects.fog = this.addToStage({
                 type: "effect",
                 tex: "effects/fog",
                 x: this.player.x(),
                 y: this.player.y()});
+
+
 
             this.effects.damage = this.addToStage({
                 type: "effect",
@@ -308,7 +314,6 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
                 return;
 
             if (data.type === "game") {
-                var event = null;
                 switch (data.action) {
                     case "shoot":
                         if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
@@ -464,7 +469,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             var i = 0;
             for (i = 0; i < this.bullets.length; ++i) {
 
-                if (!_.isUndefined(this.bullets[i])) {
+                if (this.bullets[i].ttl !== null) {
                     if (this.bullets[i].ttl <= 0) {
                         this.removeFromStage(this.bullets[i].dispObj);
                         this.bullets.removeAt(i);
