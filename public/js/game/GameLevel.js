@@ -103,11 +103,11 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             playerEvents.ammoChanged.add(this.overlay.setAmmo.bind(this.overlay));
             playerEvents.weaponAdded.add(this.overlay.addWeapon.bind(this.overlay));
             playerEvents.weaponChanged.add(this.overlay.setWeapon.bind(this.overlay));
+            playerEvents.weaponChanged.add(this.onWeaponChange.bind(this));
             playerEvents.itemAdded.add(this.overlay.addItem.bind(this.overlay));
             playerEvents.keyAdded.add(this.overlay.addKey.bind(this.overlay));
             playerEvents.scoreChanged.add(this.overlay.setScore.bind(this.overlay));
 
-            playerEvents.weaponChanged.add(this.onWeaponChange.bind(this));
 
             var self = this;
             this.keyCoder.addEventListener("keyup", GameLevel.Keys.Use, function() {
@@ -438,7 +438,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
 
         onWeaponChange: function(name) {
             this.redrawGameObject(this.player);
-            ResourceManager.playSound(ResourceManager.soundList.Weapons[this.player.currentWeapon].Draw, ResourceManager.weaponData.drawCooldown);
+            ResourceManager.playSound(ResourceManager.soundList.Weapons[name].Draw, ResourceManager.weaponData.drawCooldown);
         },
 
         playerShootingHandle: function() {
