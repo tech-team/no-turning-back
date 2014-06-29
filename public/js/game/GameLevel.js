@@ -363,12 +363,13 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
 
             if (this.player.health() <= 0 && !this.player.dead) {
                 this.player.dead = true;
+                this.finished = true;
                 console.log("Game over.");
                 ResourceManager.playSound(ResourceManager.soundList.GameOver);
                 this.keyCoder.removeAllListeners();
                 this.levelFinished.dispatch({
                     status: 'gameFinished',
-                    score: this.player.score(),
+                    score: this.player.score,
                     message: "Game over"
                 });
             }
