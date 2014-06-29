@@ -16,8 +16,6 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                 "rubbish", "waypoint", "pistol", "pistol-bullet", "shotgun", "shotgun-bullet", "golden-key", "silver-key",
                 "effects/fog", "effects/damage", "zombie_corpse", "golden_apple"],
             soundList: {
-                Ammo: "ammo.mp3",
-                Medkit: "apple.mp3",
                 Click: "click.mp3",
                 BulletHit: "bullet_hit.mp3",
                 ZombieHurt: "ambiance.mp3",
@@ -29,19 +27,29 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                 Victory: "fortunate_son.mp3",
                 CheaterVictory: "cheater_victory.mp3",
                 LevelFinished: "", //TODO: add some kind of short ta-da sound
-                knife: {
-                    Draw: "knife.mp3",
-                    Miss: "knife_miss.mp3",
-                    MissShort: "knife_miss_short.mp3",
-                    Hit: "knife_stab.mp3"
+
+                Items: {
+                    weapon: "",
+                    ammo: "ammo.mp3",
+                    medkit: "apple.mp3",
+                    key: ""
                 },
-                pistol: {
-                    Draw: "pistol_draw.mp3",
-                    Fire: "pistol_shoot.mp3"
-                },
-                shotgun: {
-                    Draw: "shotgun_draw.mp3",
-                    Fire: "shotgun_shoot.mp3"
+
+                Weapons: {
+                    knife: {
+                        Draw: "knife.mp3",
+                        Miss: "knife_miss.mp3",
+                        MissShort: "knife_miss_short.mp3",
+                        Hit: "knife_stab.mp3"
+                    },
+                    pistol: {
+                        Draw: "pistol_draw.mp3",
+                        Fire: "pistol_shoot.mp3"
+                    },
+                    shotgun: {
+                        Draw: "shotgun_draw.mp3",
+                        Fire: "shotgun_shoot.mp3"
+                    }
                 }
             },
             weaponData: {

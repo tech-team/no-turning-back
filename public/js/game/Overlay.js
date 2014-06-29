@@ -42,9 +42,11 @@ define([
                 //add weapon on bar
             },
 
-            setWeapon: function(name) {                
+            setWeapon: function(name, ammoInfo) {
                 //TODO: select weapon on bar
                 this.weaponText.text = name;
+                if (ammoInfo)
+                    this.setAmmo(ammoInfo);
             },
 
             addItem: function(name) {

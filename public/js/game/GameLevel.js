@@ -10,6 +10,7 @@ define([
     'game/misc/KeyCoder',
     'game/misc/UntilTimer',
     'game/misc/Messenger',
+    'game/entities/items/Items',
     'game/entities/Zombie',
     'game/entities/Chest',
     'game/entities/Door',
@@ -18,7 +19,7 @@ define([
     'game/misc/Vector',
     'game/Overlay'
 ],
-function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, UntilTimer, Messenger, Zombie, Chest, Door, Button, Bullet, Vector, Overlay) {
+function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, UntilTimer, Messenger, Items, Zombie, Chest, Door, Button, Bullet, Vector, Overlay) {
     var GameLevel = StageManager.$extend({
 		__init__: function(stage, levelData, player, resourceManager) {
             this.$super(stage, resourceManager);
@@ -101,9 +102,12 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             playerEvents.armorChanged.add(this.overlay.setArmor.bind(this.overlay));
             playerEvents.ammoChanged.add(this.overlay.setAmmo.bind(this.overlay));
             playerEvents.weaponAdded.add(this.overlay.addWeapon.bind(this.overlay));
+            playerEvents.weaponChanged.add(this.overlay.setWeapon.bind(this.overlay));
             playerEvents.itemAdded.add(this.overlay.addItem.bind(this.overlay));
             playerEvents.keyAdded.add(this.overlay.addKey.bind(this.overlay));
             playerEvents.scoreChanged.add(this.overlay.setScore.bind(this.overlay));
+
+            playerEvents.weaponChanged.add(this.onWeaponChange.bind(this));
 
             var self = this;
             this.keyCoder.addEventListener("keyup", GameLevel.Keys.Use, function() {
@@ -114,7 +118,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
 
             _.each(this.player.$class.getAvailableWeapons(), function(weapon) {
                 self.keyCoder.addEventListener("keyup", GameLevel.Keys.Weapon[weapon], function() {
-                    self.changeWeapon(weapon);
+                    self.player.changeWeapon(weapon);
                 });
             });
 
@@ -426,24 +430,15 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
                     }
                     else {
                         zombie.shoot(self);
-                        ResourceManager.playSound(ResourceManager.soundList[zombie.currentWeapon].Fire);
+                        ResourceManager.playSound(ResourceManager.soundList.Weapons[zombie.currentWeapon].Fire);
                     }
                 }
             });
         },
 
-        changeWeapon: function(name) {
-            if (this.player.hasWeapon(name) && this.player.currentWeapon != name) {
-                this.player.currentWeapon = name;
-                this.overlay.setWeapon(name);
-                this.overlay.setAmmo(this.player.ammo());
-
-                this.player.changeTexture(this.player.currentWeapon);
-                this.redrawGameObject(this.player);
-
-                ResourceManager.playSound(ResourceManager.soundList[this.player.currentWeapon].Draw, ResourceManager.weaponData.drawCooldown);
-                this.player.shootCooldown = ResourceManager.weaponData.drawCooldown;
-            }
+        onWeaponChange: function(name) {
+            this.redrawGameObject(this.player);
+            ResourceManager.playSound(ResourceManager.soundList.Weapons[this.player.currentWeapon].Draw, ResourceManager.weaponData.drawCooldown);
         },
 
         playerShootingHandle: function() {
@@ -451,7 +446,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
                 var currentWeapon = this.player.currentWeapon;
 
                 if (this.player.hasCurrentAmmo()) {
-                    var currentWeaponSounds = ResourceManager.soundList[currentWeapon];
+                    var currentWeaponSounds = ResourceManager.soundList.Weapons[currentWeapon];
 
                     if (this.player.isCurrentWeaponMelee()) {
                         var hit = this.player.shoot(this, this.zombies);
@@ -552,48 +547,13 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
         },
 
         itemInteraction: function(item, playSounds) {
-            switch (item.type) {
-                case "weapon":
-                    var name = item.name;
-                    var ammo = item.ammo || 5;
-                    if (this.player.hasWeapon(name)) {
-                        this.player.addAmmo(name, ammo);
-                        Messenger.showMessage(Messenger.ammoPicked, ammo, name);
-                    }
-                    else {
-                        this.player.addWeapon(name, ammo);
-                        if (this.player.weapons[name].data.power >= this.player.weapons[this.player.currentWeapon].data.power)
-                            this.changeWeapon(name);
-                        Messenger.showMessage(Messenger.newWeaponPicked, name);
-                    }
-                    if (playSounds)
-                        ResourceManager.playSound(ResourceManager.soundList.Ammo);
-                    break;
-                case "medkit":
-                    this.player.heal(item.size);
+            var itemObject = item.type in Items ? new Items[item.type](item)
+                                                : new Items.default(item);
 
-                    //please note, that amount of health to be healed is unpredictable
-                    //because player can be hurt in process
-                    Messenger.showMessage(Messenger.healPackPicked, item.size);
-                    break;
-                case "ammo":
-                    if (this.player.hasWeapon(item.name)) {
-                        this.player.addAmmo(item.name, item.size);
-                        Messenger.showMessage(Messenger.ammoPicked, item.size, item.name);
-                    }
-                    break;
-                case "key":
-                    if (!(item.name in this.player.keys())) {
-                        this.player.addToKeys(item.name);
-                        Messenger.showMessage(Messenger.keyPicked, item.name);
-                    }
-                    break;
-                default:
-                    if (item.name) {
-                        this.player.addToInventory(item.name);
-                        Messenger.showMessage(Messenger.newItemPicked, item.name);
-                    }
-            }
+            itemObject.apply(this.player);
+
+            if (playSounds)
+                ResourceManager.playSound(ResourceManager.soundList.Items[itemObject.type()]);
         },
 
         pickNearestToPlayer: function(targets, reachablePredicate) {

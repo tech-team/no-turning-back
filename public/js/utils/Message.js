@@ -1,7 +1,8 @@
 define([
+    'jquery',
     'classy'
 ],
-function(Class) {
+function($, Class) {
     var MessageHelper = Class.$extend({
         __init__: function($parent) {
             this.$parent = $parent || $(document);

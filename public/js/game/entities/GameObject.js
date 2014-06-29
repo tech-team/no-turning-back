@@ -7,6 +7,10 @@ function(Class) {
 			this.dispObj = dispObj;
 		},
 
+        _rawData: function() {
+            return this.dispObj.data;
+        },
+
         data: function() {
             this.dispObj.data.x = this.dispObj.x;
             this.dispObj.data.y = this.dispObj.y;

@@ -47,6 +47,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
                 armorChanged: new signals.Signal(),
                 ammoChanged: new signals.Signal(),
                 weaponAdded: new signals.Signal(),
+                weaponChanged: new signals.Signal(),
                 itemAdded: new signals.Signal(),
                 keyAdded: new signals.Signal(),
                 scoreChanged: new signals.Signal()
@@ -152,6 +153,15 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
 
         isCurrentWeaponMelee: function() {
             return this.weapons[this.currentWeapon].melee;
+        },
+
+        changeWeapon: function(name) {
+            if (this.hasWeapon(name) && this.currentWeapon != name) {
+                this.currentWeapon = name;
+                this.changeTexture(this.currentWeapon);
+                this.shootCooldown = ResourceManager.weaponData.drawCooldown;
+                this.events.weaponChanged.dispatch(this.currentWeapon, this.weapons[this.currentWeapon].getAmmo());
+            }
         },
 
         shoot: function(level, targets) {
@@ -331,7 +341,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
         },
 
         heal: function(howMuch) {
-            ResourceManager.playSound(ResourceManager.soundList.Medkit);
+//            ResourceManager.playSound(ResourceManager.soundList.Items.medkit);
 
             var self = this;
             var tid = setInterval(function() {

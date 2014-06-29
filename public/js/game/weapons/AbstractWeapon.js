@@ -25,6 +25,10 @@ define([
             return this.ammo > 0;
         },
 
+        power: function() {
+            return this.data.power;
+        },
+
         shoot: function(level) {
             throw "Pure weapon. Not available";
         }
