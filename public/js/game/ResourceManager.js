@@ -5,9 +5,10 @@ define([
     'preload',
     'sound',
     'alertify',
-    'game/misc/ImageTiler'
+    'game/misc/ImageTiler',
+    'utils/LocalStorage'
 ],
-function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
+function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStorage) {
 	var ResourceManager = Class.$extend({
         __classvars__: {
             //all textures should have .png format
@@ -94,11 +95,11 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                 return this.instance;
             },
 
-            soundDisabled: (localStorage["soundDisabled"] === "true"), //string to bool conversion
+            soundDisabled: LocalStorage.getJSON("soundDisabled"),
 
             toggleSound: function() {
                 this.soundDisabled = !this.soundDisabled;
-                localStorage["soundDisabled"] = this.soundDisabled;
+                LocalStorage.addJSON("soundDisabled", this.soundDisabled);
 
                 alertify.success(this.soundDisabled ? "Sound disabled" : "Sound enabled");
             },
