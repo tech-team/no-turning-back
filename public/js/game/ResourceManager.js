@@ -59,7 +59,7 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                 },
                 knife: {
                     power: 5,
-                    coolDown: 40
+                    coolDown: 15
                 },
                 pistol: {
                     power: 10,

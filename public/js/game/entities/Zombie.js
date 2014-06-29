@@ -1,11 +1,10 @@
 define([
     'game/entities/AliveObject',
     'game/ResourceManager',
-    'collision',
     'game/misc/Vector',
     'game/weapons/Weapons'
 ],
-    function(AliveObject, ResourceManager, collider, Vector, Weapons) {
+    function(AliveObject, ResourceManager, Vector, Weapons) {
         var Zombie = AliveObject.$extend({
             __init__: function(dispObj) {
                 this.$super(dispObj);
@@ -161,8 +160,7 @@ define([
                         this.dispObj.y += offsetY;
                     }
                     for (var i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision(this.dispObj, collisionObjects[i]) &&
-                            collisionObjects[i] != this.dispObj) {
+                        if (this.collidesWith(collisionObjects[i]) && collisionObjects[i] != this.dispObj) {
                             this.dispObj.x -= offsetX;
                             this.dispObj.y -= offsetY;
                         }

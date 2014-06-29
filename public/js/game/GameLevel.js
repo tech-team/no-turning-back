@@ -3,7 +3,6 @@ define([
     'lodash',
     'signals',
     'easel',
-    'collision',
     'game/StageManager',
     'game/ResourceManager',
     'game/DefaultObjects',
@@ -19,7 +18,7 @@ define([
     'game/misc/Vector',
     'game/Overlay'
 ],
-function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, DefaultObjects, KeyCoder, UntilTimer, Messenger, Items, Zombie, Chest, Door, Button, Bullet, Vector, Overlay) {
+function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjects, KeyCoder, UntilTimer, Messenger, Items, Zombie, Chest, Door, Button, Bullet, Vector, Overlay) {
     var GameLevel = StageManager.$extend({
 		__init__: function(stage, levelData, player, resourceManager) {
             this.$super(stage, resourceManager);
@@ -214,7 +213,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             var graphics = new easeljs.Graphics();
             this.effects.fogBox = new easeljs.Shape(graphics);
 
-            var fogBox = this.containers["effect"].addChild(this.effects.fogBox); // TODO: unused variable
+            this.containers["effect"].addChild(this.effects.fogBox);
 
             this.effects.fog = this.addToStage({
                 type: "effect",
@@ -243,7 +242,6 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             this.player.setEffects(this.effects);
 
             this.createCollisionObjects();
-            this.createRicochetObjects();
             //ResourceManager.stopSounds();
         },
 
@@ -274,6 +272,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
 
             _.each(this.walls, function(wall) {
                 self.collisionObjects.push(wall);
+                self.ricochetObjects.push(wall);
             });
 
             _.each(this.zombies, function(zombie) {
@@ -283,28 +282,12 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             _.each(this.doors, function(door) {
                 if (door.isClosed()) {
                     self.collisionObjects.push(door.dispObj);
-                }
-            });
-
-            _.each(this.chests, function(chest) {
-                self.collisionObjects.push(chest.dispObj);
-            });
-        },
-
-        createRicochetObjects: function() {
-            var self = this;
-
-            _.each(this.walls, function(wall) {
-                self.ricochetObjects.push(wall);
-            });
-
-            _.each(this.doors, function(door) {
-                if (door.isClosed()) {
                     self.ricochetObjects.push(door.dispObj);
                 }
             });
 
             _.each(this.chests, function(chest) {
+                self.collisionObjects.push(chest.dispObj);
                 self.ricochetObjects.push(chest.dispObj);
             });
         },
@@ -573,9 +556,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             }
         },
 
-        itemInteraction: function(item, disableSounds) {
-            var itemObject = new Items[item.type](item);
-
+        itemInteraction: function(itemObject, disableSounds) {
             itemObject.apply(this.player);
 
             if (!disableSounds)
@@ -611,7 +592,9 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
                 else {
                     ResourceManager.playSound(ResourceManager.soundList.ChestOpen);
 
-                    _.each(nearestChest.storage(), this.itemInteraction.bind(this));
+                    _.each(nearestChest.storage(), function(itemData) {
+                        this.itemInteraction(Items.createItem(itemData));
+                    }.bind(this));
 
                     nearestChest.clearStorage();
                     this.redrawGameObject(nearestChest);
@@ -630,11 +613,11 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             var newDrops = _.clone(this.drops);
 
             _.each(this.drops, function(drop, i) {
-                if (self.checkReach(drop)) {
-                    if (collider.checkPixelCollision(drop, self.player.dispObj)) {
-                        self.itemInteraction(drop.data);
-
-                        self.removeFromStage(drop);
+                var itemObject = Items.createItem(drop);
+                if (self.checkReach(itemObject)) {
+                    if (itemObject.collidesWith(self.player)) {
+                        self.itemInteraction(itemObject);
+                        self.removeFromStage(itemObject.dispObj);
                         newDrops.removeAt(i);
                     }
                 }
@@ -753,8 +736,6 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
         },
 
         checkBounds: function(obj) {
-            // TODO:  впрочем это не учитывает.. ничего не учитывает
-            // TODO:  (поворот, форму)
             return obj.x() + obj.dispObj.getBounds().width/2 >= this.data.w ||
                    obj.x() - obj.dispObj.getBounds().width/2 <= 0 ||
                    obj.y() + obj.dispObj.getBounds().height/2 >= this.data.h ||

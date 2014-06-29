@@ -13,8 +13,8 @@ define([
             },
 
             update: function(event) {
-                this.dispObj.x += this.speed * Math.cos( (Math.PI / 180) * this.dispObj.rotation);
-                this.dispObj.y += this.speed * Math.sin( (Math.PI / 180) * this.dispObj.rotation);
+                this.dispObj.x += this.speed * Math.cos( (Math.PI / 180) * this.rotation());
+                this.dispObj.y += this.speed * Math.sin( (Math.PI / 180) * this.rotation());
             }
         });
 

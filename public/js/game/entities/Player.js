@@ -4,10 +4,9 @@ define([
     'game/ResourceManager',
     'game/misc/UntilTimer',
     'game/misc/KeyCoder',
-    'collision',
     'game/weapons/Weapons'
 ],
-function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, Weapons) {
+function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
 	var Player = AliveObject.$extend({
 		__init__: function(dispObj) {
             this.$super(dispObj);
@@ -210,10 +209,10 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
                 this.dispObj.x += offsetX;
                 this.dispObj.y += offsetY;
                 for (i = 0; i < collisionObjects.length; ++i) {
-                    if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                    if (this.collidesWith(collisionObjects[i])) {
                         this.dispObj.x -= reboundModifier * offsetX;
                         this.dispObj.y -= reboundModifier * offsetY;
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                        if (this.collidesWith(collisionObjects[i])) {
                             this.dispObj.x += (reboundModifier - 1) * offsetX;
                             this.dispObj.y += (reboundModifier - 1) * offsetY;
                         }
@@ -222,7 +221,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
                 if (event.keys[KeyCoder.D]) {
                     this.dispObj.rotation += offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                        if (this.collidesWith(collisionObjects[i])) {
                             this.dispObj.rotation -= reboundModifier * offsetRotation;
 
                         }
@@ -231,7 +230,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
                 if (event.keys[KeyCoder.A]) {
                     this.dispObj.rotation -= offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                        if (this.collidesWith(collisionObjects[i])) {
                             this.dispObj.rotation += reboundModifier * offsetRotation;
                         }
                     }
@@ -243,10 +242,10 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
                 this.dispObj.x -= offsetX;
                 this.dispObj.y -= offsetY;
                 for (i = 0; i < collisionObjects.length; ++i) {
-                    if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                    if (this.collidesWith(collisionObjects[i])) {
                         this.dispObj.x += reboundModifier * offsetX;
                         this.dispObj.y += reboundModifier * offsetY;
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                        if (this.collidesWith(collisionObjects[i])) {
                             this.dispObj.x -= (reboundModifier - 1) * offsetX;
                             this.dispObj.y -= (reboundModifier - 1) * offsetY;
                         }
@@ -255,7 +254,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
                 if (event.keys[KeyCoder.D]) {
                     this.dispObj.rotation -= offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                        if (this.collidesWith(collisionObjects[i])) {
                             this.dispObj.rotation += reboundModifier * offsetRotation;
 
                         }
@@ -264,7 +263,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
                 if (event.keys[KeyCoder.A]) {
                     this.dispObj.rotation += offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                        if (this.collidesWith(collisionObjects[i])) {
                             this.dispObj.rotation -= reboundModifier * offsetRotation;
                         }
                     }
@@ -276,7 +275,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
                     offsetRotation *= 2;
                     this.dispObj.rotation += offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                        if (this.collidesWith(collisionObjects[i])) {
                             this.dispObj.rotation -= offsetRotation;
 
                         }
@@ -286,7 +285,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
                     offsetRotation *= 2;
                     this.dispObj.rotation -= offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {
-                        if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                        if (this.collidesWith(collisionObjects[i])) {
                             this.dispObj.rotation += offsetRotation;
 
                         }
@@ -313,7 +312,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, collider, 
             this.dispObj.y += offsetY;
 
             for (var i = 0; i < collisionObjects.length; ++i) {
-                if (collider.checkPixelCollision (this.dispObj, collisionObjects[i])) {
+                if (this.collidesWith(collisionObjects[i])) {
                     this.dispObj.x -= reboundModifier * offsetX;
                     this.dispObj.y -= reboundModifier * offsetY;
                     this.dispObj.rotation = currentRotation;
