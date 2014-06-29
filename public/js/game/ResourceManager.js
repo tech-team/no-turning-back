@@ -99,7 +99,7 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStor
 
             toggleSound: function() {
                 this.soundDisabled = !this.soundDisabled;
-                LocalStorage.addJSON("soundDisabled", this.soundDisabled);
+                LocalStorage.setJSON("soundDisabled", this.soundDisabled);
 
                 alertify.success(this.soundDisabled ? "Sound disabled" : "Sound enabled");
             },

@@ -117,7 +117,7 @@ define([
 
                 if (!LocalStorage.getJSON("helpMessageShown")) {
                     alertify.alert(Editor.helpMessage);
-                    LocalStorage.addJSON("helpMessageShown", true);
+                    LocalStorage.setJSON("helpMessageShown", true);
                 }
 
                 this.onLevelLoadClick(); //ask level to load

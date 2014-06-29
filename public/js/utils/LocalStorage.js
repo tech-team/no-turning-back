@@ -2,15 +2,15 @@ define([
 ],
 function() {
 	var LocalStorage = {
-        add: function(key, value) {
+        set: function(key, value) {
             window.localStorage.setItem(key, value);
         },
 
-		remove: function(key) {
+		unset: function(key) {
 			window.localStorage.removeItem(key);
 		},
 
-		addJSON: function(key, object) {
+		setJSON: function(key, object) {
 			window.localStorage.setItem(key, JSON.stringify(object));
 		},
 
