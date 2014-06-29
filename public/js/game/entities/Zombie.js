@@ -74,7 +74,7 @@ define([
             },
 
             addWeapon: function(name) {
-                var data = _.extend(ResourceManager.weaponData[name], {
+                var data = _.extend(_.clone(ResourceManager.weaponData[name]), {
                     power: this.damageAmount()
                 });
                 this.weapons[this.currentWeapon] = new Weapons[name](Infinity, data);
