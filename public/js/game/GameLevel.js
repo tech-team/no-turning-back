@@ -464,7 +464,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             var i = 0;
             for (i = 0; i < this.bullets.length; ++i) {
 
-                if (this.bullets[i].ttl) {
+                if (!_.isUndefined(this.bullets[i])) {
                     if (this.bullets[i].ttl <= 0) {
                         this.removeFromStage(this.bullets[i].dispObj);
                         this.bullets.removeAt(i);
