@@ -7,23 +7,15 @@ define([
     'game/ResourceManager',
     'game/LevelManager',
     'game/DefaultObjects',
-    'game/StageManager'
+    'game/StageManager',
+    'tmpl/_editorHelpMessage',
+    'utils/LocalStorage'
 ],
-    function($, _, easeljs, alertify, KeyCoder, ResourceManager, LevelManager, DefaultObjects, StageManager) {
+    function($, _, easeljs, alertify, KeyCoder, ResourceManager, LevelManager, DefaultObjects, StageManager, editorHelpMessage, LocalStorage) {
         var Editor = StageManager.$extend({
             __classvars__: {
                 duplicateDelta: 30,
-                helpMessage:
-                        "<h2>Quick help</h2>" +
-                        "<div align='left'>" +
-                        "Use mouse to select and move objects<br>" +
-                        "Ctrl+click to select multiple objects<br>" +
-                        "WASD to move<br>" +
-                        "QE to rotate<br>" +
-                        "FB to bring to front or back<br>" +
-                        "Double click or Ctrl+V to clone<br>" +
-                        "DEL to delete selected objects<br>" +
-                        "Shift + mouse to drag whole level</div>"
+                helpMessage: editorHelpMessage()
             },
 
             __init__: function(stage, resourceManager, levelManager) {
@@ -123,7 +115,10 @@ define([
                     onDeleteObjects();
                 });
 
-                alertify.alert(Editor.helpMessage);
+                if (!LocalStorage.getJSON("helpMessageShown")) {
+                    alertify.alert(Editor.helpMessage);
+                    LocalStorage.setJSON("helpMessageShown", true);
+                }
 
                 this.onLevelLoadClick(); //ask level to load
 
@@ -300,6 +295,8 @@ define([
                     });
 
                     self.updateWpPath();
+                    //NB: this actually wont update coords in table,
+                    //because they can and will be updated only after reg being restored on click
                     self.regenerateObjectPropertiesTable();
                 });
 
@@ -323,6 +320,8 @@ define([
                         obj.data.x = obj.x;
                         obj.data.y = obj.y;
                     });
+
+                    self.regenerateObjectPropertiesTable();
                 });
 
                 dispObj.on("dblclick", function(evt) {
