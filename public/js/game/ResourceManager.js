@@ -25,14 +25,14 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                 ChestOpen: "chest_open.mp3",
                 GameOver: "game_over.mp3",
                 Victory: "fortunate_son.mp3",
-                CheaterVictory: "cheater_victory.mp3",
-                LevelFinished: "", //TODO: add some kind of short ta-da sound
+                LevelFinished: "levelFinished.mp3",
 
                 Items: {
                     weapon: "",
                     ammo: "ammo.mp3",
                     medkit: "apple.mp3",
-                    key: ""
+                    key: ["keyPicked1.wav", "keyPicked2.wav"],
+                    default: ["itemPicked1.wav", "itemPicked2.wav", "itemPicked3.wav", "itemPicked4.wav"]
                 },
 
                 Weapons: {

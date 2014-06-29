@@ -238,7 +238,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
             this.player.setEffects(this.effects);
 
             this.createCollisionObjects();
-            ResourceManager.stopSounds();
+            //ResourceManager.stopSounds();
         },
 
         initOverlay: function() {
