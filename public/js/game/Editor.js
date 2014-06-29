@@ -323,6 +323,8 @@ define([
                         obj.data.x = obj.x;
                         obj.data.y = obj.y;
                     });
+
+                    self.regenerateObjectPropertiesTable();
                 });
 
                 dispObj.on("dblclick", function(evt) {
