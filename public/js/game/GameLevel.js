@@ -628,6 +628,7 @@ function(Class, _, signals, easeljs, collider, StageManager, ResourceManager, De
 
                     if (door.isClosed()) {
                         Messenger.showMessage(door.requiresMessage);
+                        ResourceManager.playSound(ResourceManager.soundList.DoorClosed);
                     }
                     else {
                         ResourceManager.playSound(ResourceManager.soundList.DoorOpen);

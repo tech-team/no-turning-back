@@ -22,6 +22,7 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler) {
                 PlayerHurt: ["hurt1.mp3", "hurt2.mp3", "hurt3.mp3"],
                 BulletRicochet: "ricochet.mp3",
                 DoorOpen: "door_open.mp3",
+                DoorClosed: "",
                 ChestOpen: "chest_open.mp3",
                 GameOver: "game_over.mp3",
                 Victory: "fortunate_son.mp3",
