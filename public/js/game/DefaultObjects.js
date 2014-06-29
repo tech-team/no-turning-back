@@ -35,7 +35,8 @@ define([
                     zombies: [],
                     walls: [],
                     doors: [],
-                    chests: []
+                    chests: [],
+                    decorations: []
                 },
 
                 player: {
@@ -99,6 +100,9 @@ define([
                 corpse: {
                 },
 
+                decoration: {
+
+                },
 
                 object: {
                     type: "object",

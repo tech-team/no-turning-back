@@ -142,10 +142,11 @@ define([
                     //ensure calling with one argument
                     self.addToStage(obj);
                 };
-                
-                _.each(data.walls,   add);
-                _.each(data.doors,   add);
-                _.each(data.chests,  add);
+
+                _.each(data.decorations, add);
+                _.each(data.walls, add);
+                _.each(data.doors, add);
+                _.each(data.chests, add);
                 _.each(data.buttons, add);
                 _.each(data.zombies, add);
 
@@ -240,7 +241,7 @@ define([
             populateTypeSelect: function(select) {
                 var typeSelect = select || $('.type-select');
 
-                var excludedKeys = ['level', 'build', '$extend', '$withData', 'constructor'];
+                var excludedKeys = ['level', 'build', 'object', '$extend', '$withData', 'constructor'];
                 var types = _.difference(_.keys(DefaultObjects), excludedKeys);
 
                 _.each(types, function(tex) {

@@ -158,6 +158,11 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             //add background
             this.background = this.addToStage(data, true);
 
+            //add decorations
+            _.each(data.decorations, function(obj) {
+                self.addToStage(obj);
+            });
+
             //add walls
             _.each(data.walls, function(obj) {
                 self.walls.push(self.addToStage(obj));
@@ -446,7 +451,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
                     if (this.player.isCurrentWeaponMelee()) {
                         var hit = this.player.shoot(this, this.zombies);
-                        ResourceManager.playSound((hit) ? (currentWeaponSounds.Hit) : (currentWeaponSounds.MissShort));
+                        ResourceManager.playSound((hit) ? (currentWeaponSounds.Hit) : (currentWeaponSounds.Miss));
                     }
                     else {
                         this.player.shoot(this);
