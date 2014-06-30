@@ -267,6 +267,21 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.updateCamera();
         },
 
+        addToCollisionObjects: function(dispObj) {
+            this.collisionObjects.push(dispObj);
+            this.ricochetObjects.push(dispObj);
+        },
+
+        removeFromCollisionObjects: function(dispObj) {
+            this.collisionObjects.remove(dispObj);
+            this.ricochetObjects.remove(dispObj);
+        },
+
+        recreateCollisionObject: function(dispObj) {
+            this.removeFromCollisionObjects(dispObj);
+            this.addToCollisionObjects(dispObj);
+        },
+
         createCollisionObjects: function() {
             var self = this;
 
@@ -290,21 +305,6 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                 self.collisionObjects.push(chest.dispObj);
                 self.ricochetObjects.push(chest.dispObj);
             });
-        },
-
-        addToCollisionObjects: function(dispObj) {
-            this.collisionObjects.push(dispObj);
-            this.ricochetObjects.push(dispObj);
-        },
-
-        removeFromCollisionObjects: function(dispObj) {
-            this.collisionObjects.remove(dispObj);
-            this.ricochetObjects.remove(dispObj);
-        },
-
-        recreateCollisionObject: function(dispObj) {
-            this.removeFromCollisionObjects(dispObj);
-            this.addToCollisionObjects(dispObj);
         },
 
         onJoystickMessage: function(data, answer) {
@@ -356,7 +356,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.bulletsCollisionsHandle();
             this.zombiesUpdate(event);
             this.zombiesDeathHandle();
-            this.dropsHandle();
+//            this.dropsHandle();
             this.player.update(event, this.collisionObjects);
 
             if (this.player.health() <= 0 && !this.player.dead) {
@@ -409,6 +409,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
         useHandle: function() {
             this.chestsOpeningHandle() ||
             this.buttonsPressingHandle() ||
+            this.dropsHandle() ||
             this.doorsOpeningHandle()
         },
 
@@ -553,7 +554,8 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
                     for (var j = 0; j < this.collisionObjects.length; ++j) {
                         if (this.collisionObjects[j] == this.zombies[i].dispObj) {
-                            this.collisionObjects.splice(j, 1);
+                            this.collisionObjects.removeAt(j);
+                            if (this.collisionObjects.length > 0 && i > 0) --j;
                         }
                     }
 
@@ -624,22 +626,18 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
 
         dropsHandle: function() {
-            var self = this;
+            var drop = this.pickNearestToPlayer(this.drops, function(d) {
+                return d <= this.player.$class.Reach;
+            }.bind(this));
 
-            var newDrops = _.clone(this.drops);
-
-            _.each(this.drops, function(drop, i) {
-                var itemObject = Items.createItem(drop);
-                if (self.checkReach(itemObject)) {
-                    if (itemObject.collidesWith(self.player)) {
-                        self.itemInteraction(itemObject);
-                        self.removeFromStage(itemObject.dispObj);
-                        newDrops.removeAt(i);
-                    }
+            var itemObject = Items.createItem(drop);
+            if (this.checkReach(itemObject)) {
+                if (itemObject.collidesWith(this.player)) {
+                    this.itemInteraction(itemObject);
+                    this.removeFromStage(itemObject.dispObj);
+                    this.drops.remove(drop);
                 }
-            });
-
-            this.drops = newDrops;
+            }
         },
 
         doorsOpeningHandle: function(event, targetDoors) {
