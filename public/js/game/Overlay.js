@@ -82,8 +82,12 @@ define([
                     height: this.stage.canvas.height
                 };
 
+                var scaleFactor = canvas.width/1280;
+
                 this.overlayBar.x = 0;
                 this.overlayBar.y = canvas.height - this.overlayBar.getBounds().height + 32;
+                this.overlayBar.scaleX = scaleFactor;
+                this.overlayBar.scaleY = scaleFactor;
 
                 var toolbarHeight = canvas.height - 32;
 
