@@ -1,6 +1,6 @@
 <fest:template xmlns:fest="http://fest.mail.ru"
                context_name="json">
-    <h2>Welcome to Editor!</h2>
+    <h2>Welcome to NTB Editor!</h2>
     <div align='left'>
         <h3>Quick help:</h3>
         <div style="margin: -10px 10px 0 10px">
