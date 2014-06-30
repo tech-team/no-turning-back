@@ -156,7 +156,7 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStor
             _.each(ResourceManager.texList, function(tex) {
                 manifest.push({
                     id: tex,
-                    src: "gfx/" + tex + ".png",
+                    src: "gfx/large/" + tex + ".png",
                     resType: ResourceManager.ResourceType.tex
                 });
             });

@@ -799,7 +799,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
                     var fogBox = this.effects.fogBox.graphics;
 
-                    var frameSize = 380;
+                    var frameSize = 640;
                     var stageSize = {
                         width: this.stage.canvas.width,
                         height: this.stage.canvas.height
