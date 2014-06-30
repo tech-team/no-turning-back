@@ -346,70 +346,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             }
         },
 
-		update: function(event) {
-            if (this.finished)
-                return;
-
-            if (this.checkBounds(this.player)) {
-                this.player.restorePrevPos();
-            }
-            this.player.savePrevPos();
-
-            _.each(this.bullets, function(bullet) {
-                bullet.update(event);
-            });
-            this.bulletsCollisionsHandle();
-            this.zombiesUpdate(event);
-            this.zombiesDeathHandle();
-//            this.dropsHandle();
-            this.player.update(event, this.collisionObjects);
-
-            if (this.player.health() <= 0 && !this.player.dead) {
-                this.player.dead = true;
-                this.finished = true;
-                console.log("Game over.");
-                ResourceManager.playSound(ResourceManager.soundList.GameOver);
-                this.keyCoder.removeAllListeners();
-                this.levelFinished.dispatch({
-                    status: 'gameFinished',
-                    score: this.player.score,
-                    message: "Game over"
-                });
-            }
-
-            this.updateOverlay();
-            this.updateFog();
-            this.updateCamera();
-            ResourceManager.updatePlayingSounds();
-		},
-
-        updateCamera: function() {
-            var stageSize = {
-                width: this.stage.canvas.width,
-                height: this.stage.canvas.height
-            };
-            var offset = GameLevel.CameraOffset;
-
-            if (this.player.x() > stageSize.width - offset) {
-                this.mainContainer.x = -(this.player.x() - (stageSize.width - offset));
-            }
-            else if (this.player.x() < offset) {
-                this.mainContainer.x = -this.player.x() + offset;
-            }
-
-            if (this.player.y() > stageSize.height - offset) {
-                this.mainContainer.y = -(this.player.y() - (stageSize.height - offset));
-            }
-            else if (this.player.y() < offset) {
-                this.mainContainer.y = -this.player.y() + offset;
-            }
-        },
-
-        updateOverlay: function() {
-            if (DEBUG)
-                this.overlay.setFPS(easeljs.Ticker.getMeasuredFPS());
-        },
-
+        /****************************** USE Handlers ******************************/
 
         useHandle: function() {
             this.chestsOpeningHandle() ||
@@ -418,25 +355,144 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.doorsOpeningHandle()
         },
 
-        zombiesUpdate: function(event) {
-            var self = this;
+        itemInteraction: function(itemObject, disableSounds) {
+            itemObject.apply(this.player);
 
-            _.each(this.zombies, function(zombie) {
-                zombie.update(event, self.player, self.collisionObjects);
-                if (zombie.justFired) {
-                    if (zombie.isCurrentWeaponMelee()) {
-                        var hit = zombie.shoot(self, self.player);
-                        if (hit) {
-                            ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
-                        }
-                    }
-                    else {
-                        zombie.shoot(self);
-                        ResourceManager.playSound(ResourceManager.soundList.Weapons[zombie.currentWeapon].Fire);
+            if (!disableSounds)
+                ResourceManager.playSound(ResourceManager.soundList.Items[itemObject.type()]);
+        },
+
+        chestsOpeningHandle: function(event) {
+            var nearestChest = this.pickNearestToPlayer(this.chests, function(d) {
+                return d <= this.player.$class.Reach && d <= Chest.ActivationRadius;
+            }.bind(this));
+
+            if (nearestChest) {
+                nearestChest.update(event, this.player);
+
+                if (nearestChest.isClosed()) {
+                    Messenger.showMessage(Messenger.chestLocked, nearestChest.requiresMessage);
+                }
+                else {
+                    ResourceManager.playSound(ResourceManager.soundList.ChestOpen);
+
+                    _.each(nearestChest.storage(), function(itemData) {
+                        this.itemInteraction(Items.createItem(itemData));
+                    }.bind(this));
+
+                    nearestChest.clearStorage();
+                    this.redrawGameObject(nearestChest);
+                    this.recreateCollisionObject(nearestChest.dispObj);
+
+                    this.chests.remove(nearestChest);
+                }
+                return true;
+            }
+            return false;
+        },
+
+
+        dropsHandle: function() {
+            var drop = this.pickNearestToPlayer(this.drops, function(d) {
+                return d <= this.player.$class.Reach;
+            }.bind(this));
+
+            if (drop) {
+                var itemObject = Items.createItem(drop);
+                if (this.checkReach(itemObject)) {
+                    if (itemObject.collidesWith(this.player)) {
+                        this.itemInteraction(itemObject);
+                        this.removeFromStage(itemObject.dispObj);
+                        this.drops.remove(drop);
                     }
                 }
-            });
+            }
         },
+
+        doorsOpeningHandle: function(event, targetDoors) {
+            var self = this;
+
+            var removeDoors = false;
+
+            var doorUpdater = function(door) {
+                if (door && door.isClosed()) {
+                    door.update(event, self.player, self.zombies.length);
+
+                    if (door.isClosed()) {
+                        Messenger.showMessage(door.requiresMessage);
+                        ResourceManager.playSound(ResourceManager.soundList.DoorLocked);
+                    }
+                    else {
+                        ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
+
+                        self.removeFromCollisionObjects(door.dispObj);
+                        self.redrawGameObject(door);
+                        removeDoors = true;
+
+                        self.player.addScore(GameLevel.SCORES.DOOR_OPEN);
+
+                        if (door.role() == "exit") {
+                            self.finish();
+                        }
+                    }
+                }
+            };
+
+            if (targetDoors) {
+                _.each(targetDoors, doorUpdater.bind(this));
+
+                if (removeDoors) {
+                    _.each(targetDoors, function (door) {
+                        self.doors.remove(door);
+                    });
+                }
+            } else {
+                var door = this.pickNearestToPlayer(this.doors, function (d) {
+                    return d <= Door.ActivationRadius;
+                });
+                doorUpdater(door);
+
+                if (removeDoors) {
+                    this.doors.remove(door);
+                }
+            }
+        },
+
+        // TODO: make puzzle a separate object in level
+        buttonsPressingHandle: function(event) {
+            var self = this;
+
+            var button = this.pickNearestToPlayer(this.buttons, function(d, button) {
+                return d <= Button.ActivationRadius && button.isReleased();
+            });
+
+            if (button) {
+                var solved = button.update(event);
+                self.redrawGameObject(button);
+                ResourceManager.playSound(ResourceManager.soundList.Click);
+
+                if (solved !== null) {
+
+                    if (solved) {
+                        Messenger.showMessage(Messenger.puzzleSolved);
+                        this.doorsOpeningHandle(event, button.targets());
+                    } else {
+                        Messenger.showMessage(Messenger.puzzleFailed);
+                    }
+
+                }
+
+                if (button.isPressed()) {
+                    setTimeout(function () {
+                        button.releaseButton();
+                        ResourceManager.playSound(ResourceManager.soundList.Click);
+                        self.redrawGameObject(button);
+                    }, 1500);
+                }
+            }
+        },
+
+        /****************************** Weapons Handlers ******************************/
 
         onWeaponChange: function(name) {
             this.redrawGameObject(this.player);
@@ -541,6 +597,28 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             }
         },
 
+        /****************************** Zombies Handlers ******************************/
+
+        zombiesUpdate: function(event) {
+            var self = this;
+
+            _.each(this.zombies, function(zombie) {
+                zombie.update(event, self.player, self.collisionObjects);
+                if (zombie.justFired) {
+                    if (zombie.isCurrentWeaponMelee()) {
+                        var hit = zombie.shoot(self, self.player);
+                        if (hit) {
+                            ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
+                        }
+                    }
+                    else {
+                        zombie.shoot(self);
+                        ResourceManager.playSound(ResourceManager.soundList.Weapons[zombie.currentWeapon].Fire);
+                    }
+                }
+            });
+        },
+
         zombiesDeathHandle: function() {
             var self = this;
 
@@ -578,12 +656,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             }
         },
 
-        itemInteraction: function(itemObject, disableSounds) {
-            itemObject.apply(this.player);
-
-            if (!disableSounds)
-                ResourceManager.playSound(ResourceManager.soundList.Items[itemObject.type()]);
-        },
+        /****************************** Util Functions ******************************/
 
         pickNearestToPlayer: function(targets, reachablePredicate) {
             var self = this;
@@ -598,134 +671,6 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             });
 
             return nearest;
-        },
-
-        chestsOpeningHandle: function(event) {
-            var nearestChest = this.pickNearestToPlayer(this.chests, function(d) {
-                return d <= this.player.$class.Reach && d <= Chest.ActivationRadius;
-            }.bind(this));
-
-            if (nearestChest) {
-                nearestChest.update(event, this.player);
-
-                if (nearestChest.isClosed()) {
-                    Messenger.showMessage(Messenger.chestLocked, nearestChest.requiresMessage);
-                }
-                else {
-                    ResourceManager.playSound(ResourceManager.soundList.ChestOpen);
-
-                    _.each(nearestChest.storage(), function(itemData) {
-                        this.itemInteraction(Items.createItem(itemData));
-                    }.bind(this));
-
-                    nearestChest.clearStorage();
-                    this.redrawGameObject(nearestChest);
-                    this.recreateCollisionObject(nearestChest.dispObj);
-
-                    this.chests.remove(nearestChest);
-                }
-                return true;
-            }
-            return false;
-        },
-
-
-        dropsHandle: function() {
-            var drop = this.pickNearestToPlayer(this.drops, function(d) {
-                return d <= this.player.$class.Reach;
-            }.bind(this));
-
-            var itemObject = Items.createItem(drop);
-            if (this.checkReach(itemObject)) {
-                if (itemObject.collidesWith(this.player)) {
-                    this.itemInteraction(itemObject);
-                    this.removeFromStage(itemObject.dispObj);
-                    this.drops.remove(drop);
-                }
-            }
-        },
-
-        doorsOpeningHandle: function(event, targetDoors) {
-            var self = this;
-
-            var removeDoors = false;
-
-            var doorUpdater = function(door) {
-                if (door && door.isClosed()) {
-                    door.update(event, self.player, self.zombies.length);
-
-                    if (door.isClosed()) {
-                        Messenger.showMessage(door.requiresMessage);
-                        ResourceManager.playSound(ResourceManager.soundList.DoorLocked);
-                    }
-                    else {
-                        ResourceManager.playSound(ResourceManager.soundList.DoorOpen);
-
-                        self.removeFromCollisionObjects(door.dispObj);
-                        self.redrawGameObject(door);
-                        removeDoors = true;
-
-                        self.player.addScore(GameLevel.SCORES.DOOR_OPEN);
-
-                        if (door.role() == "exit") {
-                            self.finish();
-                        }
-                    }
-                }
-            };
-
-            if (targetDoors) {
-                _.each(targetDoors, doorUpdater.bind(this));
-
-                if (removeDoors) {
-                    _.each(targetDoors, function (door) {
-                        self.doors.remove(door);
-                    });
-                }
-            } else {
-                var door = this.pickNearestToPlayer(this.doors, function (d) {
-                    return d <= Door.ActivationRadius;
-                });
-                doorUpdater(door);
-
-                if (removeDoors) {
-                    this.doors.remove(door);
-                }
-            }
-        },
-
-        // TODO: make puzzle a separate object in level
-        buttonsPressingHandle: function(event) {
-            var self = this;
-
-            var button = this.pickNearestToPlayer(this.buttons, function(d, button) {
-                return d <= Button.ActivationRadius && button.isReleased();
-            });
-
-            if (button) {
-                var solved = button.update(event);
-                self.redrawGameObject(button);
-                ResourceManager.playSound(ResourceManager.soundList.Click);
-
-                if (solved !== null) {
-
-                    if (solved) {
-                        Messenger.showMessage(Messenger.puzzleSolved);
-                        this.doorsOpeningHandle(event, button.targets());
-                    } else {
-                        Messenger.showMessage(Messenger.puzzleFailed);
-                    }
-
-                }
-
-                if (button.isPressed()) {
-                    setTimeout(function () {
-                        button.releaseButton();
-                        ResourceManager.playSound(ResourceManager.soundList.Click);
-                        self.redrawGameObject(button);
-                    }, 1500);
-                }
-            }
         },
 
         redrawGameObject: function(gameObject) {
@@ -759,6 +704,72 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                    obj.x() - obj.dispObj.getBounds().width/2 <= 0 ||
                    obj.y() + obj.dispObj.getBounds().height/2 >= this.data.h ||
                    obj.y() - obj.dispObj.getBounds().height/2 <= 0;
+        },
+
+
+        /****************************** Update Functions ******************************/
+
+        update: function(event) {
+            if (this.finished)
+                return;
+
+            if (this.checkBounds(this.player)) {
+                this.player.restorePrevPos();
+            }
+            this.player.savePrevPos();
+
+            _.each(this.bullets, function(bullet) {
+                bullet.update(event);
+            });
+            this.bulletsCollisionsHandle();
+            this.zombiesUpdate(event);
+            this.zombiesDeathHandle();
+            this.player.update(event, this.collisionObjects);
+
+            if (this.player.health() <= 0 && !this.player.dead) {
+                this.player.dead = true;
+                this.finished = true;
+                console.log("Game over.");
+                ResourceManager.playSound(ResourceManager.soundList.GameOver);
+                this.keyCoder.removeAllListeners();
+                this.levelFinished.dispatch({
+                    status: 'gameFinished',
+                    score: this.player.score,
+                    message: "Game over"
+                });
+            }
+
+            this.updateOverlay();
+            this.updateFog();
+            this.updateCamera();
+            ResourceManager.updatePlayingSounds();
+        },
+
+        updateCamera: function() {
+            var stageSize = {
+                width: this.stage.canvas.width,
+                height: this.stage.canvas.height
+            };
+            var offset = GameLevel.CameraOffset;
+
+            if (this.player.x() > stageSize.width - offset) {
+                this.mainContainer.x = -(this.player.x() - (stageSize.width - offset));
+            }
+            else if (this.player.x() < offset) {
+                this.mainContainer.x = -this.player.x() + offset;
+            }
+
+            if (this.player.y() > stageSize.height - offset) {
+                this.mainContainer.y = -(this.player.y() - (stageSize.height - offset));
+            }
+            else if (this.player.y() < offset) {
+                this.mainContainer.y = -this.player.y() + offset;
+            }
+        },
+
+        updateOverlay: function() {
+            if (DEBUG)
+                this.overlay.setFPS(easeljs.Ticker.getMeasuredFPS());
         },
 
         updateEffects: function() {
