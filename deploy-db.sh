@@ -4,8 +4,12 @@ mongo localhost:27017/test mongodb-create.js
 
 path=public/levels
 
-for file in `ls ${path}`
+OIFS="$IFS"
+IFS=$'\n'
+
+for file in `find ${path}`
 do
-    mongoimport --db NTBdb --collection levels --file ${path}/${file}
+    mongoimport --db NTBdb --collection levels --file ${file}
 done
 
+IFS="$OIFS"
