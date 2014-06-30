@@ -770,6 +770,16 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             else if (this.player.y() < offset) {
                 this.mainContainer.y = -this.player.y() + offset;
             }
+
+            //do not scroll if we at the edge of level
+            if (this.mainContainer.x >= 0)
+                this.mainContainer.x = 0;
+            if (this.mainContainer.y >= 0)
+                this.mainContainer.y = 0;
+            if (this.mainContainer.x + this.data.w <= stageSize.width)
+                this.mainContainer.x = stageSize.width - this.data.w;
+            if (this.mainContainer.y + this.data.h <= stageSize.height)
+                this.mainContainer.y = stageSize.height - this.data.h;
         },
 
         updateOverlay: function() {
