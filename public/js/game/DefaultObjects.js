@@ -40,7 +40,9 @@ define([
                 },
 
                 player: {
+                    tex: "player-knife",
                     health: 100,
+                    armor: 100,
                     inventory: [],
                     keys: []
                 },
