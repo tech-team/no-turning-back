@@ -28,7 +28,7 @@ define([
             },
 
             _createText: function(str) {
-                var text = new easeljs.Text(str, "20px Arial", "#00FF00");
+                var text = new easeljs.Text(str, "25px MacondoRegular", "#00FF00");
                 text.shadow = new easeljs.Shadow("#000000", 5, 5, 10);
                 return this.stage.addChild(text);
             },
@@ -97,10 +97,10 @@ define([
                 this.armorText.x = 20;
                 this.armorText.y = toolbarHeight - 32;
 
-                this.weaponText.x = canvas.width - 100;
+                this.weaponText.x = canvas.width - 120;
                 this.weaponText.y = toolbarHeight - 32;
 
-                this.ammoText.x = canvas.width - 100;
+                this.ammoText.x = canvas.width - 120;
                 this.ammoText.y = toolbarHeight;
 
                 this.scoreText.x = canvas.width/2;
