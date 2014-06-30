@@ -132,6 +132,7 @@ function($, _, Class, signals, createjs, alertify, KeyCoder, LevelManager, GameL
 
 		stop: function(ignore_notify) {
 			this.changeState(Game.GameState.GameOver, ignore_notify);
+            this.level._finish();
             return this.state;
 		},
 

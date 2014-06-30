@@ -74,6 +74,12 @@ function(Class, $, _) {
             this.keys = [];
         },
 
+        removeAllEvents: function() {
+            this.listener.off('keydown');
+            this.listener.off('keypress');
+            this.listener.off('keyup');
+        },
+
 		__classvars__: {
             SHIFT: 16,
             CTRL: 17,

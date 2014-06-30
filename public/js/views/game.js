@@ -225,6 +225,7 @@ function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                 this.messenger.hideMessage();
                 this.$el.hide();
                 this.game.stop();
+                (new KeyCoder()).removeAllEvents();
                 this.hidden = true;
             }
         },
