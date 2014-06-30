@@ -340,8 +340,6 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
         },
 
         heal: function(howMuch) {
-//            ResourceManager.playSound(ResourceManager.soundList.Items.medkit);
-
             var self = this;
             var tid = setInterval(function() {
                 if (howMuch > 0) {

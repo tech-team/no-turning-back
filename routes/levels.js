@@ -45,13 +45,26 @@ function saveLevel(db, levelInfo, callbacks) {
 function retrieveCampaigns(db, callbacks) {
     callbacks = utils.default_callbacks(callbacks);
 
-    //db.levels.aggregate({$sort: {name: 1}}, {$group: {_id: "$campaign", levels: {$push: "$name"}}}, {$project: {_id: 0, campaign: "$_id", levels: 1}})
-    //db.levels.aggregate({$group: {_id: "$campaign", levelsCount: {$sum: 1}}}, {$project: {_id: 0, campaign: "$_id", levelsCount: "$levelsCount"}})
-    db.levels.aggregate([
-        { $group: {_id: "$campaign", levelsCount: {$sum: 1}} },
+//    db.levels.aggregate({$sort: {name: 1}}, {$group: {_id: "$campaign", levels: {$push: "$name"}}}, {$project: {_id: 0, campaign: "$_id", levels: 1}})
+//    db.levels.aggregate({$group: {_id: "$campaign", levelsCount: {$sum: 1}}}, {$project: {_id: 0, campaign: "$_id", levelsCount: "$levelsCount"}})
+
+    var selection = [
+        { $group: {_id: "$campaign", levels: {$push: "$name"}} },
         { $match: {_id: {$ne: "Workshop"}} },
-        { $project: {_id: 0, campaign: "$_id", levelsCount: "$levelsCount"} }
-    ], function(err, data) {
+        { $unwind: "$levels" },
+        { $sort: {_id: 1, levels: 1} },
+        { $group: {_id: "$_id", levels: {$push: "$levels"}} },
+        { $sort: {_id: 1} },
+        { $project: {campaign: "$_id", levels: 1, _id: 0} }
+    ];
+
+//    var selection = [
+//        { $group: {_id: "$campaign", levelsCount: {$sum: 1}} },
+//        { $match: {_id: {$ne: "Workshop"}} },
+//        { $project: {_id: 0, campaign: "$_id", levelsCount: "$levelsCount"} }
+//    ];
+
+    db.levels.aggregate(selection, function(err, data) {
         if (err || !data) {
             callbacks.error(err);
         } else {

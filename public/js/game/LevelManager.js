@@ -10,6 +10,8 @@ function(Class, alertify) {
             this.activeCampaign = null;
             this.levels = [];
 
+            var desiredCampaign = "First Era";
+
             var self = this;
             $.ajax({
                 type: 'GET',
@@ -19,7 +21,10 @@ function(Class, alertify) {
                 },
                 success: function(data) {
                     self.campaigns = data;
-                    self.campaignPicker(loadedCallback);
+
+                    self.activeCampaign = self.campaignPicker(desiredCampaign);
+                    self.levels = self.activeCampaign.levels;
+                    loadedCallback();
                 },
                 error: function(data) {
                     alertify.alert("Unable to campaigns list. Error: " + JSON.stringify(data));
@@ -27,25 +32,29 @@ function(Class, alertify) {
             });
 		},
 
-        campaignPicker: function(loadedCallback) {
-            var randId = Math.floor((Math.random() * this.campaigns.length));
-            this.activeCampaign = this.campaigns[randId];
-
-            var self = this;
-            $.ajax({
-                type: 'GET',
-                url: 'levels/campaigns/' + this.activeCampaign.campaign,
-                dataType: 'json',
-                beforeSend: function() {
-                },
-                success: function(data) {
-                    self.levels = data;
-                    loadedCallback();
-                },
-                error: function(data) {
-                    alertify.alert("Unable to campaign's levels list. Error: " + JSON.stringify(data));
-                }
+        campaignPicker: function(desiredCampaign) {
+            return _.find(this.campaigns, function (c) {
+                return c.campaign === desiredCampaign;
             });
+
+//            var randId = Math.floor((Math.random() * this.campaigns.length));
+
+
+//            var self = this;
+//            $.ajax({
+//                type: 'GET',
+//                url: 'levels/campaigns/' + this.activeCampaign.campaign,
+//                dataType: 'json',
+//                beforeSend: function() {
+//                },
+//                success: function(data) {
+//                    self.levels = data;
+//                    loadedCallback();
+//                },
+//                error: function(data) {
+//                    alertify.alert("Unable to campaign's levels list. Error: " + JSON.stringify(data));
+//                }
+//            });
         },
 
         isLastLevel: function() {

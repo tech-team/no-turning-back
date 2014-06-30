@@ -844,8 +844,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
         finish: function() {
             if (!this.finished) {
-                this.finished = true;
-                this.keyCoder.removeAllListeners();
+                this._finish();
 
                 var finishTimeout = 7000;
 
@@ -861,6 +860,12 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                         self.stage.alpha = 1;
                     });
             }
+        },
+
+        _finish: function() {
+            this.finished = true;
+            this.keyCoder.removeAllListeners();
+            console.log("Finishing level...");
         }
 	});
 
