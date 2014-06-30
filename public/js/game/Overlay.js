@@ -10,6 +10,13 @@ define([
             __init__: function(stage) {
                 this.stage = stage;
 
+                //setup graphics
+                var rm = ResourceManager.getInstance();
+
+                this.overlayBar = this.stage.addChild(
+                    new easeljs.Sprite(rm.getSpriteSheet("overlay/OverlayBar")));
+
+                //set default values
                 this.healthText = this._createText("Health: 100");
                 this.armorText = this._createText("Armor: 100");
                 this.weaponText = this._createText("knife");
@@ -35,6 +42,10 @@ define([
             },
 
             setAmmo: function(value) {
+                if (value.current == Infinity || value.total == Infinity) {
+                    value.current = "--";
+                    value.total = "--";
+                }
                 this.ammoText.text = value.current + " / " + value.total;
             },
 
@@ -70,7 +81,10 @@ define([
                     width: this.stage.canvas.width,
                     height: this.stage.canvas.height
                 };
-                
+
+                this.overlayBar.x = 0;
+                this.overlayBar.y = canvas.height - this.overlayBar.getBounds().height + 32;
+
                 var toolbarHeight = canvas.height - 32;
 
                 this.healthText.x = 20;

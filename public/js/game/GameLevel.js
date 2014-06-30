@@ -502,9 +502,10 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
         playerShootingHandle: function() {
             if(this.player.shootCooldown == 0) {
                 var currentWeapon = this.player.currentWeapon;
+                var currentWeaponSounds = ResourceManager.soundList.Weapons[currentWeapon];
 
                 if (this.player.hasCurrentAmmo()) {
-                    var currentWeaponSounds = ResourceManager.soundList.Weapons[currentWeapon];
+
 
                     if (this.player.isCurrentWeaponMelee()) {
                         var hit = this.player.shoot(this, this.zombies);
@@ -517,9 +518,13 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
                     this.player.shootCooldown = this.player.weapons[this.player.currentWeapon].data.coolDown;
                 }
-                else if (this.player.messageCooldown <= 0) {
-                    Messenger.showMessage(Messenger.outOfAmmo);
-                    this.player.messageCooldown = 100;
+                else {
+                    ResourceManager.playSound(currentWeaponSounds.OutOfAmmo);
+
+                    if (this.player.messageCooldown <= 0) {
+                        Messenger.showMessage(Messenger.outOfAmmo);
+                        this.player.messageCooldown = 100;
+                    }
                 }
             }
         },

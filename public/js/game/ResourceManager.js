@@ -9,13 +9,14 @@ define([
     'utils/LocalStorage'
 ],
 function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStorage) {
+    //TODO: недосинглтон какой-то получился...
 	var ResourceManager = Class.$extend({
         __classvars__: {
             //all textures should have .png format
             texList: ["ground", "zombie", "zombie-pistol", "player-knife", "player-pistol", "player-shotgun", "wall", "brick_wall1", "brick_wall2",
                 "brick_wall3", "brick_wall4", "brick_wall_endless", "chest", "chest-open", "door-open", "door-closed", "door-exit", "button", "button_pressed",
                 "rubbish", "waypoint", "pistol", "pistol-bullet", "shotgun", "shotgun-bullet", "golden-key", "silver-key",
-                "effects/fog", "effects/damage", "zombie_corpse", "golden_apple", "glow"],
+                "effects/fog", "effects/damage", "zombie_corpse", "golden_apple", "glow", "overlay/OverlayBar"],
             soundList: {
                 Click: "click.mp3",
                 BulletHit: "bullet_hit.mp3",
@@ -45,11 +46,13 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStor
                     },
                     pistol: {
                         Draw: "pistol_draw.mp3",
-                        Fire: "pistol_shoot.mp3"
+                        Fire: "pistol_shoot.mp3",
+                        OutOfAmmo: "outOfAmmo.wav"
                     },
                     shotgun: {
                         Draw: "shotgun_draw.mp3",
-                        Fire: "shotgun_shoot.mp3"
+                        Fire: "shotgun_shoot.mp3",
+                        OutOfAmmo: "outOfAmmo.wav"
                     }
                 }
             },
@@ -91,6 +94,10 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStor
                 else
                     this.instance.setOnComplete(onComplete);
 
+                return this.instance;
+            },
+
+            getInstance: function() {
                 return this.instance;
             },
 
@@ -218,6 +225,9 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStor
             if (!spriteSheet) { //if not cached
                 var image = this.images[tex];
 
+                if (_.isUndefined(image))
+                    throw "No such texture: " + tex;
+
                 var data = {
                     images: [image],
                     frames: {
@@ -243,6 +253,9 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStor
                     ImageTiler(image,
                         desiredWidth/image.width,
                         desiredHeight/image.height);
+
+                if (_.isUndefined(image))
+                    throw "No such texture: " + tex;
 
                 var data = {
                     images: [tiledImage],
