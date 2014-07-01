@@ -72,7 +72,7 @@ define([
                 this.setTex(Door.Tex.Open);
             },
 
-            update: function(event, player, zombiesLeft) {
+            update: function(player, zombiesLeft) {
                 if (!this.isClosed()) return;
 
                 var self = this;

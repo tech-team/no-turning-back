@@ -61,15 +61,14 @@ define([
             },
 
 
-            update: function(event) {
+            update: function() {
                 if (this.isReleased()) {
                     this.pressButton();
 
                     if (this._puzzle.isSolved())
                         return null;
 
-                    var status = this._puzzle.update(this.value());
-                    return status;
+                    return this._puzzle.update(this.value());
                 }
                 return null;
             }

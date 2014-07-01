@@ -1,8 +1,7 @@
 define([
 	'classy',
     'collision'
-],
-function(Class, collider) {
+], function(Class, collider) {
 	var GameObject = Class.$extend({
 		__init__: function(dispObj) {
             if (dispObj && !dispObj.data) {

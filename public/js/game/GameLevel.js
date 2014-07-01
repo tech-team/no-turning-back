@@ -366,8 +366,8 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
         useHandle: function() {
             this.chestsOpeningHandle() ||
-            this.buttonsPressingHandle() ||
             this.dropsHandle() ||
+            this.buttonsPressingHandle() ||
             this.doorsOpeningHandle()
         },
 
@@ -378,13 +378,13 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                 ResourceManager.playSound(ResourceManager.soundList.Items[itemObject.type()]);
         },
 
-        chestsOpeningHandle: function(event) {
+        chestsOpeningHandle: function() {
             var nearestChest = this.pickNearestToPlayer(this.chests, function(d) {
                 return d <= this.player.$class.Reach && d <= Chest.ActivationRadius;
             }.bind(this));
 
             if (nearestChest) {
-                nearestChest.update(event, this.player);
+                nearestChest.update(this.player);
 
                 if (nearestChest.isClosed()) {
                     Messenger.showMessage(Messenger.chestLocked, nearestChest.requiresMessage);
@@ -425,14 +425,14 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             }
         },
 
-        doorsOpeningHandle: function(event, targetDoors) {
+        doorsOpeningHandle: function(targetDoors) {
             var self = this;
 
             var removeDoors = false;
 
             var doorUpdater = function(door) {
                 if (door && door.isClosed()) {
-                    door.update(event, self.player, self.zombies.length);
+                    door.update(self.player, self.zombies.length);
 
                     if (door.isClosed()) {
                         Messenger.showMessage(door.requiresMessage);
@@ -474,13 +474,13 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             }
         },
 
-        buttonsPressingHandle: function(event) {
+        buttonsPressingHandle: function() {
             var button = this.pickNearestToPlayer(this.buttons, function(d, button) {
                 return d <= Button.ActivationRadius && button.isReleased();
             });
 
             if (button) {
-                var solved = button.update(event);
+                var solved = button.update();
                 this.redrawGameObject(button);
                 ResourceManager.playSound(ResourceManager.soundList.Click);
 
@@ -488,7 +488,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
                     if (solved) {
                         Messenger.showMessage(Messenger.puzzleSolved);
-                        this.doorsOpeningHandle(event, button._puzzle.targets());
+                        this.doorsOpeningHandle(button._puzzle.targets());
                     } else {
                         Messenger.showMessage(Messenger.puzzleFailed);
                     }

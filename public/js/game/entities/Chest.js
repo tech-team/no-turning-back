@@ -56,7 +56,7 @@ define([
 
 
 
-            update: function(event, player) {
+            update: function(player) {
                 if (!this.isClosed()) return;
 
                 var self = this;
