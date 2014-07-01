@@ -265,10 +265,8 @@ define([
 
                     if (evt.nativeEvent.ctrlKey) {
                         self.selectOneMoreObject(dispObj);
-                        return;
                     }
-
-                    if (!_.contains(self.multiselection, dispObj))
+                    else if (!_.contains(self.multiselection, dispObj))
                         self.selectObject(dispObj);
 
                     var point = dispObj.globalToLocal(evt.stageX + self.mainContainer.x, evt.stageY + self.mainContainer.y);
