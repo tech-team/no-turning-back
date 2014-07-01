@@ -19,7 +19,7 @@ function(Backbone, tmpl, Scoreboard, Player, ViewManager) {
         userField: null,
         scoreField: null,
         sendSubmit: null,
-        loader: null,
+        $loader: null,
         errorField: null,
 
         initialize: function () {
@@ -38,7 +38,7 @@ function(Backbone, tmpl, Scoreboard, Player, ViewManager) {
             this.userField = this.$el.find('input#user');
             this.scoreField = this.$el.find('input#score');
             this.sendSubmit = this.$el.find('input#sendSubmit');
-            this.loader = this.$el.find('.score-content__loading-indicator');
+            this.$loader = this.$el.find('.score-content__loading-indicator');
             this.errorField = this.$el.find('.error_message');
 
             this.bindEvents();
@@ -123,13 +123,13 @@ function(Backbone, tmpl, Scoreboard, Player, ViewManager) {
         blockForm: function() {
             this.userField.prop('disabled', true);
             this.sendSubmit.prop('disabled', true);
-            this.loader.show();
+            this.$loader.show();
         },
 
         unblockForm: function() {
             this.userField.prop('disabled', false);
             this.sendSubmit.prop('disabled', false);
-            this.loader.hide();
+            this.$loader.hide();
         },
 
         reconfigureSendToSave: function() {

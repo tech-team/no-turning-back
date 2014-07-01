@@ -10,7 +10,7 @@ function retrieveScores(db, limit, callbacks) {
         options['limit'] = limit;
     }
 
-    return db.scores.find({}, options).toArray(function(err, objs) {
+    return db.scores.find({}, {_id: 0}, options).toArray(function(err, objs) {
         if (!err) {
             callbacks.success(objs);
         } else {
@@ -37,7 +37,10 @@ var scoresRoute = function(db) {
         getFull: function (req, res) {
             retrieveScores(db, req.query.limit, {
                 success: function(s) {
-                    res.end(JSON.stringify(s));
+                    setTimeout(function() {
+                        res.end(JSON.stringify(s));
+                    }, 1000);
+
                 },
                 error: function(err) {
                     res.status(503).end(err);

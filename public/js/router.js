@@ -21,20 +21,24 @@ function(Backbone, ViewManager, MainView, ScoreboardView, GameView, EditorView) 
             ViewManager.addView(EditorView);
         },
 
-        defaultActions: function () {            
-            MainView.show();
+        defaultActions: function () {
+            ViewManager.show(MainView);
+//            MainView.show();
         },
 
         scoreboardAction: function () {
-            ScoreboardView.show();
+            ViewManager.show(ScoreboardView);
+//            ScoreboardView.show();
         },
 
         gameAction: function () {
-            GameView.show();
+            ViewManager.show(GameView);
+//            GameView.show();
         },
 
         editorAction: function () {
-            EditorView.show();
+            ViewManager.show(EditorView);
+//            EditorView.show();
         }
     });
 

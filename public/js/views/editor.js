@@ -30,11 +30,11 @@ function(Backbone, tmpl, Game, Message) {
             this.$el.html(this.template());
             this.$el.attr('id', this.pageId.slice(1));
 
-            this.$backButton = this.$el.find('.back-button');
+            this.$backButton = this.$('.back-button');
 
-            this.canvas = this.$el.find('#editor-field')[0];
-            this.scene = this.$el.find('#editor-scene');
-            this.sidebar = this.$el.find('#editor-sidebar');
+            this.canvas = this.$('#editor-field')[0];
+            this.scene = this.$('#editor-scene');
+            this.sidebar = this.$('#editor-sidebar');
 
             this.messenger = new Message(this.$el);
 

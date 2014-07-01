@@ -24,6 +24,10 @@ function(Backbone) {
 
         addToDOM: function(viewId) {
             this.$el.append(this.views[viewId].$el);
+        },
+
+        show: function(viewToShow) {
+            viewToShow.show();
         }
 
     });

@@ -119,22 +119,22 @@ function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             this.$el.html(this.template());
             this.$el.attr('id', this.pageId.slice(1));
 
-            this.canvas = this.$el.find('#game-field')[0];
-            this.scene = this.$el.find('#scene');
-            this.guid = this.$el.find('#token');
+            this.canvas = this.$('#game-field')[0];
+            this.scene = this.$('#scene');
+            this.guid = this.$('#token');
 
-            this.$backButton = this.$el.find('.back-button');
+            this.$backButton = this.$('.back-button');
 
-            this.$pauseButton = this.$el.find('.pause-icon');
+            this.$pauseButton = this.$('.pause-icon');
             this.$pauseIconPause = this.$pauseButton.find('.game-icon__pause');
             this.$pauseIconPlay = this.$pauseButton.find('.game-icon__play');
 
-            this.$mobileIcon = this.$el.find('.mobile-icon');
-            this.$mobileConnect = this.$el.find('.mobile-connect');
-            this.$mobileToken = this.$el.find('.mobile-connect__token');
+            this.$mobileIcon = this.$('.mobile-icon');
+            this.$mobileConnect = this.$('.mobile-connect');
+            this.$mobileToken = this.$('.mobile-connect__token');
 
-            this.$closeButton = this.$el.find('.reconnect-button');
-            this.$loadingIndicator = this.$el.find('.loading-indicator');
+            this.$closeButton = this.$('.reconnect-button');
+            this.$loadingIndicator = this.$('.loading-indicator');
 
             this.createEvents();
             this.messenger = new Message(this.$el);
