@@ -6,7 +6,10 @@ define([
     function(Class, _, easeljs) {
         var StageManager = Class.$extend({
             __classvars__: {
-
+                BringDirection: {
+                    Front: 0,
+                    Back: 1
+                }
             },
 
             __init__: function(stage, resourceManager) {
@@ -106,11 +109,11 @@ define([
             },
 
             bringToFront: function(dispObj) {
-                this.bringTo(dispObj, "front");
+                this.bringTo(dispObj, StageManager.BringDirection.Front);
             },
 
             bringToBack: function(dispObj) {
-                this.bringTo(dispObj, "back");
+                this.bringTo(dispObj, StageManager.BringDirection.Back);
             },
 
             bringTo: function(dispObj, to) {
@@ -125,13 +128,13 @@ define([
                     return;
 
                 var id = 0;
-                if (to === "front")
+                if (to === StageManager.BringDirection.Front)
                     id = collection.indexOf(dispObj.data);
                 collection.move(id, collection.length - 1);
 
-                var container = this.level.containers[dispObj.data.type];
+                var container = this.containers[dispObj.data.type];
 
-                if (to === "front") {
+                if (to === StageManager.BringDirection.Front) {
                     var childrenCount = container.getNumChildren();
                     container.setChildIndex(dispObj, childrenCount - 1);
                 }

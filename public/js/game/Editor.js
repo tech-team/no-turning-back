@@ -326,7 +326,7 @@ define([
                 });
 
                 dispObj.on("dblclick", function(evt) {
-                    self.duplicateObject(self.selectedObject);
+                    self.duplicateObjects();
                 });
             },
 
