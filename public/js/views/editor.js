@@ -10,10 +10,8 @@ function(BaseView, tmpl, Game, Message) {
         template: tmpl,
         tagName: 'section',
         className: 'page',
-        pageId: '#editorPage',
+        pageId: '#editor',
         hidden: true,
-
-        $backButton: null,
         
         canvas: null,
         scene: null,
@@ -30,8 +28,6 @@ function(BaseView, tmpl, Game, Message) {
             this.$el.html(this.template());
             this.$el.attr('id', this.pageId.slice(1));
 
-            this.$backButton = this.$('.back-button');
-
             this.canvas = this.$('#editor-field')[0];
             this.scene = this.$('#editor-scene');
             this.sidebar = this.$('#editor-sidebar');
@@ -44,36 +40,40 @@ function(BaseView, tmpl, Game, Message) {
             return this;
         },
 
-        createEvents: function() {
-            var self = this;
+        confirm: function(callbacks) {
+            callbacks = this._getConfirmCallbacks(callbacks);
 
-            this.$backButton.on('click', function(event) {
-                var controls = [
-                    {
-                        name: "Yes",
-                        action: function(event) {
-                            window.location = self.$backButton.attr('href');
-                        }
-                    },
-                    {
-                        name: "No",
-                        action: function(event) {
-                            self.messenger.hideMessage();
-                        }
+            var self = this;
+            var controls = [
+                {
+                    name: "Yes",
+                    action: function(event) {
+                        callbacks.yes();
                     }
-                ];
-                self.messenger.showMessage("Do you really want to close this page?", true, null, controls);
-                return false;
-            });
+                },
+                {
+                    name: "No",
+                    action: function(event) {
+                        self.messenger.hideMessage();
+
+                        callbacks.no();
+                    }
+                }
+            ];
+            self.messenger.showMessage("Do you really want to close this page?", true, null, controls);
+        },
+
+        createEvents: function() {
+
         },
 
         show: function () {
             this.$el.show();
             this.hidden = false;
-            $.event.trigger({
-                type: "showPageEvent",
-                pageId: this.pageId
-            });
+//            $.event.trigger({
+//                type: "showPageEvent",
+//                pageId: this.pageId
+//            });
             this.runGame();
         },
 
@@ -115,17 +115,17 @@ function(BaseView, tmpl, Game, Message) {
                 self.scene.css(cssSizes);
                 self.sidebar.height(height);
 
-                var level = $('.editor-sidebar__level');
-                var object = $('.editor-sidebar__object');
-                var palette = $('.editor-sidebar__palette');
+                var level = self.$('.editor-sidebar__level');
+                var object = self.$('.editor-sidebar__object');
+                var palette = self.$('.editor-sidebar__palette');
                 object.height(
                     self.sidebar.height()
                     - level.height()
                     - palette.height()
                     - 18); //todo: everybody like magic
 
-                if (this.game)
-                    this.game.resize();
+                if (self.game)
+                    self.game.resize();
             });
             $(window).resize();
         }

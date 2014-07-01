@@ -22,10 +22,10 @@ function(BaseView, tmpl) {
         },
         
         show: function () {
-            $.event.trigger({
-                type: "showPageEvent",
-                pageId: this.pageId
-            });
+//            $.event.trigger({
+//                type: "showPageEvent",
+//                pageId: this.pageId
+//            });
             this.$el.show();
             this.hidden = false;
         },

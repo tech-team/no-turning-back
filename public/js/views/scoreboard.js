@@ -56,10 +56,10 @@ function(BaseView, ScoresCollection, tmpl, tableTmpl) {
             this.render();
             this.$el.show();
 
-            $.event.trigger({
-                type: "showPageEvent",
-                pageId: this.pageId
-            });
+//            $.event.trigger({
+//                type: "showPageEvent",
+//                pageId: this.pageId
+//            });
 
             ScoresCollection.getData(this.scoresMaxCount);
             this.hidden = false;

@@ -14,15 +14,13 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
         template: tmpl,
         tagName: 'section',
         className: 'page',
-        pageId: '#gamePage',
+        pageId: '#game',
         hidden: true,
 
         canvas: null,
         scene: null,
         game: null,
         guid: null,
-
-        $backButton: null,
 
         $pauseButton: null,
         $pauseIconPause: null,
@@ -123,8 +121,6 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             this.scene = this.$('#scene');
             this.guid = this.$('#token');
 
-            this.$backButton = this.$('.back-button');
-
             this.$pauseButton = this.$('.pause-icon');
             this.$pauseIconPause = this.$pauseButton.find('.game-icon__pause');
             this.$pauseIconPlay = this.$pauseButton.find('.game-icon__play');
@@ -143,34 +139,37 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             return this;
         },
 
+        confirm: function(callbacks) {
+            callbacks = this._getConfirmCallbacks(callbacks);
+
+            if (!this.gamePaused)
+                this._pauseGame();
+
+            var self = this;
+            var controls = [
+                {
+                    name: "Yes",
+                    action: function(event) {
+                        callbacks.yes();
+                    }
+                },
+                {
+                    name: "No",
+                    action: function(event) {
+                        if (self.gamePaused)
+                            self._resumeGame();
+
+                        self.messenger.hideMessage();
+
+                        callbacks.no();
+                    }
+                }
+            ];
+            this.messenger.showMessage("Do you really want to close this page?", true, null, controls);
+        },
+
         createEvents: function() {
             var self = this;
-
-            this.$backButton.on('click', function(event) {
-                if (!self.gamePaused)
-                    self._pauseGame();
-
-                var controls = [
-                    {
-                        name: "Yes",
-                        action: function(event) {
-                            window.location = self.$backButton.attr('href');
-                        }
-                    },
-                    {
-                        name: "No",
-                        action: function(event) {
-                            if (self.gamePaused)
-                                self._resumeGame();
-
-                            self.messenger.hideMessage();
-                        }
-                    }
-                ];
-                self.messenger.showMessage("Do you really want to close this page?", true, null, controls);
-                return false;
-            });
-
 
             this.$mobileIcon.on('mousemove', function() {
                 CssUtils.showBlackOnWhite(self.$mobileIcon);
@@ -211,11 +210,10 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
         show: function () {
             this.$el.show();
             this.hidden = false;
-            this.backPermitted = false;
-            $.event.trigger({
-                type: "showPageEvent",
-                pageId: this.pageId
-            });
+//            $.event.trigger({
+//                type: "showPageEvent",
+//                pageId: this.pageId
+//            });
             this.browserSupport();
             this.runGame();
         },
