@@ -22,8 +22,6 @@ function($, Class, msgTmpl) {
 
         _findElements: function(parent) {
             this.$message = parent.find('.message');
-            this.$messageTextbox = this.$message.find('.message__textbox');
-            this.$messageText = this.$messageTextbox.find('.message__textbox__text');
             this.$messageControls = this.$message.find('.message__controls');
 
             this.$messageDimmer = parent.find('.message-dimmer');
@@ -109,7 +107,7 @@ function($, Class, msgTmpl) {
                 message: messageText
             };
             this.$msgContainer = $(this.msgTemplate(data));
-            this._findElements(this.$msgContainer);
+            this._addToDOM();
 
             if (controls) {
                 this._createControls(controls);
@@ -121,7 +119,7 @@ function($, Class, msgTmpl) {
                 this._offMessageEvents();
             else
                 this._onMessageEvents(callbackOnClose);
-            this._addToDOM();
+
             this.$messageDimmer.show();
             this.$message.show();
 
