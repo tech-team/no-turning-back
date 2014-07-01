@@ -303,7 +303,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
         addItemToStage: function(){
             var dispObj = this.addToStage.apply(this, arguments);
-            dispObj.shadow = new easeljs.Shadow("#000000", 2, 2, 2);
+            dispObj.shadow = new easeljs.Shadow("#333333", 1, 1, 5);
 
             return dispObj;
         },
