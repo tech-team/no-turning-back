@@ -40,6 +40,32 @@ define([
             return this.dispObj.rotation;
         },
 
+        type: function() {
+            return this.dispObj.data.type;
+        },
+
+        tex: function() {
+            return this.dispObj.data.tex;
+        },
+
+        setTex: function(newTex) {
+            this.dispObj.data.tex = newTex;
+        },
+
+        name: function() {
+            return this.dispObj.data.name;
+        },
+
+        w: function() {
+            return this.dispObj.data.w;
+        },
+
+        h: function(newTex) {
+            return this.dispObj.data.h;
+        },
+
+
+
         collidesWith: function(otherObj) {
             var obj = otherObj.dispObj || otherObj;
             return collider.checkPixelCollision(this.dispObj, obj);

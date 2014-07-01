@@ -39,14 +39,6 @@ define([
                 this.dispObj.data.state = newState;
             },
 
-            tex: function() {
-                return this.dispObj.data.tex;
-            },
-
-            setTex: function(newTex) {
-                this.dispObj.data.tex = newTex;
-            },
-
             value: function() {
                 return this.dispObj.data.value;
             },

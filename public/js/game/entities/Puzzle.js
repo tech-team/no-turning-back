@@ -8,7 +8,7 @@ define([
             this.inputCode = "";
             this.targetDoors = [];
             _.each(doors, function(door) {
-                if (door.puzzleName() && door.puzzleName() == this.puzzleName() && door.isClosed()) {
+                if (door.puzzleName() && door.puzzleName() == this.name() && door.isClosed()) {
                     this.targetDoors.push(door);
                 }
             }.bind(this));
@@ -37,10 +37,6 @@ define([
 
         addButton: function(buttonObject) {
             this.buttonsObjects.push(buttonObject);
-        },
-
-        puzzleName: function() {
-            return this._rawData().puzzleName;
         },
 
         code: function() {

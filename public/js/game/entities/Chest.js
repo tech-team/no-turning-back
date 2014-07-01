@@ -46,15 +46,6 @@ define([
                 return this.dispObj.data.requires;
             },
 
-            tex: function() {
-                return this.dispObj.data.tex;
-            },
-
-            setTex: function(newTex) {
-                this.dispObj.data.tex = newTex;
-            },
-
-
 
             update: function(player) {
                 if (!this.isClosed()) return;

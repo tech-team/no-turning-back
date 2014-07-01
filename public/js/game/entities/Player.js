@@ -109,12 +109,8 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
             this.dispObj.data.keys = [];
         },
 
-        tex: function() {
-            return this.dispObj.data.tex;
-        },
-
         changeTexture: function(weapon) {
-            this.dispObj.data.tex = this.$class.weaponSpecificTex(weapon);
+            this.setTex(this.$class.weaponSpecificTex(weapon));
             return this.tex();
         },
 
