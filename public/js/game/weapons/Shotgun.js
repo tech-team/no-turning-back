@@ -16,7 +16,7 @@ define([
                 type: "bullet",
                 power: this.data.power,
                 tex: "shotgun-bullet",
-                ttl: 8
+                ttl: this.data.ttl
             };
 
             for (var i = 0; i < this.data.bulletNum; ++i) {

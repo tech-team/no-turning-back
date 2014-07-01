@@ -66,14 +66,14 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStor
                 },
                 pistol: {
                     power: 10,
-                    coolDown: 30
+                    coolDown: 20
                 },
                 shotgun: {
                     power: 20,
-                    coolDown: 60,
+                    coolDown: 40,
                     bulletNum: 5,
                     dispersion: 10,
-                    ttl: 8
+                    ttl: 20
                 },
                 drawCooldown: 25
             },
