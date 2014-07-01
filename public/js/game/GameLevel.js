@@ -100,7 +100,8 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                 Sprint: 1.5
             },
 
-            CameraOffset: 200
+            CameraOffset: 200,
+            DropRadius: 30
         },
 
         createEvents: function() {
@@ -231,6 +232,8 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                 });
             }
 
+            //TODO: add items via addItemToStage()
+
             //add player
             data.player.tex = this.player.$class.weaponSpecificTex(this.player.currentWeapon);
             var playerObj = this.addToStage(data.player);
@@ -296,6 +299,13 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.mainContainer.x = 0;
             this.mainContainer.y = 0;
             this.updateCamera();
+        },
+
+        addItemToStage: function(){
+            var dispObj = this.addToStage.apply(this, arguments);
+            dispObj.shadow = new easeljs.Shadow("#000000", 2, 2, 2);
+
+            return dispObj;
         },
 
         addToCollisionObjects: function(dispObj) {
@@ -670,11 +680,11 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                     }
 
                     this.zombies[i].drops().forEach(function(dropped) {
-                        dropped.x = self.zombies[i].x();
-                        dropped.y = self.zombies[i].y();
+                        dropped.x = self.zombies[i].x() + _.random(-GameLevel.DropRadius, GameLevel.DropRadius);
+                        dropped.y = self.zombies[i].y() + _.random(-GameLevel.DropRadius, GameLevel.DropRadius);
 
                         var drop = DefaultObjects.build(dropped.type, dropped);
-                        self.drops.push(self.addToStage(drop))
+                        self.drops.push(self.addItemToStage(drop))
                     });
 
                     this.zombies.splice(i, 1);
