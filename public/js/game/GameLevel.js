@@ -15,11 +15,10 @@ define([
     'game/entities/Door',
     'game/entities/Button',
     'game/entities/Puzzle',
-    'game/entities/Bullet',
     'game/misc/Vector',
     'game/Overlay'
 ],
-function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjects, KeyCoder, UntilTimer, Messenger, Items, Zombie, Chest, Door, Button, Puzzle, Bullet, Vector, Overlay) {
+function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjects, KeyCoder, UntilTimer, Messenger, Items, Zombie, Chest, Door, Button, Puzzle, Vector, Overlay) {
     var GameLevel = StageManager.$extend({
 		__init__: function(stage, levelData, player, resourceManager) {
             this.$super(stage, resourceManager);
@@ -66,10 +65,14 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                 ToggleSound: KeyCoder.M,
                 Use: KeyCoder.E,
                 Shoot: KeyCoder.SPACE,
-                Forward: KeyCoder.W,
-                Back: KeyCoder.S,
-                Left: KeyCoder.A,
-                Right: KeyCoder.D,
+
+                Movement: {
+                    Forward: KeyCoder.W,
+                    Back: KeyCoder.S,
+                    Left: KeyCoder.A,
+                    Right: KeyCoder.D,
+                    Boost: KeyCoder.SHIFT
+                },
 
                 Weapon: {
                     knife: KeyCoder.ONE,
@@ -77,9 +80,13 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                     shotgun: KeyCoder.THREE
                 },
 
-                Hack: {
+                Debug: {
                     Finish: KeyCoder.X,
-                    GearUp: KeyCoder.G
+                    GearUp: KeyCoder.G,
+                    ShowKeys: KeyCoder.K,
+                    ShowWeapons: KeyCoder.O,
+                    ShowInventory: KeyCoder.I,
+                    Fog: KeyCoder.F
                 }
             },
 
@@ -126,25 +133,26 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.keyCoder.addEventListener("keypress", GameLevel.Keys.Shoot, this.playerShootingHandle.bind(this));
 
             if (DEBUG) {
-                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.Finish, this.finish.bind(this));
+                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Debug.Finish, this.finish.bind(this));
 
-                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Hack.GearUp, function () {
+                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Debug.GearUp, function () {
+                    self.player._setHealth(100);
                     self.player.addWeapon("shotgun", 200);
                 });
 
-                this.keyCoder.addEventListener("keyup", KeyCoder.K, function () {
+                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Debug.ShowKeys, function () {
                     console.log(self.player.keys());
                 });
 
-                this.keyCoder.addEventListener("keyup", KeyCoder.I, function () {
+                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Debug.ShowInventory, function () {
                     console.log(self.player.inventory());
                 });
 
-                this.keyCoder.addEventListener("keyup", KeyCoder.O, function () {
+                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Debug.ShowWeapons, function () {
                     console.log(self.player.weapons);
                 });
 
-                this.keyCoder.addEventListener("keyup", KeyCoder.F, function () {
+                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Debug.Fog, function () {
                     self.effects.fogBox.visible = !self.effects.fogBox.visible;
                     self.effects.fog.visible = !self.effects.fog.visible;
                 });
@@ -227,6 +235,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             var playerObj = this.addToStage(data.player);
 
             this.player.setDispObj(playerObj);
+            this.player.setMovementKeys(GameLevel.Keys.Movement);
 
             //add effects
             this.createContainer("effect", true);

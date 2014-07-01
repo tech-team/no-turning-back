@@ -3,10 +3,9 @@ define([
     'signals',
     'game/ResourceManager',
     'game/misc/UntilTimer',
-    'game/misc/KeyCoder',
     'game/weapons/Weapons'
 ],
-function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
+function(AliveObject, signals, ResourceManager, UntilTimer, Weapons) {
 	var Player = AliveObject.$extend({
 		__init__: function(dispObj) {
             this.$super(dispObj);
@@ -37,7 +36,9 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
 
             Reach: 50,
             MaxHealth: 100,
-            OverSaturationHealthDecrease: 0.1
+            OverSaturationHealthDecrease: 0.1,
+
+            Movement: null
         },
 
         createEvents: function() {
@@ -175,6 +176,10 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
             return shot;
         },
 
+        setMovementKeys: function(keys) {
+            this.$class.Movement = keys;
+        },
+
 		update: function(event, collisionObjects) {
             if (this.shootCooldown > 0) {
                 --this.shootCooldown;
@@ -198,8 +203,8 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
             var i = 0;
 
 
-            if (event.keys[KeyCoder.W]) {
-                if (event.keys[KeyCoder.SHIFT]) { speedModifier = 4; }
+            if (event.keys[Player.Movement.Forward]) {
+                if (event.keys[Player.Movement.Boost]) { speedModifier = 4; }
                 offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.dispObj.rotation);
                 offsetY = speedModifier * Math.sin( (Math.PI / 180) * this.dispObj.rotation);
                 this.dispObj.x += offsetX;
@@ -214,7 +219,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
                         }
                     }
                 }
-                if (event.keys[KeyCoder.D]) {
+                if (event.keys[Player.Movement.Right]) {
                     this.dispObj.rotation += offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {
                         if (this.collidesWith(collisionObjects[i])) {
@@ -223,7 +228,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
                         }
                     }
                 }
-                if (event.keys[KeyCoder.A]) {
+                if (event.keys[Player.Movement.Left]) {
                     this.dispObj.rotation -= offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {
                         if (this.collidesWith(collisionObjects[i])) {
@@ -232,7 +237,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
                     }
                 }
             }
-            if (event.keys[KeyCoder.S]) {
+            if (event.keys[Player.Movement.Back]) {
                 offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.dispObj.rotation);
                 offsetY = speedModifier * Math.sin( (Math.PI / 180) * this.dispObj.rotation);
                 this.dispObj.x -= offsetX;
@@ -247,7 +252,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
                         }
                     }
                 }
-                if (event.keys[KeyCoder.D]) {
+                if (event.keys[Player.Movement.Right]) {
                     this.dispObj.rotation -= offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {
                         if (this.collidesWith(collisionObjects[i])) {
@@ -256,7 +261,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
                         }
                     }
                 }
-                if (event.keys[KeyCoder.A]) {
+                if (event.keys[Player.Movement.Left]) {
                     this.dispObj.rotation += offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {
                         if (this.collidesWith(collisionObjects[i])) {
@@ -266,8 +271,8 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
                 }
             }
 
-            if (!(event.keys[KeyCoder.W] || event.keys[KeyCoder.S])) {
-                if (event.keys[KeyCoder.D]) {
+            if (!(event.keys[Player.Movement.Forward] || event.keys[Player.Movement.Back])) {
+                if (event.keys[Player.Movement.Right]) {
                     offsetRotation *= 2;
                     this.dispObj.rotation += offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {
@@ -277,7 +282,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, KeyCoder, Weapons) {
                         }
                     }
                 }
-                if (event.keys[KeyCoder.A]) {
+                if (event.keys[Player.Movement.Left]) {
                     offsetRotation *= 2;
                     this.dispObj.rotation -= offsetRotation;
                     for (i = 0; i < collisionObjects.length; ++i) {

@@ -60,7 +60,7 @@ define([
             return this.dispObj.data.w;
         },
 
-        h: function(newTex) {
+        h: function() {
             return this.dispObj.data.h;
         },
 
