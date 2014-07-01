@@ -9,7 +9,7 @@ define([
                 this.$super(dispObj);
 
                 this.requiresMessage = null;
-                this.inputCode = ""; // TODO: need to do smth with this...
+                this.puzzleSolvedStatus = false;
             },
 
             __classvars__: {
@@ -54,12 +54,16 @@ define([
                 return this.dispObj.data.role;
             },
 
-            puzzle: function() {
-                return this.dispObj.data.puzzle;
+            puzzleName: function() {
+                return this.dispObj.data.puzzleName;
             },
 
-            puzzleSolved: function() {
-                return this.inputCode == this.puzzle().code;
+            setPuzzleSolved: function() {
+                this.puzzleSolvedStatus = true;
+            },
+
+            isPuzzleSolved: function() {
+                return this.puzzleSolvedStatus;
             },
 
 
@@ -81,7 +85,7 @@ define([
                                 self.requiresMessage = Messenger.doorLockedKillAll;
                         }
                         else if(requirement === "puzzle") {
-                            if (!self.puzzleSolved()) {
+                            if (!self.isPuzzleSolved()) {
                                 self.requiresMessage = Messenger.doorLockedPuzzle;
                             }
                         }

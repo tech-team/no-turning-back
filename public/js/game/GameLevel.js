@@ -14,11 +14,12 @@ define([
     'game/entities/Chest',
     'game/entities/Door',
     'game/entities/Button',
+    'game/entities/Puzzle',
     'game/entities/Bullet',
     'game/misc/Vector',
     'game/Overlay'
 ],
-function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjects, KeyCoder, UntilTimer, Messenger, Items, Zombie, Chest, Door, Button, Bullet, Vector, Overlay) {
+function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjects, KeyCoder, UntilTimer, Messenger, Items, Zombie, Chest, Door, Button, Puzzle, Bullet, Vector, Overlay) {
     var GameLevel = StageManager.$extend({
 		__init__: function(stage, levelData, player, resourceManager) {
             this.$super(stage, resourceManager);
@@ -37,6 +38,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.walls = [];
             this.doors = [];
             this.chests = [];
+            this.puzzles = [];
             this.buttons = [];
             this.zombies = [];
             this.bullets = [];
@@ -188,9 +190,23 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             });
 
             //add buttons
-            _.each(data.buttons, function(obj) {
-                var button = new Button(self.addToStage(obj), self.doors);
-                self.buttons.push(button);
+//            _.each(data.buttons, function(obj) {
+//                var button = new Button(self.addToStage(obj), self.doors);
+//                self.buttons.push(button);
+//            });
+
+            //add puzzles
+            _.each(data.puzzles, function(obj) {
+                var puzzle = new Puzzle(obj, self.doors);
+
+                //add buttons
+                _.each(puzzle._buttons(), function(obj) {
+                    var button = new Button(self.addToStage(obj), puzzle);
+                    puzzle.addButton(button);
+                    self.buttons.push(button);
+                });
+
+                self.puzzles.push(puzzle);
             });
 
             //add enemies
@@ -458,38 +474,38 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             }
         },
 
-        // TODO: make puzzle a separate object in level
         buttonsPressingHandle: function(event) {
-            var self = this;
-
             var button = this.pickNearestToPlayer(this.buttons, function(d, button) {
                 return d <= Button.ActivationRadius && button.isReleased();
             });
 
             if (button) {
                 var solved = button.update(event);
-                self.redrawGameObject(button);
+                this.redrawGameObject(button);
                 ResourceManager.playSound(ResourceManager.soundList.Click);
 
                 if (solved !== null) {
 
                     if (solved) {
                         Messenger.showMessage(Messenger.puzzleSolved);
-                        this.doorsOpeningHandle(event, button.targets());
+                        this.doorsOpeningHandle(event, button._puzzle.targets());
                     } else {
                         Messenger.showMessage(Messenger.puzzleFailed);
                     }
-
                 }
 
                 if (button.isPressed()) {
                     setTimeout(function () {
                         button.releaseButton();
                         ResourceManager.playSound(ResourceManager.soundList.Click);
-                        self.redrawGameObject(button);
-                    }, 1500);
+                        this.redrawGameObject(button);
+                    }.bind(this), 1500);
                 }
+
+                return true;
             }
+
+            return false;
         },
 
         /****************************** Weapons Handlers ******************************/

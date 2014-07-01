@@ -4,16 +4,10 @@ define([
 ],
     function(_, GameObject) {
         var Button = GameObject.$extend({
-            __init__: function(dispObj, doors) {
+            __init__: function(dispObj, puzzle) {
                 this.$super(dispObj);
 
-                this.targetDoors = [];
-                _.each(doors, function(door) {
-                    if (door.puzzle() && door.puzzle().name == this.puzzle() && door.isClosed()) {
-                        this.targetDoors.push(door);
-                    }
-                }.bind(this));
-
+                this._puzzle = puzzle;
                 this.puzzleSolvedStatus = null;
             },
 
@@ -27,10 +21,6 @@ define([
                     Released: "button"
                 },
                 ActivationRadius: 30
-            },
-
-            targets: function() {
-                return this.targetDoors;
             },
 
             state: function() {
@@ -61,10 +51,6 @@ define([
                 return this.dispObj.data.value;
             },
 
-            puzzle: function() {
-                return this.dispObj.data.puzzle;
-            },
-
             pressButton: function() {
                 this.setState(Button.State.Pressed);
                 this.setTex(Button.Tex.Pressed);
@@ -79,23 +65,11 @@ define([
                 if (this.isReleased()) {
                     this.pressButton();
 
-                    if (this.puzzleSolvedStatus === true)
+                    if (this._puzzle.isSolved())
                         return null;
 
-                    var self = this;
-                    _.each(this.targetDoors, function(door) {
-                        door.inputCode += self.value();
-                        if (door.inputCode.length >= door.puzzle().code.length) {
-                            if (door.puzzleSolved()) {
-                                self.puzzleSolvedStatus = true;
-                            } else {
-                                self.puzzleSolvedStatus = false;
-                                door.inputCode = "";
-                            }
-
-                        }
-                    });
-                    return self.puzzleSolvedStatus;
+                    var status = this._puzzle.update(this.value());
+                    return status;
                 }
                 return null;
             }

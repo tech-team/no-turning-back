@@ -36,7 +36,8 @@ define([
                     walls: [],
                     doors: [],
                     chests: [],
-                    decorations: []
+                    decorations: [],
+                    puzzles: []
                 },
 
                 player: {
@@ -60,7 +61,7 @@ define([
                 },
 
                 door: {
-                    puzzle: "",
+                    puzzleName: "",
                     role: "",
                     state: "closed",
                     requires: []
@@ -72,8 +73,13 @@ define([
                     storage: []
                 },
 
+                puzzle: {
+                    puzzleName: "",
+                    code: "",
+                    buttons: []
+                },
+
                 button: {
-                    puzzle: "",
                     value: "",
                     state: "released"
                 },

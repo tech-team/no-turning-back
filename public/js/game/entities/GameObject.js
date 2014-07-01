@@ -5,7 +5,13 @@ define([
 function(Class, collider) {
 	var GameObject = Class.$extend({
 		__init__: function(dispObj) {
-			this.dispObj = dispObj;
+            if (dispObj && !dispObj.data) {
+                this.dispObj = {
+                                data: dispObj
+                               };
+            } else {
+                this.dispObj = dispObj;
+            }
 		},
 
         _rawData: function() {
@@ -13,9 +19,9 @@ function(Class, collider) {
         },
 
         data: function() {
-            this.dispObj.data.x = this.dispObj.x;
-            this.dispObj.data.y = this.dispObj.y;
-            this.dispObj.data.r = this.dispObj.rotation;
+            this.dispObj.data.x = this.dispObj.x || null;
+            this.dispObj.data.y = this.dispObj.y || null;
+            this.dispObj.data.r = this.dispObj.rotation || null;
             return this.dispObj.data;
         },
 
