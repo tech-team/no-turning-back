@@ -48,12 +48,11 @@ define([
                     objData.type = objData.data.type;
 
                 if (!_.isUndefined(id))
-                    alert("Do you really need id?");
+                    throw "addToStage: Do you really need id?";
 
-                //TODO: fix undefined type issue
                 if (_.isUndefined(objData.type)) {
                     console.log(objData);
-                    alert("objData.type should be specified!");
+                    throw "addToStage: objData.type should be specified!";
                 }
 
                 var spriteSheet =
@@ -61,11 +60,9 @@ define([
 
                 var sprite = new easeljs.Sprite(spriteSheet);
 
-                if (_.isUndefined(this.containers[objData.type])) {
-                    var container = new createjs.Container();
-                    this.containers[objData.type] = container;
-                    this.mainContainer.addChild(container);
-                }
+                if (_.isUndefined(this.containers[objData.type]))
+                    this.createContainer(objData.type);
+
                 var addTo = this.containers[objData.type];
 
                 var dispObj = null;
@@ -84,6 +81,23 @@ define([
                 dispObj.data = objData;
 
                 return dispObj;
+            },
+
+            //(x, y, type, ...)
+            //ex: this.addPoint({x: 100, y: 200, type: "i'm a point"});
+            addPoint: function(objData) {
+                if (_.isUndefined(objData.type))
+                    throw "addPoint: type is undefined";
+
+                var point = new createjs.Shape();
+                point.x = objData.x;
+                point.y = objData.y;
+                point.data = objData;
+
+                if (_.isUndefined(this.containers[objData.type]))
+                    this.createContainer(objData.type);
+
+                return this.containers[objData.type].addChild(point);
             },
 
             removeFromStage: function(dispObj) {
