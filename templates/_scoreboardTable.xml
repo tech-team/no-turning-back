@@ -1,0 +1,32 @@
+<fest:template xmlns:fest="http://fest.mail.ru"
+               context_name="json">
+    <fest:if test="json.error">
+        <div class="error_message scores-wrapper__error">
+            <fest:value>json.error</fest:value>
+        </div>
+    </fest:if>
+
+    <fest:if test="json.scores.length != 0">
+    <table class="scores">
+        <tr class="scores__row">
+            <th class="scores__header">#</th>
+            <th class="scores__header">Player</th>
+            <th class="scores__header">Score</th>
+        </tr>
+
+        <fest:for iterate="json.scores" index="i" value="score">
+            <tr class="scores__row">
+                <td class="scores__col">
+                    <fest:value>i+1</fest:value>
+                </td>
+                <td class="scores__col">
+                    <fest:value>score.get('name')</fest:value>
+                </td>
+                <td class="scores__col">
+                    <fest:value>score.get('score')</fest:value>
+                </td>
+            </tr>
+        </fest:for>
+    </table>
+    </fest:if>
+</fest:template>

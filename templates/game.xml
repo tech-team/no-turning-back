@@ -6,7 +6,6 @@
             <span class="back-button__caption">Menu</span>
         </a>
         <fest:include context="json" src="./_progress.xml" />
-        <fest:include context="json" src="./_message.xml" />
 
         <canvas id="game-field">You have a very old browser, dude.</canvas>
         <div class="mobile-connect">

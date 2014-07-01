@@ -1,34 +1,54 @@
 define([
-    'backbone',
+    'views/baseView',
+    'collections/scores',
     'tmpl/scoreboard',
-    'collections/scores'
+    'tmpl/_scoreboardTable'
 ], 
-function(Backbone, tmpl, scoresCollection) {
-    var ScoreboardView = Backbone.View.extend({
+function(BaseView, ScoresCollection, tmpl, tableTmpl) {
+    var ScoreboardView = BaseView.extend({
 
         template: tmpl,
+        tableTemplate: tableTmpl,
         tagName: 'section',
         className: 'page',
         pageId: '#scoreboardPage',
         hidden: true,
 
-        loader: null,
+        $scoresTable: null,
+        $loader: null,
+
+        scoresMaxCount: 10,
 
         initialize: function () {
-            this.render();
+            ScoresCollection.on('reset', this.renderSuccess, this);
+            ScoresCollection.on('fetchFailed', this.renderFailed, this);
         },
 
-        render: function (data, error_message) {
+        renderSuccess: function(collection, options) {
+            this.renderTable(collection.models);
+        },
+
+        renderFailed: function(message) {
+            this.renderTable(null, message);
+        },
+
+        render: function () {
+            this.$el.html(this.template());
+            this.$el.attr('id', this.pageId.slice(1));
+            this.$loader = this.$('.scores-wrapper__loading-indicator');
+            this.$scoresTable = this.$('#scoresTable');
+            this.$loader.show();
+            return this;
+        },
+
+        renderTable: function(data, errorMessage) {
             data = data ? data : [];
 
-            this.$el.html(this.template({
-                                            scores: data,
-                                            error: error_message
-                                        }));
-            this.$el.attr('id', this.pageId.slice(1));
-
-            this.loader = this.$el.find('.scores-wrapper__loading-indicator');
- 
+            this.$loader.hide();
+            this.$scoresTable.html(this.tableTemplate({
+                scores: data,
+                error: errorMessage
+            }));
             return this;
         },
 
@@ -36,32 +56,17 @@ function(Backbone, tmpl, scoresCollection) {
             this.render();
             this.$el.show();
 
-            $.event.trigger({
-                type: "showPageEvent",
-                pageId: this.pageId
-            });
+//            $.event.trigger({
+//                type: "showPageEvent",
+//                pageId: this.pageId
+//            });
 
-            var self = this;
-            scoresCollection.retrieve(10,
-                {
-                    before: function() {
-                        self.loader.show();
-                    },
-
-                    success: function() {
-                        self.totalShow();
-                    },
-
-                    fail: function(data) {
-                        self.loader.hide();
-                        self.totalShow(data.message);
-                    }
-                });
+            ScoresCollection.getData(this.scoresMaxCount);
             this.hidden = false;
         },
 
         totalShow: function(error_message) {
-            this.render(scoresCollection.toJSON(), error_message);
+            this.render(ScoresCollection.toJSON(), error_message);
         },
 
         hide: function () {

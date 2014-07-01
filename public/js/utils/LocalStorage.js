@@ -31,7 +31,7 @@ function() {
 
 			if(Object.prototype.toString.call(arr) === '[object Array]') {
 			   arr.push(element);
-			   this.addJSON(keyOfArray, arr);
+			   this.setJSON(keyOfArray, arr);
 			}
 			else {
 				throw "Not an array";
@@ -44,7 +44,7 @@ function() {
 				console.log("Problem loading localstorage value");
 
 			arr.pop();
-			this.addJSON(keyOfArray, arr);
+			this.setJSON(keyOfArray, arr);
 		}
 	};
 

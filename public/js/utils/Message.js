@@ -1,10 +1,14 @@
 define([
     'jquery',
-    'classy'
+    'classy',
+    'tmpl/_message'
 ],
-function($, Class) {
+function($, Class, msgTmpl) {
     var MessageHelper = Class.$extend({
         __init__: function($parent) {
+            this.msgTemplate = msgTmpl;
+            this.$msgContainer = null;
+
             this.$parent = $parent || $(document);
             this.$message = null;
             this.$messageText = null;
@@ -14,17 +18,26 @@ function($, Class) {
 
             this.buttonClass = 'message__controls__button';
             this.buttonHtml = '<div class="' + this.buttonClass +'">{0}</div>';
-
-            this._findElements();
         },
 
-        _findElements: function() {
-            this.$message = this.$parent.find('.message');
-            this.$messageTextbox = this.$message.find('.message__textbox');
-            this.$messageText = this.$messageTextbox.find('.message__textbox__text');
+        _findElements: function(parent) {
+            this.$message = parent.find('.message');
             this.$messageControls = this.$message.find('.message__controls');
 
-            this.$messageDimmer = this.$parent.find('.message-dimmer');
+            this.$messageDimmer = parent.find('.message-dimmer');
+        },
+
+        _addToDOM: function() {
+            this.$parent.append(this.$msgContainer[0]);
+            this.$parent.append(this.$msgContainer[1]);
+            this._findElements(this.$parent);
+        },
+
+        _removeFromDOM: function(keepDimmer) {
+            if (!keepDimmer) {
+                this.$messageDimmer && this.$messageDimmer.remove();
+            }
+            this.$message && this.$message.remove();
         },
 
         _hideControls: function() {
@@ -88,9 +101,13 @@ function($, Class) {
              */
 
             callbackOnClose || (callbackOnClose = function() {});
+            this._removeFromDOM();
 
-            this._hideControls();
-            this._removeControls();
+            var data = {
+                message: messageText
+            };
+            this.$msgContainer = $(this.msgTemplate(data));
+            this._addToDOM();
 
             if (controls) {
                 this._createControls(controls);
@@ -102,9 +119,10 @@ function($, Class) {
                 this._offMessageEvents();
             else
                 this._onMessageEvents(callbackOnClose);
-            this.$messageText.text(messageText);
+
             this.$messageDimmer.show();
             this.$message.show();
+
         },
 
         hideMessage: function(keepDimmer) {
@@ -113,6 +131,7 @@ function($, Class) {
             this._hideControls();
             if (!keepDimmer)
                 this.$messageDimmer.hide();
+            this._removeFromDOM(keepDimmer);
         }
     });
 

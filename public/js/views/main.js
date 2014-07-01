@@ -1,9 +1,9 @@
 define([
-    'backbone',
+    'views/baseView',
     'tmpl/main'
 ], 
-function(Backbone, tmpl) {
-    var MainView = Backbone.View.extend({
+function(BaseView, tmpl) {
+    var MainView = BaseView.extend({
 
         template: tmpl,
         tagName: 'section',
@@ -22,10 +22,10 @@ function(Backbone, tmpl) {
         },
         
         show: function () {
-            $.event.trigger({
-                type: "showPageEvent",
-                pageId: this.pageId
-            });
+//            $.event.trigger({
+//                type: "showPageEvent",
+//                pageId: this.pageId
+//            });
             this.$el.show();
             this.hidden = false;
         },

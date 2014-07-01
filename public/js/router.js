@@ -15,26 +15,27 @@ function(Backbone, ViewManager, MainView, ScoreboardView, GameView, EditorView) 
             '*default': 'defaultActions'
         },
         initialize: function() {
+            ViewManager.setRouter(this);
             ViewManager.addView(MainView);
             ViewManager.addView(ScoreboardView);
             ViewManager.addView(GameView);
             ViewManager.addView(EditorView);
         },
 
-        defaultActions: function () {            
-            MainView.show();
+        defaultActions: function () {
+            ViewManager.show(MainView);
         },
 
         scoreboardAction: function () {
-            ScoreboardView.show();
+            ViewManager.show(ScoreboardView);
         },
 
         gameAction: function () {
-            GameView.show();
+            ViewManager.show(GameView);
         },
 
         editorAction: function () {
-            EditorView.show();
+            ViewManager.show(EditorView);
         }
     });
 

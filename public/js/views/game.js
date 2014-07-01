@@ -1,5 +1,5 @@
 define([
-    'backbone',
+    'views/baseView',
     'utils/BrowserCheck',
     'tmpl/game',
     'game/Game',
@@ -8,21 +8,19 @@ define([
     'game/misc/KeyCoder',
     'utils/Message'
 ], 
-function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Message) {
-    var GameView = Backbone.View.extend({
+function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Message) {
+    var GameView = BaseView.extend({
 
         template: tmpl,
         tagName: 'section',
         className: 'page',
-        pageId: '#gamePage',
+        pageId: '#game',
         hidden: true,
 
         canvas: null,
         scene: null,
         game: null,
         guid: null,
-
-        $backButton: null,
 
         $pauseButton: null,
         $pauseIconPause: null,
@@ -119,22 +117,20 @@ function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             this.$el.html(this.template());
             this.$el.attr('id', this.pageId.slice(1));
 
-            this.canvas = this.$el.find('#game-field')[0];
-            this.scene = this.$el.find('#scene');
-            this.guid = this.$el.find('#token');
+            this.canvas = this.$('#game-field')[0];
+            this.scene = this.$('#scene');
+            this.guid = this.$('#token');
 
-            this.$backButton = this.$el.find('.back-button');
-
-            this.$pauseButton = this.$el.find('.pause-icon');
+            this.$pauseButton = this.$('.pause-icon');
             this.$pauseIconPause = this.$pauseButton.find('.game-icon__pause');
             this.$pauseIconPlay = this.$pauseButton.find('.game-icon__play');
 
-            this.$mobileIcon = this.$el.find('.mobile-icon');
-            this.$mobileConnect = this.$el.find('.mobile-connect');
-            this.$mobileToken = this.$el.find('.mobile-connect__token');
+            this.$mobileIcon = this.$('.mobile-icon');
+            this.$mobileConnect = this.$('.mobile-connect');
+            this.$mobileToken = this.$('.mobile-connect__token');
 
-            this.$closeButton = this.$el.find('.reconnect-button');
-            this.$loadingIndicator = this.$el.find('.loading-indicator');
+            this.$closeButton = this.$('.reconnect-button');
+            this.$loadingIndicator = this.$('.loading-indicator');
 
             this.createEvents();
             this.messenger = new Message(this.$el);
@@ -143,34 +139,37 @@ function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             return this;
         },
 
+        confirm: function(callbacks) {
+            callbacks = this._getConfirmCallbacks(callbacks);
+
+            if (!this.gamePaused)
+                this._pauseGame();
+
+            var self = this;
+            var controls = [
+                {
+                    name: "Yes",
+                    action: function(event) {
+                        callbacks.yes();
+                    }
+                },
+                {
+                    name: "No",
+                    action: function(event) {
+                        if (self.gamePaused)
+                            self._resumeGame();
+
+                        self.messenger.hideMessage();
+
+                        callbacks.no();
+                    }
+                }
+            ];
+            this.messenger.showMessage("Do you really want to close this page?", true, null, controls);
+        },
+
         createEvents: function() {
             var self = this;
-
-            this.$backButton.on('click', function(event) {
-                if (!self.gamePaused)
-                    self._pauseGame();
-
-                var controls = [
-                    {
-                        name: "Yes",
-                        action: function(event) {
-                            window.location = self.$backButton.attr('href');
-                        }
-                    },
-                    {
-                        name: "No",
-                        action: function(event) {
-                            if (self.gamePaused)
-                                self._resumeGame();
-
-                            self.messenger.hideMessage();
-                        }
-                    }
-                ];
-                self.messenger.showMessage("Do you really want to close this page?", true, null, controls);
-                return false;
-            });
-
 
             this.$mobileIcon.on('mousemove', function() {
                 CssUtils.showBlackOnWhite(self.$mobileIcon);
@@ -211,11 +210,10 @@ function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
         show: function () {
             this.$el.show();
             this.hidden = false;
-            this.backPermitted = false;
-            $.event.trigger({
-                type: "showPageEvent",
-                pageId: this.pageId
-            });
+//            $.event.trigger({
+//                type: "showPageEvent",
+//                pageId: this.pageId
+//            });
             this.browserSupport();
             this.runGame();
         },

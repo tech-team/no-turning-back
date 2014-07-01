@@ -3,10 +3,9 @@
     <div class="message-dimmer"></div>
     <div class="message">
         <div class="message__textbox border-full">
-            <div class="message__textbox__text"></div>
+            <div class="message__textbox__text"><fest:value>json.message</fest:value></div>
         </div>
         <div class="message__controls" >
-
         </div>
     </div>
 </fest:template>
