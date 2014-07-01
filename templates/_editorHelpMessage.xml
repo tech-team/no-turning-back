@@ -8,6 +8,7 @@
             <b>Ctrl+click</b><fest:space/> to select multiple objects<br/>
             <b>WASD</b><fest:space/> to move<br/>
             <b>QE</b><fest:space/> to rotate<br/>
+            <b>Shift</b><fest:space/> to speedup<br/>
             <b>FB</b><fest:space/> to bring to front or back<br/>
             <b>Double click</b><fest:space/> or <fest:space/><b>Ctrl+V</b><fest:space/> to clone<br/>
             <b>DEL</b><fest:space/> to delete selected objects<br/>

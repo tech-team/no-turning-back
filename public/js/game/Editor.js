@@ -341,45 +341,49 @@ define([
                 if (_.isEmpty(this.multiselection))
                     return;
 
+                var delta = 1;
+                if (event.keys[KeyCoder.SHIFT])
+                    delta = 5;
+                
                 if (event.keys[KeyCoder.A]) {
                     _.each(this.multiselection, function(obj) {
-                        obj.x--;
-                        obj.data.x--;
+                        obj.x -= delta;
+                        obj.data.x -= delta;
                     });
                 }
 
                 if (event.keys[KeyCoder.D]) {
                     _.each(this.multiselection, function(obj) {
-                        obj.x++;
-                        obj.data.x++;
+                        obj.x += delta;
+                        obj.data.x += delta;
                     });
                 }
 
                 if (event.keys[KeyCoder.W]) {
                     _.each(this.multiselection, function(obj) {
-                        obj.y--;
-                        obj.data.y--;
+                        obj.y -= delta;
+                        obj.data.y -= delta;
                     });
                 }
 
                 if (event.keys[KeyCoder.S]) {
                     _.each(this.multiselection, function(obj) {
-                        obj.y++;
-                        obj.data.y++;
+                        obj.y += delta;
+                        obj.data.y += delta;
                     });
                 }
 
                 if (event.keys[KeyCoder.Q]) {
                     _.each(this.multiselection, function(obj) {
-                        obj.rotation--;
-                        obj.data.r--;
+                        obj.rotation -= delta;
+                        obj.data.r -= delta;
                     });
                 }
 
                 if (event.keys[KeyCoder.E]) {
                     _.each(this.multiselection, function(obj) {
-                        obj.rotation++;
-                        obj.data.r++;
+                        obj.rotation += delta;
+                        obj.data.r += delta;
                     });
                 }
 
