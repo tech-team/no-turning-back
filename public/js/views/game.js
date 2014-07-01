@@ -1,5 +1,5 @@
 define([
-    'backbone',
+    'views/baseView',
     'utils/BrowserCheck',
     'tmpl/game',
     'game/Game',
@@ -8,8 +8,8 @@ define([
     'game/misc/KeyCoder',
     'utils/Message'
 ], 
-function(Backbone, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Message) {
-    var GameView = Backbone.View.extend({
+function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Message) {
+    var GameView = BaseView.extend({
 
         template: tmpl,
         tagName: 'section',

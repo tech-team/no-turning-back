@@ -1,11 +1,11 @@
 define([
-    'backbone',
+    'views/baseView',
     'tmpl/editor',
     'game/Game',
     'utils/Message'
 ], 
-function(Backbone, tmpl, Game, Message) {
-    var EditorView = Backbone.View.extend({
+function(BaseView, tmpl, Game, Message) {
+    var EditorView = BaseView.extend({
 
         template: tmpl,
         tagName: 'section',

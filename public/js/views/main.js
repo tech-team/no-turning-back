@@ -1,9 +1,9 @@
 define([
-    'backbone',
+    'views/baseView',
     'tmpl/main'
 ], 
-function(Backbone, tmpl) {
-    var MainView = Backbone.View.extend({
+function(BaseView, tmpl) {
+    var MainView = BaseView.extend({
 
         template: tmpl,
         tagName: 'section',

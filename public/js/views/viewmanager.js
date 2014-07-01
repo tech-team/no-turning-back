@@ -27,6 +27,7 @@ function(Backbone) {
         },
 
         show: function(viewToShow) {
+
             viewToShow.show();
         }
 

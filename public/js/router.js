@@ -23,22 +23,18 @@ function(Backbone, ViewManager, MainView, ScoreboardView, GameView, EditorView) 
 
         defaultActions: function () {
             ViewManager.show(MainView);
-//            MainView.show();
         },
 
         scoreboardAction: function () {
             ViewManager.show(ScoreboardView);
-//            ScoreboardView.show();
         },
 
         gameAction: function () {
             ViewManager.show(GameView);
-//            GameView.show();
         },
 
         editorAction: function () {
             ViewManager.show(EditorView);
-//            EditorView.show();
         }
     });
 

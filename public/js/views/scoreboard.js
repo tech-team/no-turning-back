@@ -1,11 +1,11 @@
 define([
-    'backbone',
+    'views/baseView',
     'collections/scores',
     'tmpl/scoreboard',
     'tmpl/_scoreboardTable'
 ], 
-function(Backbone, ScoresCollection, tmpl, tableTmpl) {
-    var ScoreboardView = Backbone.View.extend({
+function(BaseView, ScoresCollection, tmpl, tableTmpl) {
+    var ScoreboardView = BaseView.extend({
 
         template: tmpl,
         tableTemplate: tableTmpl,
