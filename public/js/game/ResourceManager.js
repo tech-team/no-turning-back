@@ -16,12 +16,13 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStor
             texList: ["ground", "zombie", "zombie-pistol", "player-knife", "player-pistol", "player-shotgun", "wall", "brick_wall1", "brick_wall2",
                 "brick_wall3", "brick_wall4", "brick_wall_endless", "chest", "chest-open", "door-open", "door-closed", "door-exit", "button", "button_pressed",
                 "rubbish", "waypoint", "pistol", "pistol-bullet", "shotgun", "shotgun-bullet", "golden-key", "silver-key",
-                "effects/fog", "effects/damage", "zombie_corpse", "golden_apple", "glow", "overlay/OverlayBar"],
+                "effects/fog", "effects/damage", "zombie_corpse", "golden_apple", "glow", "overlay/OverlayBar", "armor"],
             soundList: {
                 Click: "click.mp3",
                 BulletHit: "bullet_hit.mp3",
                 ZombieHurt: "ambiance.mp3",
                 PlayerHurt: ["hurt1.mp3", "hurt2.mp3", "hurt3.mp3"],
+                ArmorHit: "armorHit.mp3",
                 BulletRicochet: "ricochet.mp3",
                 DoorOpen: "door_open.mp3",
                 DoorLocked: ["doorLocked1.mp3", "doorLocked2.wav"],
@@ -34,6 +35,7 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStor
                     weapon: "ammo.mp3",
                     ammo: "ammo.mp3",
                     medkit: "apple.mp3",
+                    armor: ["armor1.mp3", "armor2.mp3", "armor3.mp3"],
                     key: ["keyPicked1.wav", "keyPicked2.wav"],
                     inventoryItem: ["itemPicked1.wav", "itemPicked2.wav", "itemPicked3.wav", "itemPicked4.wav"]
                 },
@@ -111,6 +113,9 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStor
             },
 
             playSound: function(snd, cooldown) {
+                if (_.isUndefined(snd))
+                    throw "playSound: snd is undefined";
+
                 if (this.soundDisabled)
                     return;
 

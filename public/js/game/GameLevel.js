@@ -181,6 +181,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             //create empty containers for future stuff
             this.createContainer("corpse");
             this.createContainer("medkit");
+            this.createContainer("armor");
             this.createContainer("weapon");
             this.createContainer("key");
             this.createContainer("bullet");
@@ -600,7 +601,6 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                         if (this.bullets.length > 0 && i > 0) --i;
 
                         ResourceManager.playSound(ResourceManager.soundList.BulletHit);
-                        ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
                     }
 
                 }
@@ -637,9 +637,6 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                 if (zombie.justFired) {
                     if (zombie.isCurrentWeaponMelee()) {
                         var hit = zombie.shoot(self, self.player);
-                        if (hit) {
-                            ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
-                        }
                     }
                     else {
                         zombie.shoot(self);

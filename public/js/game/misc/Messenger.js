@@ -15,6 +15,11 @@ define([
                     color: "#1397F0",
                     period: 5
                 },
+                armorPicked: {
+                    text: ["Armor picked: +{0}", "We are getting stronger!"],
+                    color: "#3197FF",
+                    period: 5
+                },
                 ammoPicked: {
                     text: ["+{0} ammo for {1}", "Much ammo, very for {1}, wow!"],
                     color: "#A7FA16",

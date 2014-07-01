@@ -147,6 +147,10 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Weapons) {
             }
         },
 
+        addArmor: function(value) {
+            this._setArmor(this.armor() + value);
+        },
+
         isCurrentWeaponMelee: function() {
             return this.weapons[this.currentWeapon].melee;
         },
@@ -322,7 +326,20 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Weapons) {
         },
 
         damage: function(howMuch) {
+            var armor = this.armor() - howMuch;
+            if (armor < 0) { //no more armor
+                this._setHealth(this.health() + armor);
+                this._setArmor(0);
+            }
+            else {
+                this._setArmor(armor);
+                ResourceManager.playSound(ResourceManager.soundList.ArmorHit);
+                return; //do not hurt player, thx for armor!
+            }
+
             this._setHealth(this.health() - howMuch);
+            ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
+
             //TODO: should be replaced with UntilTimer
             //well that and heal() function cannot be replaced by UntilTimer
             //because UntilTimer tick speed is uncontrollable

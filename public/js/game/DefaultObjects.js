@@ -43,7 +43,7 @@ define([
                 player: {
                     tex: "player-knife",
                     health: 100,
-                    armor: 100,
+                    armor: 0,
                     inventory: [],
                     keys: []
                 },
@@ -89,6 +89,10 @@ define([
 
                 medkit: {
                     size: 25
+                },
+
+                armor: {
+                    size: 30
                 },
 
                 key: {

@@ -2,13 +2,15 @@ define([
     'game/entities/items/WeaponItem',
     'game/entities/items/AmmoItem',
     'game/entities/items/MedkitItem',
+    'game/entities/items/ArmorItem',
     'game/entities/items/KeyItem',
     'game/entities/items/DefaultItem'
-], function(WeaponItem, AmmoItem, MedkitAmmo, KeyItem, DefaultItem) {
+], function(WeaponItem, AmmoItem, MedkitItem, ArmorItem, KeyItem, DefaultItem) {
     var availableItems = {
         weapon: WeaponItem,
         ammo: AmmoItem,
-        medkit: MedkitAmmo,
+        medkit: MedkitItem,
+        armor: ArmorItem,
         key: KeyItem,
         default: DefaultItem
     };
