@@ -18,6 +18,8 @@ function($, Class, msgTmpl) {
 
             this.buttonClass = 'message__controls__button';
             this.buttonHtml = '<div class="' + this.buttonClass +'">{0}</div>';
+
+            this.visible = false;
         },
 
         _findElements: function(parent) {
@@ -41,11 +43,11 @@ function($, Class, msgTmpl) {
         },
 
         _hideControls: function() {
-            this.$messageControls.hide();
+            this.$messageControls && this.$messageControls.hide();
         },
 
         _showControls: function() {
-            this.$messageControls.show();
+            this.$messageControls && this.$messageControls.show();
         },
 
         _buttonHtml: function(name) {
@@ -53,7 +55,7 @@ function($, Class, msgTmpl) {
         },
 
         _removeControls: function() {
-            this.$messageControls.empty();
+            this.$messageControls && this.$messageControls.empty();
         },
 
         _createControls: function(controls) {
@@ -71,20 +73,20 @@ function($, Class, msgTmpl) {
 
         _onMessageEvents: function(callbackOnClose) {
             var self = this;
-            this.$messageDimmer.on('click', function () {
+            this.$messageDimmer && this.$messageDimmer.on('click', function () {
                 self.hideMessage();
                 callbackOnClose();
             });
 
-            this.$message.on('click', function () {
+            this.$message && this.$message.on('click', function () {
                 self.hideMessage();
                 callbackOnClose();
             });
         },
 
         _offMessageEvents: function() {
-            this.$messageDimmer.off('click');
-            this.$message.off('click');
+            this.$messageDimmer && this.$messageDimmer.off('click');
+            this.$message && this.$message.off('click');
         },
 
 
@@ -123,15 +125,18 @@ function($, Class, msgTmpl) {
             this.$messageDimmer.show();
             this.$message.show();
 
+            this.visible = true;
+
         },
 
         hideMessage: function(keepDimmer) {
-            this.$message.hide();
+            this.$message && this.$message.hide();
             this._removeControls();
             this._hideControls();
             if (!keepDimmer)
-                this.$messageDimmer.hide();
+                this.$messageDimmer && this.$messageDimmer.hide();
             this._removeFromDOM(keepDimmer);
+            this.visible = false;
         }
     });
 

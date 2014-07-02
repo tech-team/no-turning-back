@@ -22,9 +22,7 @@ function(modernizr, createjs) {
         },
 
         touchSupport: function() {
-            this._modernizrCheck(function() {
-                return createjs.Touch.isSupported();
-            });
+            return createjs.Touch.isSupported();
         }
     }
 });

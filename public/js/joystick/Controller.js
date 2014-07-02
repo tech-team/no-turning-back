@@ -1,16 +1,16 @@
 define([
-    'underscore',
+    'lodash',
     'classy',
     'easel',
     'game/misc/ImageTiler'
 ],
     function(_, Class, createjs, ImageTiler) {
         var Controller = Class.$extend({
-            __init__: function($window, canvas, stopJoystick) {
-                this.$window = $window;
+            __init__: function(canvas, stopJoystick) {
+                this.$window = $(window);
                 this.canvas = canvas;
                 this.stopJoystick = stopJoystick;
-                console.log(this.stopJoystick); //TODO: wtf is this, for some reason that is function
+                console.log(this.stopJoystick);
                 this.stage = new createjs.Stage(this.canvas);
                 this.stage.enableDOMEvents(true);
                 createjs.Touch.enable(this.stage);
@@ -86,7 +86,7 @@ define([
                 this.canvas.height = this.$window.height();
 
                 var self = this;
-                var gfx = "/res/gfx/";
+                var gfx = "/res/gfx/large/";
 
                 var stageSize = {
                     width: self.stage.canvas.width,
@@ -218,7 +218,7 @@ define([
                     height: self.stage.canvas.height
                 };
 
-                var gfx = "/res/gfx/";
+                var gfx = "/res/gfx/large/";
 
                 var parallax = new createjs.Bitmap(gfx + "parallax.jpg");
                 parallax.image.onload = function() {

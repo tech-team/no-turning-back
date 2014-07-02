@@ -7,21 +7,41 @@ define([
     function(Backbone, ViewManager, LobbyView, ControlsView) {
         var Router = Backbone.Router.extend({
             routes: {
-                'joystick': 'controlsAction',
+                'j': 'controlsAction',
                 '*default': 'defaultActions'
             },
+
+            jConnector: null,
+
+            goTo: function(where) {
+                this.navigate(where, {trigger: true});
+            },
+
             initialize: function() {
                 ViewManager.setRouter(this);
                 ViewManager.addView(LobbyView);
                 ViewManager.addView(ControlsView);
+
+
+                var self = this;
+                LobbyView.on('joystickStarted', function(jConnector) {
+                    self.jConnector = jConnector;
+                    ControlsView.setJConnector(self.jConnector);
+                    self.goTo(ControlsView.pageId);
+                });
             },
 
             defaultActions: function () {
                 ViewManager.show(LobbyView);
+                LobbyView.setJConnector(this.jConnector);
             },
 
             controlsAction: function () {
-                ViewManager.show(ControlsView);
+                if (!this.jConnector) {
+                    this.goTo(LobbyView.pageId);
+                } else {
+                    ViewManager.show(ControlsView);
+                }
             }
         });
 
