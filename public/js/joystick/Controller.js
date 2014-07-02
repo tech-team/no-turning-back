@@ -1,16 +1,14 @@
 define([
-    'underscore',
+    'lodash',
     'classy',
     'easel',
     'game/misc/ImageTiler'
 ],
     function(_, Class, createjs, ImageTiler) {
         var Controller = Class.$extend({
-            __init__: function($window, canvas, stopJoystick) {
-                this.$window = $window;
+            __init__: function(canvas) {
+                this.$window = $(window);
                 this.canvas = canvas;
-                this.stopJoystick = stopJoystick;
-                console.log(this.stopJoystick); //TODO: wtf is this, for some reason that is function
                 this.stage = new createjs.Stage(this.canvas);
                 this.stage.enableDOMEvents(true);
                 createjs.Touch.enable(this.stage);
@@ -33,15 +31,32 @@ define([
                     self.updateFunc(event);
                 });
 
-                this.createControls();
-
                 navigator.vibrate = navigator.vibrate ||
-                    navigator.webkitVibrate ||
-                    navigator.mozVibrate ||
-                    navigator.msVibrate;
+                                    navigator.webkitVibrate ||
+                                    navigator.mozVibrate ||
+                                    navigator.msVibrate;
 
-                this.$window.resize(function() { self.resize(); });
-                this.resize();
+
+                this.availableWeapons = [];
+                var tid = setInterval(function() {
+                    window.serverSend({
+                        type: 'game',
+                        action: 'availableWeapons'
+                    }, function(weapons) {
+                        clearInterval(tid);
+                        self.availableWeapons = weapons;
+                        console.log(self.availableWeapons);
+                        self.createControls();
+                        self.$window.resize(function() { self.resize(); });
+                        self.resize();
+                        self.createWindowEvents();
+                    });
+                }, 1000);
+
+            },
+
+            createWindowEvents: function() {
+                this.$window[0].addEventListener("deviceorientation", this.onGyro.bind(this), false);
             },
 
             __classvars__: {
@@ -86,7 +101,7 @@ define([
                 this.canvas.height = this.$window.height();
 
                 var self = this;
-                var gfx = "/res/gfx/";
+                var gfx = "/res/gfx/large/";
 
                 var stageSize = {
                     width: self.stage.canvas.width,
@@ -218,7 +233,7 @@ define([
                     height: self.stage.canvas.height
                 };
 
-                var gfx = "/res/gfx/";
+                var gfx = "/res/gfx/large/";
 
                 var parallax = new createjs.Bitmap(gfx + "parallax.jpg");
                 parallax.image.onload = function() {
@@ -410,12 +425,7 @@ define([
 
                     self.forceUpdate();
 
-                    self.stopJoystick();
-                    // **********************what***********************
-                    // **********************the************************
-                    // **********************hell***********************
-                    // ***********************is************************
-                    // **********************this***********************
+                    window.location = '#lobby';
                 });
             },
 
@@ -466,6 +476,22 @@ define([
                     action: "weaponchange",
                     weapon: weapon.name
                 });
+            },
+
+            addWeapon: function(name) {
+                console.log('new weapon: ' + name);
+            },
+
+            changeWeapon: function(name, noPropagation) {
+                console.log('changed weapon to: ' + name);
+
+                if (!noPropagation) {
+                    window.serverSend({
+                        type: "game",
+                        action: "weaponchange",
+                        weapon: name
+                    });
+                }
             },
 
             onGyro: function(e) {

@@ -8,7 +8,7 @@ function(BaseView, tmpl) {
         template: tmpl,
         tagName: 'section',
         className: 'page',
-        pageId: '#mainPage',
+        pageId: '#main',
         hidden: true,
 
         initialize: function () {

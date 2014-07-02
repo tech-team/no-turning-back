@@ -8,3 +8,4 @@ public/css/**/*.css
 public/js/build
 public/js/joystick/build
 public/js/tmpl
+public/js/tmpl_j

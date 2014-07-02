@@ -46,12 +46,10 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.ricochetObjects = [];
             this.drops = [];
 
-//            /*** <Joystick stuff> ***/
-//            this.isJoystick = false;
-//            this.joystickServer = null;
-//            this.lastShootTime = 0;
-//            this.shootDelta = 350;
-//            /*** </Joystick stuff> ***/
+            /*** <Joystick stuff> ***/
+            this.lastShootTime = 0;
+            this.shootDelta = 350;
+            /*** </Joystick stuff> ***/
 
             this.finished = false;
 
@@ -381,6 +379,10 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                     case "use":
                         this.useHandle();
                         break;
+
+                    case "availableWeapons":
+                        answer(this.player.getAvailableWeapons());
+                        break;
                     default:
                         break;
                 }
@@ -538,6 +540,11 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
         onWeaponChange: function(name) {
             this.redrawGameObject(this.player);
             ResourceManager.playSound(ResourceManager.soundList.Weapons[name].Draw, ResourceManager.weaponData.drawCooldown);
+            window.serverSend({
+                type: 'game',
+                action: 'weaponChange',
+                name: name
+            });
         },
 
         playerShootingHandle: function() {

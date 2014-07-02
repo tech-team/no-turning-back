@@ -11,10 +11,9 @@ define([
     'game/Editor',
 	'game/entities/Player',
 	'game/ResourceManager',
-    'console',
     'game/misc/Messenger'
 ],
-function($, _, Class, signals, createjs, alertify, KeyCoder, LevelManager, GameLevel, Editor, Player, ResourceManager, Console, Messenger) {
+function($, _, Class, signals, createjs, alertify, KeyCoder, LevelManager, GameLevel, Editor, Player, ResourceManager, Messenger) {
 	var Game = Class.$extend({
 		__init__: function(canvas, editorMode, onLoadedCallback) {
             this.editorMode = editorMode;
@@ -45,8 +44,7 @@ function($, _, Class, signals, createjs, alertify, KeyCoder, LevelManager, GameL
               	Game: 1,
               	GameOver: 2,
                 Pause: 3
-          	},
-            console: Console
+          	}
         },
 
         createGameLevel: function(levelData) {
@@ -156,11 +154,6 @@ function($, _, Class, signals, createjs, alertify, KeyCoder, LevelManager, GameL
                 this.stage.update(event);
             }
 		},
-
-        startJoystickSession: function(server) {
-            this.level.isJoystick = true;
-            this.level.joystickServer = server;
-        },
 
         onJoystickMessage: function(data, answer) {
             this.level.onJoystickMessage(data, answer);

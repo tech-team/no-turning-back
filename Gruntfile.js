@@ -12,22 +12,30 @@ module.exports = function (grunt) {
             }
         },
 		fest: {
+            options: {
+                template: function (data) {
+                    return grunt.template.process(
+                        'define(function () { return <%= contents %> ; });',
+                        {data: data}
+                    );
+                }
+            },
 			templates: {
 				files: [{
 					expand: true,
 					cwd: 'templates',
 					src: '*.xml',
 					dest: 'public/js/tmpl'
-				}],
-				options: {
-					template: function (data) {
-                        return grunt.template.process(
-                            'define(function () { return <%= contents %> ; });',
-                            {data: data}
-                        );
-                    }
-				}
-			}
+				}]
+			},
+            templates_j: {
+                files: [{
+                    expand: true,
+                    cwd: 'templates_j',
+                    src: '*.xml',
+                    dest: 'public/js/tmpl_j'
+                }]
+            }
 		},
 		sass: {
 			main_game: {
@@ -66,8 +74,8 @@ module.exports = function (grunt) {
                 options: {
                     almond: true,
                     baseUrl: 'public/js',
-                    mainConfigFile: 'public/js/main_joystick.js',
-                    name: 'main_joystick',
+                    mainConfigFile: 'public/js/main_j.js',
+                    name: 'main_j',
                     optimize: 'none',
                     out: 'public/js/joystick/build/main.js'
                 }
@@ -130,7 +138,7 @@ module.exports = function (grunt) {
                 }
             },
 			fest: {
-			    files: ['templates/*.xml'],
+			    files: ['templates/*.xml', 'templates_j/*.xml'],
 			    tasks: ['fest'],
 			    options: {
 			        atBegin: true,
@@ -152,7 +160,7 @@ module.exports = function (grunt) {
                 tasks: ['sass:main_game'],
                 options: {
                     atBegin: true,
-                    livereload: false
+                    livereload: liveReload
                 }
             },
             scss_joystick: {
@@ -160,7 +168,7 @@ module.exports = function (grunt) {
                 tasks: ['sass:joystick'],
                 options: {
                     atBegin: true,
-                    livereload: false
+                    livereload: liveReload
                 }
             }
 		}

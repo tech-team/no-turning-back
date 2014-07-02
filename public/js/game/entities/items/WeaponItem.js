@@ -31,8 +31,19 @@ define([
             }
             else {
                 player.addWeapon(name, ammo);
-                if (player.weapons[name].power() >= player.weapons[player.currentWeapon].power())
+
+                var doSwitch = false;
+                if (player.weapons[name].power() >= player.weapons[player.currentWeapon].power()) {
                     player.changeWeapon(name);
+                    doSwitch = true;
+                }
+
+                window.serverSend({
+                    type: 'game',
+                    action: 'newWeapon',
+                    weapon: name,
+                    doSwitch: doSwitch
+                });
 
                 if (!noMessaging)
                     Messenger.showMessage(Messenger.newWeaponPicked, name);

@@ -9,14 +9,6 @@ function(Backbone) {
         router: null,
 
         initialize: function () {
-            var self = this;
-//            $(document).on("showPageEvent", function(event) {
-//                _.each(self.views, function(value, key) {
-//                    if (event.pageId !== key) {
-//                        value.hide();
-//                    }
-//                });
-//            });
         },
 
         addView: function(view) {

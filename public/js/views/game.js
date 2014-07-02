@@ -6,9 +6,10 @@ define([
     'views/gamefinished',
     'utils/CssUtils',
     'game/misc/KeyCoder',
-    'utils/Message'
+    'utils/Message',
+    'CConnector'
 ], 
-function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Message) {
+function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Message, CConnector) {
     var GameView = BaseView.extend({
 
         template: tmpl,
@@ -30,12 +31,13 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
         $mobileIcon: null,
         $mobileConnect: null,
         $mobileToken: null,
-        $closeButton: null,
+        $reconnectButton: null,
         $loadingIndicator: null,
         mobileOpened: false,
 
         messenger: null,
 
+        cConnector: null,
 
         initialize: function () {
             this.render();
@@ -103,16 +105,6 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             this.game.continueGame();
         },
 
-        disconnect: function(sendToJoystick) {
-            localStorage.removeItem('consoleguid');
-            if (sendToJoystick) {
-                window.server.send({
-                    type: "disconnect"
-                });
-            }
-            window.server.disconnect();
-        },
-
         render: function () {
             this.$el.html(this.template());
             this.$el.attr('id', this.pageId.slice(1));
@@ -129,7 +121,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             this.$mobileConnect = this.$('.mobile-connect');
             this.$mobileToken = this.$('.mobile-connect__token');
 
-            this.$closeButton = this.$('.reconnect-button');
+            this.$reconnectButton = this.$('.reconnect-button');
             this.$loadingIndicator = this.$('.loading-indicator');
 
             this.createEvents();
@@ -149,13 +141,13 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             var controls = [
                 {
                     name: "Yes",
-                    action: function(event) {
+                    action: function() {
                         callbacks.yes();
                     }
                 },
                 {
                     name: "No",
-                    action: function(event) {
+                    action: function() {
                         if (self.gamePaused)
                             self._resumeGame();
 
@@ -199,9 +191,11 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             });
 
 
-            this.$closeButton.on('click', function() {
-                self.disconnect(true);
-                self.$closeButton.hide();
+            this.$reconnectButton.on('click', function() {
+//                self.disconnect(true);
+                self.$reconnectButton.hide();
+                self.$loadingIndicator.show();
+                window.server.forceReconnect();
             });
 
             (new KeyCoder()).addEventListener("keyup", KeyCoder.P, this.triggerGamePause.bind(this));
@@ -210,10 +204,6 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
         show: function () {
             this.$el.show();
             this.hidden = false;
-//            $.event.trigger({
-//                type: "showPageEvent",
-//                pageId: this.pageId
-//            });
             this.browserSupport();
             this.runGame();
         },
@@ -242,44 +232,42 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                         this.game.continueGame(true);
                     }
                     break;
-
-                case "disconnect":
-                    this.disconnect();
-                    break;
                 default:
                     break;
             }
 
         },
 
-        startJoystick: function() { // TODO: add reconnect feature
-            window.server = null;
+        startJoystick: function() {
             var self = this;
-            Game.console({
-                onStarted: function() {
-                    self.game.startJoystickSession(window.server);
+            this.cConnector = new CConnector({
+                onStart: function() {
                     if (self.mobileOpened) {
-                        self.triggerConnectDialog();
+                        self.triggerConnectDialog(); // скрыть если открыто
                     }
+                    self.$reconnectButton.show();
                 },
-                saveToken: function(guid) {
+                saveToken: function(token) {
                     self.$loadingIndicator.hide();
-                    self.$mobileToken.text(guid);
-                    if (guid === "Already connected") {
-                        self.$closeButton.show();
+                    self.$mobileToken.text(token);
+                    if (token == "Already connected") {
+                        self.$reconnectButton.show();
                     }
 
                 },
                 onMessage: function(data, answer) {
-                    if (data.type === "orientation" || data.type === "disconnect") {
+//                    console.log(data);
+                    if (data.type === "orientation") {
                         self.onJoystickMessage(data, answer);
                     }
                     else {
                         self.game.onJoystickMessage(data, answer);
                     }
                 },
+                onForceReconnect: function() {
+
+                },
                 onDisconnect: function() {
-                    console.log("joystick disconnected");
                     self.messenger.showMessage("You were disconnected", false, function() {
                         self.game.continueGame();
                     });
