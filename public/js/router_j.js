@@ -29,11 +29,18 @@ define([
                     ControlsView.setJConnector(self.jConnector);
                     self.goTo(ControlsView.pageId);
                 });
+
+                ControlsView.on('JReconnect', function(noNotification) {
+                    console.log('on JReconnect');
+                    if (noNotification)
+                        ControlsView.disableConfirm();
+                    self.goTo(LobbyView.pageId);
+                });
             },
 
             defaultActions: function () {
-                ViewManager.show(LobbyView);
                 LobbyView.setJConnector(this.jConnector);
+                ViewManager.show(LobbyView);
             },
 
             controlsAction: function () {

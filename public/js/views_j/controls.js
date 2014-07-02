@@ -18,6 +18,8 @@ define([
         $canvas: null,
         messenger: null,
 
+        confirmDisabled: false,
+
         initialize: function () {
             this.render();
         },
@@ -36,6 +38,7 @@ define([
         show: function () {
             this.$el.show();
             this.hidden = false;
+            this.confirmDisabled = false;
         },
 
         hide: function () {
@@ -45,23 +48,57 @@ define([
             }
         },
 
+        disableConfirm: function() {
+            this.confirmDisabled = true;
+        },
+
+        confirm: function(callbacks) {
+            callbacks = this._getConfirmCallbacks(callbacks);
+
+            if (this.confirmDisabled) {
+                callbacks.yes();
+                return;
+            }
+
+            var self = this;
+            var controls = [
+                {
+                    name: "Yes",
+                    action: function(event) {
+                        window.server.forceReconnect();
+                        self.messenger.hideMessage();
+                        callbacks.yes();
+                    }
+                },
+                {
+                    name: "No",
+                    action: function(event) {
+                        self.messenger.hideMessage();
+                        callbacks.no();
+                    }
+                }
+            ];
+            this.messenger.showMessage("Do you really want to reconnect?", true, null, controls);
+        },
+
         setJConnector: function(jConnector) {
             var callbacks = {
                 onStart: this.onJStart.bind(this),
                 onMessage: this.onMessage.bind(this),
                 onStatusChanged: this.onStatusChanged.bind(this),
-                onDisconnect: this.onDisconnect.bind(this)
+                onDisconnect: this.onDisconnect.bind(this),
+                onForceReconnect: this.onForceReconnect.bind(this)
             };
 
             this.jConnector = jConnector;
-            this.jConnector.setCallbacks(callbacks);
+            this.jConnector && this.jConnector.addCallbacks(callbacks);
         },
 
         onJStart: function() {
 
         },
 
-        onMessage: function(data) {
+        onMessage: function(data, answer) {
 //            switch (data.type) {
 //                case "info":
 //                    if (data.action === "gamefinished") {
@@ -85,19 +122,22 @@ define([
         },
 
         onDisconnect: function() {
-            this.messenger.showMessage("You were disconnected", false, function() {
-                location.reload();
-            });
+            var self = this;
+            this.messenger.showMessage("You were disconnected. Try reloading the page.", true);
+        },
+
+        onForceReconnect: function(noNotification) {
+            this.trigger('JReconnect', noNotification);
         },
 
         disconnect: function(sendToClient) {
-            localStorage.removeItem('playerguid');
-            if (sendToClient) {
-                window.serverSend({
-                    type: "disconnect"
-                });
-            }
-            window.server.disconnect();
+//            localStorage.removeItem('playerguid');
+//            if (sendToClient) {
+//                window.serverSend({
+//                    type: "disconnect"
+//                });
+//            }
+//            window.server.disconnect();
         }
 
     });

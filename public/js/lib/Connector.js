@@ -8,8 +8,7 @@ define([
     io
 ){
     function Connector(conf){
-        conf || (conf = {});
-
+        this.conf = conf || (conf = {});
 
         this.socket = io.connect(conf.remote);
 
@@ -53,6 +52,7 @@ define([
                 self._query.run();
             }
         });
+
     }
 
     $.extend(Connector.prototype, Backbone.Events, {
@@ -69,6 +69,10 @@ define([
 
         disconnect: function() {
             this.socket.disconnect('unauthorized');
+        },
+
+        forceReconnect: function() {
+            this.trigger('forceReconnect');
         },
 
         isReady: function(){

@@ -47,8 +47,6 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.drops = [];
 
 //            /*** <Joystick stuff> ***/
-//            this.isJoystick = false;
-//            this.joystickServer = null;
 //            this.lastShootTime = 0;
 //            this.shootDelta = 350;
 //            /*** </Joystick stuff> ***/

@@ -51,7 +51,7 @@ define([
             return this;
         },
 
-        setJConnector: function(jConnector) {
+        setJConnector: function(jConnector, noRecreate) {
             var callbacks = {
                 onStart: this.onJStart.bind(this),
                 onMessage: this.onMessage.bind(this),
@@ -59,22 +59,16 @@ define([
                 onDisconnect: this.onDisconnect.bind(this)
             };
 
-            if (jConnector) {
-                this.jConnector.setCallbacks(callbacks);
-            } else {
-                jConnector = new JConnector(this.$tokenForm, this.$token, callbacks);
-            }
-            this.jConnector = jConnector;
-        },
+            if (!this.jConnector) {
 
-        startJoystick: function() {
-            this.jConnector = new JConnector(this.$tokenForm, this.$token, {
-                onStart: this.onJStart.bind(this),
-                onMessage: this.onMessage.bind(this),
-                onStatusChanged: this.onStatusChanged.bind(this),
-                onDisconnect: this.onDisconnect.bind(this),
-                onWrongToken: this.onWrongToken.bind(this)
-            });
+                if (jConnector) {
+                    this.jConnector = jConnector;
+                    this.jConnector.addCallbacks(callbacks);
+                } else {
+                    jConnector = new JConnector(this.$tokenForm, this.$token, callbacks);
+                    this.jConnector = jConnector;
+                }
+            }
         },
 
         createWindowEvents: function() {
@@ -94,12 +88,12 @@ define([
         },
 
         show: function () {
+            this.$token.val('');
             this.$el.show();
             this.hidden = false;
 
             this.checkBrowserSupport() &&
             this.checkOrientation();
-            this.startJoystick();
         },
 
         hide: function () {
@@ -113,7 +107,7 @@ define([
             this.trigger('joystickStarted', this.jConnector);
         },
 
-        onMessage: function() {
+        onMessage: function(data, answer) {
 
         },
 
