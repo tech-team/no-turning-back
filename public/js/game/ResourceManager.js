@@ -16,7 +16,7 @@ function(Class, _, createjs, preloadjs, soundjs, alertify, ImageTiler, LocalStor
             texList: ["ground", "zombie", "zombie-pistol", "player-knife", "player-pistol", "player-shotgun", "wall", "brick_wall1", "brick_wall2",
                 "brick_wall3", "brick_wall4", "brick_wall_endless", "chest", "chest-open", "door-open", "door-closed", "door-exit", "button", "button_pressed",
                 "rubbish", "waypoint", "pistol", "pistol-bullet", "shotgun", "shotgun-bullet", "golden-key", "silver-key",
-                "effects/fog", "effects/damage", "effects/poison", "zombie_corpse", "golden_apple", "glow", "overlay/OverlayBar", "armor"],
+                "effects/fog", "effects/damage", "effects/poison", "zombie_corpse", "golden_apple", "glow", "overlay/OverlayBar", "armor", "puzzle"],
             soundList: {
                 Click: "click.mp3",
                 BulletHit: "bullet_hit.mp3",

@@ -147,6 +147,7 @@ define([
                 _.each(data.walls, add);
                 _.each(data.doors, add);
                 _.each(data.chests, add);
+                _.each(data.puzzles, add);
                 _.each(data.buttons, add);
                 _.each(data.zombies, add);
 

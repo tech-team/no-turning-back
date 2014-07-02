@@ -74,8 +74,8 @@ define([
                 },
 
                 puzzle: {
-                    code: "",
-                    buttons: []
+                    name: "puzzle1",
+                    code: ""
                 },
 
                 button: {

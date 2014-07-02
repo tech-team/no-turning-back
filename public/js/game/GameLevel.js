@@ -199,24 +199,23 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                 self.chests.push(chest);
             });
 
-            //add buttons
-//            _.each(data.buttons, function(obj) {
-//                var button = new Button(self.addToStage(obj), self.doors);
-//                self.buttons.push(button);
-//            });
-
             //add puzzles
             _.each(data.puzzles, function(obj) {
                 var puzzle = new Puzzle(obj, self.doors);
+                self.puzzles.push(puzzle);
+            });
 
-                //add buttons
-                _.each(puzzle._buttons(), function(obj) {
-                    var button = new Button(self.addToStage(obj), puzzle);
-                    puzzle.addButton(button);
-                    self.buttons.push(button);
+            //add buttons
+            _.each(data.buttons, function(obj) {
+                //associate button with puzzle
+                var puzzle = _.find(self.puzzles, function(puzzle) {
+                    return puzzle.name() == obj.puzzleName;
                 });
 
-                self.puzzles.push(puzzle);
+                var button = new Button(self.addToStage(obj), puzzle);
+                self.buttons.push(button);
+
+                puzzle.addButton(button);
             });
 
             //add enemies
