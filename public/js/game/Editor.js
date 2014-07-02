@@ -167,6 +167,7 @@ define([
             
             setMainContainer: function(container) {
                 this.mainContainer = container;
+                var self = this;
 
                 var point = {x: 0, y: 0};
 
@@ -179,6 +180,8 @@ define([
                         container.x = evt.stageX - point.x;
                         container.y = evt.stageY - point.y;
                     }
+
+                    self.updateWpPath();
                 });
             },
 
@@ -269,7 +272,7 @@ define([
                     else if (!_.contains(self.multiselection, dispObj))
                         self.selectObject(dispObj);
 
-                    var point = dispObj.globalToLocal(evt.stageX + self.mainContainer.x, evt.stageY + self.mainContainer.y);
+                    var point = dispObj.globalToLocal(evt.stageX, evt.stageY);
                     dispObj.oldReg = {
                         x: dispObj.regX,
                         y: dispObj.regY
@@ -278,8 +281,10 @@ define([
                     dispObj.regX = point.x;
                     dispObj.regY = point.y;
 
-                    dispObj.x = evt.stageX;
-                    dispObj.y = evt.stageY;
+                    dispObj.x = evt.stageX - self.mainContainer.x;
+                    dispObj.y = evt.stageY - self.mainContainer.y;
+
+                    self.updateWpPath();
                 });
 
                 dispObj.on("pressmove", function(evt) {
@@ -289,8 +294,8 @@ define([
                     };
 
                     _.each(self.multiselection, function(obj) {
-                        obj.x = evt.stageX + (obj.x - origin.x);
-                        obj.y = evt.stageY + (obj.y - origin.y);
+                        obj.x = evt.stageX + (obj.x - origin.x) - self.mainContainer.x;
+                        obj.y = evt.stageY + (obj.y - origin.y) - self.mainContainer.y;
                     });
 
                     self.updateWpPath();
@@ -320,6 +325,7 @@ define([
                         obj.data.y = obj.y;
                     });
 
+                    self.updateWpPath();
                     self.regenerateObjectPropertiesTable();
                 });
 
@@ -713,21 +719,22 @@ define([
             },
 
             updateWpPath: function(wps) {
+                this.mainContainer.removeChild(this.wpPath);
+
                 if (!this.showingWpsOwner)
                     return;
 
                 var waypoints = wps || this.showingWpsOwner.data.waypoints;
 
-                this.mainContainer.removeChild(this.wpPath);
+
                 if (waypoints.length) {
                     var graphics = new easeljs.Graphics();
                     graphics.setStrokeStyle(3, "round");
                     graphics.beginStroke("#00F");
 
                     graphics.moveTo(this.showingWpsOwner.x, this.showingWpsOwner.y);
-                    graphics.lineTo(waypoints[0].x, waypoints[0].y);
 
-                    _.each(this.showingWpsOwner.data.waypoints, function(wp) {
+                    _.each(waypoints, function(wp) {
                         graphics.lineTo(wp.x, wp.y);
                     });
                     graphics.endStroke();
