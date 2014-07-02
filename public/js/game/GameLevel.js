@@ -374,6 +374,10 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                     case "use":
                         this.useHandle();
                         break;
+
+                    case "availableWeapons":
+                        answer(this.player.getAvailableWeapons());
+                        break;
                     default:
                         break;
                 }

@@ -29,17 +29,12 @@ define([
             this.$el.attr('id', this.pageId.slice(1));
 
             this.$canvas = this.$('canvas');
-            this.controller = new Controller(this.$canvas[0], function() {});
-
-            this.createWindowEvents();
             return this;
         },
 
-        createWindowEvents: function() {
-            window.addEventListener("deviceorientation", this.controller.onGyro.bind(this.controller), false);
-        },
-
         show: function () {
+            this.controller = new Controller(this.$canvas[0]);
+
             this.$el.show();
             this.hidden = false;
             this.confirmDisabled = false;
@@ -119,6 +114,15 @@ define([
                             this.messenger.hideMessage();
                     }
                     break;
+
+                case 'game':
+                    if (data.action == 'newWeapon') {
+                        this.controller.addWeapon(data.weapon);
+                        if (data.doSwitch) {
+                            this.controller.changeWeapon(data.weapon);
+                        }
+                    }
+
                 default:
                     break;
             }

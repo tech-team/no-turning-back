@@ -147,6 +147,10 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Weapons) {
             }
         },
 
+        getAvailableWeapons: function() {
+            return _.keys(this.weapons);
+        },
+
         addArmor: function(value) {
             this._setArmor(this.armor() + value);
         },

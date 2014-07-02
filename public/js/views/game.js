@@ -141,13 +141,13 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             var controls = [
                 {
                     name: "Yes",
-                    action: function(event) {
+                    action: function() {
                         callbacks.yes();
                     }
                 },
                 {
                     name: "No",
-                    action: function(event) {
+                    action: function() {
                         if (self.gamePaused)
                             self._resumeGame();
 
