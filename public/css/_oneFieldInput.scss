@@ -1,53 +1,61 @@
 
 .one-field-input {
-  &__input-field {
-    width: $input-width;
-    height: 45px;
-    padding-left: 5px;
+  &__inputs {
+    &__input-field {
+      width: $input-width;
+      height: 45px;
+      padding-left: 5px;
 
-    border-style: solid;
-    border-width: 1px;
-    border-right-width: 0px;
-    border-color: $background-color;
-    border-radius: 5px 0 0 5px;
+      border-style: solid;
+      border-width: 1px;
+      border-right-width: 0px;
+      border-color: $background-color;
+      border-radius: 5px 0 0 5px;
 
-    font-family: $font;
-    font-size: 35px;
-  }
-
-  &__send-button {
-    width: $button-width;
-    height: 49px;
-    vertical-align: top;
-
-    font-family: $font;
-    font-size: 20px;
-    color: black;
-
-    background-color: $orange-color;
-
-
-    border-color: black;
-    border-width: 1px;
-    -webkit-border-radius: 0 5px 5px 0;
-    -moz-border-radius: 0 5px 5px 0;
-    border-radius: 0 5px 5px 0;
-
-    -webkit-transition: All 0.2s ease;
-    -moz-transition: All 0.2s ease;
-    -o-transition: All 0.2s ease;
-    -ms-transition: All 0.2s ease;
-    transition: All 0.2s ease;
-
-    cursor: pointer;
-
-    &:hover {
-      background-color: #F7AF28;
+      font-family: $font;
+      font-size: 35px;
     }
 
-    &:disabled:hover {
-      cursor: wait;
-      background-color: #FDC66A;
+    &__send-button {
+      height: 49px;
+      line-height: 49px;
+      display: inline-block;
+      margin: 0;
+      padding: 0 10px 0px 10px;
+      margin-left: 0px;
+
+      width: $button-width;
+//      height: 49px;
+      vertical-align: top;
+
+      font-family: $font;
+      font-size: 20px;
+      color: black;
+
+      background-color: $orange-color;
+
+      border-color: black;
+      border-width: 1px;
+      -webkit-border-radius: 0 5px 5px 0;
+      -moz-border-radius: 0 5px 5px 0;
+      border-radius: 0 5px 5px 0;
+
+      -webkit-transition: All 0.2s ease;
+      -moz-transition: All 0.2s ease;
+      -o-transition: All 0.2s ease;
+      -ms-transition: All 0.2s ease;
+      transition: All 0.2s ease;
+
+      cursor: pointer;
+
+      &:hover {
+        background-color: #F7AF28;
+      }
+
+      &:disabled:hover {
+        cursor: wait;
+        background-color: #FDC66A;
+      }
     }
   }
 }

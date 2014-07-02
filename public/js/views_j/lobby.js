@@ -1,14 +1,13 @@
 define([
-    'views/baseView',
-    'tmpl/main'
-], 
-function(BaseView, tmpl) {
-    var MainView = BaseView.extend({
+   'views/baseView',
+   'tmpl_j/lobby'
+], function(BaseView, tmpl) {
+    var LobbyView = BaseView.extend({
 
         template: tmpl,
         tagName: 'section',
         className: 'page',
-        pageId: '#main',
+        pageId: '#lobby',
         hidden: true,
 
         initialize: function () {
@@ -20,12 +19,8 @@ function(BaseView, tmpl) {
             this.$el.attr('id', this.pageId.slice(1));
             return this;
         },
-        
+
         show: function () {
-//            $.event.trigger({
-//                type: "showPageEvent",
-//                pageId: this.pageId
-//            });
             this.$el.show();
             this.hidden = false;
         },
@@ -39,5 +34,5 @@ function(BaseView, tmpl) {
 
     });
 
-    return new MainView();
+    return new LobbyView();
 });

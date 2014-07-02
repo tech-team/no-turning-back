@@ -10,21 +10,11 @@
         <link rel="stylesheet" type="text/css" href="css/min/joystick.min.css" />
 	</head>
 	<body>
-        <div class="inputs">
-            <form id="tokenForm" method='post' class="one-field-input">
-                <input type="text" id="token" class="one-field-input__input-field" placeholder="Enter a token" autocomplete="off" name="token"/>
-                <input type="submit" id="connect" class="one-field-input__send-button" value="Submit" />
-            </form>
-            <div id="message"></div>
-        </div>
-        <div class="canvasHolder" style="display:none;">
-            <canvas id="canvas">You have a very old browser, dude.</canvas>
-        </div>
-        <fest:include context="json" src="../templates/_message.xml" />
+        <div id="pages" class="pages"></div>
         <br />
 
         <fest:if test="json.development">
-            <script data-main="js/main_joystick" src="js/lib/require.js"></script>
+            <script data-main="js/main_j" src="js/lib/require.js"></script>
             <script src="http://localhost:35729/livereload.js?snipver=1"></script>
         </fest:if>
         <fest:if test="!json.development">
@@ -33,8 +23,8 @@
             </script>
             <script src="js/joystick/build/build.min.js"></script>
             <script>
-                require(['main_joystick'], function(){
-                console.timeEnd('load');
+                require(['main_j'], function(){
+                    console.timeEnd('load');
                 });
             </script>
         </fest:if>
