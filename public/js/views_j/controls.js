@@ -1,8 +1,9 @@
 define([
     'views/baseView',
     'tmpl_j/controls',
-    'joystick/Controller'
-], function(BaseView, tmpl, Controller) {
+    'joystick/Controller',
+    'utils/Message'
+], function(BaseView, tmpl, Controller, Messenger) {
     var ControlsView = BaseView.extend({
 
         template: tmpl,
@@ -15,6 +16,7 @@ define([
         controller: null,
 
         $canvas: null,
+        messenger: null,
 
         initialize: function () {
             this.render();
@@ -26,6 +28,7 @@ define([
 
             this.$canvas = this.$('canvas');
             this.controller = new Controller(this.$canvas[0], function() {});
+            this.messenger = new Messenger(this.$el);
 
             return this;
         },
@@ -58,8 +61,23 @@ define([
 
         },
 
-        onMessage: function() {
-
+        onMessage: function(data) {
+//            switch (data.type) {
+//                case "info":
+//                    if (data.action === "gamefinished") {
+//                        this.messenger.showMessage(data.message, false);
+//                    }
+//                    else if (data.action === "gameStateChanged") {
+//                        if (data.arg === "pause")
+//                            this.messenger.showMessage("Game paused", true);
+//                        else if (data.arg === "play")
+//                            this.messenger.hideMessage();
+//                    }
+//                    break;
+//                case "disconnect":
+//                    this.disconnect();
+//                    break;
+//            }
         },
 
         onStatusChanged: function() {
@@ -67,7 +85,19 @@ define([
         },
 
         onDisconnect: function() {
+            this.messenger.showMessage("You were disconnected", false, function() {
+                location.reload();
+            });
+        },
 
+        disconnect: function(sendToClient) {
+            localStorage.removeItem('playerguid');
+            if (sendToClient) {
+                window.serverSend({
+                    type: "disconnect"
+                });
+            }
+            window.server.disconnect();
         }
 
     });

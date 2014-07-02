@@ -32,6 +32,7 @@ define([
             callbacks.onMessage || (callbacks.onMessage = function(data) {});
             callbacks.onStatusChanged || (callbacks.onStatusChanged = function(status) {});
             callbacks.onDisconnect || (callbacks.onDisconnect = function() {});
+            callbacks.onWrongToken || (callbacks.onWrongToken = function() {});
 
             this.callbacks = callbacks;
         },
@@ -68,6 +69,8 @@ define([
                         if (data.status == 'success') { //  В случае успеха
                             // Стартуем джостик
                             self.start(data.guid);
+                        } else {
+                            self.callbacks.onWrongToken();
                         }
                     });
                 });

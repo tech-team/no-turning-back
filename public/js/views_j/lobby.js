@@ -3,7 +3,7 @@ define([
    'tmpl_j/lobby',
    'utils/BrowserCheck',
    'device_normalizer',
-   'joystick/j_connector',
+   'joystick/JConnector',
    'utils/Message'
 ], function(BaseView, tmpl, checker, device_normalizer, JConnector, Message) {
     var LobbyView = BaseView.extend({
@@ -72,7 +72,8 @@ define([
                 onStart: this.onJStart.bind(this),
                 onMessage: this.onMessage.bind(this),
                 onStatusChanged: this.onStatusChanged.bind(this),
-                onDisconnect: this.onDisconnect.bind(this)
+                onDisconnect: this.onDisconnect.bind(this),
+                onWrongToken: this.onWrongToken.bind(this)
             });
         },
 
@@ -122,6 +123,10 @@ define([
 
         onDisconnect: function() {
 
+        },
+
+        onWrongToken: function() {
+            this.messenger.showMessage("Wrong Token. Try Again");
         },
 
 
