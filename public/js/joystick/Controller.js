@@ -482,8 +482,16 @@ define([
                 console.log('new weapon: ' + name);
             },
 
-            changeWeapon: function(name) {
+            changeWeapon: function(name, noPropagation) {
                 console.log('changed weapon to: ' + name);
+
+                if (!noPropagation) {
+                    window.serverSend({
+                        type: "game",
+                        action: "weaponchange",
+                        weapon: name
+                    });
+                }
             },
 
             onGyro: function(e) {

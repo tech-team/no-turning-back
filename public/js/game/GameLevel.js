@@ -535,6 +535,11 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
         onWeaponChange: function(name) {
             this.redrawGameObject(this.player);
             ResourceManager.playSound(ResourceManager.soundList.Weapons[name].Draw, ResourceManager.weaponData.drawCooldown);
+            window.serverSend({
+                type: 'game',
+                action: 'weaponChange',
+                name: name
+            });
         },
 
         playerShootingHandle: function() {

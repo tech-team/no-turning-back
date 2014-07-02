@@ -121,6 +121,8 @@ define([
                         if (data.doSwitch) {
                             this.controller.changeWeapon(data.weapon);
                         }
+                    } else if (data.action == 'changeWeapon') {
+                        this.controller.changeWeapon(data.name, true);
                     }
 
                 default:
