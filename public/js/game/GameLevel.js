@@ -255,8 +255,6 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                 x: this.player.x(),
                 y: this.player.y()});
 
-
-
             this.effects.damage = this.addToStage({
                 type: "effect",
                 tex: "effects/damage",
@@ -264,6 +262,14 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                 w: this.stage.canvas.width,
                 h: this.stage.canvas.height}, true);
             this.effects.damage.visible = false;
+
+            this.effects.poison = this.addToStage({
+                type: "effect",
+                tex: "effects/poison",
+                x: 0, y: 0,
+                w: this.stage.canvas.width,
+                h: this.stage.canvas.height}, true);
+            this.effects.poison.visible = false;
 
             this.initOverlay();
 

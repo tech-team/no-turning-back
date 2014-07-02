@@ -90,6 +90,11 @@ define([
                     color: "#0FFFF0",
                     period: 5
                 },
+                playerPoisoned: {
+                    text: ["Oh no, i'm poisoned! Need a medkit to cure!", "Zombie's poison, i gonna die...", "Hey, may be i'll become a zombie after that poison?"],
+                    color: "#FF2233",
+                    period: 15
+                },
 
                 setStage: function(stage) {
                     this.stage = stage;

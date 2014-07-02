@@ -3,9 +3,10 @@ define([
     'signals',
     'game/ResourceManager',
     'game/misc/UntilTimer',
+    'game/misc/Messenger',
     'game/weapons/Weapons'
 ],
-function(AliveObject, signals, ResourceManager, UntilTimer, Weapons) {
+function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, Weapons) {
 	var Player = AliveObject.$extend({
 		__init__: function(dispObj) {
             this.$super(dispObj);
@@ -17,6 +18,8 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Weapons) {
             this.saturationTime = 0;
             this.effects = null;
             this.events = null;
+
+            this.poisonTimer = null;
 
             this.currentWeapon = "knife";
             this.weapons = { };
@@ -105,7 +108,6 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Weapons) {
             this.events.keyAdded.dispatch(key);
         },
 
-        //TODO: rename to onLevelFinished/prepareToNextLevel
         clearKeys: function() {
             this.dispObj.data.keys = [];
         },
@@ -325,8 +327,8 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Weapons) {
             }
         },
 
-        damage: function(howMuch) {
-            var armor = this.armor() - howMuch;
+        damage: function(value) {
+            var armor = this.armor() - value;
             if (armor < 0) { //no more armor
                 this._setHealth(this.health() + armor);
                 this._setArmor(0);
@@ -337,7 +339,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Weapons) {
                 return; //do not hurt player, thx for armor!
             }
 
-            this._setHealth(this.health() - howMuch);
+            this._setHealth(this.health() - value);
             ResourceManager.playSound(ResourceManager.soundList.PlayerHurt);
 
             //TODO: should be replaced with UntilTimer
@@ -356,9 +358,38 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Weapons) {
                 }
             }, 50);
         },
+        
+        poison: function(value) {
+            var self = this;
+
+            Messenger.showMessage(Messenger.playerPoisoned);
+
+            var poisonEffect = this.effects.poison;
+            poisonEffect.alpha = 0.5;
+            poisonEffect.visible = true;
+
+            this.poisonTimer = setInterval(function() {
+                if (poisonEffect.alpha > 0) {
+                    poisonEffect.alpha -= 1.0/value;
+                    self._setHealth(self.health() - 1);
+                }
+                else
+                    self.stopPoison();
+            }, 50);
+        },
+
+        stopPoison: function() {
+            //TODO: maybe add easing?
+
+            var poisonEffect = this.effects.poison;
+            poisonEffect.visible = false;
+            clearInterval(this.poisonTimer);
+        },
 
         heal: function(howMuch) {
             var self = this;
+
+            this.stopPoison();
             var tid = setInterval(function() {
                 if (howMuch > 0) {
                     howMuch--;
