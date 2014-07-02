@@ -9,7 +9,7 @@ function($, Class, msgTmpl) {
             this.msgTemplate = msgTmpl;
             this.$msgContainer = null;
 
-            this.$parent = $parent || $(document);
+            this.$parent = $parent;
             this.$message = null;
             this.$messageText = null;
             this.$messageTextbox = null;
@@ -109,6 +109,9 @@ function($, Class, msgTmpl) {
                 message: messageText
             };
             this.$msgContainer = $(this.msgTemplate(data));
+            if (!this.$parent)
+                this.$parent = $(document);
+
             this._addToDOM();
 
             if (controls) {

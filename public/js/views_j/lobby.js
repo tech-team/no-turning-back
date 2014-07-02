@@ -32,9 +32,8 @@ define([
         initialize: function () {
             window.scrollTo(0,1);
             mo.init();
-            this.createWindowEvents();
-
             this.render();
+            this.createWindowEvents();
         },
 
         render: function () {
@@ -45,10 +44,13 @@ define([
             this.$token = this.$('#token');
             this.$connectorMessage = this.$('#message');
 
-            this.messenger = new Message(this.$el);
             this.createEvents();
 
             return this;
+        },
+
+        setMessenger: function(messenger) {
+            this.messenger = messenger;
         },
 
         setJConnector: function(jConnector, noRecreate) {
@@ -72,9 +74,10 @@ define([
         },
 
         createWindowEvents: function() {
+            var self = this;
             window.addEventListener("orientationchange", function (e) {
-                this.checkOrientation();
-            }.bind(this), false);
+                self.checkOrientation();
+            }, false);
         },
 
         removeWindowEvents: function() {
@@ -134,14 +137,15 @@ define([
             var orient = this.getOrientation();
             if (orient === this.static.Orientation.Portrait) {
                 this.messenger.showMessage("Change device orientation to landscape", true);
-                window.serverSend({
-                    type: "orientation",
-                    orientation: orient
-                });
             }
             else {
                 this.messenger.hideMessage();
             }
+
+            window.serverSend && window.serverSend({
+                type: "orientation",
+                orientation: orient
+            });
         },
 
         checkBrowserSupport: function() {

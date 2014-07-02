@@ -1,10 +1,11 @@
 define([
         'backbone',
+        'utils/Message',
         'views/viewmanager',
         'views_j/lobby',
         'views_j/controls'
     ],
-    function(Backbone, ViewManager, LobbyView, ControlsView) {
+    function(Backbone, Message, ViewManager, LobbyView, ControlsView) {
         var Router = Backbone.Router.extend({
             routes: {
                 'j': 'controlsAction',
@@ -12,6 +13,7 @@ define([
             },
 
             jConnector: null,
+            messenger: new Message(ViewManager.$el),
 
             goTo: function(where) {
                 this.navigate(where, {trigger: true});
@@ -22,6 +24,8 @@ define([
                 ViewManager.addView(LobbyView);
                 ViewManager.addView(ControlsView);
 
+                LobbyView.setMessenger(this.messenger);
+                ControlsView.setMessenger(this.messenger);
 
                 var self = this;
                 LobbyView.on('joystickStarted', function(jConnector) {

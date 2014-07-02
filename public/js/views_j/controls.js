@@ -30,9 +30,13 @@ define([
 
             this.$canvas = this.$('canvas');
             this.controller = new Controller(this.$canvas[0], function() {});
-            this.messenger = new Messenger(this.$el);
 
+            this.createWindowEvents();
             return this;
+        },
+
+        createWindowEvents: function() {
+            window.addEventListener("deviceorientation", this.controller.onGyro.bind(this.controller), false);
         },
 
         show: function () {
@@ -81,6 +85,10 @@ define([
             this.messenger.showMessage("Do you really want to reconnect?", true, null, controls);
         },
 
+        setMessenger: function(messenger) {
+            this.messenger = messenger;
+        },
+
         setJConnector: function(jConnector) {
             var callbacks = {
                 onStart: this.onJStart.bind(this),
@@ -99,22 +107,21 @@ define([
         },
 
         onMessage: function(data, answer) {
-//            switch (data.type) {
-//                case "info":
-//                    if (data.action === "gamefinished") {
-//                        this.messenger.showMessage(data.message, false);
-//                    }
-//                    else if (data.action === "gameStateChanged") {
-//                        if (data.arg === "pause")
-//                            this.messenger.showMessage("Game paused", true);
-//                        else if (data.arg === "play")
-//                            this.messenger.hideMessage();
-//                    }
-//                    break;
-//                case "disconnect":
-//                    this.disconnect();
-//                    break;
-//            }
+            switch (data.type) {
+                case "info":
+                    if (data.action === "gamefinished") {
+                        this.messenger.showMessage(data.message, false);
+                    }
+                    else if (data.action === "gameStateChanged") {
+                        if (data.arg === "pause")
+                            this.messenger.showMessage("Game paused", true);
+                        else if (data.arg === "play")
+                            this.messenger.hideMessage();
+                    }
+                    break;
+                default:
+                    break;
+            }
         },
 
         onStatusChanged: function() {
@@ -123,23 +130,12 @@ define([
 
         onDisconnect: function() {
             var self = this;
-            this.messenger.showMessage("You were disconnected. Try reloading the page.", true);
+            this.messenger.showMessage("You were disconnected. Try reloading.", true);
         },
 
         onForceReconnect: function(noNotification) {
             this.trigger('JReconnect', noNotification);
-        },
-
-        disconnect: function(sendToClient) {
-//            localStorage.removeItem('playerguid');
-//            if (sendToClient) {
-//                window.serverSend({
-//                    type: "disconnect"
-//                });
-//            }
-//            window.server.disconnect();
         }
-
     });
 
     return new ControlsView();

@@ -46,10 +46,10 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.ricochetObjects = [];
             this.drops = [];
 
-//            /*** <Joystick stuff> ***/
-//            this.lastShootTime = 0;
-//            this.shootDelta = 350;
-//            /*** </Joystick stuff> ***/
+            /*** <Joystick stuff> ***/
+            this.lastShootTime = 0;
+            this.shootDelta = 350;
+            /*** </Joystick stuff> ***/
 
             this.finished = false;
 

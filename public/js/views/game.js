@@ -105,16 +105,6 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             this.game.continueGame();
         },
 
-        disconnect: function(sendToJoystick) {
-            localStorage.removeItem('consoleguid');
-            if (sendToJoystick) {
-                window.server.send({
-                    type: "disconnect"
-                });
-            }
-            window.server.disconnect();
-        },
-
         render: function () {
             this.$el.html(this.template());
             this.$el.attr('id', this.pageId.slice(1));
@@ -242,10 +232,6 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                         this.game.continueGame(true);
                     }
                     break;
-
-                case "disconnect":
-                    this.disconnect();
-                    break;
                 default:
                     break;
             }
@@ -270,7 +256,8 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
                 },
                 onMessage: function(data, answer) {
-                    if (data.type === "orientation" || data.type === "disconnect") {
+//                    console.log(data);
+                    if (data.type === "orientation") {
                         self.onJoystickMessage(data, answer);
                     }
                     else {
@@ -281,11 +268,10 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
                 },
                 onDisconnect: function() {
-//                    console.log("joystick disconnected");
-//                    self.messenger.showMessage("You were disconnected", false, function() {
-//                        self.game.continueGame();
-//                    });
-//                    self.game.pause(true);
+                    self.messenger.showMessage("You were disconnected", false, function() {
+                        self.game.continueGame();
+                    });
+                    self.game.pause(true);
                 }
             });
         },
