@@ -238,7 +238,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
         },
 
-        startJoystick: function() { // TODO: add reconnect feature
+        startJoystick: function() {
             var self = this;
             this.cConnector = new CConnector({
                 onStart: function() {

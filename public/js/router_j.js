@@ -35,7 +35,6 @@ define([
                 });
 
                 ControlsView.on('JReconnect', function(noNotification) {
-                    console.log('on JReconnect');
                     if (noNotification)
                         ControlsView.disableConfirm();
                     self.goTo(LobbyView.pageId);
