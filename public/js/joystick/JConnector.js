@@ -100,24 +100,25 @@ define([
         },
 
         forceReconnect: function(theirAttempt) {
+            var guid = localStorage.getItem('playerguid');
+            localStorage.removeItem('playerguid');
             this.applyCallback('onForceReconnect', theirAttempt);
             if (!theirAttempt) {
                 var self = this;
-                var guid = localStorage.getItem('playerguid');
                 self.server.send({
                     type: '__forceReconnect__'
                 }, function(data) {
                     self.server.unbind({guid: guid}, function(data) {
                         if (data.status == 'success') {
                             console.log('onReconnecting unbind success: ');
-                            self.reconnect("k");
+                            self.init();
                         } else {
                             console.warn('onReconnecting error: ' + data.status);
                         }
                     });
                 });
             } else {
-                this.reconnect("k");
+                this.init();
             }
         },
 

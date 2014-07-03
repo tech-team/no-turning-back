@@ -6,7 +6,7 @@ var functions = {
 	getToken: function(data, answer){
 		var token;
 
-		if (this.token){
+		if (this.token && !data.forceNewToken){
 			token = this.token;
 		} else {
 			var min = parseInt(1000,16);

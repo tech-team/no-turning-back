@@ -120,7 +120,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
             this.$mobileIcon = this.$('.mobile-icon');
             this.$mobileConnect = this.$('.mobile-connect');
-            this.$mobileToken = this.$('.mobile-connect__token');
+            this.$mobileToken = this.$('#connect_token');
 
             this.$reconnectButton = this.$('.reconnect-button');
             this.$loadingIndicator = this.$('.loading-indicator');
@@ -193,9 +193,9 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
 
             this.$reconnectButton.on('click', function() {
-                self.$reconnectButton.hide();
                 self.$loadingIndicator.show();
-                window.server.forceReconnect();
+                self.$mobileToken.hide();
+                window.server && window.server.forceReconnect();
             });
 
             (new KeyCoder()).addEventListener("keyup", KeyCoder.P, this.triggerGamePause.bind(this));
@@ -249,15 +249,11 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                     if (self.mobileOpened) {
                         self.triggerConnectDialog(); // скрыть если открыто
                     }
-                    self.$reconnectButton.show();
                 },
                 saveToken: function(token) {
+                    self.$mobileToken.show();
                     self.$loadingIndicator.hide();
                     self.$mobileToken.text(token);
-                    if (token == "Already connected") {
-                        self.$reconnectButton.show();
-                    }
-
                 },
                 onMessage: function(data, answer) {
                     if (data.type === "orientation") {
@@ -274,6 +270,8 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
                         var closeCallback = function() {
                             self.messenger.hideMessage();
+                            if (self.gamePaused)
+                                self._resumeGame(true);
                         };
 
                         var controls = [
@@ -305,11 +303,15 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
             this.game = new Game(this.canvas, false, 
                 function() {
-                    if (!self.mobileOpened) {
-                        self.showPauseButton();
-                    }
                     self.startJoystick();
                     self.game.run();
+                    if (!self.mobileOpened) {
+                        self.showPauseButton();
+                    } else {
+                        self.triggerGamePause();
+                        self.triggerConnectDialog();
+                        self.triggerConnectDialog();
+                    }
                 }
             );
 
@@ -327,7 +329,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                 if (event.state === Game.GameState.Pause) {
                     self.messenger.showMessage("Game paused", true);
                     if (!event.ignore_notify) {
-                        window.serverSend({
+                        window.serverSend && window.serverSend({
                             type: "info",
                             action: "gameStateChanged",
                             arg: "pause"
@@ -336,7 +338,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                 } else if (event.state === Game.GameState.Game) {
                     self.messenger.hideMessage();
                     if (!event.ignore_notify) {
-                        window.serverSend({
+                        window.serverSend && window.serverSend({
                             type: "info",
                             action: "gameStateChanged",
                             arg: "play"

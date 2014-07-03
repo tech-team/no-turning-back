@@ -74,13 +74,13 @@ define([
             });
         },
 
-        init: function() {
+        init: function(forceNewToken) {
             var self = this;
             console.log('ready');
             // Если id нет
             if (!localStorage.getItem('consoleguid')) {
                 // Получаем токен
-                this.server.getToken(function (token) {
+                this.server.getToken({forceNewToken: forceNewToken}, function (token) {
                     console.log('token: ' + token);
                     localStorage.setItem('token', token);
                     self.applyCallback('saveToken', token);
@@ -99,24 +99,30 @@ define([
         },
 
         forceReconnect: function(theirAttempt) {
+            var guid = localStorage.getItem('consoleguid');
+            if (guid === null) {
+                this.init(true);
+                return;
+            }
+            localStorage.removeItem('consoleguid');
+            localStorage.removeItem('token');
             this.applyCallback('onForceReconnect', theirAttempt);
             if (!theirAttempt) {
                 var self = this;
-                var guid = localStorage.getItem('consoleguid');
-                self.server.send({
+                self.server && self.server.send({
                     type: '__forceReconnect__'
                 }, function(data) {
                     self.server.unbind({guid: guid}, function(data) {
                         if (data.status == 'success') {
                             console.log('onReconnecting unbind success: ');
-                            self.reconnect("k");
+                            self.init();
                         } else {
                             console.warn('onReconnecting error: ' + data.status);
                         }
                     });
                 });
             } else {
-                this.reconnect("k");
+                this.init();
             }
         },
 

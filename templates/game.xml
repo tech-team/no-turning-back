@@ -10,7 +10,10 @@
         <canvas id="game-field">You have a very old browser, dude.</canvas>
         <div class="mobile-connect">
             <div class="mobile-connect__header">Enter this token on your mobile device:</div>
-            <div class="mobile-connect__token"><div class="loading-indicator token-loading"></div></div>
+            <div class="mobile-connect__token">
+                <div class="loading-indicator token-loading"></div>
+                <div id="connect_token"></div>
+            </div>
             <div class="reconnect-button">
                 <img class="reconnect-button__image" src="/res/img/reconnect.png" width="50" height="50"></img>
             </div>
