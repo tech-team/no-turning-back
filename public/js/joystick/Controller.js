@@ -39,7 +39,7 @@ define([
 
                 this.availableWeapons = [];
                 var tid = setInterval(function() {
-                    window.serverSend({
+                    window.server.send({
                         type: 'game',
                         action: 'availableWeapons'
                     }, function(weapons) {
@@ -301,7 +301,7 @@ define([
 
                 var phi = (180 / Math.PI) * Math.atan2(target_prime.y, target_prime.x);
 
-                window.serverSend({
+                window.server.send({
                     type: "game",
                     action: "move",
                     r: r,
@@ -383,7 +383,7 @@ define([
 
                     self.forceUpdate();
 
-                    window.serverSend({
+                    window.server.send({
                         type: "game",
                         action: "shoot",
                         timestamp: evt.timeStamp
@@ -404,7 +404,7 @@ define([
 
                     self.forceUpdate();
 
-                    window.serverSend({
+                    window.server.send({
                         type: "game",
                         action: "use",
                         timestamp: evt.timeStamp
@@ -471,7 +471,7 @@ define([
                 this.toolBar.selection.y = this.currentWeapon.y;
                 this.forceUpdate();
 
-                window.serverSend({
+                window.server.send({
                     type: "game",
                     action: "weaponchange",
                     weapon: weapon.name
@@ -486,7 +486,7 @@ define([
                 console.log('changed weapon to: ' + name);
 
                 if (!noPropagation) {
-                    window.serverSend({
+                    window.server.send({
                         type: "game",
                         action: "weaponchange",
                         weapon: name

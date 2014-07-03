@@ -83,7 +83,7 @@ $borderRadius: 20px;
         margin-right: 0;
       }
 
-      &:hover {
+      &:hover, &.hover_effect {
         color: white;
         background-color: black;
       }

@@ -142,7 +142,7 @@ define([
                 this.messenger.hideMessage();
             }
 
-            window.serverSend && window.serverSend({
+            window.server && window.server.send({
                 type: "orientation",
                 orientation: orient
             });

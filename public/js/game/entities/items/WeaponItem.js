@@ -38,7 +38,7 @@ define([
                     doSwitch = true;
                 }
 
-                window.serverSend({
+                window.server.send({
                     type: 'game',
                     action: 'newWeapon',
                     weapon: name,

@@ -20,11 +20,6 @@ define([
             this.createServerEvents();
             this.init();
             window.server = this.server;
-            window.serverSend = function(obj, answer) {
-                if (window.server) {
-                    window.server.send(obj, answer)
-                }
-            };
         },
 
         applyCallback: function(name) {
@@ -107,7 +102,7 @@ define([
                 var self = this;
                 self.server.send({
                     type: '__forceReconnect__'
-                }, function(data) {
+                }, function() {
                     self.server.unbind({guid: guid}, function(data) {
                         if (data.status == 'success') {
                             console.log('onReconnecting unbind success: ');

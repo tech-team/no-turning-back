@@ -329,7 +329,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                 if (event.state === Game.GameState.Pause) {
                     self.messenger.showMessage("Game paused", true);
                     if (!event.ignore_notify) {
-                        window.serverSend && window.serverSend({
+                        window.server && window.server.send({
                             type: "info",
                             action: "gameStateChanged",
                             arg: "pause"
@@ -338,7 +338,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                 } else if (event.state === Game.GameState.Game) {
                     self.messenger.hideMessage();
                     if (!event.ignore_notify) {
-                        window.serverSend && window.serverSend({
+                        window.server && window.server.send({
                             type: "info",
                             action: "gameStateChanged",
                             arg: "play"

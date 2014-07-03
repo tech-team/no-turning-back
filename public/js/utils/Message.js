@@ -67,6 +67,12 @@ function($, Class, msgTmpl) {
                 var $button = $(this._buttonHtml(control.name));
                 $button.click(control.action);
 
+                $button.off('touchstart touchend');
+                $button.on('click touchstart touchend', function(e) {
+                    e.preventDefault();
+                    $(this).toggleClass('hover_effect');
+                });
+
                 this.$messageControls.append($button);
             }
         },
