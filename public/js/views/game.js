@@ -27,6 +27,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
         $pauseIconPause: null,
         $pauseIconPlay: null,
         gamePaused: false,
+        pauseReason: null,
 
         $mobileIcon: null,
         $mobileConnect: null,
@@ -95,14 +96,14 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             }
         },
 
-        _pauseGame: function() {
+        _pauseGame: function(ignore_notify) {
             this.gamePaused = true;
-            this.game.pause();
+            this.game.pause(ignore_notify);
         },
 
-        _resumeGame: function() {
+        _resumeGame: function(ignore_notify) {
             this.gamePaused = false;
-            this.game.continueGame();
+            this.game.continueGame(ignore_notify);
         },
 
         render: function () {
@@ -192,7 +193,6 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
 
             this.$reconnectButton.on('click', function() {
-//                self.disconnect(true);
                 self.$reconnectButton.hide();
                 self.$loadingIndicator.show();
                 window.server.forceReconnect();
@@ -223,13 +223,17 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                 case "orientation":
                     if (data.orientation === "portrait") {
                         console.log("change orientation!");
+                        this.triggerGamePause();
                         this.messenger.showMessage("Change device orientation to landscape", true);
-                        this.game.pause(true);
+                        this.pauseReason = 'orientation';
                     }
                     else {
-                        console.log("thanks for changing orientation");
-                        this.messenger.hideMessage();
-                        this.game.continueGame(true);
+                        if (this.pauseReason == 'orientation') {
+                            this.pauseReason = null;
+                            console.log("thanks for changing orientation");
+                            this.triggerGamePause();
+                            this.messenger.hideMessage();
+                        }
                     }
                     break;
                 default:
@@ -256,7 +260,6 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
                 },
                 onMessage: function(data, answer) {
-//                    console.log(data);
                     if (data.type === "orientation") {
                         self.onJoystickMessage(data, answer);
                     }
@@ -264,14 +267,30 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                         self.game.onJoystickMessage(data, answer);
                     }
                 },
-                onForceReconnect: function() {
+                onForceReconnect: function(theirAttempt) {
+                    if (theirAttempt) {
+                        if (!self.gamePaused)
+                            self._pauseGame(true);
+
+                        var closeCallback = function() {
+                            self.messenger.hideMessage();
+                        };
+
+                        var controls = [
+                            {
+                                name: "Okay",
+                                action: closeCallback
+                            }
+                        ];
+                        self.messenger.showMessage("Joystick has been disconnected", false, closeCallback, controls);
+                    }
 
                 },
                 onDisconnect: function() {
                     self.messenger.showMessage("You were disconnected", false, function() {
                         self.game.continueGame();
                     });
-                    self.game.pause(true);
+                    self._pauseGame(true);
                 }
             });
         },
@@ -307,8 +326,8 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             this.game.gameStateChanged.add(function(event) {
                 if (event.state === Game.GameState.Pause) {
                     self.messenger.showMessage("Game paused", true);
-                    if (window.server) {
-                        window.server.send({
+                    if (!event.ignore_notify) {
+                        window.serverSend({
                             type: "info",
                             action: "gameStateChanged",
                             arg: "pause"
@@ -316,8 +335,8 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                     }
                 } else if (event.state === Game.GameState.Game) {
                     self.messenger.hideMessage();
-                    if (window.server) {
-                        window.server.send({
+                    if (!event.ignore_notify) {
+                        window.serverSend({
                             type: "info",
                             action: "gameStateChanged",
                             arg: "play"

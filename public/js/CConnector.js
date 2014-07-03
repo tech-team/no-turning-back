@@ -10,7 +10,7 @@ define([
 
             // Создаем связь с сервером
             this.server = new Connector({
-                    server: ['getToken', 'bind'],
+                    server: ['getToken', 'bind', 'unbind'],
                     remote: '/console'
                 }
             );
@@ -61,6 +61,7 @@ define([
             this.server.on('message', function (data, answer) {
                 if (data.type == '__forceReconnect__') {
                     self.forceReconnect(true);
+                    answer && answer()
                 } else {
                     self.applyCallback('onMessage', data, answer);
                 }
@@ -81,6 +82,7 @@ define([
                 // Получаем токен
                 this.server.getToken(function (token) {
                     console.log('token: ' + token);
+                    localStorage.setItem('token', token);
                     self.applyCallback('saveToken', token);
                 });
             } else { // иначе
@@ -96,14 +98,26 @@ define([
             this.applyCallback('onStart');
         },
 
-        forceReconnect: function(noNotification) {
-            this.applyCallback('onForceReconnect');
-            if (!noNotification) {
-                window.server.send({
+        forceReconnect: function(theirAttempt) {
+            this.applyCallback('onForceReconnect', theirAttempt);
+            if (!theirAttempt) {
+                var self = this;
+                var guid = localStorage.getItem('consoleguid');
+                self.server.send({
                     type: '__forceReconnect__'
+                }, function(data) {
+                    self.server.unbind({guid: guid}, function(data) {
+                        if (data.status == 'success') {
+                            console.log('onReconnecting unbind success: ');
+                            self.reconnect("k");
+                        } else {
+                            console.warn('onReconnecting error: ' + data.status);
+                        }
+                    });
                 });
+            } else {
+                this.reconnect("k");
             }
-            this.reconnect("k");
         },
 
         reconnect: function(guid) {
@@ -115,13 +129,17 @@ define([
             this.server.bind({guid: guid}, function (data) {
                 // Если все ок
                 if (data.status == 'success') {
-                    self.applyCallback('saveToken', "Already connected");
+                    var prevToken = localStorage.getItem('token');
+                    console.log('using prev token: ' + prevToken);
+                    prevToken || (prevToken = 'Already connected');
+                    self.applyCallback('saveToken', prevToken);
                     // Стартуем
                     self.start(data.guid);
                     // Если связки уже нет
                 } else if (data.status == 'undefined guid') {
                     // Начинаем все заново
                     localStorage.removeItem('consoleguid');
+                    localStorage.removeItem('token');
                     self.init();
                 }
             });

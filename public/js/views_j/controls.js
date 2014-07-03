@@ -140,6 +140,8 @@ define([
         },
 
         onForceReconnect: function(noNotification) {
+//            if (noNotification)
+                this.messenger.hideMessage();
             this.trigger('JReconnect', noNotification);
         }
     });

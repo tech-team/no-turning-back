@@ -121,11 +121,10 @@ function($, _, Class, signals, createjs, alertify, KeyCoder, LevelManager, GameL
 
         changeState: function(state, ignore_notify) {
             this.state = state;
-            if (!ignore_notify) {
-                this.gameStateChanged.dispatch({
-                    state: this.state
-                });
-            }
+            this.gameStateChanged.dispatch({
+                state: this.state,
+                ignore_notify: ignore_notify
+            });
         },
 
 		stop: function(ignore_notify) {

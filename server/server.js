@@ -112,7 +112,36 @@ var functions = {
 			}
 		}
 
-	}
+        console.log('bind: bindings.keys() = ', Object.keys(bindings));
+
+	},
+
+    unbind: function(data, answer) {
+        if (bindings[data.guid]){
+            var g = data.guid;
+
+            answer({
+                status: 'success'
+            });
+
+            delete bindings[g].console.binding;
+            bindings[g].console.removeAllListeners('sms');
+            delete bindings[g].console;
+
+            delete bindings[g].player.binding;
+            bindings[g].player.removeAllListeners('sms');
+            delete bindings[g].player;
+
+            delete bindings[g];
+
+        } else {
+            answer({
+                status: 'undefined guid'
+            });
+        }
+
+        console.log('unbind: bindings.keys() = ', Object.keys(bindings));
+    }
 };
 
 function sms(data, answer){

@@ -57,6 +57,7 @@ define([
             this.server.on('message', function (data, answer) {
                 if (data.type == '__forceReconnect__') {
                     self.forceReconnect(true);
+                    answer && answer()
                 } else {
                     self.applyCallback('onMessage', data, answer);
                 }
@@ -98,14 +99,26 @@ define([
             }
         },
 
-        forceReconnect: function(noNotification) {
-            this.applyCallback('onForceReconnect', noNotification);
-            if (!noNotification) {
-                window.server.send({
+        forceReconnect: function(theirAttempt) {
+            this.applyCallback('onForceReconnect', theirAttempt);
+            if (!theirAttempt) {
+                var self = this;
+                var guid = localStorage.getItem('playerguid');
+                self.server.send({
                     type: '__forceReconnect__'
+                }, function(data) {
+                    self.server.unbind({guid: guid}, function(data) {
+                        if (data.status == 'success') {
+                            console.log('onReconnecting unbind success: ');
+                            self.reconnect("k");
+                        } else {
+                            console.warn('onReconnecting error: ' + data.status);
+                        }
+                    });
                 });
+            } else {
+                this.reconnect("k");
             }
-            this.reconnect("k");
         },
 
         // Переподключение
