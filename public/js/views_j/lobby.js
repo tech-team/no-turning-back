@@ -58,7 +58,8 @@ define([
                 onStart: this.onJStart.bind(this),
                 onMessage: this.onMessage.bind(this),
                 onStatusChanged: this.onStatusChanged.bind(this),
-                onDisconnect: this.onDisconnect.bind(this)
+                onDisconnect: this.onDisconnect.bind(this),
+                onWrongToken: this.onWrongToken.bind(this)
             };
 
             if (!this.jConnector) {
@@ -123,7 +124,19 @@ define([
         },
 
         onWrongToken: function() {
-            this.messenger.showMessage("Wrong Token. Try Again");
+            var self = this;
+            var closeCallback = function() {
+                self.messenger.hideMessage();
+                self.$token.select();
+            };
+
+            var controls = [
+                {
+                    name: "Okay",
+                    action: closeCallback
+                }
+            ];
+            this.messenger.showMessage("Wrong Token. Try Again", false, closeCallback, controls);
         },
 
 

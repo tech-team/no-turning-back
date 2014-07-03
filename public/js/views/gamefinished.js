@@ -51,7 +51,6 @@ function(Backbone, tmpl, Scoreboard, Player, ViewManager) {
             this.dimmer.click(function() {
                 self.hide();
                 ViewManager.show(ViewManager.views['#scoreboard'], true);
-//                window.location = '#scoreboard';
             });
 
             this.senderForm.submit(function(event) {
