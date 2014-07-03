@@ -44,6 +44,9 @@ define([
         },
 
         createServerEvents: function() {
+            this.server.on('connect', function() {
+                this.applyCallback('onStatusChanged', 'ready');
+            }.bind(this));
             this.server.on('reconnect', this.reconnect.bind(this));
             this.server.on('forceReconnect', this.forceReconnect.bind(this));
 
@@ -67,7 +70,7 @@ define([
 
         // Инициализация
         init: function () {
-            this.applyCallback('onStatusChanged', 'ready');
+            this.applyCallback('onStatusChanged', 'not ready');
 
             // Если id нет
             if (!localStorage.getItem('playerguid')) {
