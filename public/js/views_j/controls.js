@@ -52,7 +52,7 @@ define([
         },
 
         enableConfirm: function() {
-            this.confirmDisabled = true;
+            this.confirmDisabled = false;
         },
 
         confirm: function(callbacks) {

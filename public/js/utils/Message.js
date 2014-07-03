@@ -68,9 +68,9 @@ function($, Class, msgTmpl) {
                 $button.click(control.action);
 
                 $button.off('touchstart touchend');
-                $button.on('click touchstart touchend', function(e) {
-                    e.preventDefault();
+                $button.on('touchstart touchend', function(e) {
                     $(this).toggleClass('hover_effect');
+                    return true;
                 });
 
                 this.$messageControls.append($button);

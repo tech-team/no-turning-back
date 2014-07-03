@@ -374,9 +374,10 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                                 speedModifier: speedModifier,
                                 angle: data.phi
                             };
+                            this.jMoving = true;
+                        } else {
+                            this.jMoving = false;
                         }
-
-                        this.jMoving = true;
                         this.jMovementData = movementData;
                         break;
                     case "use":
@@ -765,12 +766,8 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             if (this.finished)
                 return;
 
-            if (this.jMoving) {
-                if (this.jMovementData.speedModifier === null) {
-                    this.jMoving = false;
-                } else {
-                    this.player.movementHandle(this.jMovementData, this.collisionObjects);
-                }
+            if (this.jMoving && this.jMovementData) {
+                this.player.movementHandle(this.jMovementData, this.collisionObjects);
             }
 
             if (this.checkBounds(this.player)) {
