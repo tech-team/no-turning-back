@@ -7,6 +7,7 @@
   left: 0;
   background-color: black;
   opacity: $dimmer-opacity;
+  z-index: 1000;
 }
 
 $messageWidth: 350px;
@@ -25,6 +26,7 @@ $controlsHeight: 40px;
   -webkit-transform: translate($xOffset, $yOffset);
   -ms-transform: translate($xOffset, $yOffset);
   transform: translate($xOffset, $yOffset);
+
 }
 
 $borderRadius: 20px;
@@ -36,6 +38,7 @@ $borderRadius: 20px;
     @include message-inner-thing($messageWidth, $messageHeight, -50%, -50%);
 
     border-radius: $borderRadius;
+    z-index: 1001;
 
     &__text {
       color: black;
@@ -60,6 +63,7 @@ $borderRadius: 20px;
     padding-bottom: 10px;
     border-radius: 0 0 $borderRadius $borderRadius;
     text-align: center;
+    z-index: 1001;
 
     &__button {
       display: inline-block;

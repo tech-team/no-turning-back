@@ -37,22 +37,27 @@ function(Backbone) {
             this.router = router;
         },
 
-        show: function(viewToShow) {
+        show: function(viewToShow, noConfirm) {
             if (!this.currentView) {
                 this._setCurrentViewActive(viewToShow);
                 return;
             }
 
-            var self = this;
-            this.currentView.confirm({
-                yes: function() {
-                    self._closeOthers(viewToShow.pageId);
-                    self._setCurrentViewActive(viewToShow);
-                },
-                no: function() {
-                    self.router.navigate(self.currentView.pageId);
-                }
-            });
+            if (!noConfirm) {
+                var self = this;
+                this.currentView.confirm({
+                    yes: function () {
+                        self._closeOthers(viewToShow.pageId);
+                        self._setCurrentViewActive(viewToShow);
+                    },
+                    no: function () {
+                        self.router.navigate(self.currentView.pageId);
+                    }
+                });
+            } else {
+                this._closeOthers(viewToShow.pageId);
+                this._setCurrentViewActive(viewToShow);
+            }
 
         }
 

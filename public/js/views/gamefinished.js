@@ -50,7 +50,8 @@ function(Backbone, tmpl, Scoreboard, Player, ViewManager) {
 
             this.dimmer.click(function() {
                 self.hide();
-                window.location = '#scoreboard';
+                ViewManager.show(ViewManager.views['#scoreboard'], true);
+//                window.location = '#scoreboard';
             });
 
             this.senderForm.submit(function(event) {
@@ -138,32 +139,6 @@ function(Backbone, tmpl, Scoreboard, Player, ViewManager) {
 
             var saveFlagInput = $('<input type="hidden" value="1" name="save"/>');
             this.senderForm.append(saveFlagInput);
-        },
-
-        calcDimensions: function() {
-
-            var $sender = this.$el.find('.score-content-wrapper');
-            var senderWidth = $sender.width();
-            var senderHeight = $sender.height();
-
-            var self = this;
-            $(window).resize(function() {
-                var windowWidth = $(this).width();
-                var windowHeight = $(this).height();
-
-                self.dimmer.css({
-                    'height': windowHeight + 'px'
-                });
-
-                var marginLeft = (windowWidth - senderWidth) / 2;
-                var marginTop = (windowHeight - senderHeight) / 2 - 30;
-                $sender.css({
-                    'margin-left': marginLeft + 'px',
-                    'margin-top': marginTop + 'px'
-                });
-            });
-            $(window).resize();
-
         }
 
     });

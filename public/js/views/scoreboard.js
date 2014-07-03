@@ -11,7 +11,7 @@ function(BaseView, ScoresCollection, tmpl, tableTmpl) {
         tableTemplate: tableTmpl,
         tagName: 'section',
         className: 'page',
-        pageId: '#scoreboardPage',
+        pageId: '#scoreboard',
         hidden: true,
 
         $scoresTable: null,

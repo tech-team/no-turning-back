@@ -6,6 +6,7 @@
 	left: 0;
 	background-color: black;
 	opacity: 0.7;
+    z-index: 1000;
 }
 
 @mixin translate($x, $y) {
@@ -24,6 +25,7 @@
     @include translate(-50%, -55%);
     margin: 0;
 	border-radius: 20px;
+    z-index: 1001;
 }
 
 .finish-message {
@@ -38,6 +40,7 @@
     text-align: center;
 //    color: greenyellow;
     font-family: macondoregular,cursive;
+    z-index: 1001;
 }
 
 @import "_oneFieldInput";
