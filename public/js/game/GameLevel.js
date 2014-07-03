@@ -49,6 +49,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             /*** <Joystick stuff> ***/
             this.lastShootTime = 0;
             this.shootDelta = 350;
+            this.jMoving = false;
             /*** </Joystick stuff> ***/
 
             this.finished = false;
@@ -94,8 +95,8 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             },
 
             SpeedModifier: {
-                Normal: 0.75,
-                Sprint: 1.5
+                Normal: 2,
+                Sprint: 4
             },
 
             CameraOffset: 200,
@@ -373,8 +374,10 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                                 speedModifier: speedModifier,
                                 angle: data.phi
                             };
-                            this.player.movementHandle(movementData, this.collisionObjects);
                         }
+
+                        this.jMoving = true;
+                        this.jMovementData = movementData;
                         break;
                     case "use":
                         this.useHandle();
@@ -761,6 +764,14 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
         update: function(event) {
             if (this.finished)
                 return;
+
+            if (this.jMoving) {
+                if (this.jMovementData.speedModifier === null) {
+                    this.jMoving = false;
+                } else {
+                    this.player.movementHandle(this.jMovementData, this.collisionObjects);
+                }
+            }
 
             if (this.checkBounds(this.player)) {
                 this.player.restorePrevPos();

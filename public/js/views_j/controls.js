@@ -51,6 +51,10 @@ define([
             this.confirmDisabled = true;
         },
 
+        enableConfirm: function() {
+            this.confirmDisabled = true;
+        },
+
         confirm: function(callbacks) {
             callbacks = this._getConfirmCallbacks(callbacks);
 

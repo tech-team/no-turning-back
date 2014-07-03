@@ -1,8 +1,8 @@
 define([
+    'lodash',
     'classy',
     'Connector'
-], function(Class, Connector) {
-
+], function(_, Class, Connector) {
     var CConnector = Class.$extend({
         __init__: function(callbacks) {
             this.callbacksArray = [];
