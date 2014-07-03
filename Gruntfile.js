@@ -186,6 +186,11 @@ module.exports = function (grunt) {
 	
 	grunt.registerTask('default', ['watch', 'express']);
 
+
+    grunt.registerTask('watch-express', ['watch:express']);
+    grunt.registerTask('watch-rest', ['watch:fest', 'watch:frontend',
+                                      'watch:scss_main', 'watch:scss_joystick']);
+
 	grunt.registerTask(
 	    'build_main',
 	    [

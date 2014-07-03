@@ -287,10 +287,10 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
                 },
                 onDisconnect: function() {
+                    self._pauseGame(true);
                     self.messenger.showMessage("You were disconnected", false, function() {
                         self.game.continueGame();
                     });
-                    self._pauseGame(true);
                 }
             });
         },
