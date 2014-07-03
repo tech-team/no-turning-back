@@ -6,6 +6,10 @@ function() {
             window.localStorage.setItem(key, value);
         },
 
+        get: function(key) {
+            return window.localStorage.getItem(key);
+        },
+
 		unset: function(key) {
 			window.localStorage.removeItem(key);
 		},

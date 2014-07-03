@@ -120,16 +120,29 @@ define([
                     LocalStorage.setJSON("helpMessageShown", true);
                 }
 
-                this.onLevelLoadClick(); //ask level to load
+                var levelName = LocalStorage.get("lastEditedLevel");
 
-                this.regenerateLevelPropertiesTable();
-                this.populateTexSelect();
-                this.populateTypeSelect();
+                if (levelName) {
+                    this.levelManager.loadLevelByName(levelName, function(data) {
+                        if (data)
+                            self.load(data);
+                        else {
+                            alertify.error("Unable to load level");
+                            self.onLevelLoadClick();
+                        }
+                    });
+                }
+                else
+                    this.onLevelLoadClick(); //ask level to load
             },
 
             load: function(data) {
                 //reset stage
                 this.$super(data);
+
+                //TODO: move all LS keys to LS __classvars__
+                LocalStorage.set("lastEditedLevel", data.name);
+
                 this.setMainContainer(this.mainContainer); //setter in JS, oh wow, lol
 
                 var self = this;
@@ -153,6 +166,12 @@ define([
 
                 //add player
                 this.addToStage(data.player);
+
+                //update GUI
+                this.regenerateLevelPropertiesTable();
+                this.regenerateObjectPropertiesTable();
+                this.populateTexSelect();
+                this.populateTypeSelect();
             },
 
             update: function(event) {
@@ -452,11 +471,8 @@ define([
                     }
 
                     self.levelManager.loadLevelByName(levelName, function(data) {
-                        if (data) {
+                        if (data)
                             self.load(data);
-                            self.regenerateLevelPropertiesTable();
-                            self.regenerateObjectPropertiesTable();
-                        }
                         else
                             alertify.error("Unable to load level");
                     });
