@@ -3,9 +3,9 @@
 	<div class="score-sender-dimmer"></div>
 
 
-    <div class="content-wrapper score-content-wrapper">
+    <div class="finish-message"><fest:value>json.message</fest:value></div>
 
-        <div class="finish-message"><fest:value>json.message</fest:value></div>
+    <div class="content-wrapper score-content-wrapper">
 
 	    <div class="content score-content ">
 	    	<div class="loading-indicator score-content__loading-indicator"></div>

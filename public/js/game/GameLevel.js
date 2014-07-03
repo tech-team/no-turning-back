@@ -81,6 +81,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
                 Debug: {
                     Finish: KeyCoder.X,
+                    FinishGame: KeyCoder.Z,
                     GearUp: KeyCoder.G,
                     ShowKeys: KeyCoder.K,
                     ShowWeapons: KeyCoder.O,
@@ -134,6 +135,16 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
             if (DEBUG) {
                 this.keyCoder.addEventListener("keyup", GameLevel.Keys.Debug.Finish, this.finish.bind(this));
+
+                this.keyCoder.addEventListener("keyup", GameLevel.Keys.Debug.FinishGame, function () {
+                    self.levelFinished.dispatch({
+                        status: 'gameFinished',
+                        score: self.player.score,
+                        message: "Game over"
+                    });
+                });
+
+
 
                 this.keyCoder.addEventListener("keyup", GameLevel.Keys.Debug.GearUp, function () {
                     self.player._setHealth(100);
