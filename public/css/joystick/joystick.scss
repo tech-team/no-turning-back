@@ -43,6 +43,7 @@ $button-width: 84px;
 .inputs {
   width: $input-width + $button-width + 6px;
   margin: 0 auto;
+  padding: 15px 15px 7px 15px;
   position: relative;
   top: 50%;
   -webkit-transform: translateY(-50%);
