@@ -158,6 +158,10 @@ function($, _, Class, signals, createjs, alertify, KeyCoder, LevelManager, GameL
             this.level.onJoystickMessage(data, answer);
         },
 
+        onJoystickReady: function() {
+            this.level.onJoystickReady();
+        },
+
         resize: function() {
             if (this.level)
                 this.level.resize();

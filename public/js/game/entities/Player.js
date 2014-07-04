@@ -154,6 +154,10 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, Weapons) 
             }
         },
 
+        getCurrentWeapon: function() {
+            return this.currentWeapon;
+        },
+
         getAvailableWeapons: function() {
             return _.keys(this.weapons);
         },
@@ -171,6 +175,9 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, Weapons) 
                 this.currentWeapon = name;
                 this.changeTexture(this.currentWeapon);
                 this.shootCooldown = ResourceManager.weaponData.drawCooldown;
+
+                ResourceManager.playSound(ResourceManager.soundList.Weapons[name].Draw, ResourceManager.weaponData.drawCooldown);
+
                 this.events.weaponChanged.dispatch(this.currentWeapon, this.weapons[this.currentWeapon].getAmmo());
             }
         },

@@ -249,6 +249,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                     if (self.mobileOpened) {
                         self.triggerConnectDialog(); // скрыть если открыто
                     }
+                    self.game.onJoystickReady();
                 },
                 saveToken: function(token) {
                     self.$mobileToken.show();

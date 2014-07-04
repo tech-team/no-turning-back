@@ -15,7 +15,7 @@ define([
         jConnector: null,
         controller: null,
 
-        $canvas: null,
+        canvas: null,
         messenger: null,
 
         confirmDisabled: false,
@@ -28,7 +28,7 @@ define([
             this.$el.html(this.template());
             this.$el.attr('id', this.pageId.slice(1));
 
-            this.$canvas = this.$('canvas');
+            this.canvas = this.$('canvas')[0];
             return this;
         },
 
@@ -37,17 +37,17 @@ define([
 
             var $window = $(window);
 
-            this.$canvas[0].width = $window.width();
-            this.$canvas[0].height = $window.height();
+            this.canvas.width = $window.width();
+            this.canvas.height = $window.height();
 
-            this.controller = new Controller(this.$canvas[0]); //why [0]?... and same below
+            this.controller = new Controller(this.canvas);
             $window.resize(function() {
-                self.$canvas[0].width = $window.width();
-                self.$canvas[0].height = $window.height();
+                self.canvas.width = $window.width();
+                self.canvas.height = $window.height();
                 self.controller.resize();
             });
 
-            $window[0].addEventListener("deviceorientation", this.controller.onGyro.bind(this.controller), false);
+            $window.on("deviceorientation", this.controller.onGyro.bind(this.controller), false);
 
             this.$el.show();
             this.hidden = false;
@@ -116,7 +116,7 @@ define([
         },
 
         onJStart: function() {
-
+            console.warn('hi');
         },
 
         onMessage: function(data, answer) {
@@ -138,11 +138,13 @@ define([
                 case 'game':
                     if (data.action == 'newWeapon') {
                         this.controller.addWeapon(data.weapon);
-                        if (data.doSwitch) {
-                            this.controller.changeWeapon(data.weapon);
-                        }
-                    } else if (data.action == 'changeWeapon') {
-                        this.controller.changeWeapon(data.name, true);
+                    }
+                    else if (data.action == 'weaponChange') {
+                        this.controller.selectWeapon(data.name);
+                    }
+                    else if (data.action == 'availableWeapons') {
+                        this.controller.setAvailableWeapons(data.availableWeapons);
+                        this.controller.selectWeapon(data.currentWeapon);
                     }
                     break;
 
@@ -153,7 +155,7 @@ define([
         },
 
         onStatusChanged: function() {
-            throw "onStatusChanged";
+            throw "controls.js onStatusChanged";
         },
 
         onDisconnect: function() {

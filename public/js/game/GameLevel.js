@@ -106,6 +106,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             playerEvents.armorChanged.add(this.overlay.setArmor.bind(this.overlay));
             playerEvents.ammoChanged.add(this.overlay.setAmmo.bind(this.overlay));
             playerEvents.weaponAdded.add(this.overlay.addWeapon.bind(this.overlay));
+            playerEvents.weaponAdded.add(this.onWeaponAdd.bind(this));
             playerEvents.weaponChanged.add(this.overlay.setWeapon.bind(this.overlay));
             playerEvents.weaponChanged.add(this.onWeaponChange.bind(this));
             playerEvents.itemAdded.add(this.overlay.addItem.bind(this.overlay));
@@ -286,6 +287,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
             this.createCollisionObjects();
             //ResourceManager.stopSounds();
+
         },
 
         initOverlay: function() {
@@ -297,6 +299,15 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.overlay.setWeapon(this.player.currentWeapon);
             this.overlay.setAmmo(this.player.ammo());
             this.overlay.setScore(this.player.score);
+        },
+
+        onJoystickReady: function() {
+            window.server.send({
+             type: "game",
+             action: "availableWeapons",
+             availableWeapons: this.player.getAvailableWeapons(),
+             currentWeapon: this.player.getCurrentWeapon()
+             });
         },
 
         resize: function() {
@@ -386,7 +397,11 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                         break;
 
                     case "availableWeapons":
-                        answer(this.player.getAvailableWeapons());
+                        answer({
+                            availableWeapons: this.player.getAvailableWeapons(),
+                            currentWeapon: this.player.getCurrentWeapon()
+                        });
+
                         break;
                     default:
                         break;
@@ -542,9 +557,17 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
 
         /****************************** Weapons Handlers ******************************/
 
+        onWeaponAdd: function(name) {
+            window.server.send({
+                type: 'game',
+                action: 'newWeapon',
+                weapon: name
+            });
+        },
+
         onWeaponChange: function(name) {
             this.redrawGameObject(this.player);
-            ResourceManager.playSound(ResourceManager.soundList.Weapons[name].Draw, ResourceManager.weaponData.drawCooldown);
+
             window.server.send({
                 type: 'game',
                 action: 'weaponChange',
