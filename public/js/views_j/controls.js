@@ -33,7 +33,21 @@ define([
         },
 
         show: function () {
-            this.controller = new Controller(this.$canvas[0]);
+            var self = this;
+
+            var $window = $(window);
+
+            this.$canvas[0].width = $window.width();
+            this.$canvas[0].height = $window.height();
+
+            this.controller = new Controller(this.$canvas[0]); //why [0]?... and same below
+            $window.resize(function() {
+                self.$canvas[0].width = $window.width();
+                self.$canvas[0].height = $window.height();
+                self.controller.resize();
+            });
+
+            $window[0].addEventListener("deviceorientation", this.controller.onGyro.bind(this.controller), false);
 
             this.$el.show();
             this.hidden = false;
@@ -106,6 +120,8 @@ define([
         },
 
         onMessage: function(data, answer) {
+            //TODO: everything below looks really weird :(
+
             switch (data.type) {
                 case "info":
                     if (data.action === "gamefinished") {
@@ -128,14 +144,16 @@ define([
                     } else if (data.action == 'changeWeapon') {
                         this.controller.changeWeapon(data.name, true);
                     }
+                    break;
 
                 default:
+                    console.error("Unsupported message received: ", data);
                     break;
             }
         },
 
         onStatusChanged: function() {
-
+            throw "onStatusChanged";
         },
 
         onDisconnect: function() {

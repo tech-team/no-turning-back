@@ -45,7 +45,7 @@ function(Class, $, _) {
             };
 
             _.each(_.keys(this.keyEventsCallbacks), function(keyEvent) {
-                self.listener.bind(keyEvent, self.keyEventsCallbacks[keyEvent]);
+                self.listener.on(keyEvent, self.keyEventsCallbacks[keyEvent]);
             });
 
 //            this.listener.keydown();

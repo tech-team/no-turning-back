@@ -6,59 +6,6 @@ define([
 ],
     function(_, Class, createjs, ImageTiler) {
         var Controller = Class.$extend({
-            __init__: function(canvas) {
-                this.$window = $(window);
-                this.canvas = canvas;
-                this.stage = new createjs.Stage(this.canvas);
-                this.stage.enableDOMEvents(true);
-                createjs.Touch.enable(this.stage);
-                this.stage.enableMouseOver(10);
-                this.container = new createjs.Container();
-                this.stage.addChild(this.container);
-
-                this.update = true;
-                this.FPS = 30;
-
-                this.lastMoveSent = 0;
-                this.moveTimeDelta = 10; // ms
-
-                var self = this;
-
-                this.ticker = createjs.Ticker;
-                this.ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-                this.ticker.setFPS(this.FPS);
-                this.ticker.on("tick", function(event) {
-                    self.updateFunc(event);
-                });
-
-                navigator.vibrate = navigator.vibrate ||
-                                    navigator.webkitVibrate ||
-                                    navigator.mozVibrate ||
-                                    navigator.msVibrate;
-
-
-                this.availableWeapons = [];
-                var tid = setInterval(function() {
-                    window.server.send({
-                        type: 'game',
-                        action: 'availableWeapons'
-                    }, function(weapons) {
-                        clearInterval(tid);
-                        self.availableWeapons = weapons;
-                        console.log(self.availableWeapons);
-                        self.createControls();
-                        self.$window.resize(function() { self.resize(); });
-                        self.resize();
-                        self.createWindowEvents();
-                    });
-                }, 1000);
-
-            },
-
-            createWindowEvents: function() {
-                this.$window[0].addEventListener("deviceorientation", this.onGyro.bind(this), false);
-            },
-
             __classvars__: {
                 SIZE: {
                     padRadius: 100,
@@ -96,10 +43,43 @@ define([
                 WEAPON: ["knife", "pistol", "shotgun"]
             },
 
-            createControls: function() {
-                this.canvas.width = this.$window.width();
-                this.canvas.height = this.$window.height();
+            __init__: function(canvas) {
+                //TODO: containers, I want containers!
+                this.canvas = canvas;
+                this.stage = new createjs.Stage(this.canvas);
+                this.stage.enableDOMEvents(true);
+                createjs.Touch.enable(this.stage);
+                this.stage.enableMouseOver(10);
+                this.container = new createjs.Container();
+                this.stage.addChild(this.container);
 
+                this.FPS = 30;
+
+                this.lastMoveSent = 0;
+                this.moveTimeDelta = 10; // ms
+
+                var self = this;
+
+                this.ticker = createjs.Ticker;
+                this.ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+                this.ticker.setFPS(this.FPS);
+                this.ticker.on("tick", this.stage.update.bind(this.stage));
+
+                navigator.vibrate = navigator.vibrate ||
+                                    navigator.webkitVibrate ||
+                                    navigator.mozVibrate ||
+                                    navigator.msVibrate;
+
+
+                this.weapons = [];
+
+                self.createControls();
+                self.resize();
+
+                self.requestAvailableWeapons();
+            },
+
+            createControls: function() {
                 var self = this;
                 var gfx = "/res/gfx/large/";
 
@@ -154,27 +134,14 @@ define([
 
                 this.toolBar.selection = this.addToStage(this.toolBar.selection, Controller.SIZE.weaponSelection, Controller.SIZE.weaponSelection);
 
-                this.weapons = [];
-
-                _.each(Controller.WEAPON, function(name) {
-                    var weapon = new createjs.Bitmap(gfx + name + ".png");
-                    self.addToStage(weapon, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
-                    self.weapons.push({name: name, obj: weapon});
-                });
-
-                if (this.weapons.length != 0)
-                    this.currentWeapon = this.weapons[0].obj;
-
                 this.createEvents();
             },
 
             resize: function() {
-                this.canvas.width = this.$window.width();
-                this.canvas.height = this.$window.height();
+                var self = this;
 
                 this.createParallax();
 
-                var self = this;
                 var stageSize = {
                     width: self.stage.canvas.width,
                     height: self.stage.canvas.height
@@ -207,8 +174,10 @@ define([
                     obj.y = this.toolBar.y;
                 }
 
-                this.toolBar.selection.x = this.currentWeapon.x;
-                this.toolBar.selection.y = this.currentWeapon.y;
+                if (this.currentWeapon) {
+                    this.toolBar.selection.x = this.currentWeapon.x;
+                    this.toolBar.selection.y = this.currentWeapon.y;
+                }
 
                 this.reconnectPad.x = stageSize.width/2;
                 this.reconnectPad.y = Controller.POS.reconnectOffset;
@@ -221,8 +190,6 @@ define([
 
                 this.usePadText.x = this.usePad.x;
                 this.usePadText.y = this.usePad.y;
-
-                this.update = true;
             },
 
             createParallax: function() {
@@ -267,12 +234,35 @@ define([
                 return obj;
             },
 
-            updateFunc: function(event) {
-                //TODO: see icq conversation
-                //if (this.update) {
-                    this.update = false;
-                    this.stage.update(event);
-                //}
+            requestAvailableWeapons: function() {
+                var self = this;
+
+                //why timer...
+                var tid = setInterval(function() {
+                    window.server.send({
+                        type: 'game',
+                        action: 'availableWeapons'
+                    }, function(weapons) {
+                        clearInterval(tid);
+                        self.setAvailableWeapons(weapons);
+                    });
+                }, 1000);
+            },
+
+            setAvailableWeapons: function(weapons) {
+                var self = this;
+                console.log("Weapons available: ", weapons);
+
+                _.each(weapons, function(name) {
+                    //TODO: maybe preload everything in init... or even on lobby
+                    var gfx = "/res/gfx/large/";
+                    var weapon = new createjs.Bitmap(gfx + name + ".png");
+                    self.addToStage(weapon, Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
+                    self.weapons.push({name: name, obj: weapon});
+                });
+
+                if (this.weapons.length != 0)
+                    this.currentWeapon = this.weapons[0].obj;
             },
 
             sendMoving: function() {
@@ -319,12 +309,9 @@ define([
                     evt.on("mouseup", function(evt) {
                         self.mover.x = self.leftPad.x;
                         self.mover.y = self.leftPad.y;
-                        self.forceUpdate();
                         self.sendMoving();
                     });
                 });
-
-
 
                 this.mover.on("pressmove", function(evt) {
                     evt.preventDefault();
@@ -357,8 +344,6 @@ define([
                         self.mover.y -= g.y;
                     }
 
-                    self.forceUpdate();
-
                     var currentMoveTime = (new Date()).getTime();
                     if (self.lastMoveSent === 0 || currentMoveTime - self.lastMoveSent >= self.moveTimeDelta) {
                         console.log("sending");
@@ -378,10 +363,8 @@ define([
 
                     setTimeout(function() {
                         self.rightPad.graphics.clear().beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
-                        self.update = true;
                     }, 400);
-
-                    self.forceUpdate();
+;
 
                     window.server.send({
                         type: "game",
@@ -399,10 +382,8 @@ define([
 
                     setTimeout(function() {
                         self.usePad.graphics.clear().beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
-                        self.update = true;
                     }, 400);
-
-                    self.forceUpdate();
+;
 
                     window.server.send({
                         type: "game",
@@ -420,10 +401,8 @@ define([
 
                     setTimeout(function() {
                         self.reconnectPad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
-                        self.update = true;
                     }, 400);
-
-                    self.forceUpdate();
+;
 
                     window.location = '#lobby';
                 });
@@ -446,11 +425,6 @@ define([
 
             drawCircle: function(object, color, x, y, radius) {
                 object.graphics.clear().beginFill(color).drawCircle(x, y, radius).endFill();
-                self.forceUpdate();
-            },
-
-            forceUpdate: function() {
-                this.update = true;
             },
 
             selectWeapon: function(evt) {
@@ -469,7 +443,6 @@ define([
                 this.currentWeapon = weapon.obj;
                 this.toolBar.selection.x = this.currentWeapon.x;
                 this.toolBar.selection.y = this.currentWeapon.y;
-                this.forceUpdate();
 
                 window.server.send({
                     type: "game",
