@@ -41,6 +41,11 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, Weapons) 
             MaxHealth: 100,
             OverSaturationHealthDecrease: 0.1,
 
+            SpeedModifier: {
+                Normal: 2,
+                Sprint: 4
+            },
+
             Movement: null
         },
 
@@ -205,16 +210,50 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, Weapons) 
                 this._setHealth(healthLeft < Player.MaxHealth ? Player.MaxHealth : healthLeft);
             }
 
-            var speedModifier = 2;
+//            var phi = 0;
+//            var speedModifier = 2;
+//            if (event.keys[Player.Movement.Boost]) { speedModifier = 4; }
+//
+//            if (event.keys[Player.Movement.Forward] && event.keys[Player.Movement.Back]) {
+//                phi = null;
+//            } else {
+//                if (event.keys[Player.Movement.Left] && event.keys[Player.Movement.Right) {
+//                    if (event.keys[Player.Movement.Forward]) {
+//                        phi = 90;
+//                    } else if (event.keys[Player.Movement.Back]) {
+//                        phi = 180 + 90;
+//                    }
+//                }
+//
+//                if (event.keys[Player.Movement.Forward]) {
+//                    if (event.keys[Player.Movement.Right]) {
+//                        phi = 45;
+//                    } else if (event.keys[Player.Movement.Left]) {
+//                        phi = 90 + 45;
+//                    } else if (!event.keys[Player.Movement.Back]) {
+//                        phi = 90;
+//                    }
+//                }
+//                if (event.keys[Player.Movement.Back]) {
+//                    if (event.keys[Player.Movement.Right]) {
+//                        phi = 360 - 45;
+//                    } else if (event.keys[Player.Movement.Left]) {
+//                        phi = 180 + 45;
+//                    } else if (!event.keys[Player.Movement.Forward]) {
+//                        phi = 180 + 90;
+//                    }
+//                }
+//            }
+
+            var speedModifier = this.$class.SpeedModifier.Normal;
             var reboundModifier = 1.1;
             var offsetRotation = 4;
             var offsetX, offsetY;
 
             var i = 0;
 
-
             if (event.keys[Player.Movement.Forward]) {
-                if (event.keys[Player.Movement.Boost]) { speedModifier = 4; }
+                if (event.keys[Player.Movement.Boost]) { speedModifier = this.$class.SpeedModifier.Sprint; }
                 offsetX = speedModifier * Math.cos( (Math.PI / 180) * this.dispObj.rotation);
                 offsetY = speedModifier * Math.sin( (Math.PI / 180) * this.dispObj.rotation);
                 this.dispObj.x += offsetX;
@@ -306,6 +345,8 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, Weapons) 
         },
 
         movementHandle: function(movementData, collisionObjects) {
+            var speedModifier = (movementData.r === 1) ? this.$class.SpeedModifier.Normal
+                                                       : this.$class.SpeedModifier.Sprint;
             //TODO: Movement code refactoring will be carried out only after implementing two-joystick handling
             var reboundModifier = 1;
 
@@ -313,12 +354,12 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, Weapons) 
                 this.dispObj.rotation -= (this.dispObj.rotation > 0) ? (360) : (-360);
             }
             var currentRotation = this.dispObj.rotation;
-            this.dispObj.rotation = movementData.angle;
+            this.dispObj.rotation = movementData.phi;
 
-            this.dispObj.angle = (Math.PI / 180) * this.dispObj.rotation;
+            var angle = (Math.PI / 180) * this.dispObj.rotation;
 
-            var offsetX = movementData.speedModifier * Math.cos(this.dispObj.angle);
-            var offsetY = movementData.speedModifier * Math.sin(this.dispObj.angle);
+            var offsetX = speedModifier * Math.cos(angle);
+            var offsetY = speedModifier * Math.sin(angle);
             this.dispObj.x += offsetX;
             this.dispObj.y += offsetY;
 

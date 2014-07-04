@@ -46,16 +46,15 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.ricochetObjects = [];
             this.drops = [];
 
-            /*** <Joystick stuff> ***/
-            this.lastShootTime = 0;
-            this.shootDelta = 350;
-            this.jMoving = false;
-            /*** </Joystick stuff> ***/
+            this.jInfo = {
+                jLastShootTime: 0,
+                jShootDelta: 350,
+                jMoving: false,
+                jMovementData: null
+            };
 
             this.finished = false;
-
             this.load(levelData);
-
             this.createEvents();
 		},
 
@@ -93,11 +92,6 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             SCORES: {
                 KILL: 10,
                 DOOR_OPEN: 5
-            },
-
-            SpeedModifier: {
-                Normal: 2,
-                Sprint: 4
             },
 
             CameraOffset: 200,
@@ -370,8 +364,8 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             if (data.type === "game") {
                 switch (data.action) {
                     case "shoot":
-                        if ('timestamp' in data && (this.lastShootTime === 0 || data.timestamp - this.lastShootTime > this.shootDelta)) {
-                            this.lastShootTime = data.timestamp;
+                        if ('timestamp' in data && (this.jInfo.jLastShootTime === 0 || data.timestamp - this.jInfo.jLastShootTime > this.jInfo.jShootDelta)) {
+                            this.jInfo.jLastShootTime = data.timestamp;
                             this.playerShootingHandle();
                         }
                         break;
@@ -379,17 +373,13 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                         this.player.changeWeapon(data.weapon);
                         break;
                     case "move":
-                        var speedModifier = (data.r === 0) ? (null) : (data.r === 1) ? (GameLevel.SpeedModifier.Normal) : (GameLevel.SpeedModifier.Sprint);
-                        if (speedModifier) {
-                            var movementData = {
-                                speedModifier: speedModifier,
-                                angle: data.phi
-                            };
-                            this.jMoving = true;
+                        if (!(data.r === 0 && data.phi === 0)) {
+                            var movementData = data;
+                            this.jInfo.jMoving = true;
                         } else {
-                            this.jMoving = false;
+                            this.jInfo.jMoving = false;
                         }
-                        this.jMovementData = movementData;
+                        this.jInfo.jMovementData = movementData;
                         break;
                     case "use":
                         this.useHandle();
@@ -777,8 +767,8 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             if (this.finished)
                 return;
 
-            if (this.jMoving && this.jMovementData) {
-                this.player.movementHandle(this.jMovementData, this.collisionObjects);
+            if (this.jInfo.jMoving && this.jInfo.jMovementData) {
+                this.player.movementHandle(this.jInfo.jMovementData, this.collisionObjects);
             }
 
             if (this.checkBounds(this.player)) {

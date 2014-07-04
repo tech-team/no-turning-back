@@ -2,6 +2,14 @@ define([
 ],
 function() {
 	var LocalStorage = {
+        $keys: {
+            J: {
+                Token: 'token',
+                Console: 'consoleguid',
+                Player: 'playerguid'
+            }
+        },
+
         set: function(key, value) {
             window.localStorage.setItem(key, value);
         },
@@ -45,7 +53,7 @@ function() {
 		popFromArray: function(keyOfArray) {
 			var arr = this.getJSON(keyOfArray);
 			if (!arr || Object.prototype.toString.call(arr) !== '[object Array]')
-				console.log("Problem loading localstorage value");
+				console.error("Problem loading localstorage value");
 
 			arr.pop();
 			this.setJSON(keyOfArray, arr);

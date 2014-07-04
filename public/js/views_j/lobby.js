@@ -117,6 +117,11 @@ define([
 
         onStatusChanged: function(status) {
             this.$connectorMessage.text(status);
+            if (status != 'ready') {
+                this.$tokenForm.find(':input').prop("disabled", true);
+            } else {
+                this.$tokenForm.find(':input').prop("disabled", false);
+            }
         },
 
         onDisconnect: function() {

@@ -1,8 +1,9 @@
 define([
     'lodash',
     'classy',
-    'Connector'
-], function(_, Class, Connector) {
+    'Connector',
+    'utils/LocalStorage'
+], function(_, Class, Connector, LocalStorage) {
     var CConnector = Class.$extend({
         __init__: function(callbacks) {
             this.callbacksArray = [];
@@ -19,6 +20,28 @@ define([
             this.init();
             window.server = this.server;
         },
+
+        _setToken: function(token) {
+            LocalStorage.set(LocalStorage.$keys.J.Token, token);
+        },
+
+        _setConsoleGuid: function(guid) {
+            LocalStorage.set(LocalStorage.$keys.J.Console, guid);
+        },
+
+        _getToken: function() {
+            return LocalStorage.get(LocalStorage.$keys.J.Token);
+        },
+
+        _getConsoleGuid: function() {
+            return LocalStorage.get(LocalStorage.$keys.J.Console);
+        },
+
+        _removeLSInfo: function() {
+            LocalStorage.unset(LocalStorage.$keys.J.Console);
+            LocalStorage.unset(LocalStorage.$keys.J.Token);
+        },
+
 
         applyCallback: function(name) {
             var self = this;
@@ -63,7 +86,7 @@ define([
             });
 
             this.server.on('disconnect', function() {
-                localStorage.removeItem('consoleguid');
+                self._removeLSInfo();
                 window.server = null;
                 self.applyCallback('onDisconnect');
             });
@@ -73,11 +96,11 @@ define([
             var self = this;
             console.log('ready');
             // Если id нет
-            if (!localStorage.getItem('consoleguid')) {
+            if (!this._getConsoleGuid()) {
                 // Получаем токен
                 this.server.getToken({forceNewToken: forceNewToken}, function (token) {
                     console.log('token: ' + token);
-                    localStorage.setItem('token', token);
+                    self._setToken(token);
                     self.applyCallback('saveToken', token);
                 });
             } else { // иначе
@@ -89,18 +112,17 @@ define([
         start: function(guid) {
             console.log('start console');
             // Сохраняем id связки
-            localStorage.setItem('consoleguid', guid);
+            this._setConsoleGuid(guid);
             this.applyCallback('onStart');
         },
 
         forceReconnect: function(theirAttempt) {
-            var guid = localStorage.getItem('consoleguid');
+            var guid = this._getConsoleGuid();
             if (guid === null) {
                 this.init(true);
                 return;
             }
-            localStorage.removeItem('consoleguid');
-            localStorage.removeItem('token');
+            this._removeLSInfo();
             this.applyCallback('onForceReconnect', theirAttempt);
             if (!theirAttempt) {
                 var self = this;
@@ -124,13 +146,13 @@ define([
         reconnect: function(guid) {
             var self = this;
 
-            guid || (guid = localStorage.getItem('consoleguid'));
+            guid || (guid = this._getConsoleGuid());
 
             // Используем сохранненный id связки
             this.server.bind({guid: guid}, function (data) {
                 // Если все ок
                 if (data.status == 'success') {
-                    var prevToken = localStorage.getItem('token');
+                    var prevToken = self._getToken();
                     console.log('using prev token: ' + prevToken);
                     prevToken || (prevToken = 'Already connected');
                     self.applyCallback('saveToken', prevToken);
@@ -139,8 +161,7 @@ define([
                     // Если связки уже нет
                 } else if (data.status == 'undefined guid') {
                     // Начинаем все заново
-                    localStorage.removeItem('consoleguid');
-                    localStorage.removeItem('token');
+                    self._removeLSInfo();
                     self.init();
                 }
             });
@@ -150,87 +171,4 @@ define([
     });
 
     return CConnector;
-//
-//    var Console = function(callbacks) {
-//        callbacks = callbacks ? callbacks : {};
-//        callbacks.onStarted = callbacks.onStarted ? callbacks.onStarted : function(token) {};
-//        callbacks.saveToken = callbacks.saveToken ? callbacks.saveToken : function(token) {};
-//        callbacks.onMessage = callbacks.onMessage ? callbacks.onMessage : function(data) {};
-//        callbacks.onDisconnect = callbacks.onDisconnect ? callbacks.onDisconnect : function() {};
-//
-//
-////        var message = document.getElementById('message');
-//        var start, init, reconnect;
-//
-//        // Создаем связь с сервером
-//        var server = new Connector({
-//                server: ['getToken', 'bind'],
-//                remote: '/console'
-//            }
-//        );
-//
-//        // На подключении игрока стартуем игру
-//        server.on('player-joined', function (data) {
-//            // Передаем id связки консоль-джостик
-//            start(data.guid);
-//        });
-//
-//        // Инициализация
-//        init = function () {
-//            console.log('ready');
-//            // Если id нет
-//            if (!localStorage.getItem('consoleguid')) {
-//                // Получаем токен
-//                server.getToken(function (token) {
-//                    console.log('token: ' + token);
-//                    callbacks.saveToken(token);
-//                });
-//            } else { // иначе
-//                // переподключаемся к уже созданной связке
-//                reconnect();
-//            }
-//        };
-//
-//        // Переподключение
-//        reconnect = function () {
-//            // Используем сохранненный id связки
-//            server.bind({guid: localStorage.getItem('consoleguid')}, function (data) {
-//                // Если все ок
-//                if (data.status == 'success') {
-//                    callbacks.saveToken("Already connected");
-//                    // Стартуем
-//                    start(data.guid);
-//                    // Если связки уже нет
-//                } else if (data.status == 'undefined guid') {
-//                    // Начинаем все заново
-//                    localStorage.removeItem('consoleguid');
-//                    init();
-//                }
-//            });
-//        };
-//
-//        server.on('reconnect', reconnect);
-//
-//        // Старт игры
-//        start = function (guid) {
-//            console.log('start console');
-//            // Сохраняем id связки
-//            localStorage.setItem('consoleguid', guid);
-//            callbacks.onStarted();
-//        };
-//
-//        init();
-//
-//        // Обмен сообщениями
-//        server.on('message', function (data, answer) {
-//            callbacks.onMessage(data, answer);
-////            answer('answer');
-//        });
-//
-//        server.on('disconnect', callbacks.onDisconnect);
-//        window.server = server;
-//
-//
-//    };
-//    return Console;
 });

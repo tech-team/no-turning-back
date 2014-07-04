@@ -1,8 +1,9 @@
 define([
     'lodash',
     'classy',
-    'Connector'
-], function(_, Class, Connector) {
+    'Connector',
+    'utils/LocalStorage'
+], function(_, Class, Connector, LocalStorage) {
     var JConnector = Class.$extend({
         __init__: function($tokenForm, $inputField, callbacks) {
             this.$tokenForm = $tokenForm;
@@ -12,7 +13,7 @@ define([
 
             // Создаем связь с сервером
             this.server = new Connector({
-                    server: ['bind'],
+                    server: ['bind', 'unbind'],
                     remote: '/player'
                 }
             );
@@ -20,6 +21,19 @@ define([
             this.createServerEvents();
             this.init();
             window.server = this.server;
+            this.ready = false;
+        },
+
+        _getPlayerGuid: function() {
+            return LocalStorage.get(LocalStorage.$keys.J.Player);
+        },
+
+        _setPlayerGuid: function(guid) {
+            LocalStorage.set(LocalStorage.$keys.J.Player, guid);
+        },
+
+        _removePlayerGuid: function() {
+            LocalStorage.unset(LocalStorage.$keys.J.Player);
         },
 
         applyCallback: function(name) {
@@ -45,6 +59,7 @@ define([
 
         createServerEvents: function() {
             this.server.on('connect', function() {
+                this.ready = true;
                 this.applyCallback('onStatusChanged', 'ready');
             }.bind(this));
             this.server.on('reconnect', this.reconnect.bind(this));
@@ -62,7 +77,7 @@ define([
             });
 
             this.server.on('disconnect', function() {
-                localStorage.removeItem('playerguid');
+                self._removePlayerGuid();
                 window.server = null;
                 self.applyCallback('onDisconnect');
             });
@@ -70,10 +85,14 @@ define([
 
         // Инициализация
         init: function () {
-            this.applyCallback('onStatusChanged', 'not ready');
+            if (this.ready) {
+                this.applyCallback('onStatusChanged', 'ready');
+            } else {
+                this.applyCallback('onStatusChanged', 'server is not available');
+            }
 
             // Если id нет
-            if (!localStorage.getItem('playerguid')) {
+            if (!this._getPlayerGuid()) {
                 // Ждем ввода токена
                 var self = this;
                 this.$tokenForm.off('submit');
@@ -98,8 +117,8 @@ define([
         },
 
         forceReconnect: function(theirAttempt) {
-            var guid = localStorage.getItem('playerguid');
-            localStorage.removeItem('playerguid');
+            var guid = this._getPlayerGuid();
+            this._removePlayerGuid();
             this.applyCallback('onForceReconnect', theirAttempt);
             if (!theirAttempt) {
                 var self = this;
@@ -125,7 +144,7 @@ define([
         reconnect: function (guid) {
             var self = this;
 
-            guid || (guid = localStorage.getItem('playerguid'));
+            guid || (guid = this._getPlayerGuid());
 
             this.server.bind({guid: guid}, function (data) {
                 // Если все ок
@@ -135,7 +154,7 @@ define([
                     // Если связки уже нет
                 } else if (data.status == 'undefined guid') {
                     // Начинаем все заново
-                    localStorage.removeItem('playerguid');
+                    self._removePlayerGuid();
                     self.init();
                 }
             });
@@ -144,7 +163,7 @@ define([
         start: function(guid) {
             console.log('start player');
             // Сохраняем id связки
-            localStorage.setItem('playerguid', guid);
+            this._setPlayerGuid(guid);
             this.applyCallback('onStatusChanged', 'game');
             this.applyCallback('onStart');
         }
