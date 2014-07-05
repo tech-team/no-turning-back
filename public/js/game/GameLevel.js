@@ -139,8 +139,6 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
                     });
                 });
 
-
-
                 this.keyCoder.addEventListener("keyup", GameLevel.Keys.Debug.GearUp, function () {
                     self.player._setHealth(100);
                     self.player.addWeapon("shotgun", 200);

@@ -45,13 +45,24 @@ define([
                     this.mainContainer.addChild(container);
             },
 
-            //objData requires to have {type, tex, x, y}
+            /**
+             * Adds object to specified container on stage
+             * See github documentation for further information about containers
+             *
+             * @param objData
+             *  @param {String} objData.type specifies container/render layer (i.e. "wall"/"zombie"/"effect")
+             *  @param {String} objData.tex
+             *  @param {Number} [objData.x=0] container-local coordinate
+             *  @param {Number} [objData.y=0] container-local coordinate
+             *  @param {Number} [objData.r=0] container-local coordinate
+             * @param {Boolean} [doNotCenter=false]
+             * @param {Number} id specifies render id in container
+             *
+             * @returns {DisplayObject}
+             */
             addToStage: function(objData, doNotCenter, id) {
                 if (objData instanceof createjs.DisplayObject)
                     objData.type = objData.data.type;
-
-                if (!_.isUndefined(id))
-                    throw "addToStage: Do you really need id?";
 
                 if (_.isUndefined(objData.type)) {
                     console.log(objData);
@@ -86,8 +97,13 @@ define([
                 return dispObj;
             },
 
-            //(x, y, type, ...)
-            //ex: this.addPoint({x: 100, y: 200, type: "i'm a point"});
+            /**
+             * @param {{x: Number, y: Number, type: String}} objData
+             * @returns {DisplayObject}
+             *
+             * @example
+             * this.addPoint({x: 100, y: 200, type: "point"});
+             */
             addPoint: function(objData) {
                 if (_.isUndefined(objData.type))
                     throw "addPoint: type is undefined";
@@ -108,14 +124,26 @@ define([
                 container.removeChild(dispObj);
             },
 
+
+            /**
+             * @see bringTo
+             */
             bringToFront: function(dispObj) {
                 this.bringTo(dispObj, StageManager.BringDirection.Front);
             },
 
+            /**
+             * @see bringTo
+             */
             bringToBack: function(dispObj) {
                 this.bringTo(dispObj, StageManager.BringDirection.Back);
             },
 
+            /**
+             * Changes render order in object's container
+             * @param {DisplayObject} dispObj object to move to front or back
+             * @param {BringDirection} to
+             */
             bringTo: function(dispObj, to) {
                 //omit single objects
                 if (!dispObj || dispObj.data.type == 'player')

@@ -85,42 +85,55 @@ define([
                     height: self.stage.canvas.height
                 };
 
+                var textShadow = new createjs.Shadow("#333333", 0, 0, 2);
+
                 this.leftPad = new createjs.Shape();
                 this.leftPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
-                this.addToStage(this.leftPad, 0, 0);
+                this.addToStage({obj: this.leftPad, w: 0, h: 0});
 
                 this.mover = new createjs.Shape();
                 this.mover.graphics.beginFill(Controller.COLOR.mover).drawCircle(0, 0, Controller.SIZE.moverRadius).endFill();
-                this.addToStage(this.mover, 0, 0);
+                this.addToStage({obj: this.mover, w: 0, h: 0});
 
                 this.rightPad = new createjs.Shape();
                 this.rightPad.graphics.beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
-                this.addToStage(this.rightPad, 0, 0);
+                this.addToStage({obj: this.rightPad, w: 0, h: 0});
 
                 var rightPadText = new createjs.Text("Fire!", "50px Arial", "#FF0000");
-                this.rightPadText = this.addToStage(rightPadText);
+                this.rightPadText = this.addToStage({obj: rightPadText, shadow: textShadow});
 
                 this.usePad = new createjs.Shape();
                 this.usePad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
-                this.addToStage(this.usePad, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight);
+                this.addToStage({
+                        obj: this.usePad,
+                        w: Controller.SIZE.usePadWidth,
+                        h: Controller.SIZE.usePadHeight
+                    });
 
                 var usePadText = new createjs.Text("Use", "30px Arial", "#000000");
-                this.usePadText = this.addToStage(usePadText);
+                this.usePadText = this.addToStage({obj: usePadText, shadow: textShadow});
 
                 this.reconnectPad = new createjs.Shape();
                 this.reconnectPad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
-                this.addToStage(this.reconnectPad, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight);
+                this.addToStage({
+                    obj: this.reconnectPad,
+                    w: Controller.SIZE.reconnectPadWidth,
+                    h: Controller.SIZE.reconnectPadHeight});
 
-                var reconnectPadText = new createjs.Text("Reconnect", "25px Arial", "#000000");
-                this.reconnectPadText = this.addToStage(reconnectPadText);
+                var reconnectPadText = new createjs.Text("Reconnect", "22px Arial", "#000000");
+                this.reconnectPadText = this.addToStage({obj: reconnectPadText, shadow: textShadow});
 
-                this.toolBar = new createjs.Shape();
-                this.toolBar.graphics
+                var toolBar = new createjs.Shape();
+                toolBar.graphics
                     .beginFill(Controller.COLOR.toolBar)
                     .drawRoundRect(0, 0, Controller.SIZE.toolBarWidth, Controller.SIZE.toolBarHeight, 10)
                     .endFill();
 
-                this.toolBar = this.addToStage(this.toolBar, Controller.SIZE.toolBarWidth, Controller.SIZE.toolBarHeight);
+                this.toolBar = this.addToStage({
+                    obj: toolBar,
+                    w: Controller.SIZE.toolBarWidth,
+                    h: Controller.SIZE.toolBarHeight
+                });
                 this.toolBar.on("mousedown", this.onToolBarClick.bind(this));
 
                 var selection = new createjs.Shape();
@@ -129,14 +142,20 @@ define([
                     .drawRoundRect(0, 0, Controller.SIZE.weaponSelection, Controller.SIZE.weaponSelection, 10)
                     .endFill();
 
-                this.toolBar.selection = this.addToStage(selection, Controller.SIZE.weaponSelection, Controller.SIZE.weaponSelection);
+                this.toolBar.selection = this.addToStage({
+                    obj: selection,
+                    w: Controller.SIZE.weaponSelection,
+                    h: Controller.SIZE.weaponSelection
+                });
                 this.toolBar.selection.visible = false;
 
                 this.weapons = {};
                 _.each(Controller.WEAPON, function(weaponName) {
-                    var dispObj = self.addToStage(
-                        new createjs.Bitmap(gfx + weaponName + ".png"),
-                        Controller.SIZE.toolBarItemSize, Controller.SIZE.toolBarItemSize);
+                    var dispObj = self.addToStage({
+                        obj: new createjs.Bitmap(gfx + weaponName + ".png"),
+                        w: Controller.SIZE.toolBarItemSize,
+                        h:Controller.SIZE.toolBarItemSize
+                    });
                     dispObj.visible = false;
 
                     self.weapons[weaponName] = dispObj;
@@ -145,6 +164,9 @@ define([
                 this.createEvents();
             },
 
+            /**
+             * Updates controls' positions
+             */
             resize: function() {
                 var self = this;
 
@@ -230,24 +252,38 @@ define([
                 };
             },
 
-            addToStage: function(obj, width, height, noShadow) {
-                obj = this.container.addChild(obj);
+            /**
+             * @param data
+             * @param {createjs.Shape|createjs.Text|createjs.Sprite|createjs.Bitmap} data.obj
+             * @param {Number} [data.w] width used only for regX, if not specified, obj.getBounds() used instead
+             * @param {Number} [data.h] height used only for regY, if not specified, obj.getBounds() used instead
+             * @param {?createjs.Shadow} [data.shadow] custom Shadow or null, in not specified default Shadow will be used
+             *
+             * @returns {DisplayObject}
+             */
+            addToStage: function(data) {
+                var obj = this.container.addChild(data.obj);
 
-                if (_.isUndefined(width) || _.isUndefined(height)) {
+                if (_.isUndefined(data.w) || _.isUndefined(data.h)) {
                     obj.regX = obj.getBounds().width / 2;
                     obj.regY = obj.getBounds().height / 2;
                 }
                 else {
-                    obj.regX = width / 2;
-                    obj.regY = height / 2;
+                    obj.regX = data.w / 2;
+                    obj.regY = data.h / 2;
                 }
 
-                if (!noShadow && false)
-                    obj.shadow = new createjs.Shadow("#000000", 5, 5, 10);
+                if (_.isUndefined(data.shadow))
+                    obj.shadow = new createjs.Shadow("#000000", 0, 0, 10);
+                else
+                    obj.shadow = data.shadow; //custom or null
 
                 return obj;
             },
 
+            /**
+             * Sends repetitive requests to server, until it answers, then calls setAvailableWeapons()
+             */
             requestAvailableWeapons: function() {
                 var self = this;
 
@@ -418,16 +454,27 @@ define([
                 });
             },
 
+            /**
+             * {{x: Number, y: Number}} obj1
+             * {{x: Number, y: Number}} obj2
+             * @returns {Number} distance between 2 points squared
+             */
             distanceSq: function(obj1, obj2) {
                 var dx = obj2.x - obj1.x;
                 var dy = obj2.y - obj1.y;
                 return dx * dx + dy * dy;
             },
 
+            /**
+             * {{x: Number, y: Number}} obj1
+             * {{x: Number, y: Number}} obj2
+             * @returns {Number} distance between 2 points squared
+             */
             distance: function(obj1, obj2) {
                 return Math.sqrt(this.distanceSq(obj1, obj2));
             },
 
+            //TODO: documentation required
             checkBounds: function(target) {
                 var eps = 0.01;
                 return (this.distance(target, this.leftPad) + Controller.SIZE.moverRadius - Controller.SIZE.padRadius <= eps);
@@ -485,6 +532,17 @@ define([
                 this.parallax.y = this.map(obj.gamma, 0, 360, -offset, offset);
             },
 
+            /**
+             * Scales value x from [in_min, in_max] to [out_min, out_max]
+             *
+             * @param {Number} x value to scale
+             * @param {Number} in_min
+             * @param {Number} in_max
+             * @param {Number} out_min
+             * @param {Number} out_max
+             *
+             * @returns {Number}
+             */
             map: function(x, in_min, in_max, out_min, out_max) {
                 return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
             }
