@@ -237,6 +237,8 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                         this.pauseReason = 'orientation';
                         console.log("change orientation!");
 
+                        this.$pauseButton.hide();
+                        this.$mobileIcon.hide();
                         this.triggerGamePause(true, true);
                         this.messenger.showMessage("Change device orientation to landscape", true);
                     }
@@ -245,6 +247,8 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                             this.pauseReason = null;
                             console.log("orientation is correct");
 
+                            this.$pauseButton.show();
+                            this.$mobileIcon.show();
                             this.triggerGamePause(true, true);
                             this.messenger.hideMessage();
                         }

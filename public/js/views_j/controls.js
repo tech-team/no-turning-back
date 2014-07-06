@@ -47,7 +47,7 @@ define([
                 self.controller.resize();
             });
 
-            $window.on("deviceorientation", this.controller.onGyro.bind(this.controller), false);
+            $window[0].addEventListener("deviceorientation", this.controller.onGyro.bind(this.controller), false);
 
             this.$el.show();
             this.hidden = false;
@@ -95,6 +95,7 @@ define([
                     }
                 }
             ];
+            self.messenger.hideMessage();
             this.messenger.showMessage("Do you really want to reconnect?", true, null, controls);
         },
 

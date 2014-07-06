@@ -410,7 +410,6 @@ define([
                     setTimeout(function() {
                         self.rightPad.graphics.clear().beginFill(Controller.COLOR.pad).drawCircle(0, 0, Controller.SIZE.padRadius).endFill();
                     }, 400);
-;
 
                     window.server.send({
                         type: "game",
@@ -497,7 +496,10 @@ define([
 
                 var weaponName = Controller.WEAPON[id];
                 var weapon = this.weapons[weaponName];
-                this.selectWeapon(weaponName, true);
+
+                if (this.currentWeapon.weaponName !== weaponName) {
+                    this.selectWeapon(weaponName, true);
+                }
             },
 
             selectWeapon: function(weaponName, sendToServer) {
@@ -505,6 +507,8 @@ define([
                     return;
 
                 this.currentWeapon = this.weapons[weaponName];
+                this.currentWeapon.weaponName = weaponName;
+
                 this.toolBar.selection.x = this.currentWeapon.x;
                 this.toolBar.selection.y = this.currentWeapon.y;
 
@@ -516,6 +520,10 @@ define([
                         action: "weaponchange",
                         weapon: weaponName
                     });
+                }
+
+                if (navigator.vibrate) {
+                    navigator.vibrate(10);
                 }
             },
 
