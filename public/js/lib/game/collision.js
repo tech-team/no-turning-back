@@ -102,19 +102,6 @@ this.ndgmr = this.ndgmr || {};
     };
 
     var _collisionDistancePrecheck = function (bitmap1, bitmap2) {
-        //var base1 = bitmap1.localToGlobal(0, 0);
-        //var base2 = bitmap2.localToGlobal(0, 0);
-
-        var base1 = {
-            x: bitmap1.x,
-            y: bitmap1.y
-        };
-
-        var base2 = {
-            x: bitmap2.x,
-            y: bitmap2.y
-        };
-
         var rect1 = bitmap1 instanceof createjs.Bitmap
             ? {width: bitmap1.image.width, height: bitmap1.image.height}
             : bitmap1.spriteSheet.getFrameBounds(bitmap1.currentFrame);
@@ -122,11 +109,11 @@ this.ndgmr = this.ndgmr || {};
             ? {width: bitmap2.image.width, height: bitmap2.image.height}
             : bitmap2.spriteSheet.getFrameBounds(bitmap2.currentFrame);
 
-        var rotatedRect1 = _rotateRect(rect1, bitmap1.rotation);
-        var rotatedRect2 = _rotateRect(rect2, bitmap2.rotation);
+        rect1.halfDiagonal = (rect1.width*rect1.width + rect1.height * rect1.height)/2;
+        rect2.halfDiagonal = (rect2.width*rect2.width + rect2.height * rect2.height)/2;
 
-        return (Math.abs(base2.x - base1.x) < rotatedRect2.width  * Math.abs(bitmap2.scaleX) + rotatedRect1.width  * Math.abs(bitmap1.scaleX)
-             && Math.abs(base2.y - base1.y) < rotatedRect2.height * Math.abs(bitmap2.scaleY) + rotatedRect1.height * Math.abs(bitmap2.scaleY));
+        return (bitmap1.x - bitmap2.x)*(bitmap1.x - bitmap2.x) + (bitmap1.y - bitmap2.y)*(bitmap1.y - bitmap2.y)
+            < (rect1.halfDiagonal + rect2.halfDiagonal);
     };
     
     var _rotateRect = function(rect, deg) {
