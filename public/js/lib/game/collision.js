@@ -115,9 +115,8 @@ this.ndgmr = this.ndgmr || {};
         var rotatedRect1 = _rotateRect(rect1, bitmap1.rotation);
         var rotatedRect2 = _rotateRect(rect2, bitmap2.rotation);
         
-        
         return (Math.abs(base2.x - base1.x) < rotatedRect2.width  * Math.abs(bitmap2.scaleX) + rotatedRect1.width  * Math.abs(bitmap1.scaleX)
-             && Math.abs(base2.y - base1.y) < rotatedRect2.height * Math.abs(bitmap2.scaleY) + rotatedRect1.height * Math.abs(bitmap2.scaleY));
+             || Math.abs(base2.y - base1.y) < rotatedRect2.height * Math.abs(bitmap2.scaleY) + rotatedRect1.height * Math.abs(bitmap2.scaleY));
     };
     
     var _rotateRect = function(rect, deg) {
