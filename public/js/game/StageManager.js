@@ -89,8 +89,9 @@ define([
                 dispObj.y = objData.y || objData.height/2 || 0;
                 dispObj.rotation = objData.r || objData.rotation || 0;
                 if (!doNotCenter) {
-                    dispObj.regX = dispObj.getBounds().width / 2;
-                    dispObj.regY = dispObj.getBounds().height / 2;
+                    //why not getBounds()? because it sometimes returns null in FF for tiled (not completely loaded from data uri) image objects
+                    dispObj.regX = dispObj.spriteSheet._frameWidth / 2;
+                    dispObj.regY = dispObj.spriteSheet._frameHeight / 2;
                 }
                 dispObj.data = objData;
 
