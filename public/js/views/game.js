@@ -82,17 +82,17 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
         },
 
-        triggerGamePause: function() {
+        triggerGamePause: function(ignore_notify) {
             if (this.game.state === Game.GameState.Game) {
                 CssUtils.showBlackOnWhite(this.$pauseButton);
                 this.$pauseIconPause.hide();
                 this.$pauseIconPlay.show();
-                this._pauseGame();
+                this._pauseGame(ignore_notify);
             } else {
                 CssUtils.showWhiteOnBlack(this.$pauseButton);
                 this.$pauseIconPause.show();
                 this.$pauseIconPlay.hide();
-                this._resumeGame();
+                this._resumeGame(ignore_notify);
             }
         },
 
@@ -223,7 +223,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                 case "orientation":
                     if (data.orientation === "portrait") {
                         console.log("change orientation!");
-                        this.triggerGamePause();
+                        this.triggerGamePause(true);
                         this.messenger.showMessage("Change device orientation to landscape", true);
                         this.pauseReason = 'orientation';
                     }
@@ -231,7 +231,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                         if (this.pauseReason == 'orientation') {
                             this.pauseReason = null;
                             console.log("thanks for changing orientation");
-                            this.triggerGamePause();
+                            this.triggerGamePause(true);
                             this.messenger.hideMessage();
                         }
                     }

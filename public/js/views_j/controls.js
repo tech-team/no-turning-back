@@ -116,7 +116,6 @@ define([
         },
 
         onJStart: function() {
-            console.warn('hi');
         },
 
         onMessage: function(data, answer) {
@@ -155,7 +154,6 @@ define([
         },
 
         onStatusChanged: function() {
-            throw "controls.js onStatusChanged";
         },
 
         onDisconnect: function() {
