@@ -82,28 +82,28 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
         },
 
-        triggerGamePause: function(ignore_notify) {
+        triggerGamePause: function(ignore_notify, ignore_send) {
             if (this.game.state === Game.GameState.Game) {
                 CssUtils.showBlackOnWhite(this.$pauseButton);
                 this.$pauseIconPause.hide();
                 this.$pauseIconPlay.show();
-                this._pauseGame(ignore_notify);
+                this._pauseGame(ignore_notify, ignore_send);
             } else {
                 CssUtils.showWhiteOnBlack(this.$pauseButton);
                 this.$pauseIconPause.show();
                 this.$pauseIconPlay.hide();
-                this._resumeGame(ignore_notify);
+                this._resumeGame(ignore_notify, ignore_send);
             }
         },
 
-        _pauseGame: function(ignore_notify) {
+        _pauseGame: function(ignore_notify, ignore_send) {
             this.gamePaused = true;
-            this.game.pause(ignore_notify);
+            this.game.pause(ignore_notify, ignore_send);
         },
 
-        _resumeGame: function(ignore_notify) {
+        _resumeGame: function(ignore_notify, ignore_send) {
             this.gamePaused = false;
-            this.game.continueGame(ignore_notify);
+            this.game.continueGame(ignore_notify, ignore_send);
         },
 
         render: function () {
@@ -136,13 +136,22 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             callbacks = this._getConfirmCallbacks(callbacks);
 
             if (!this.gamePaused)
-                this._pauseGame();
+                this._pauseGame(true, false);
+
+            this.$pauseButton.hide();
+            this.$mobileIcon.hide();
 
             var self = this;
             var controls = [
                 {
                     name: "Yes",
                     action: function() {
+                        if (self.gamePaused)
+                            self._resumeGame(true, false);
+
+                        self.$pauseButton.show();
+                        self.$mobileIcon.show();
+
                         callbacks.yes();
                     }
                 },
@@ -150,7 +159,10 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                     name: "No",
                     action: function() {
                         if (self.gamePaused)
-                            self._resumeGame();
+                            self._resumeGame(true, false);
+
+                        self.$pauseButton.show();
+                        self.$mobileIcon.show();
 
                         self.messenger.hideMessage();
 
@@ -222,16 +234,18 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             switch (data.type) {
                 case "orientation":
                     if (data.orientation === "portrait") {
-                        console.log("change orientation!");
-                        this.triggerGamePause(true);
-                        this.messenger.showMessage("Change device orientation to landscape", true);
                         this.pauseReason = 'orientation';
+                        console.log("change orientation!");
+
+                        this.triggerGamePause(true, true);
+                        this.messenger.showMessage("Change device orientation to landscape", true);
                     }
                     else {
                         if (this.pauseReason == 'orientation') {
                             this.pauseReason = null;
-                            console.log("thanks for changing orientation");
-                            this.triggerGamePause(true);
+                            console.log("orientation is correct");
+
+                            this.triggerGamePause(true, true);
                             this.messenger.hideMessage();
                         }
                     }
@@ -267,12 +281,12 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                 onForceReconnect: function(theirAttempt) {
                     if (theirAttempt) {
                         if (!self.gamePaused)
-                            self._pauseGame(true);
+                            self._pauseGame(true, true);
 
                         var closeCallback = function() {
                             self.messenger.hideMessage();
                             if (self.gamePaused)
-                                self._resumeGame(true);
+                                self._resumeGame(true, true);
                         };
 
                         var controls = [
@@ -286,7 +300,7 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
 
                 },
                 onDisconnect: function() {
-                    self._pauseGame(true);
+                    self._pauseGame(false, true);
                     self.messenger.showMessage("You were disconnected", false, function() {
                         self.game.continueGame();
                     });
@@ -309,9 +323,9 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                     if (!self.mobileOpened) {
                         self.showPauseButton();
                     } else {
-                        self.triggerGamePause();
-                        self.triggerConnectDialog();
-                        self.triggerConnectDialog();
+                        self.triggerGamePause(true, false);
+//                        self.triggerConnectDialog();
+//                        self.triggerConnectDialog();
                     }
                 }
             );
@@ -329,22 +343,8 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
             this.game.gameStateChanged.add(function(event) {
                 if (event.state === Game.GameState.Pause) {
                     self.messenger.showMessage("Game paused", true);
-                    if (!event.ignore_notify) {
-                        window.server && window.server.send({
-                            type: "info",
-                            action: "gameStateChanged",
-                            arg: "pause"
-                        });
-                    }
                 } else if (event.state === Game.GameState.Game) {
                     self.messenger.hideMessage();
-                    if (!event.ignore_notify) {
-                        window.server && window.server.send({
-                            type: "info",
-                            action: "gameStateChanged",
-                            arg: "play"
-                        });
-                    }
                 }
             });
         },

@@ -119,31 +119,48 @@ function($, _, Class, signals, createjs, alertify, KeyCoder, LevelManager, GameL
 			});
 		},
 
-        changeState: function(state, ignore_notify) {
+        changeState: function(state, ignore_notify, ignore_send) {
             this.state = state;
-            this.gameStateChanged.dispatch({
-                state: this.state,
-                ignore_notify: ignore_notify
-            });
+            if (!ignore_notify) {
+                this.gameStateChanged.dispatch({
+                    state: this.state
+                });
+            }
+            if (!ignore_send) {
+                var arg = null;
+                switch (state) {
+                    case Game.GameState.Game:
+                        arg = "play";
+                        break;
+                    case Game.GameState.Pause:
+                        arg = "pause";
+                        break;
+                }
+                window.server && window.server.send({
+                    type: "info",
+                    action: "gameStateChanged",
+                    arg: arg
+                });
+            }
         },
 
-		stop: function(ignore_notify) {
-			this.changeState(Game.GameState.GameOver, ignore_notify);
+		stop: function(ignore_notify, ignore_send) {
+			this.changeState(Game.GameState.GameOver, ignore_notify, ignore_send);
             this.level._finish();
             return this.state;
 		},
 
-        pause: function(ignore_notify) {
+        pause: function(ignore_notify, ignore_send) {
             if (this.state != Game.GameState.Pause)
-                this.changeState(Game.GameState.Pause, ignore_notify);
+                this.changeState(Game.GameState.Pause, ignore_notify, ignore_send);
             else
-                this.changeState(Game.GameState.Game, ignore_notify);
+                this.changeState(Game.GameState.Game, ignore_notify, ignore_send);
 
             return this.state;
         },
 
-        continueGame: function(ignore_notify) {
-            this.changeState(Game.GameState.Game, ignore_notify);
+        continueGame: function(ignore_notify, ignore_send) {
+            this.changeState(Game.GameState.Game, ignore_notify, ignore_send);
             return this.state;
         },
 

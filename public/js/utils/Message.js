@@ -4,7 +4,7 @@ define([
     'tmpl/_message'
 ],
 function($, Class, msgTmpl) {
-    var MessageHelper = Class.$extend({
+    var Message = Class.$extend({
         __init__: function($parent) {
             this.msgTemplate = msgTmpl;
             this.$msgContainer = null;
@@ -19,7 +19,8 @@ function($, Class, msgTmpl) {
             this.buttonClass = 'message__controls__button';
             this.buttonHtml = '<div class="' + this.buttonClass +'">{0}</div>';
 
-            this.visible = false;
+            this.visibleMessage = false;
+            this.visibleDimmer = false;
         },
 
         _findElements: function(parent) {
@@ -108,6 +109,11 @@ function($, Class, msgTmpl) {
              *
              */
 
+            if (this.visibleMessage) {
+                console.warn('Another message is active');
+                return;
+            }
+
             callbackOnClose || (callbackOnClose = function() {});
             this._removeFromDOM();
 
@@ -134,7 +140,8 @@ function($, Class, msgTmpl) {
             this.$messageDimmer.show();
             this.$message.show();
 
-            this.visible = true;
+            this.visibleMessage = true;
+            this.visibleDimmer = true;
 
         },
 
@@ -142,12 +149,14 @@ function($, Class, msgTmpl) {
             this.$message && this.$message.hide();
             this._removeControls();
             this._hideControls();
-            if (!keepDimmer)
+            if (!keepDimmer) {
                 this.$messageDimmer && this.$messageDimmer.hide();
+                this.visibleDimmer = false;
+            }
             this._removeFromDOM(keepDimmer);
-            this.visible = false;
+            this.visibleMessage = false;
         }
     });
 
-    return MessageHelper;
+    return Message;
 });

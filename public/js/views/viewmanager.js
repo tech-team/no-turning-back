@@ -44,14 +44,15 @@ function(Backbone) {
             }
 
             if (!noConfirm) {
+                this.router.navigate(this.currentView.pageId);
                 var self = this;
                 this.currentView.confirm({
                     yes: function () {
                         self._closeOthers(viewToShow.pageId);
                         self._setCurrentViewActive(viewToShow);
+                        self.router.navigate(viewToShow.pageId);
                     },
                     no: function () {
-                        self.router.navigate(self.currentView.pageId);
                     }
                 });
             } else {
