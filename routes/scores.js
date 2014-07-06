@@ -37,13 +37,13 @@ var scoresRoute = function(db) {
         getFull: function (req, res) {
             retrieveScores(db, req.query.limit, {
                 success: function(s) {
-                    setTimeout(function() {
-                        res.end(JSON.stringify(s));
-                    }, 1000);
+//                    setTimeout(function() {
+                        res.send(s);
+//                    }, 1000);
 
                 },
                 error: function(err) {
-                    res.status(503).end(err);
+                    res.send(503, err);
                 }
             });
         },
@@ -52,17 +52,17 @@ var scoresRoute = function(db) {
             var newScore = req.body;
 
             if (!newScore || !newScore.name || !newScore.score || newScore.score && isNaN(parseInt(newScore.score, 10))) {
-                res.status(400).end();
+                res.send(400);
                 return;
             }
             newScore.score = parseInt(newScore.score, 10);
 
             saveScore(db, newScore, {
                 success: function(newScore) {
-                    res.end(JSON.stringify(newScore));
+                    res.send(newScore);
                 },
                 error: function(err) {
-                    res.status(503).end(err);
+                    res.send(503, err);
                 }
             });
         }

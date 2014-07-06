@@ -100,24 +100,24 @@ var levelsRoute = function(db) {
 
             retrieveLevel(db, name, {
                 success: function(levelData) {
-                    resp.end(JSON.stringify(levelData));
+                    resp.send(levelData);
                 },
                 error: function(msg) {
-                    resp.status(404).end(msg);
+                    resp.send(404, msg);
                 }
             });
         },
 
         addLevel: function (req, resp) {
             if (!req.body || !req.body.name || !req.body.data) {
-                resp.status(400).end("No data provided");
+                resp.send(400, "No data provided");
             }
 
             var levelName = req.body.name;
             var levelStr = req.body.data;
 
             var errorCallback = function(msg) {
-                resp.status(400).end(msg);
+                resp.send(404, msg);
             };
 
 
@@ -130,7 +130,7 @@ var levelsRoute = function(db) {
                     var levelsDir = path.join('public', 'levels');
                     fs.writeFile(path.join(levelsDir, levelName + '.json'), levelStr, function (err) {});
 
-                    resp.end(msg);
+                    resp.send(msg);
                 },
                 error: errorCallback
             });
@@ -140,15 +140,15 @@ var levelsRoute = function(db) {
             var name = req.query.name;
 
             if (!name) {
-                resp.status(400).end("Level name not provided");
+                resp.send(400, "Level name not provided");
             }
 
             retrieveLevel(db, name, {
                 success: function() {
-                    resp.end(String(true));
+                    resp.send(true);
                 },
                 error: function() {
-                    resp.end(String(false));
+                    resp.send(false);
                 }
             });
         },
@@ -156,10 +156,10 @@ var levelsRoute = function(db) {
         getCampaignsNames: function(req, resp) {
             retrieveCampaigns(db, {
                 success: function(data) {
-                    resp.end(JSON.stringify(data));
+                    resp.send(data);
                 },
                 error: function(err) {
-                    resp.status(400).end(err);
+                    resp.send(400, err);
                 }
             });
         },
@@ -168,10 +168,10 @@ var levelsRoute = function(db) {
             var campaignName = req.params.name;
             retrieveCampaignLevelNames(db, campaignName, {
                 success: function(levels) {
-                    resp.end(JSON.stringify(levels));
+                    resp.send(levels);
                 },
                 error: function(err) {
-                    resp.status(400).end(err);
+                    resp.send(400, err);
                 }
             });
         }

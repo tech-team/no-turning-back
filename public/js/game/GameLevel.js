@@ -126,7 +126,7 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             });
 
             this.keyCoder.addEventListener("keyup", GameLevel.Keys.ToggleSound, ResourceManager.toggleSound.bind(ResourceManager));
-            this.keyCoder.addEventListener("keypress", GameLevel.Keys.Shoot, this.playerShootingHandle.bind(this));
+            this.keyCoder.addEventListener("keyup", GameLevel.Keys.Shoot, this.playerShootingHandle.bind(this));
 
             if (DEBUG) {
                 this.keyCoder.addEventListener("keyup", GameLevel.Keys.Debug.Finish, this.finish.bind(this));
