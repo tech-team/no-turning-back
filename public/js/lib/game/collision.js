@@ -117,13 +117,13 @@ this.ndgmr = this.ndgmr || {};
 
         var rect1 = bitmap1 instanceof createjs.Bitmap
             ? {width: bitmap1.image.width, height: bitmap1.image.height}
-            : bitmap1.spriteSheet.getFrame(bitmap1.currentFrame).rect;
+            : bitmap1.spriteSheet.getFrameBounds(bitmap1.currentFrame);
         var rect2 = bitmap2 instanceof createjs.Bitmap
             ? {width: bitmap2.image.width, height: bitmap2.image.height}
-            : bitmap2.spriteSheet.getFrame(bitmap2.currentFrame).rect;
+            : bitmap2.spriteSheet.getFrameBounds(bitmap2.currentFrame);
 
-        var rotatedRect1 = _rotateRect(rect1, bitmap1.rotation);
-        var rotatedRect2 = _rotateRect(rect2, bitmap2.rotation);
+        var rotatedRect1 = rect1;//_rotateRect(rect1, bitmap1.rotation);
+        var rotatedRect2 = rect2;//_rotateRect(rect2, bitmap2.rotation);
         
         return (Math.abs(base2.x - base1.x) < rotatedRect2.width  * Math.abs(bitmap2.scaleX) + rotatedRect1.width  * Math.abs(bitmap1.scaleX)
              && Math.abs(base2.y - base1.y) < rotatedRect2.height * Math.abs(bitmap2.scaleY) + rotatedRect1.height * Math.abs(bitmap2.scaleY));
