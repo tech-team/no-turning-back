@@ -83,7 +83,7 @@ app.get('/levels/campaigns/:name', levels.getCampaignLevels);
 
 var server = http.createServer(app);
 
-require('./server/server').init(server);
+require('./socket_server/jserver').init(server);
 
 server.listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));

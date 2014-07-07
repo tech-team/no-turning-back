@@ -1,6 +1,4 @@
-<!-- Currently unused, see joystick.xml -->
-<fest:template xmlns:fest="http://fest.mail.ru"
-               context_name="json">
+<fest:template xmlns:fest="http://fest.mail.ru" ontext_name="json">
     <div class="canvasHolder">
         <canvas id="canvas">You have a very old browser, dude.</canvas>
     </div>

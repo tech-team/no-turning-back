@@ -1,19 +1,17 @@
 var utils = require('./utils.js');
 
 var mongodb_helper = {
+    /**
+     * @param connection_info Connection Info structure
+     * @param {String} [connection_info.host='127.0.0.1']
+     * @param {Number} [connection_info.port=27017]
+     * @param {String} connection_info.user Mongodb user
+     * @param {String} connection_info.password Mongodb password
+     * @param {String} connection_info.db Database to connect
+     * @param {String[]} connection_info.collections Array of required collections
+     * @returns {*} mongodb instance or null if required parameters not valid
+     */
     connect: function(connection_info) {
-        /*
-         * connection_info - connection info structure
-         *  -> host; default = 127.0.0.1
-         *  -> port; default = 27017
-         *  -> user;
-         *  -> password;
-         *  -> db;
-         *  -> collections;
-         *
-         *  Returns: mongodb instance or null if required parameters not valid
-         */
-
         if (utils.is_invalid(connection_info)
             || utils.is_invalid(connection_info.user)
             || utils.is_invalid(connection_info.password)

@@ -1,5 +1,4 @@
-<fest:template xmlns:fest="http://fest.mail.ru"
-    context_name="json">
+<fest:template xmlns:fest="http://fest.mail.ru" context_name="json">
     <div id="editor-scene" class="content-wrapper game-wrapper editor-scene">
         <a href="#main" class="back-button back-button_cornered">
             <div class="left-arrow-wrapper"><div class="left-arrow"></div></div>

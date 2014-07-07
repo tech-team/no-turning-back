@@ -1,33 +1,33 @@
 <fest:template xmlns:fest="http://fest.mail.ru" context_name="json">
-<fest:doctype>html</fest:doctype>
-<html>
-	<head>
-		<meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-		<title>
-			<fest:value>json.title</fest:value>
-		</title>
-        <link rel="stylesheet" type="text/css" href="css/min/joystick.min.css" />
-	</head>
-	<body>
-        <div id="pages" class="pages"></div>
-        <br />
+    <fest:doctype>html</fest:doctype>
+    <html>
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <title>
+                <fest:value>json.title</fest:value>
+            </title>
+            <link rel="stylesheet" type="text/css" href="css/min/joystick.min.css" />
+        </head>
+        <body>
+            <div id="pages" class="pages"></div>
+            <br />
 
-        <fest:if test="json.development">
-            <script data-main="js/main_j" src="js/lib/require.js"></script>
-            <script src="http://localhost:35729/livereload.js?snipver=1"></script>
-        </fest:if>
-        <fest:if test="!json.development">
-            <script>
-                console.time('load');
-            </script>
-            <script src="js/joystick/build/build.min.js"></script>
-            <script>
-                require(['main_j'], function(){
+            <fest:if test="json.development">
+                <script data-main="js/main_j" src="js/lib/require.js"></script>
+                <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+            </fest:if>
+            <fest:if test="!json.development">
+                <script>
+                    console.time('load');
+                </script>
+                <script src="js/joystick/build/build.min.js"></script>
+                <script>
+                    require(['main_j'], function(){
                     console.timeEnd('load');
-                });
-            </script>
-        </fest:if>
-	</body>
-</html>
+                    });
+                </script>
+            </fest:if>
+        </body>
+    </html>
 </fest:template>

@@ -1,5 +1,4 @@
-<fest:template xmlns:fest="http://fest.mail.ru"
-               context_name="json">
+<fest:template xmlns:fest="http://fest.mail.ru" context_name="json">
     <div class="game-load-progress">
         <div class="game-load-progress__wrapper">
             <h2 class="game-load-progress__wrapper__header">Loading resources...</h2>

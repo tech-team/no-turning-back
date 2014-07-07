@@ -1,29 +1,29 @@
-<fest:template xmlns:fest="http://fest.mail.ru"
-    context_name="json">
+<fest:template xmlns:fest="http://fest.mail.ru" context_name="json">
     <div class="content-wrapper">
-	    <div class="content">
-	    	<h1 class="content__h1">No Turning Back</h1>
-	    	<h2 class="content__h2">Main Menu</h2>
-	    	<div class="mainmenu-wrapper">
-		    	<ul class="mainmenu">
-					<li class="mainmenu__item"><a href="#game">Start Game</a></li>
-                    <li class="mainmenu__item"><a href="#editor">Editor</a></li>
+        <div class="content">
+            <h1 class="content__h1">No Turning Back</h1>
+            <h2 class="content__h2">Main Menu</h2>
+            <div class="mainmenu-wrapper">
+                <ul class="mainmenu">
+                    <li class="mainmenu__item"><a href="#game">Start Game</a></li>
+                    <li class="mainmenu__item"><a href="/joystick">Joystick</a></li>
                     <li class="mainmenu__item"><a href="#scoreboard">Scoreboard</a></li>
-		    	</ul>
-	    	</div>  
+                    <li class="mainmenu__item"><a href="#editor">Editor</a></li>
+                </ul>
+            </div>
 
-		</div>
+        </div>
 
-		<footer class="page-footer">
-    		<div class="social-buttons hidden">
-    			<div class="social-button"><a href="https://vk.com/" target="_blank">vk</a></div>
-    			<div class="social-button"><a href="https://www.facebook.com" target="_blank">facebook</a></div>
-    			<div class="social-button"><a href="http://twitter.com" target="_blank">twitter</a></div>
-    		</div>
-    		<div class="github-wrapper">
-				<a href="https://github.com/tech-team/no-turning-back" class="github" target="_blank">See us on GitHub</a>
-			</div>
-    	</footer>
-		
-	</div>
+        <footer class="page-footer">
+            <div class="social-buttons hidden">
+                <div class="social-button"><a href="https://vk.com/" target="_blank">vk</a></div>
+                <div class="social-button"><a href="https://www.facebook.com" target="_blank">facebook</a></div>
+                <div class="social-button"><a href="http://twitter.com" target="_blank">twitter</a></div>
+            </div>
+            <div class="github-wrapper">
+                <a href="https://github.com/tech-team/no-turning-back" class="github" target="_blank">See us on GitHub</a>
+            </div>
+        </footer>
+
+    </div>
 </fest:template>
