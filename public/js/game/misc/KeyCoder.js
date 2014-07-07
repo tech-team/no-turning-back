@@ -47,13 +47,9 @@ function(Class, $, _) {
             _.each(_.keys(this.keyEventsCallbacks), function(keyEvent) {
                 self.listener.on(keyEvent, self.keyEventsCallbacks[keyEvent]);
             });
-
-//            this.listener.keydown();
-//            this.listener.keyup();
-//            this.listener.keypress();
 		},
 
-		getKeys: function() {
+        getKeys: function() {
 			return {
 				keys: this.keys
 			};
@@ -81,6 +77,25 @@ function(Class, $, _) {
         },
 
 		__classvars__: {
+            //TODO: haha neozhidali? nemnogo staticheskih funkcii
+            setStage: function(stage) {
+                this.stage = stage;
+
+                this.mousePos = {x: 0, y: 0};
+                this.stage.on("stagemousemove", this.onMouseMove.bind(this));
+            },
+
+            onMouseMove: function(event) {
+                this.mousePos = {
+                    x: event.stageX,
+                    y: event.stageY
+                };
+            },
+
+            getMousePos: function() {
+                return this.mousePos;
+            },
+
             SHIFT: 16,
             CTRL: 17,
             SPACE: 32,

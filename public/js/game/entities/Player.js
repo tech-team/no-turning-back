@@ -4,9 +4,10 @@ define([
     'game/ResourceManager',
     'game/misc/UntilTimer',
     'game/misc/Messenger',
+    'game/misc/KeyCoder',
     'game/weapons/Weapons'
 ],
-function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, Weapons) {
+function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, KeyCoder, Weapons) {
 	var Player = AliveObject.$extend({
 		__init__: function(dispObj) {
             this.$super(dispObj);
@@ -202,7 +203,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, Weapons) 
             this.$class.Movement = keys;
         },
 
-		update: function(event, collisionObjects) {
+		update: function(event, mousePos, collisionObjects) {
             if (this.shootCooldown > 0) {
                 --this.shootCooldown;
             }
@@ -217,41 +218,61 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, Weapons) 
                 this._setHealth(healthLeft < Player.MaxHealth ? Player.MaxHealth : healthLeft);
             }
 
-//            var phi = 0;
-//            var speedModifier = 2;
-//            if (event.keys[Player.Movement.Boost]) { speedModifier = 4; }
-//
-//            if (event.keys[Player.Movement.Forward] && event.keys[Player.Movement.Back]) {
-//                phi = null;
-//            } else {
-//                if (event.keys[Player.Movement.Left] && event.keys[Player.Movement.Right) {
-//                    if (event.keys[Player.Movement.Forward]) {
-//                        phi = 90;
-//                    } else if (event.keys[Player.Movement.Back]) {
-//                        phi = 180 + 90;
-//                    }
-//                }
-//
-//                if (event.keys[Player.Movement.Forward]) {
-//                    if (event.keys[Player.Movement.Right]) {
-//                        phi = 45;
-//                    } else if (event.keys[Player.Movement.Left]) {
-//                        phi = 90 + 45;
-//                    } else if (!event.keys[Player.Movement.Back]) {
-//                        phi = 90;
-//                    }
-//                }
-//                if (event.keys[Player.Movement.Back]) {
-//                    if (event.keys[Player.Movement.Right]) {
-//                        phi = 360 - 45;
-//                    } else if (event.keys[Player.Movement.Left]) {
-//                        phi = 180 + 45;
-//                    } else if (!event.keys[Player.Movement.Forward]) {
-//                        phi = 180 + 90;
-//                    }
-//                }
-//            }
+            this.inputHandler(event, mousePos);
+        },
 
+        _rotateRect: function(rect, deg) {
+            var rad = deg * Math.PI / 180;
+
+            return {
+                x: rect.x * Math.cos(rad) - rect.y * Math.sin(rad),
+                y: rect.x * Math.sin(rad) + rect.y * Math.cos(rad)
+            };
+        },
+        
+        inputHandler: function(event, mousePos) {
+            //mouse, rotation handle
+            this.dispObj.rotation = 90 - 180 / Math.PI *
+                Math.atan2(
+                    mousePos.x - this.dispObj.x,
+                    mousePos.y - this.dispObj.y
+                );
+            //TODO: handle collisions, or do it in the end of function once
+
+            //keyboard, movement handle
+            var r = this.dispObj.rotation;
+            var rect = null;
+
+            var speedModifier = Player.SpeedModifier.Normal;
+            if (event.keys[Player.Movement.Boost])
+                speedModifier = Player.SpeedModifier.Sprint;
+
+            var speed = {
+                x: 0,
+                y: 0
+            };
+
+            if (event.keys[Player.Movement.Forward])
+                speed.x += speedModifier;
+
+            if (event.keys[Player.Movement.Back])
+                speed.x -= speedModifier;
+
+            if (event.keys[Player.Movement.Left])
+                speed.y -= speedModifier / 2; //slowdown strafes
+
+            if (event.keys[Player.Movement.Right])
+                speed.y += speedModifier / 2; //slowdown strafes
+
+            if (speed.x != 0 || speed.y != 0) {
+                rect = this._rotateRect({x: speed.x, y: speed.y}, r);
+                this.dispObj.x += rect.x;
+                this.dispObj.y += rect.y;
+                //TODO: handle collisions
+            }
+        },
+
+        oldKeyFunc: function() {
             var speedModifier = this.$class.SpeedModifier.Normal;
             var reboundModifier = 1.1;
             var offsetRotation = 4;

@@ -25,6 +25,8 @@ function($, _, Class, signals, createjs, alertify, KeyCoder, LevelManager, GameL
 			this.height = canvas.height;
 			this.stage = new createjs.Stage(this.canvas);
             Messenger.setStage(this.stage);
+            KeyCoder.setStage(this.stage);
+
 			this.ticker = createjs.Ticker;
 			this.levelManager = new LevelManager(this.onLevelLoaded.bind(this));
 			this.level = null;

@@ -803,7 +803,12 @@ function(Class, _, signals, easeljs, StageManager, ResourceManager, DefaultObjec
             this.bulletsCollisionsHandle();
             this.zombiesUpdate(event);
             this.zombiesDeathHandle();
-            this.player.update(event, this.collisionObjects);
+
+            //TODO: could be easely changed to non-static function here, but setStage() now being called just once in a Game... we could pass keyCoder instance from Game to GL thought, so all the mouse-api-functions could be made non-static, by the way it is very very very long comment
+            var mousePos = KeyCoder.getMousePos();
+            mousePos = this.mainContainer.globalToLocal(mousePos.x, mousePos.y);
+
+            this.player.update(event, mousePos, this.collisionObjects);
 
             if (this.player.health() <= 0 && !this.player.dead) {
                 this.player.dead = true;
