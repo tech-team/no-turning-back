@@ -1,9 +1,8 @@
 define([
     'views/baseView',
     'tmpl_j/controls',
-    'joystick/Controller',
-    'utils/Message'
-], function(BaseView, tmpl, Controller, Messenger) {
+    'joystick/Controller'
+], function(BaseView, tmpl, Controller) {
     var ControlsView = BaseView.extend({
 
         template: tmpl,
@@ -51,7 +50,7 @@ define([
 
             this.$el.show();
             this.hidden = false;
-            this.confirmDisabled = false;
+            this.enableConfirm();
         },
 
         hide: function () {
@@ -81,7 +80,7 @@ define([
             var controls = [
                 {
                     name: "Yes",
-                    action: function(event) {
+                    action: function() {
                         window.server.forceReconnect();
                         self.messenger.hideMessage();
                         callbacks.yes();
@@ -89,7 +88,7 @@ define([
                 },
                 {
                     name: "No",
-                    action: function(event) {
+                    action: function() {
                         self.messenger.hideMessage();
                         callbacks.no();
                     }
@@ -158,7 +157,6 @@ define([
         },
 
         onDisconnect: function() {
-            var self = this;
             this.messenger.showMessage("You were disconnected. Try reloading.", true);
         },
 

@@ -203,8 +203,12 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                 self.triggerGamePause();
             });
 
-
             this.$reconnectButton.on('click', function() {
+                // $(this).toggleClass("rotated-thing");
+                // var $rb = $(this);
+                // $rb.removeClass('rotated-thing');
+                // setTimeout(function(){$rb.addClass('rotated-thing')},0);
+
                 self.$loadingIndicator.show();
                 self.$mobileToken.hide();
                 window.server && window.server.forceReconnect();
@@ -359,17 +363,15 @@ function(BaseView, checker, tmpl, Game, GameFinishedView, CssUtils, KeyCoder, Me
                 return;
             }
 
-            var horizontalMargin = 10;
-            var verticalMargin = 10;
             var self = this;
             $(window).resize(function() {
-                var width = $(this).width();// - 2 * horizontalMargin;
-                var height = $(this).height();// - 2 * verticalMargin;
+                var width = $(this).width();
+                var height = $(this).height();
                 var cssSizes = {
                     'width': width + "px",
                     'height' : height + "px"
                 };
-                self.scene.css(cssSizes);//.css({'margin-top': verticalMargin});
+                self.scene.css(cssSizes);
                 self.canvas.width = width;
                 self.canvas.height = height;
 

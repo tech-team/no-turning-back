@@ -3,9 +3,8 @@ define([
    'tmpl_j/lobby',
    'utils/BrowserCheck',
    'device_normalizer',
-   'joystick/JConnector',
-   'utils/Message'
-], function(BaseView, tmpl, checker, device_normalizer, JConnector, Message) {
+   'joystick/JConnector'
+], function(BaseView, tmpl, checker, device_normalizer, JConnector) {
     var LobbyView = BaseView.extend({
 
         template: tmpl,
@@ -53,7 +52,7 @@ define([
             this.messenger = messenger;
         },
 
-        setJConnector: function(jConnector, noRecreate) {
+        setJConnector: function(jConnector) {
             var callbacks = {
                 onStart: this.onJStart.bind(this),
                 onMessage: this.onMessage.bind(this),
@@ -76,13 +75,9 @@ define([
 
         createWindowEvents: function() {
             var self = this;
-            window.addEventListener("orientationchange", function (e) {
+            window.addEventListener("orientationchange", function () {
                 self.checkOrientation();
             }, false);
-        },
-
-        removeWindowEvents: function() {
-            window.removeEventListener("orientationchange");
         },
 
         createEvents: function() {

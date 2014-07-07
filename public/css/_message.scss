@@ -1,3 +1,5 @@
+$dimmer-opacity: 0.8;
+
 .message-dimmer {
   display: none;
   width: 100%;
@@ -23,9 +25,7 @@ $controlsHeight: 40px;
   position: absolute;
   top: 50%;
   left: 50%;
-  -webkit-transform: translate($xOffset, $yOffset);
-  -ms-transform: translate($xOffset, $yOffset);
-  transform: translate($xOffset, $yOffset);
+  @include transform-translate($xOffset, $yOffset);
 
 }
 
@@ -50,10 +50,7 @@ $borderRadius: 20px;
       position: relative;
 
       top: 50%;
-      -webkit-transform: translateY(-50%);
-      -ms-transform: translateY(-50%);
-      transform: translateY(-50%);
-
+      @include transform-translateY(-50%);
     }
   };
 
@@ -67,8 +64,7 @@ $borderRadius: 20px;
 
     &__button {
       display: inline-block;
-      margin: 0 auto;
-      margin-right: 20px;
+      margin: 0 20px 0 auto;
       width: 70px;
       height: 30px;
       line-height: 30px;

@@ -80,10 +80,10 @@ define([
                 var self = this;
                 var gfx = "/res/gfx/large/";
 
-                var stageSize = {
-                    width: self.stage.canvas.width,
-                    height: self.stage.canvas.height
-                };
+//                var stageSize = {
+//                    width: self.stage.canvas.width,
+//                    height: self.stage.canvas.height
+//                };
 
                 var textShadow = new createjs.Shadow("#333333", 0, 0, 2);
 
@@ -301,8 +301,6 @@ define([
             },
 
             setAvailableWeapons: function(weapons) {
-                var self = this;
-
                 _.each(this.weapons, function(w) {
                     w.visible = false;
                 });
@@ -352,7 +350,7 @@ define([
                     //target.parent.addChild(target);
                     self.mover.offset = {x:self.mover.x-evt.stageX, y:self.mover.y-evt.stageY};
 
-                    evt.on("mouseup", function(evt) {
+                    evt.on("mouseup", function() {
                         self.mover.x = self.leftPad.x;
                         self.mover.y = self.leftPad.y;
                         self.sendMoving();
@@ -428,7 +426,6 @@ define([
                     setTimeout(function() {
                         self.usePad.graphics.clear().beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.usePadWidth, Controller.SIZE.usePadHeight, 10).endFill();
                     }, 400);
-;
 
                     window.server.send({
                         type: "game",
@@ -437,7 +434,7 @@ define([
                     });
                 });
 
-                this.reconnectPad.on("mousedown", function(evt) {
+                this.reconnectPad.on("mousedown", function() {
                     self.reconnectPad.graphics.beginFill(Controller.PRESSCOLOR.reconnect).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
 
                     if (navigator.vibrate) {
@@ -447,7 +444,6 @@ define([
                     setTimeout(function() {
                         self.reconnectPad.graphics.beginFill(Controller.COLOR.pad).drawRoundRect(0, 0, Controller.SIZE.reconnectPadWidth, Controller.SIZE.reconnectPadHeight, 10).endFill();
                     }, 400);
-;
 
                     window.location = '#lobby';
                 });
@@ -495,7 +491,7 @@ define([
                 ));
 
                 var weaponName = Controller.WEAPON[id];
-                var weapon = this.weapons[weaponName];
+//                var weapon = this.weapons[weaponName];
 
                 if (this.currentWeapon.weaponName !== weaponName) {
                     this.selectWeapon(weaponName, true);

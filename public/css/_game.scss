@@ -1,25 +1,17 @@
 /********** game **********/
-
 .game-wrapper {
   margin-top: 0;
   background-color: black;
 }
 
 .game {
-	margin: 0;
-	padding: 0;
-
-	canvas {
-	}
+  margin: 0;
+  padding: 0;
 }
 
 #game-field {
   display: none;
 }
-
-$dimmer-opacity: 0.7;
-@import "_message";
-
 
 
 .white-background {
@@ -81,11 +73,15 @@ $icon-height: 40px;
   }
 
   &__token {
-    margin-top: 25px;
+    margin-top: 30px;
     font-size: 40px;
     text-transform: uppercase;
     letter-spacing: 10px;
   }
+}
+
+.rotated-thing {
+
 }
 
 .reconnect-button {
@@ -93,20 +89,23 @@ $icon-height: 40px;
   height: 50px;
   position: absolute;
   right: 30px;
-  bottom: 55px;
+  bottom: 69px;
   cursor: pointer;
+
+  @include transition(all, 0.3s, ease-in);
+
+  // -webkit-animation: spin 1s ease-in infinite;
+  // -webkit-animation-play-state: paused;
 
   &__image {
 
   }
 }
 
+
 .token-loading {
   display: block;
   position: relative;
   left: 50%;
-  -webkit-transform: translateX(-50%);
-  -moz-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);
+  @include transform-translateX(-50%);
 }

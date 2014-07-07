@@ -1,0 +1,48 @@
+@mixin transform-rotate($angle) {
+  -webkit-transform: rotate($angle);
+     -moz-transform: rotate($angle);
+       -o-transform: rotate($angle);
+      -ms-transform: rotate($angle);
+          transform: rotate($angle);
+}
+
+@mixin transform-translate($x, $y) {
+  -webkit-transform: translate($x, $y);
+     -moz-transform: translate($x, $y);
+       -o-transform: translate($x, $y);
+      -ms-transform: translate($x, $y);
+          transform: translate($x, $y);
+}
+
+@mixin transform-translateX($x) {
+  -webkit-transform: translateX($x);
+     -moz-transform: translateX($x);
+       -o-transform: translateX($x);
+      -ms-transform: translateX($x);
+          transform: translateX($x);
+}
+
+@mixin transform-translateY($y) {
+  -webkit-transform: translateY($y);
+     -moz-transform: translateY($y);
+       -o-transform: translateY($y);
+      -ms-transform: translateY($y);
+          transform: translateY($y);
+}
+
+
+@mixin transition($property, $duration, $timing-function) {
+  -webkit-transition: $property $duration $timing-function;
+     -moz-transition: $property $duration $timing-function;
+       -o-transition: $property $duration $timing-function;
+      -ms-transition: $property $duration $timing-function;
+          transition: $property $duration $timing-function;
+}
+
+@mixin user-select($prop) {
+  -webkit-user-select: $prop;
+   -khtml-user-select: $prop;
+     -moz-user-select: $prop;
+      -ms-user-select: $prop;
+          user-select: $prop;
+}

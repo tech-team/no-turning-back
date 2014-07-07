@@ -8,6 +8,9 @@
 		</title>
 		<meta name="viewport" content="user-scalable=no, initial-scale=1.0" />
 		<link rel="stylesheet" type="text/css" href="css/min/styles.min.css" />
+		<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="css/min/iestyles.min.css" />
+		<![endif]-->
 	</head>
 	<body>
 		<div id="pages" class="pages"></div>

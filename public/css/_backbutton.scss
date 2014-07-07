@@ -1,46 +1,43 @@
 /********** back button **********/
 
 .back-button {
-	display: block;
-	width: 60px;
-	height: 40px;
-	line-height: 40px;
-	vertical-align: middle;
-	padding: 0 5px;
-	text-decoration: none;
-	color: black;
-	font-size: 20px;
-	background-color: #CCCCCC;
+  display: block;
+  width: 60px;
+  height: 40px;
+  line-height: 40px;
+  vertical-align: middle;
+  padding: 0 5px;
+  text-decoration: none;
+  color: black;
+  font-size: 20px;
+  background-color: #CCCCCC;
 
-	&:hover {
-		background-color: $orange-color;
-		cursor: pointer;
-	}
+  &:hover {
+    background-color: $orange-color;
+    cursor: pointer;
+  }
 
-	&__caption {
-		display: inline-block;
-	}
+  &__caption {
+    display: inline-block;
+  }
 
-	&_cornered {
-		position: absolute;
-		top: 5px;
-		left: 5px;
-	}
+  &_cornered {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+  }
 }
 
 .left-arrow-wrapper {
-	display: inline-block;
-	margin-right: 3px;
-	margin-top: -3px;
-	margin-left: -6px;
+  display: inline-block;
+  margin: -3px 3px 0 -6px;
 }
 
 .left-arrow {
-	width: 0;
-	height: 0;
-    border-style: solid;
-    border-width: 6px;
-    border-bottom-color: transparent;
-    border-top-color: transparent;
-    border-left-color: transparent;
+  width: 0;
+  height: 0;
+  border: 6px solid;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
 }
