@@ -218,7 +218,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, KeyCoder,
                 this._setHealth(healthLeft < Player.MaxHealth ? Player.MaxHealth : healthLeft);
             }
 
-            this.inputHandler(event, mousePos);
+            this.inputHandler(event, mousePos, collisionObjects);
         },
 
         _rotateRect: function(rect, deg) {
@@ -230,22 +230,32 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, KeyCoder,
             };
         },
         
-        inputHandler: function(event, mousePos) {
+        inputHandler: function(event, mousePos, collisionObjects) {
+            var self = this;
+
             //mouse, rotation handle
-            this.dispObj.rotation = 90 - 180 / Math.PI *
+            var oldRotation = this.dispObj.rotation;
+            var newRotation = 90 - 180 / Math.PI *
                 Math.atan2(
                     mousePos.x - this.dispObj.x,
                     mousePos.y - this.dispObj.y
                 );
-            //TODO: handle collisions, or do it in the end of function once
+
+            if (Math.abs(newRotation - this.dispObj.rotation) > 1)
+            {
+                this.dispObj.rotation = newRotation;
+
+                if (_.any(collisionObjects, function(obj) {
+                    return self.collidesWith(obj);
+                })) {
+                    this.dispObj.rotation = oldRotation;
+                }
+            }
 
             //keyboard, movement handle
-            var r = this.dispObj.rotation;
-            var rect = null;
-
             var speedModifier = Player.SpeedModifier.Normal;
             if (event.keys[Player.Movement.Boost])
-                speedModifier = Player.SpeedModifier.Sprint;
+                speedModifier = Player.SpeedModifier.Normal + _.random(0, Player.SpeedModifier.Sprint); //random makes it possible to runaway after zombie attack
 
             var speed = {
                 x: 0,
@@ -265,10 +275,21 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, KeyCoder,
                 speed.y += speedModifier / 2; //slowdown strafes
 
             if (speed.x != 0 || speed.y != 0) {
-                rect = this._rotateRect({x: speed.x, y: speed.y}, r);
+                var r = this.dispObj.rotation;
+                var rect = this._rotateRect({x: speed.x, y: speed.y}, r);
+
+                var oldX = this.dispObj.x;
+                var oldY = this.dispObj.y;
+
                 this.dispObj.x += rect.x;
                 this.dispObj.y += rect.y;
-                //TODO: handle collisions
+
+                if (_.any(collisionObjects, function(obj) {
+                    return self.collidesWith(obj);
+                })) {
+                    this.dispObj.x = oldX;
+                    this.dispObj.y = oldY;
+                }
             }
         },
 

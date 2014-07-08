@@ -18,6 +18,7 @@ define([
 
                 this.currentWaypoint = 0;
                 this.canAttack = true;
+                this.canMove = true;
 
                 this.justFired = false;
             },
@@ -29,7 +30,7 @@ define([
                 DefaultFollowDistance: 150,
                 DefaultSpeed: 2,
                 DefaultDamage: 5,
-                Reach: 30,
+                Reach: 40,
                 DefaultAttackInterval: 1000,
 
                 FireDelayModifier: {
@@ -84,22 +85,33 @@ define([
             },
 
             shoot: function(level, targets) {
-                this.justFired = false;
-                if (targets)
-                    return this.weapons[this.currentWeapon].shoot(this, targets);
-                else
-                    return this.weapons[this.currentWeapon].shoot(Zombie.EntityName, this, level);
-            },
+                var self = this;
 
+                this.justFired = false;
+
+                var shot = false;
+                if (targets)
+                    shot = this.weapons[this.currentWeapon].shoot(this, targets);
+                else
+                    shot = this.weapons[this.currentWeapon].shoot(Zombie.EntityName, this, level);
+
+                //this is optional thing
+                if (shot) {
+                   this.canMove = false;
+                   setTimeout(function() {
+                       self.canMove = true;
+                   }, 900);
+                }
+
+                return shot;
+            },
 
             damage: function(howMuch) {
                 this.health -= howMuch;
             },
 
-
-
             update: function(event, player, collisionObjects) {
-
+                var self = this;
                 var epsilon = 5, offsetX = 0, offsetY = 0;
 
                 if (this.target == null) {
@@ -119,12 +131,23 @@ define([
                 var vectorToPlayerDistance = vectorToPlayer.distance();
                 var angle = vectorsToWaypoint.angle();
 
-                this.dispObj.rotation = (180 / Math.PI) * angle;
+                var oldRotation = this.dispObj.rotation;
+                var newRotation = (180 / Math.PI) * angle;
+
+                if (Math.abs(newRotation - oldRotation) > 1) {
+                    this.dispObj.rotation = newRotation;
+
+                    //check collisions
+                    if (_.any(collisionObjects, function(obj) {
+                        return obj != self.dispObj && self.collidesWith(obj);
+                    })) {
+                        this.dispObj.rotation = oldRotation;
+                    }
+                }
 
                 if (vectorToPlayerDistance < this.followDistance()) {
                     this.target = player.dispObj;
                     if (this.canAttack) {
-                        var self = this;
                         var delay = null;
 
                         this.justFired = true;
@@ -150,7 +173,10 @@ define([
                     this.target = this.dispObj;
                 }
 
-                if (vectorToPlayerDistance > Zombie.Reach) {
+                if (vectorToPlayerDistance > Zombie.Reach && this.canMove) {
+                    var oldX = this.dispObj.x;
+                    var oldY = this.dispObj.y;
+
                     if (vectorsToWaypoint.x != 0) {
                         offsetX = this.speed() * Math.cos(angle);
                         this.dispObj.x += offsetX;
@@ -159,11 +185,13 @@ define([
                         offsetY = this.speed() * Math.sin(angle);
                         this.dispObj.y += offsetY;
                     }
-                    for (var i = 0; i < collisionObjects.length; ++i) {
-                        if (this.collidesWith(collisionObjects[i]) && collisionObjects[i] != this.dispObj) {
-                            this.dispObj.x -= offsetX;
-                            this.dispObj.y -= offsetY;
-                        }
+
+                    //check collisions
+                    if (_.any(collisionObjects, function(obj) {
+                        return obj != self.dispObj && self.collidesWith(obj);
+                    })) {
+                        this.dispObj.x = oldX;
+                        this.dispObj.y = oldY;
                     }
                 }
 
@@ -179,9 +207,6 @@ define([
                         this.target = this.waypoints()[this.currentWaypoint];
                     }
                 }
-
-
-
             }
         });
 
