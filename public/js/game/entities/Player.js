@@ -255,7 +255,7 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, KeyCoder,
             //keyboard, movement handle
             var speedModifier = Player.SpeedModifier.Normal;
             if (event.keys[Player.Movement.Boost])
-                speedModifier = Player.SpeedModifier.Normal + _.random(0, Player.SpeedModifier.Sprint); //random makes it possible to runaway after zombie attack
+                speedModifier = Player.SpeedModifier.Sprint;// + _.random(0, Player.SpeedModifier.Sprint); //random makes it possible to runaway after zombie attack
 
             var speed = {
                 x: 0,
@@ -269,10 +269,10 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, KeyCoder,
                 speed.x -= speedModifier;
 
             if (event.keys[Player.Movement.Left])
-                speed.y -= speedModifier / 2; //slowdown strafes
+                speed.y -= speedModifier; //slowdown strafes
 
             if (event.keys[Player.Movement.Right])
-                speed.y += speedModifier / 2; //slowdown strafes
+                speed.y += speedModifier; //slowdown strafes
 
             if (speed.x != 0 || speed.y != 0) {
                 var r = this.dispObj.rotation;
@@ -281,8 +281,8 @@ function(AliveObject, signals, ResourceManager, UntilTimer, Messenger, KeyCoder,
                 var oldX = this.dispObj.x;
                 var oldY = this.dispObj.y;
 
-                this.dispObj.x += rect.x;
-                this.dispObj.y += rect.y;
+                this.dispObj.x += speed.y;
+                this.dispObj.y += -speed.x;
 
                 if (_.any(collisionObjects, function(obj) {
                     return self.collidesWith(obj);
