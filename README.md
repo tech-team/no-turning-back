@@ -1,6 +1,8 @@
 No Turning Back
 =============
-#####HTML5 + JS game.
+#####HTML5 + JS game featuring inbuilt level editor and virtual smartphone gamepad via WiFi.
+![banner](https://raw.githubusercontent.com/tech-team/no-turning-back/master/banner.png)
+
 > Used technologies and libraries:
   * [Backbone.js](http://backbonejs.org/)
   * [easel.js](http://www.createjs.com/#!/EaselJS)
